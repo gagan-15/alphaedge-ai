@@ -3,9 +3,25 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.0.1
+> **Current Version:** v0.0.2
 
 ---
+
+# Project Metrics
+
+Current Version: v0.0.2
+
+Total Sprints Completed: 2
+
+Python Files: 3
+
+Services: 1
+
+Providers: 1
+
+Engines Completed: 1
+
+Git Commits: 2
 
 # Vision
 
@@ -30,19 +46,29 @@ Build a commercial SaaS platform capable of serving thousands of users with feat
 
 ---
 
+
+# Sprint History
+
+| Sprint | Status | Description |
+|---------|--------|-------------|
+| Sprint 1 | ✅ | Project Foundation |
+| Sprint 2.1 | ✅ | Market Data Engine |
+| Sprint 2.2 | 🔄 | Configuration Engine |
+
 # Current Sprint
 
-**Sprint 2 – Market Data Engine**
+**Sprint 2.2 – Configuration Engine**
 
 ## Objective
 
-Build the first production-ready engine capable of:
+Build a centralized configuration system for AlphaEdge AI.
 
-* Downloading market data
-* Validating data
-* Cleaning data
-* Saving data
-* Supporting multiple future data providers
+Objectives:
+
+• Centralize application settings
+• Eliminate hardcoded values
+• Support future configuration changes
+• Provide a single source of configuration for all modules
 
 ---
 
@@ -60,18 +86,42 @@ Build the first production-ready engine capable of:
 * Professional Project Folder Structure
 * Documentation Structure Created
 * Architecture Planned
+- Yahoo Finance Provider
+- Market Data Service
+- Application Entry Point
+- Live Market Data Download
+- Market Data Cleaning
 
 ---
 
 # In Progress
 
-* Market Data Engine
+* Configuration Engine
 
 ---
 
+# Current Architecture
+
+Application
+
+↓
+
+main.py
+
+↓
+
+MarketDataService
+
+↓
+
+YahooProvider
+
+↓
+
+Yahoo Finance API
+
 # Pending Modules
 
-* Market Data Engine
 * Indicator Engine
 * Rule Engine
 * Screener Engine
@@ -148,13 +198,13 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Initial AlphaEdge AI project structure
+Sprint 2.1: Implement Market Data Engine with Yahoo Finance provider
 
 ---
 
 # Immediate Next Task
 
-Implement Yahoo Finance Provider.
+Build Configuration Engine (settings.py)
 
 ---
 
@@ -216,10 +266,10 @@ Future additions (new indicators, AI models, timeframes, markets, strategies, ne
 
 Whenever continuing this project in a new chat, start with:
 
-"Continue AlphaEdge AI.
-Current Version: v0.0.1
-Current Sprint: Sprint 2 – Market Data Engine.
-Follow MASTER_PROJECT.md."
+Continue AlphaEdge AI.
+Current Version: v0.0.2
+Current Sprint: Sprint 2.2 – Configuration Engine.
+Follow MASTER_PROJECT.md.
 
 This document is the single source of truth for the project.
 
@@ -228,3 +278,61 @@ This document is the single source of truth for the project.
 # Project Motto
 
 > Every line of code should make AlphaEdge AI easier to extend, easier to understand, and easier to trust.
+
+# Upcoming Sprint
+
+Sprint 2.3 – Market Data Validation
+
+Objectives:
+
+- Validate downloaded data
+- Handle invalid symbols
+- Validate required columns
+- Improve error handling
+
+backend/
+│
+├── config/
+├── data_providers/
+├── services/
+├── engines/
+├── indicators/
+├── strategies/
+├── models/
+├── utils/
+└── main.py
+
+
+Future Features
+
+□ Multi-timeframe Screener
+□ AI Confidence Score
+□ Institutional Order Blocks
+□ Heatmap
+□ Sector Rotation
+□ Portfolio Tracker
+□ Telegram Alerts
+□ Mobile App
+□ Options Chain Analysis
+□ News Sentiment
+□ Voice Assistant
+
+Architecture Decisions
+
+AD-001
+AI is an enhancement, not the core decision maker.
+
+AD-002
+Every external API must have its own Provider.
+
+AD-003
+No business logic inside main.py.
+
+AD-004
+No hardcoded values. Use configuration.
+
+AD-005
+Each engine has a single responsibility.
+
+AD-006
+Every feature must be testable.
