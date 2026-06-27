@@ -22,7 +22,13 @@ Project:
 # --------------------------------------------------------
 
 from backend.services.market_data.market_data_service import MarketDataService
-
+from backend.config.settings import (
+    APP_NAME,
+    VERSION,
+    DEFAULT_SYMBOL,
+    DEFAULT_PERIOD,
+    DEFAULT_INTERVAL,
+)
 
 def main():
     """
@@ -30,7 +36,7 @@ def main():
     """
 
     print("=" * 60)
-    print("🚀 Welcome to AlphaEdge AI")
+    print(f"🚀 Welcome to {APP_NAME} (v{VERSION})")
     print("=" * 60)
 
     # Create an instance of the Market Data Service.
@@ -41,10 +47,10 @@ def main():
     # Request one year of daily historical data
     # for Tata Consultancy Services (TCS).
     stock_data = market_service.get_stock_data(
-        symbol="TCS.NS",
-        period="1y",
-        interval="1d",
-    )
+    symbol=DEFAULT_SYMBOL,
+    period=DEFAULT_PERIOD,
+    interval=DEFAULT_INTERVAL,
+)
 
     # Display the first five rows of the downloaded data.
     print(stock_data.head())
