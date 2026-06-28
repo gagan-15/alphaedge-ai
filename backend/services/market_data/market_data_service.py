@@ -1,4 +1,5 @@
 from backend.data_providers.yahoo.yahoo_provider import YahooProvider
+from backend.validators.market_data_validator import MarketDataValidator
 
 
 class MarketDataService:
@@ -19,8 +20,16 @@ class MarketDataService:
         Get stock market data.
         """
 
-        return self.provider.download_stock_data(
+        # Download market data from the provider.
+        data = self.provider.download_stock_data(
             symbol=symbol,
             period=period,
             interval=interval,
         )
+
+        # Validate the downloaded market data.
+        MarketDataValidator.validate(data)
+    
+        # Return validated market data.
+
+        return data

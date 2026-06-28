@@ -34,27 +34,31 @@ def main():
     """
     Main entry point of the AlphaEdge AI application.
     """
+    try:
+        print("=" * 60)
+        print(f"🚀 Welcome to {APP_NAME} (v{VERSION})")
+        print("=" * 60)
 
-    print("=" * 60)
-    print(f"🚀 Welcome to {APP_NAME} (v{VERSION})")
-    print("=" * 60)
+        # Create an instance of the Market Data Service.
+        # This service is responsible for retrieving
+        # historical stock market data.
 
-    # Create an instance of the Market Data Service.
-    # This service is responsible for retrieving
-    # historical stock market data.
-    market_service = MarketDataService()
+        market_service = MarketDataService()
 
-    # Request one year of daily historical data
-    # for Tata Consultancy Services (TCS).
-    stock_data = market_service.get_stock_data(
-    symbol=DEFAULT_SYMBOL,
-    period=DEFAULT_PERIOD,
-    interval=DEFAULT_INTERVAL,
-)
+        # Request one year of daily historical data
+        # for Tata Consultancy Services (TCS).
+        stock_data = market_service.get_stock_data(
+        symbol=DEFAULT_SYMBOL,
+        period=DEFAULT_PERIOD,
+        interval=DEFAULT_INTERVAL,
+        )
 
-    # Display the first five rows of the downloaded data.
-    print(stock_data.head())
+        # Display the first five rows of the downloaded data.
+        print(stock_data.head())
 
+    except ValueError as error:
+            print("\n❌ Error")
+            print(error)
 
 # Execute the application only when this file
 # is run directly.
