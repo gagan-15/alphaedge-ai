@@ -135,25 +135,19 @@ Objectives
 
 # Current Architecture
 
-            Application
+                Application
 
-               ↓
+                    ↓
 
-            main.py
-
-               ↓
-
-            MarketDataService
-
-            ├──────────────┐
-            │              │
-            ▼              ▼
-
-MarketDataValidator      YahooProvider
-
+                 main.py
+                    │
+                    ▼
+           MarketDataService
+            │             │
+            ▼             ▼
+ MarketDataValidator   YahooProvider
                             │
                             ▼
-
                     Yahoo Finance API
 
 # Pending Modules

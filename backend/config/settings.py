@@ -22,7 +22,7 @@ Project:
 
 APP_NAME = "AlphaEdge AI"
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 # ==========================================================
 # Market Data Configuration

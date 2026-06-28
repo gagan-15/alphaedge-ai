@@ -29,6 +29,7 @@ from backend.config.settings import (
     DEFAULT_PERIOD,
     DEFAULT_INTERVAL,
 )
+from backend.core.logger import logger
 
 def main():
     """
@@ -36,7 +37,7 @@ def main():
     """
     try:
         print("=" * 60)
-        print(f"🚀 Welcome to {APP_NAME} (v{VERSION})")
+        logger.info(f"Welcome to {APP_NAME} (v{VERSION})")
         print("=" * 60)
 
         # Create an instance of the Market Data Service.
@@ -57,8 +58,9 @@ def main():
         print(stock_data.head())
 
     except ValueError as error:
-            print("\n❌ Error")
-            print(error)
+     logger.error(error)
+     print("\n❌ Error")
+     print(error)
 
 # Execute the application only when this file
 # is run directly.

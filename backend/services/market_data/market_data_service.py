@@ -1,5 +1,6 @@
 from backend.data_providers.yahoo.yahoo_provider import YahooProvider
 from backend.validators.market_data_validator import MarketDataValidator
+from backend.core.logger import logger
 
 
 class MarketDataService:
@@ -16,6 +17,8 @@ class MarketDataService:
         period: str = "1y",
         interval: str = "1d",
     ):
+        logger.info(f"Downloading market data for {symbol}")
+
         """
         Get stock market data.
         """
@@ -29,6 +32,8 @@ class MarketDataService:
 
         # Validate the downloaded market data.
         MarketDataValidator.validate(data)
+
+        logger.info("Market data validation completed successfully.")
     
         # Return validated market data.
 
