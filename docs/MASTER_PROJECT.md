@@ -256,28 +256,27 @@ Yahoo Finance API
 
 # Current Folder Structure
 
-backend/
+AlphaEdgeAI/
 
-├── config/
-
-├── data_providers/
-
-├── services/
-
+├── backend/
+│   ├── config/
+│   ├── data_providers/
+│   ├── services/
+│   ├── validators/
+│   ├── engines/
+│   ├── indicators/
+│   ├── strategies/
+│   ├── models/
+│   ├── utils/
+│   └── main.py
+│
 ├── tests/
-
-├── validators/
-
-├── engines/
-
-├── indicators/
-
-├── strategies/
-
-├── models/
-
-├── utils/
-
+├── docs/
+├── data/
+├── logs/
+├── scripts/
+├── requirements.txt
+└── README.md
 └── main.py
 
 ---
