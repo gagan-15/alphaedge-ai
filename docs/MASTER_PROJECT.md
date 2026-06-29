@@ -3,29 +3,40 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.0.3
+> **Current Version:** v0.0.4
 
 ---
 
 # Project Metrics
 
-Current Version: v0.0.3
+Current Version: v0.0.4
 
-Total Sprints Completed: 3
+Total Sprints Completed: 6
 
-Python Files: 5
+Python Files: 12
 
-Services: 1
+Services: 2
+MarketDataService
+IndicatorService
 
 Providers: 1
 
-Validators: 1
+Validators: 2
+MarketDataValidator
+IndicatorValidator
+
+Indicators: 3
+BaseIndicator
+SMAIndicator
+EMAIndicator
 
 Configuration Modules: 1
 
 Entry Points: 1
 
-Git Commits: 4
+Tests: 2
+
+Git Commits: 5
 
 # Vision
 
@@ -52,7 +63,7 @@ Build a commercial SaaS platform capable of serving thousands of users with feat
 
 # Overall Project Progress
 
-██████░░░░░░░░░░░░ 12%
+██████░░░░░░░░░░░░ 18%
 
 Core Platform
 
@@ -63,6 +74,13 @@ Commercial Readiness
 █░░░░░░░░░░░░░░░░░ 5%
 
 
+Version History
+
+v0.0.1  Project Foundation
+v0.0.2  Market Data Engine
+v0.0.3  Validation & Logging
+v0.0.4  Indicator Foundation (SMA, EMA)
+
 # Sprint History
 
 | Sprint | Status | Description |
@@ -71,30 +89,33 @@ Commercial Readiness
 | Sprint 2.1 | ✅ | Market Data Engine |
 | Sprint 2.2 | ✅ | Configuration Engine |
 | Sprint 2.3 | ✅ | Market Data Validation Engine |
-| Sprint 2.4 | 🔄 | Logging Engine |
+| Sprint 2.4 | ✅ | Logging Engine |
+| Sprint 2.5 | ✅  | Indicator Foundation |
+| Sprint 2.6 | 🔄  | RSI Engine|
 
 # Current Sprint
 
-**Sprint 2.4 – Logging Engine**
+Current Sprint: Sprint 2.6 – RSI Engine.
 
 ## Objective
 
-Build a centralized logging system.
+Build the Relative Strength Index (RSI) Engine.
 
 Objectives
 
-• Record application events
+• Build RSI Indicator
 
-• Record validation events
+• Learn Wilder's RSI Formula
 
-• Record API failures
+• Integrate RSI with Indicator Service
 
-• Record unexpected exceptions
+• Add Validation
 
-• Support console and file logging
+• Add Logging
 
-• Prepare AlphaEdge AI for production debugging
+• Add Unit Tests
 
+• Prepare for Rule Engine integration
 ---
 
 # Current Project Status
@@ -124,35 +145,45 @@ Objectives
 • Missing Value Validation
 • Duplicate Date Validation
 • Sorted Date Validation
+• Indicator Foundation
+• Base Indicator
+• SMA Indicator
+• EMA Indicator
+• Indicator Service
+• Indicator Validator
+• Indicator Logging
+• Indicator Unit Tests
 
 ---
 
 # In Progress
 
-* Logging Engine
+* RSI Engine
 
 ---
 
 # Current Architecture
 
-                Application
-
-                    ↓
-
-                 main.py
-                    │
-                    ▼
-           MarketDataService
-            │             │
-            ▼             ▼
- MarketDataValidator   YahooProvider
-                            │
-                            ▼
-                    Yahoo Finance API
+   Application
+      │
+      ▼
+main.py
+      │
+      ├───────────────┐
+      ▼               ▼
+MarketDataService   IndicatorService
+      │               │
+      ▼               ├──────────────┐
+MarketDataValidator   ▼              ▼
+      │          SMAIndicator   EMAIndicator
+      ▼               │              │
+YahooProvider         └──────┬───────┘
+      │                      ▼
+      ▼              IndicatorValidator
+Yahoo Finance API
 
 # Pending Modules
 
-* Indicator Engine
 * Rule Engine
 * Screener Engine
 * Demand & Supply Engine
@@ -242,13 +273,13 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Sprint 2.3: Build Market Data Validation Engine
+Sprint 2.5: Build Indicator Foundation with SMA, EMA, validation, logging and tests
 
 ---
 
 # Immediate Next Task
 
-Build Logging Engine
+RSI Engine
 
 ---
 
@@ -311,7 +342,7 @@ Future additions (new indicators, AI models, timeframes, markets, strategies, ne
 Whenever continuing this project in a new chat, start with:
 
 Continue AlphaEdge AI.
-Current Version: v0.0.3
+Current Version: v0.0.4
 
 Current Sprint: Sprint 2.4 – Logging Engine.
 
@@ -327,19 +358,25 @@ This document is the single source of truth for the project.
 
 # Upcoming Sprint
 
-Sprint 2.5 – Indicator Foundation
+Sprint 2.7 – MACD Engine
 
 Objectives
 
-- Build Indicator Engine
+• Build MACD Indicator
 
-- SMA
+• Fast EMA
 
-- EMA
+• Slow EMA
 
-- Moving Average Framework
+• Signal Line
 
-- Indicator Base Class
+• Histogram
+
+• Logging
+
+• Validation
+
+• Unit Tests
 
 
 
@@ -384,3 +421,11 @@ Every feature must be testable.
 AD-007
 
 All downloaded market data must pass through the Validation Engine before being used anywhere in AlphaEdge AI.
+
+AD-008
+
+Every indicator must inherit from BaseIndicator.
+
+AD-009
+
+Every indicator must include validation, logging and unit tests before being considered complete.

@@ -22,6 +22,7 @@ Project:
 # --------------------------------------------------------
 
 from backend.services.market_data.market_data_service import MarketDataService
+from backend.services.indicator.indicator_service import IndicatorService
 from backend.config.settings import (
     APP_NAME,
     VERSION,
@@ -54,13 +55,17 @@ def main():
         interval=DEFAULT_INTERVAL,
         )
 
-        # Display the first five rows of the downloaded data.
-        print(stock_data.head())
+        indicator_service = IndicatorService()
+
+        result = indicator_service.calculate_ema(stock_data)
+
+         # Display the first five rows of the downloaded data.
+        print(result.head())
 
     except ValueError as error:
-     logger.error(error)
-     print("\n❌ Error")
-     print(error)
+       logger.error(error)
+       print("\n❌ Error")
+       print(error)
 
 # Execute the application only when this file
 # is run directly.
