@@ -264,6 +264,8 @@ backend/
 
 ├── services/
 
+├── tests/
+
 ├── validators/
 
 ├── engines/
@@ -359,7 +361,7 @@ Whenever continuing this project in a new chat, start with:
 Continue AlphaEdge AI.
 Current Version: v0.0.4
 
-Current Sprint: Sprint 2.4 – Logging Engine.
+Current Sprint: Sprint 2.6 – RSI Engine.
 
 Follow MASTER_PROJECT.md.
 
