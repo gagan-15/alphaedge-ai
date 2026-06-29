@@ -1,3 +1,18 @@
+# Engineering Rules
+
+1. Architecture before coding.
+2. Explain every line of code.
+3. Keep modules small and reusable.
+4. No duplicate logic.
+5. Validation, Logging, and Unit Tests are mandatory.
+6. Think scalability before implementation.
+7. AI assists decisions but never replaces rule-based logic.
+8. Every sprint ends with:
+   - Tests passing
+   - Documentation updated
+   - Git commit
+   - Git push
+
 # AlphaEdge AI - Master Project Document
 
 > **Project Status:** Active Development
