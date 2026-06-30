@@ -15,6 +15,7 @@ Project:
 
 from backend.indicators.sma_indicator import SMAIndicator
 from backend.indicators.ema_indicator import EMAIndicator
+from backend.indicators.rsi_indicator import RSIIndicator
 
 
 class IndicatorService:
@@ -44,3 +45,19 @@ class IndicatorService:
         """
 
         return self.ema_indicator.calculate(data, period)
+    
+    def calculate_rsi( self, data, period: int = 14):
+        """
+        Calculate RSI.
+
+        Args:
+            data: Market data.
+            period: RSI period.
+
+        Returns:
+            pd.Series
+        """
+
+        indicator = RSIIndicator(period)
+
+        return indicator.calculate(data)

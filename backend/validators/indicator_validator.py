@@ -47,3 +47,20 @@ class IndicatorValidator:
             raise ValueError(
                 f"Not enough data to calculate a {period}-period indicator."
             )
+        
+    @staticmethod
+    def validate_period(period: int) -> None:
+        """
+        Validate indicator period.
+
+        Args:
+            period (int): Indicator period.
+
+        Raises:
+            ValueError: If period is not a positive integer.
+        """
+        if not isinstance(period, int):
+            raise ValueError("Indicator period must be an integer.")
+
+        if period <= 0:
+            raise ValueError("Indicator period must be greater than zero.")

@@ -18,15 +18,15 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.0.4
+> **Current Version:** v0.0.5
 
 ---
 
 # Project Metrics
 
-Current Version: v0.0.4
+Current Version: v0.0.5
 
-Total Sprints Completed: 6
+Total Sprints Completed: 7
 
 Python Files: 12
 
@@ -40,16 +40,17 @@ Validators: 2
 MarketDataValidator
 IndicatorValidator
 
-Indicators: 3
+Indicators: 4
 BaseIndicator
 SMAIndicator
 EMAIndicator
+RSI Indicator
 
 Configuration Modules: 1
 
 Entry Points: 1
 
-Tests: 2
+Tests: 8 Passing
 
 Git Commits: 5
 
@@ -95,6 +96,7 @@ v0.0.1  Project Foundation
 v0.0.2  Market Data Engine
 v0.0.3  Validation & Logging
 v0.0.4  Indicator Foundation (SMA, EMA)
+v0.0.5  RSI Engine
 
 # Sprint History
 
@@ -106,30 +108,28 @@ v0.0.4  Indicator Foundation (SMA, EMA)
 | Sprint 2.3 | ✅ | Market Data Validation Engine |
 | Sprint 2.4 | ✅ | Logging Engine |
 | Sprint 2.5 | ✅  | Indicator Foundation |
-| Sprint 2.6 | 🔄  | RSI Engine|
+| Sprint 2.6 | ✅ | RSI Engine |
 
 # Current Sprint
 
-Current Sprint: Sprint 2.6 – RSI Engine.
+Current Sprint: Sprint 2.7 – MACD Engine.
 
 ## Objective
 
-Build the Relative Strength Index (RSI) Engine.
+Build the Moving Average Convergence Divergence (MACD) Engine.
 
 Objectives
 
-• Build RSI Indicator
-
-• Learn Wilder's RSI Formula
-
-• Integrate RSI with Indicator Service
-
+• Build MACD Indicator
+• Learn MACD Formula
+• Reuse EMA logic where appropriate
+• Calculate MACD Line
+• Calculate Signal Line
+• Calculate Histogram
+• Integrate MACD with Indicator Service
 • Add Validation
-
 • Add Logging
-
 • Add Unit Tests
-
 • Prepare for Rule Engine integration
 ---
 
@@ -168,12 +168,17 @@ Objectives
 • Indicator Validator
 • Indicator Logging
 • Indicator Unit Tests
+• RSI Indicator
+• RSI Validation
+• RSI Logging
+• RSI Unit Tests
+• Indicator Service RSI Integration
 
 ---
 
 # In Progress
 
-* RSI Engine
+* MACD Engine
 
 ---
 
@@ -188,11 +193,11 @@ main.py
       ▼               ▼
 MarketDataService   IndicatorService
       │               │
-      ▼               ├──────────────┐
-MarketDataValidator   ▼              ▼
-      │          SMAIndicator   EMAIndicator
-      ▼               │              │
-YahooProvider         └──────┬───────┘
+      ▼               ├──────────────┐──────────────┐
+MarketDataValidator   ▼              ▼              ▼
+      │          SMAIndicator   EMAIndicator   RSIIndicator
+      ▼               │              │              │
+YahooProvider         └──────┬───────┘──────────────┘
       │                      ▼
       ▼              IndicatorValidator
 Yahoo Finance API
@@ -289,13 +294,13 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Sprint 2.5: Build Indicator Foundation with SMA, EMA, validation, logging and tests
+Sprint 2.6: Build RSI Engine with validation, logging and unit tests
 
 ---
 
 # Immediate Next Task
 
-RSI Engine
+MACD Engine
 
 ---
 
@@ -358,9 +363,9 @@ Future additions (new indicators, AI models, timeframes, markets, strategies, ne
 Whenever continuing this project in a new chat, start with:
 
 Continue AlphaEdge AI.
-Current Version: v0.0.4
+Current Version: v0.0.5
 
-Current Sprint: Sprint 2.6 – RSI Engine.
+Current Sprint: Sprint 2.7 – MACD Engine.
 
 Follow MASTER_PROJECT.md.
 
