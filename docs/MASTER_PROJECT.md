@@ -18,17 +18,17 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.0.5
+> **Current Version:** v0.0.6
 
 ---
 
 # Project Metrics
 
-Current Version: v0.0.5
+Current Version: v0.0.6
 
-Total Sprints Completed: 7
+Total Sprints Completed: 8
 
-Python Files: 12
+Python Files: 13
 
 Services: 2
 MarketDataService
@@ -40,19 +40,20 @@ Validators: 2
 MarketDataValidator
 IndicatorValidator
 
-Indicators: 4
+Indicators: 5
 BaseIndicator
 SMAIndicator
 EMAIndicator
-RSI Indicator
+RSIIndicator
+MACDIndicator
 
 Configuration Modules: 1
 
 Entry Points: 1
 
-Tests: 8 Passing
+Tests: 9 Passing
 
-Git Commits: 5
+Git Commits: 6
 
 # Vision
 
@@ -97,6 +98,7 @@ v0.0.2  Market Data Engine
 v0.0.3  Validation & Logging
 v0.0.4  Indicator Foundation (SMA, EMA)
 v0.0.5  RSI Engine
+v0.0.6  MACD Engine
 
 # Sprint History
 
@@ -109,28 +111,34 @@ v0.0.5  RSI Engine
 | Sprint 2.4 | ✅ | Logging Engine |
 | Sprint 2.5 | ✅  | Indicator Foundation |
 | Sprint 2.6 | ✅ | RSI Engine |
+| Sprint 2.7 | ✅ | MACD Engine |
+
 
 # Current Sprint
 
-Current Sprint: Sprint 2.7 – MACD Engine.
+Sprint 2.8 – ATR Engine
 
 ## Objective
 
-Build the Moving Average Convergence Divergence (MACD) Engine.
+## Objective
+
+Build the Average True Range (ATR) Engine.
 
 Objectives
 
-• Build MACD Indicator
-• Learn MACD Formula
-• Reuse EMA logic where appropriate
-• Calculate MACD Line
-• Calculate Signal Line
-• Calculate Histogram
-• Integrate MACD with Indicator Service
+• Build ATR Indicator
+
+• Learn ATR Formula
+
+• Integrate ATR with Indicator Service
+
 • Add Validation
+
 • Add Logging
+
 • Add Unit Tests
-• Prepare for Rule Engine integration
+
+• Prepare for Risk Engine integration
 ---
 
 # Current Project Status
@@ -173,34 +181,43 @@ Objectives
 • RSI Logging
 • RSI Unit Tests
 • Indicator Service RSI Integration
+• MACD Indicator
+• Signal Line
+• Histogram
+• MACD Validation
+• MACD Logging
+• MACD Unit Tests
+• Indicator Service MACD Integration
 
 ---
 
 # In Progress
 
-* MACD Engine
+* ATR Engine
 
 ---
 
 # Current Architecture
 
-   Application
+Application
       │
       ▼
 main.py
       │
-      ├───────────────┐
-      ▼               ▼
-MarketDataService   IndicatorService
-      │               │
-      ▼               ├──────────────┐──────────────┐
-MarketDataValidator   ▼              ▼              ▼
-      │          SMAIndicator   EMAIndicator   RSIIndicator
-      ▼               │              │              │
-YahooProvider         └──────┬───────┘──────────────┘
-      │                      ▼
-      ▼              IndicatorValidator
-Yahoo Finance API
+      ├───────────────────────┐
+      ▼                       ▼
+MarketDataService      IndicatorService
+      │                       │
+      ▼                       ├──────────────┬──────────────┬──────────────┬──────────────┐
+MarketDataValidator           ▼              ▼              ▼              ▼
+      │                  SMAIndicator   EMAIndicator   RSIIndicator   MACDIndicator
+      ▼
+YahooProvider
+      │
+      ▼
+Yahoo Finance API     
+                                      
+                               
 
 # Pending Modules
 
@@ -294,13 +311,13 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Sprint 2.6: Build RSI Engine with validation, logging and unit tests
+Sprint 2.7: Build MACD Engine with validation, logging and unit tests
 
 ---
 
 # Immediate Next Task
 
-MACD Engine
+ATR Engine
 
 ---
 
@@ -363,9 +380,9 @@ Future additions (new indicators, AI models, timeframes, markets, strategies, ne
 Whenever continuing this project in a new chat, start with:
 
 Continue AlphaEdge AI.
-Current Version: v0.0.5
+Current Version: v0.0.6
 
-Current Sprint: Sprint 2.7 – MACD Engine.
+Sprint 2.8 – ATR Engine
 
 Follow MASTER_PROJECT.md.
 
@@ -379,23 +396,17 @@ This document is the single source of truth for the project.
 
 # Upcoming Sprint
 
-Sprint 2.7 – MACD Engine
+Sprint 2.8 – ATR Engine
 
-Objectives
+# Objectives
 
-• Build MACD Indicator
+• Build ATR Indicator
 
-• Fast EMA
-
-• Slow EMA
-
-• Signal Line
-
-• Histogram
-
-• Logging
+• Learn Average True Range Formula
 
 • Validation
+
+• Logging
 
 • Unit Tests
 
@@ -450,3 +461,122 @@ Every indicator must inherit from BaseIndicator.
 AD-009
 
 Every indicator must include validation, logging and unit tests before being considered complete.
+
+AD-010
+
+MACDIndicator reuses EMAIndicator instead of duplicating EMA calculation logic.
+
+Reason:
+Avoid duplicate code and maintain a single source of truth for EMA calculations.
+
+# Development Rules
+
+DR-001 – Completed Sprints Are Read-Only
+
+Rule:
+
+Once a sprint is marked ✅ Complete, its implementation is considered frozen.
+
+It will only be modified if:
+
+A verified bug is found.
+A security issue exists.
+The project owner (Gagan) approves the change.
+
+Reason:
+
+Keeps completed work stable and prevents accidental regressions.
+
+DR-002 – Verify Existing Code Before Reuse ⭐
+
+Rule:
+
+Before reusing any module from a previous sprint, inspect its actual implementation.
+
+Do not assume:
+
+constructor parameters
+method names
+return types
+input parameters
+class design
+
+Reason:
+
+Today's EMAIndicator() issue happened because I assumed its interface instead of verifying it.
+
+DR-003 – Existing Code Is the Source of Truth
+
+Rule:
+
+When continuing AlphaEdge AI, the existing implementation always takes precedence over assumptions or generic examples.
+
+New code must adapt to the existing architecture.
+
+Reason:
+
+Keeps the project internally consistent.
+
+DR-004 – No Breaking Changes Without Approval
+
+Rule:
+
+If a previous module needs to change:
+
+Explain why.
+Explain the impact.
+Explain the benefits.
+Wait for approval.
+
+Only then make the change.
+
+DR-005 – Dependency Verification Checklist
+
+Before coding any new module, verify:
+
+Required classes
+Public methods
+Constructor signatures
+Return types
+Existing tests
+
+Only then begin implementation.
+
+DR-006 – Tests Before Architecture Changes
+
+If a design assumption is uncertain:
+
+Check the implementation.
+Write/update tests.
+Then implement.
+
+Never redesign based on assumptions.
+
+DR-007 – Preserve Sprint Independence
+
+Each sprint should integrate with previous sprints without requiring previous completed code to change, whenever reasonably possible.
+
+This keeps every completed sprint self-contained and reliable.
+
+
+DR-008 – ChatGPT Verification Rule
+
+Rule:
+
+Before generating code that depends on a previous sprint, ChatGPT must verify the dependent module if it has not been shown in the current chat.
+
+If verification is not possible, ChatGPT must ask for the relevant file instead of assuming its implementation.
+
+Reason:
+
+Prevents mistakes like today's EMAIndicator constructor mismatch.
+
+DR-009 – Test Before Closing Sprint
+
+A sprint cannot be marked complete until:
+
+• All unit tests pass.
+• Previous sprint tests continue to pass.
+• MASTER_PROJECT.md is updated.
+• Git commit is created.
+• Git push is completed.

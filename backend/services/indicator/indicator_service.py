@@ -16,6 +16,7 @@ Project:
 from backend.indicators.sma_indicator import SMAIndicator
 from backend.indicators.ema_indicator import EMAIndicator
 from backend.indicators.rsi_indicator import RSIIndicator
+from backend.indicators.macd_indicator import MACDIndicator
 
 
 class IndicatorService:
@@ -59,5 +60,33 @@ class IndicatorService:
         """
 
         indicator = RSIIndicator(period)
+
+        return indicator.calculate(data)
+    
+    @staticmethod
+    def calculate_macd(
+        data,
+        fast_period: int = 12,
+        slow_period: int = 26,
+        signal_period: int = 9
+    ):
+        """
+        Calculate MACD values.
+
+        Args:
+            data: Market data.
+            fast_period: Fast EMA period.
+            slow_period: Slow EMA period.
+            signal_period: Signal EMA period.
+
+        Returns:
+            pd.DataFrame: MACD, Signal and Histogram.
+        """
+
+        indicator = MACDIndicator(
+            fast_period=fast_period,
+            slow_period=slow_period,
+            signal_period=signal_period
+        )
 
         return indicator.calculate(data)
