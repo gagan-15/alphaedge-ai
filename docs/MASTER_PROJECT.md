@@ -18,13 +18,13 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.0.6
+> **Current Version:** v0.0.7
 
 ---
 
 # Project Metrics
 
-Current Version: v0.0.6
+Current Version: v0.0.7
 
 Total Sprints Completed: 8
 
@@ -40,18 +40,20 @@ Validators: 2
 MarketDataValidator
 IndicatorValidator
 
-Indicators: 5
+Indicators: 6
+
 BaseIndicator
 SMAIndicator
 EMAIndicator
 RSIIndicator
 MACDIndicator
+ATRIndicator
 
 Configuration Modules: 1
 
 Entry Points: 1
 
-Tests: 9 Passing
+Tests: 15 Passing
 
 Git Commits: 6
 
@@ -99,6 +101,7 @@ v0.0.3  Validation & Logging
 v0.0.4  Indicator Foundation (SMA, EMA)
 v0.0.5  RSI Engine
 v0.0.6  MACD Engine
+v0.0.7  ATR Engine
 
 # Sprint History
 
@@ -112,33 +115,28 @@ v0.0.6  MACD Engine
 | Sprint 2.5 | ✅  | Indicator Foundation |
 | Sprint 2.6 | ✅ | RSI Engine |
 | Sprint 2.7 | ✅ | MACD Engine |
+| Sprint 2.8 | ✅ | ATR Engine |
 
 
 # Current Sprint
 
-Sprint 2.8 – ATR Engine
+Sprint 2.9 – Bollinger Bands
 
 ## Objective
 
-## Objective
-
-Build the Average True Range (ATR) Engine.
+Build the Bollinger Bands Engine.
 
 Objectives
 
-• Build ATR Indicator
-
-• Learn ATR Formula
-
-• Integrate ATR with Indicator Service
-
+• Build Bollinger Bands Indicator
+• Calculate Middle Band (SMA)
+• Calculate Upper Band
+• Calculate Lower Band
 • Add Validation
-
 • Add Logging
-
 • Add Unit Tests
+• Prepare for Rule Engine integration
 
-• Prepare for Risk Engine integration
 ---
 
 # Current Project Status
@@ -188,12 +186,16 @@ Objectives
 • MACD Logging
 • MACD Unit Tests
 • Indicator Service MACD Integration
+• ATR Indicator
+• ATR Validation
+• ATR Unit Tests
+• Indicator Service ATR Integration
 
 ---
 
 # In Progress
 
-* ATR Engine
+* Bollinger Bands Engine
 
 ---
 
@@ -204,18 +206,18 @@ Application
       ▼
 main.py
       │
-      ├───────────────────────┐
-      ▼                       ▼
-MarketDataService      IndicatorService
-      │                       │
-      ▼                       ├──────────────┬──────────────┬──────────────┬──────────────┐
-MarketDataValidator           ▼              ▼              ▼              ▼
-      │                  SMAIndicator   EMAIndicator   RSIIndicator   MACDIndicator
+      ├────────────────────────────┐
+      ▼                            ▼
+MarketDataService           IndicatorService
+      │                            │
+      ▼                            ├───────────────────────────┐
+MarketDataValidator                ▼      ▼      ▼      ▼      ▼
+      │                           SMA    EMA    RSI   MACD    ATR
       ▼
 YahooProvider
       │
       ▼
-Yahoo Finance API     
+Yahoo Finance API  
                                       
                                
 
@@ -311,13 +313,15 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Sprint 2.7: Build MACD Engine with validation, logging and unit tests
+Sprint 2.8:
+Build ATR Engine with validation,
+logging, service integration and unit tests
 
 ---
 
 # Immediate Next Task
 
-ATR Engine
+Bollinger Bands Engine
 
 ---
 
@@ -380,9 +384,9 @@ Future additions (new indicators, AI models, timeframes, markets, strategies, ne
 Whenever continuing this project in a new chat, start with:
 
 Continue AlphaEdge AI.
-Current Version: v0.0.6
+Current Version: v0.0.7
 
-Sprint 2.8 – ATR Engine
+Sprint 2.9 – Bollinger Bands
 
 Follow MASTER_PROJECT.md.
 
@@ -396,19 +400,22 @@ This document is the single source of truth for the project.
 
 # Upcoming Sprint
 
-Sprint 2.8 – ATR Engine
+Sprint 2.9 – Bollinger Bands
 
-# Objectives
+## Objective
 
-• Build ATR Indicator
+Build the Bollinger Bands Engine.
 
-• Learn Average True Range Formula
+Objectives
 
-• Validation
-
-• Logging
-
-• Unit Tests
+• Build Bollinger Bands Indicator
+• Calculate Middle Band (SMA)
+• Calculate Upper Band
+• Calculate Lower Band
+• Add Validation
+• Add Logging
+• Add Unit Tests
+• Prepare for Rule Engine integration
 
 
 
@@ -580,3 +587,21 @@ A sprint cannot be marked complete until:
 • MASTER_PROJECT.md is updated.
 • Git commit is created.
 • Git push is completed.
+
+DR-010 – Simplicity First
+
+Code should always be written in the simplest
+possible way while maintaining enterprise-grade
+performance, scalability and maintainability.
+
+Avoid unnecessary complexity, clever tricks,
+over-engineering and premature optimization.
+
+The goal is that a new developer joining the
+project should be able to understand the code
+with minimal effort.
+
+Prefer readable code over clever code.
+
+Only introduce advanced techniques when there is
+a measurable engineering benefit.

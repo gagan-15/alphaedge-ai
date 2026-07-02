@@ -64,3 +64,28 @@ class IndicatorValidator:
 
         if period <= 0:
             raise ValueError("Indicator period must be greater than zero.")
+        
+
+    @staticmethod
+    def validate_atr_input(data: pd.DataFrame) -> None:
+        """
+        Validate input data required for ATR calculation.
+
+        Args:
+            data (pd.DataFrame): Market data.
+
+        Raises:
+            ValueError: If required columns are missing.
+        """
+
+        required_columns = [
+            "High",
+            "Low",
+            "Close"
+        ]
+
+        for column in required_columns:
+            if column not in data.columns:
+                raise ValueError(
+                    f"Required column '{column}' not found."
+                )

@@ -17,6 +17,7 @@ from backend.indicators.sma_indicator import SMAIndicator
 from backend.indicators.ema_indicator import EMAIndicator
 from backend.indicators.rsi_indicator import RSIIndicator
 from backend.indicators.macd_indicator import MACDIndicator
+from backend.indicators.atr_indicator import ATRIndicator
 
 
 class IndicatorService:
@@ -88,5 +89,25 @@ class IndicatorService:
             slow_period=slow_period,
             signal_period=signal_period
         )
+
+        return indicator.calculate(data)
+    
+    @staticmethod
+    def calculate_atr(
+        data,
+        period: int = 14
+    ):
+        """
+        Calculate Average True Range (ATR).
+
+        Args:
+            data: Market data.
+            period: ATR period.
+
+        Returns:
+            pd.Series: ATR values.
+        """
+
+        indicator = ATRIndicator(period)
 
         return indicator.calculate(data)
