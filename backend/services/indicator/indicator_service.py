@@ -18,6 +18,7 @@ from backend.indicators.ema_indicator import EMAIndicator
 from backend.indicators.rsi_indicator import RSIIndicator
 from backend.indicators.macd_indicator import MACDIndicator
 from backend.indicators.atr_indicator import ATRIndicator
+from backend.indicators.bollinger_bands_indicator import BollingerBandsIndicator
 
 
 class IndicatorService:
@@ -109,5 +110,33 @@ class IndicatorService:
         """
 
         indicator = ATRIndicator(period)
+
+        return indicator.calculate(data)
+    
+    @staticmethod
+    def calculate_bollinger_bands(
+        data,
+        period: int = 20,
+        multiplier: int = 2
+    ):
+        """
+        Calculate Bollinger Bands.
+
+        Args:
+            data: Market data.
+            period: Moving average period.
+            multiplier: Standard deviation multiplier.
+
+        Returns:
+            pd.DataFrame:
+                Middle Band,
+                Upper Band,
+                Lower Band.
+        """
+
+        indicator = BollingerBandsIndicator(
+            period=period,
+            multiplier=multiplier
+        )
 
         return indicator.calculate(data)
