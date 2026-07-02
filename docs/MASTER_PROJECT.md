@@ -18,17 +18,17 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.0.8
+> **Current Version:** v0.0.9
 
 ---
 
 # Project Metrics
 
-Current Version: v0.0.8
+Current Version: v0.0.9
 
-Total Sprints Completed: 10
+Total Sprints Completed: 11
 
-Python Files: 13
+Python Files: 15
 
 Services: 2
 MarketDataService
@@ -40,7 +40,7 @@ Validators: 2
 MarketDataValidator
 IndicatorValidator
 
-Indicators: 7
+Indicators: 8
 
 BaseIndicator
 SMAIndicator
@@ -49,14 +49,15 @@ RSIIndicator
 MACDIndicator
 ATRIndicator
 BollingerBandsIndicator
+VolumeSMAIndicator
 
 Configuration Modules: 1
 
 Entry Points: 1
 
-Tests: 21 Passing
+Tests: 22 Passing
 
-Git Commits: 6
+Git Commits: 7
 
 # Vision
 
@@ -104,6 +105,7 @@ v0.0.5  RSI Engine
 v0.0.6  MACD Engine
 v0.0.7  ATR Engine
 v0.0.8  Bollinger Bands Engine
+v0.0.9  Volume Indicator Engine
 
 # Sprint History
 
@@ -119,20 +121,21 @@ v0.0.8  Bollinger Bands Engine
 | Sprint 2.7 | ✅ | MACD Engine |
 | Sprint 2.8 | ✅ | ATR Engine |
 | Sprint 2.9 | ✅ | Bollinger Bands Engine |
+| Sprint 2.10 | ✅ | Volume Indicator Engine
 
 # Current Sprint
 
-Sprint 2.10 – Volume Indicators
+Sprint 2.11 – Relative Volume (RVOL)
 
 ## Objective
 
-Build the Volume Indicator Engine.
+Build the Relative Volume (RVOL) Engine.
 
 Objectives
 
-• Learn Volume Analysis
-• Build Volume SMA Indicator
-• Understand Volume Confirmation
+• Learn Relative Volume
+• Build RVOL Indicator
+• Compare Volume against Average Volume
 • Add Validation
 • Add Logging
 • Add Unit Tests
@@ -198,12 +201,17 @@ Objectives
 • Bollinger Bands Validation
 • Bollinger Bands Unit Tests
 • Indicator Service Bollinger Integration
+• Volume SMA Indicator
+• Volume SMA Validation
+• Volume SMA Logging
+• Volume SMA Unit Tests
+• Indicator Service Volume SMA Integration
 
 ---
 
 # In Progress
 
-* Volume Indicator Engine
+* Relative Volume (RVOL) Engine
 
 ---
 
@@ -219,9 +227,8 @@ main.py
 MarketDataService           IndicatorService
       │                            │
       ▼                            ├────────────────────────────────────────────┐
-MarketDataValidator                ▼      ▼      ▼      ▼      ▼        ▼
-      │                           SMA    EMA    RSI   MACD    ATR   Bollinger
-      ▼
+MarketDataValidator                
+      │                           SMA    EMA    RSI   MACD    ATR   Bollinger  Volume SMA
 YahooProvider
       │
       ▼
@@ -320,8 +327,8 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Sprint 2.9:
-Build Bollinger Bands Engine with
+Sprint 2.10:
+Build Volume Indicator Engine with
 validation, logging, service integration
 and unit tests.
 
@@ -329,7 +336,7 @@ and unit tests.
 
 # Immediate Next Task
 
-Volume Indicator Engine
+Relative Volume (RVOL) Engine
 
 ---
 
@@ -392,13 +399,14 @@ Future additions (new indicators, AI models, timeframes, markets, strategies, ne
 Whenever continuing this project in a new chat, start with:
 
 Continue AlphaEdge AI.
-Current Version: v0.0.8
 
-Sprint 2.10 – Volume Indicators
+Current Version: v0.0.9
+
+Sprint 2.11 – Relative Volume (RVOL)
 
 Follow MASTER_PROJECT.md.
 
-This document is the single source of truth for the project.
+This document is the single source of truth.
 
 ---
 
@@ -408,16 +416,12 @@ This document is the single source of truth for the project.
 
 # Upcoming Sprint
 
-Sprint 2.10 – Volume Indicators
-
-Objective
-
-Build the Volume Indicator Engine.
+Sprint 2.11 – Relative Volume (RVOL)
 
 Objectives
 
-• Volume SMA
 • Relative Volume
+• High Volume Detection
 • Volume Confirmation
 • Validation
 • Logging

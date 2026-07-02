@@ -19,6 +19,7 @@ from backend.indicators.rsi_indicator import RSIIndicator
 from backend.indicators.macd_indicator import MACDIndicator
 from backend.indicators.atr_indicator import ATRIndicator
 from backend.indicators.bollinger_bands_indicator import BollingerBandsIndicator
+from backend.indicators.volume_sma_indicator import VolumeSMAIndicator
 
 
 class IndicatorService:
@@ -34,6 +35,7 @@ class IndicatorService:
 
         self.sma_indicator = SMAIndicator()
         self.ema_indicator = EMAIndicator()
+        self.volume_sma_indicator = VolumeSMAIndicator()
 
     def calculate_sma(self, data, period=20):
         """
@@ -41,6 +43,26 @@ class IndicatorService:
         """
 
         return self.sma_indicator.calculate(data, period)
+    
+    def calculate_volume_sma(self,data, period: int = 20):
+            """
+            Calculate the Volume Simple Moving Average.
+
+            Args:
+                data:
+                    Market data.
+
+                period:
+                    Volume SMA period.
+
+            Returns:
+                pd.DataFrame
+            """
+
+            return self.volume_sma_indicator.calculate(
+                data,
+                period
+            )
     
     def calculate_ema(self, data, period=20):
         """
