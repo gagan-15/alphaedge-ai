@@ -13,7 +13,6 @@ Project:
     AlphaEdge AI
 """
 
-from backend.indicators.relative_volume_indicator import RelativeVolumeIndicator
 from backend.indicators.sma_indicator import SMAIndicator
 from backend.indicators.ema_indicator import EMAIndicator
 from backend.indicators.rsi_indicator import RSIIndicator
@@ -21,6 +20,10 @@ from backend.indicators.macd_indicator import MACDIndicator
 from backend.indicators.atr_indicator import ATRIndicator
 from backend.indicators.bollinger_bands_indicator import BollingerBandsIndicator
 from backend.indicators.volume_sma_indicator import VolumeSMAIndicator
+from backend.indicators.relative_volume_indicator import RelativeVolumeIndicator
+from backend.indicators.volume_confirmation_indicator import (
+    VolumeConfirmationIndicator
+)
 
 
 class IndicatorService:
@@ -38,6 +41,9 @@ class IndicatorService:
         self.ema_indicator = EMAIndicator()
         self.volume_sma_indicator = VolumeSMAIndicator()
         self.relative_volume_indicator = RelativeVolumeIndicator()
+        self.volume_confirmation_indicator = (
+                VolumeConfirmationIndicator()
+            )
 
     def calculate_sma(self, data, period=20):
         """
@@ -88,6 +94,21 @@ class IndicatorService:
         return self.relative_volume_indicator.calculate(
             data,
             period
+        )
+    
+    def __init__(self):
+        """
+        Initialize the Indicator Service.
+        """
+
+        self.sma_indicator = SMAIndicator()
+        self.ema_indicator = EMAIndicator()
+        self.volume_sma_indicator = VolumeSMAIndicator()
+        self.relative_volume_indicator = (
+            RelativeVolumeIndicator()
+        )
+        self.volume_confirmation_indicator = (
+            VolumeConfirmationIndicator()
         )
     
     def calculate_ema(self, data, period=20):
