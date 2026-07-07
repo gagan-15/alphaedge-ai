@@ -18,12 +18,19 @@ from backend.indicators.ema_indicator import EMAIndicator
 from backend.indicators.rsi_indicator import RSIIndicator
 from backend.indicators.macd_indicator import MACDIndicator
 from backend.indicators.atr_indicator import ATRIndicator
-from backend.indicators.bollinger_bands_indicator import BollingerBandsIndicator
-from backend.indicators.volume_sma_indicator import VolumeSMAIndicator
-from backend.indicators.relative_volume_indicator import RelativeVolumeIndicator
+from backend.indicators.bollinger_bands_indicator import (
+    BollingerBandsIndicator
+)
+from backend.indicators.volume_sma_indicator import (
+    VolumeSMAIndicator
+)
+from backend.indicators.relative_volume_indicator import (
+    RelativeVolumeIndicator
+)
 from backend.indicators.volume_confirmation_indicator import (
     VolumeConfirmationIndicator
 )
+from backend.indicators.vwap_indicator import VWAPIndicator
 
 
 class IndicatorService:
@@ -40,100 +47,109 @@ class IndicatorService:
         self.sma_indicator = SMAIndicator()
         self.ema_indicator = EMAIndicator()
         self.volume_sma_indicator = VolumeSMAIndicator()
-        self.relative_volume_indicator = RelativeVolumeIndicator()
-        self.volume_confirmation_indicator = (
-                VolumeConfirmationIndicator()
-            )
-
-    def calculate_sma(self, data, period=20):
-        """
-        Calculate the Simple Moving Average (SMA).
-        """
-
-        return self.sma_indicator.calculate(data, period)
-    
-    def calculate_volume_sma(self,data, period: int = 20):
-            """
-            Calculate the Volume Simple Moving Average.
-
-            Args:
-                data:
-                    Market data.
-
-                period:
-                    Volume SMA period.
-
-            Returns:
-                pd.DataFrame
-            """
-
-            return self.volume_sma_indicator.calculate(
-                data,
-                period
-            )
-    
-    def calculate_relative_volume(
-    self,
-    data,
-    period: int = 20
-):
-        """
-        Calculate Relative Volume (RVOL).
-
-        Args:
-            data:
-                Market data.
-
-            period:
-                Relative Volume period.
-
-        Returns:
-            pd.DataFrame
-        """
-
-        return self.relative_volume_indicator.calculate(
-            data,
-            period
-        )
-    
-    def __init__(self):
-        """
-        Initialize the Indicator Service.
-        """
-
-        self.sma_indicator = SMAIndicator()
-        self.ema_indicator = EMAIndicator()
-        self.volume_sma_indicator = VolumeSMAIndicator()
         self.relative_volume_indicator = (
             RelativeVolumeIndicator()
         )
         self.volume_confirmation_indicator = (
             VolumeConfirmationIndicator()
         )
-    
-    def calculate_ema(self, data, period=20):
+        self.vwap_indicator = VWAPIndicator()
+
+    def calculate_sma(
+        self,
+        data,
+        period: int = 20
+    ):
+        """
+        Calculate the Simple Moving Average (SMA).
+        """
+
+        return self.sma_indicator.calculate(
+            data,
+            period
+        )
+
+    def calculate_ema(
+        self,
+        data,
+        period: int = 20
+    ):
         """
         Calculate the Exponential Moving Average (EMA).
         """
 
-        return self.ema_indicator.calculate(data, period)
-    
-    def calculate_rsi( self, data, period: int = 14):
+        return self.ema_indicator.calculate(
+            data,
+            period
+        )
+
+    def calculate_volume_sma(
+        self,
+        data,
+        period: int = 20
+    ):
+        """
+        Calculate Volume SMA.
+        """
+
+        return self.volume_sma_indicator.calculate(
+            data,
+            period
+        )
+
+    def calculate_relative_volume(
+        self,
+        data,
+        period: int = 20
+    ):
+        """
+        Calculate Relative Volume (RVOL).
+        """
+
+        return self.relative_volume_indicator.calculate(
+            data,
+            period
+        )
+
+    def calculate_volume_confirmation(
+        self,
+        data,
+        period: int = 20
+    ):
+        """
+        Calculate Volume Confirmation.
+        """
+
+        return self.volume_confirmation_indicator.calculate(
+            data,
+            period
+        )
+
+    def calculate_vwap(
+        self,
+        data
+    ):
+        """
+        Calculate Session VWAP.
+        """
+
+        return self.vwap_indicator.calculate(
+            data
+        )
+
+    def calculate_rsi(
+        self,
+        data,
+        period: int = 14
+    ):
         """
         Calculate RSI.
-
-        Args:
-            data: Market data.
-            period: RSI period.
-
-        Returns:
-            pd.Series
         """
 
         indicator = RSIIndicator(period)
 
         return indicator.calculate(data)
-    
+
     @staticmethod
     def calculate_macd(
         data,
@@ -142,16 +158,7 @@ class IndicatorService:
         signal_period: int = 9
     ):
         """
-        Calculate MACD values.
-
-        Args:
-            data: Market data.
-            fast_period: Fast EMA period.
-            slow_period: Slow EMA period.
-            signal_period: Signal EMA period.
-
-        Returns:
-            pd.DataFrame: MACD, Signal and Histogram.
+        Calculate MACD.
         """
 
         indicator = MACDIndicator(
@@ -161,7 +168,7 @@ class IndicatorService:
         )
 
         return indicator.calculate(data)
-    
+
     @staticmethod
     def calculate_atr(
         data,
@@ -169,19 +176,12 @@ class IndicatorService:
     ):
         """
         Calculate Average True Range (ATR).
-
-        Args:
-            data: Market data.
-            period: ATR period.
-
-        Returns:
-            pd.Series: ATR values.
         """
 
         indicator = ATRIndicator(period)
 
         return indicator.calculate(data)
-    
+
     @staticmethod
     def calculate_bollinger_bands(
         data,
@@ -190,17 +190,6 @@ class IndicatorService:
     ):
         """
         Calculate Bollinger Bands.
-
-        Args:
-            data: Market data.
-            period: Moving average period.
-            multiplier: Standard deviation multiplier.
-
-        Returns:
-            pd.DataFrame:
-                Middle Band,
-                Upper Band,
-                Lower Band.
         """
 
         indicator = BollingerBandsIndicator(

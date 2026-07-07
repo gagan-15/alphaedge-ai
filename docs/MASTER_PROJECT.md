@@ -18,17 +18,17 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.1.0
+> **Current Version:** v0.1.2
 
 ---
 
 # Project Metrics
 
-Current Version: v0.1.0
+Current Version: v0.1.2
 
-Total Sprints Completed: 13
+Total Sprints Completed: 14
 
-Python Files: 19
+Python Files: 20
 
 Services: 2
 MarketDataService
@@ -40,7 +40,7 @@ Validators: 2
 MarketDataValidator
 IndicatorValidator
 
-Indicators: 10
+Indicators: 11
 
 BaseIndicator
 SMAIndicator
@@ -52,14 +52,15 @@ BollingerBandsIndicator
 VolumeSMAIndicator
 RelativeVolumeIndicator
 VolumeConfirmationIndicator
+VWAPIndicator
 
 Configuration Modules: 1
 
 Entry Points: 1
 
-Tests: 24 Passing
+Tests: 25 Passing
 
-Git Commits: 9
+Git Commits: 10
 
 # Vision
 
@@ -86,15 +87,15 @@ Build a commercial SaaS platform capable of serving thousands of users with feat
 
 # Overall Project Progress
 
-███████░░░░░░░░░░░░ 22%
+███████░░░░░░░░░░░░ 24%
 
 Core Platform
 
-████████████░░░░░░ 42%
+████████████░░░░░░ 45%
 
 Commercial Readiness
 
-██░░░░░░░░░░░░░░░░ 8%
+██░░░░░░░░░░░░░░░░ 9%
 
 
 # Current Milestone
@@ -124,6 +125,7 @@ v0.0.8  Bollinger Bands Engine
 v0.0.9  Volume Indicator Engine
 v0.1.0  Relative Volume Engine
 v0.1.1  Volume Confirmation Engine
+v0.1.2  VWAP Indicator Engine
 
 # Sprint History
 
@@ -141,11 +143,12 @@ v0.1.1  Volume Confirmation Engine
 | Sprint 2.9 | ✅ | Bollinger Bands Engine |
 | Sprint 2.10 | ✅ | Volume Indicator Engine
 | Sprint 2.11 | ✅ | Relative Volume Engine |
-Sprint 2.12 | ✅ | Volume Confirmation Engine
+| Sprint 2.12 | ✅ | Volume Confirmation Engine |
+| Sprint 2.13 | ✅ | VWAP Indicator Engine |
 
 # Current Sprint
 
-Sprint 2.13 – VWAP Indicator Engine
+Sprint 2.14 – On-Balance Volume (OBV) Indicator Engine
 
 # Sprint Completion Checklist
 
@@ -160,14 +163,13 @@ Sprint 2.13 – VWAP Indicator Engine
 
 ## Objective
 
-Build the Volume Confirmation Engine.
+Build the On-Balance Volume (OBV) Indicator Engine.
 
 Objectives
 
-• Learn Volume Confirmation
-• Build Volume Confirmation Indicator
-• Detect High Volume
-• Detect Low Volume
+• Learn OBV
+• Build OBV Indicator
+• Understand Volume Flow
 • Add Validation
 • Add Logging
 • Add Unit Tests
@@ -247,29 +249,36 @@ Objectives
 • Volume Confirmation Logging
 • Volume Confirmation Unit Tests
 • Indicator Service Volume Confirmation Integration
+• VWAP Indicator
+• VWAP Validation
+• VWAP Logging
+• VWAP Unit Tests
+• Indicator Service VWAP Integration
 
 ---
 
 # In Progress
 
-* Volume Confirmation Engine
+* On-Balance Volume (OBV) Indicator Engine
 
 ---
 
 # Core Runtime Architecture
 
-                    main.py
-                       │
-                       ▼
-              IndicatorService
-                       │
- ┌──────────┬──────────┬──────────┬──────────┬────────────┐
- ▼          ▼          ▼          ▼          ▼
-SMA        EMA    Volume SMA    RVOL   Volume Confirmation
-                               │               │
-                               └───────┬───────┘
-                                       ▼
-                             Updated DataFrame 
+      main.py
+      │
+      ▼
+IndicatorService
+        │
+ ┌──────┼──────────────┬───────────────┐
+ ▼      ▼              ▼               ▼
+SMA    EMA           VWAP        Volume SMA
+                                  │
+                                  ▼
+                                RVOL
+                                  │
+                                  ▼
+                       Volume Confirmation
                                
 
 # Pending Modules
@@ -364,13 +373,13 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Sprint 2.12: Build Volume Confirmation Engine
+Sprint 2.13: Build VWAP Indicator Engine
 
 ---
 
 # Immediate Next Task
 
-VWAP Indicator Engine
+On-Balance Volume (OBV) Indicator Engine
 
 ---
 
@@ -381,11 +390,15 @@ For every feature:
 1. Requirement
 2. Architecture
 3. Implementation
-4. Explanation (every line)
-5. Testing
-6. Git Commit
-7. GitHub Push
-8. Documentation Update
+4. Explain Every Line
+5. Validation
+6. Logging
+7. IndicatorService Integration
+8. Unit Tests
+9. Run pytest
+10. Update MASTER_PROJECT.md
+11. Git Commit
+12. Git Push
 
 ---
 
@@ -434,9 +447,9 @@ Whenever continuing this project in a new chat, start with:
 
 Continue AlphaEdge AI.
 
-Current Version: v0.1.1
+Current Version: v0.1.2
 
-Sprint 2.13 – VWAP Indicator Engine
+Sprint 2.14 – On-Balance Volume (OBV) Indicator Engine
 
 Follow MASTER_PROJECT.md.
 
@@ -450,16 +463,16 @@ This document is the single source of truth.
 
 # Upcoming Sprint
 
-Sprint 2.13 – VWAP Indicator Engine
+Sprint 2.14 – On-Balance Volume (OBV) Indicator Engine
 
 Objectives
 
-• Learn VWAP
-• Build VWAP Indicator
-• Price vs VWAP
-• Validation
-• Logging
-• Unit Tests
+• Learn OBV
+• Build OBV Indicator
+• Understand Volume Flow
+• Add Validation
+• Add Logging
+• Add Unit Tests
 
 
 
@@ -480,6 +493,21 @@ Objectives
 □ Broker Integration
 □ Portfolio Analytics
 □ Multi Provider Support
+
+# How to add a new indicator
+
+1. Create indicator file
+2. Inherit BaseIndicator
+3. Implement calculate()
+4. Add validation
+5. Add logging
+6. Integrate with IndicatorService
+7. Create unit test
+8. Run pytest
+9. Update MASTER_PROJECT.md
+10. Git Commit
+11. Git Push
+12. Sprint Closed
 
 # Architecture Decisions
 
@@ -523,6 +551,11 @@ Avoid duplicate code and maintain a single source of truth for EMA calculations.
 AD-011
 
 Indicators should reuse existing indicators whenever doing so avoids duplicate logic and preserves a single source of truth.
+
+AD-012
+
+VWAP is implemented as an independent indicator because its calculation is based directly on price and volume data and does not reuse other indicators.
+
 
 # Development Rules
 
