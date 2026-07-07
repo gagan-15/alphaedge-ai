@@ -476,7 +476,7 @@ Objectives
 • Build CMF Indicator
 • Understand Money Flow Strength
 • Add Validation
-• Add Logging
+• Add Logging     
 • Add Unit Tests
 
 
