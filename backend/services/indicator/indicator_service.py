@@ -13,6 +13,7 @@ Project:
     AlphaEdge AI
 """
 
+from backend.indicators.relative_volume_indicator import RelativeVolumeIndicator
 from backend.indicators.sma_indicator import SMAIndicator
 from backend.indicators.ema_indicator import EMAIndicator
 from backend.indicators.rsi_indicator import RSIIndicator
@@ -36,6 +37,7 @@ class IndicatorService:
         self.sma_indicator = SMAIndicator()
         self.ema_indicator = EMAIndicator()
         self.volume_sma_indicator = VolumeSMAIndicator()
+        self.relative_volume_indicator = RelativeVolumeIndicator()
 
     def calculate_sma(self, data, period=20):
         """
@@ -63,6 +65,30 @@ class IndicatorService:
                 data,
                 period
             )
+    
+    def calculate_relative_volume(
+    self,
+    data,
+    period: int = 20
+):
+        """
+        Calculate Relative Volume (RVOL).
+
+        Args:
+            data:
+                Market data.
+
+            period:
+                Relative Volume period.
+
+        Returns:
+            pd.DataFrame
+        """
+
+        return self.relative_volume_indicator.calculate(
+            data,
+            period
+        )
     
     def calculate_ema(self, data, period=20):
         """
