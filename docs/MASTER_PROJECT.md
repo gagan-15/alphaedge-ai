@@ -18,17 +18,17 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.1.2
+> **Current Version:** v0.1.3
 
 ---
 
 # Project Metrics
 
-Current Version: v0.1.2
+Current Version: v0.1.3
 
-Total Sprints Completed: 14
+Total Sprints Completed: 15
 
-Python Files: 20
+Python Files: 21
 
 Services: 2
 MarketDataService
@@ -40,7 +40,7 @@ Validators: 2
 MarketDataValidator
 IndicatorValidator
 
-Indicators: 11
+Indicators: 12
 
 BaseIndicator
 SMAIndicator
@@ -53,14 +53,15 @@ VolumeSMAIndicator
 RelativeVolumeIndicator
 VolumeConfirmationIndicator
 VWAPIndicator
+OBVIndicator
 
 Configuration Modules: 1
 
 Entry Points: 1
 
-Tests: 25 Passing
+Tests: 26 Passing
 
-Git Commits: 10
+Git Commits: 11
 
 # Vision
 
@@ -126,6 +127,7 @@ v0.0.9  Volume Indicator Engine
 v0.1.0  Relative Volume Engine
 v0.1.1  Volume Confirmation Engine
 v0.1.2  VWAP Indicator Engine
+v0.1.3 — OBV Indicator Engine
 
 # Sprint History
 
@@ -145,10 +147,11 @@ v0.1.2  VWAP Indicator Engine
 | Sprint 2.11 | ✅ | Relative Volume Engine |
 | Sprint 2.12 | ✅ | Volume Confirmation Engine |
 | Sprint 2.13 | ✅ | VWAP Indicator Engine |
+| Sprint 2.14 | ✅ | On-Balance Volume (OBV) Indicator Engine |
 
 # Current Sprint
 
-Sprint 2.14 – On-Balance Volume (OBV) Indicator Engine
+Sprint 2.15 – Chaikin Money Flow (CMF) Indicator Engine
 
 # Sprint Completion Checklist
 
@@ -163,13 +166,13 @@ Sprint 2.14 – On-Balance Volume (OBV) Indicator Engine
 
 ## Objective
 
-Build the On-Balance Volume (OBV) Indicator Engine.
+Build the Chaikin Money Flow (CMF) Indicator Engine.
 
 Objectives
 
-• Learn OBV
-• Build OBV Indicator
-• Understand Volume Flow
+• Learn CMF
+• Build CMF Indicator
+• Understand Money Flow Strength
 • Add Validation
 • Add Logging
 • Add Unit Tests
@@ -254,31 +257,35 @@ Objectives
 • VWAP Logging
 • VWAP Unit Tests
 • Indicator Service VWAP Integration
+• OBV Indicator
+• OBV Validation
+• OBV Logging
+• OBV Unit Tests
+• Indicator Service OBV Integration
 
 ---
 
 # In Progress
 
-* On-Balance Volume (OBV) Indicator Engine
+* Chaikin Money Flow (CMF) Indicator Engine
 
 ---
 
 # Core Runtime Architecture
 
-      main.py
+   BaseIndicator
       │
-      ▼
-IndicatorService
-        │
- ┌──────┼──────────────┬───────────────┐
- ▼      ▼              ▼               ▼
-SMA    EMA           VWAP        Volume SMA
-                                  │
-                                  ▼
-                                RVOL
-                                  │
-                                  ▼
-                       Volume Confirmation
+      ├── SMA
+      ├── EMA
+      ├── RSI
+      ├── MACD
+      ├── ATR
+      ├── Bollinger Bands
+      ├── Volume SMA
+      ├── Relative Volume
+      ├── Volume Confirmation
+      ├── VWAP
+      └── OBV
                                
 
 # Pending Modules
@@ -373,13 +380,13 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Sprint 2.13: Build VWAP Indicator Engine
+Sprint 2.14: Build On-Balance Volume (OBV) Indicator Engine
 
 ---
 
 # Immediate Next Task
 
-On-Balance Volume (OBV) Indicator Engine
+Chaikin Money Flow (CMF) Indicator Engine
 
 ---
 
@@ -443,13 +450,11 @@ Future additions (new indicators, AI models, timeframes, markets, strategies, ne
 
 # Resume Instructions
 
-Whenever continuing this project in a new chat, start with:
-
 Continue AlphaEdge AI.
 
-Current Version: v0.1.2
+Current Version: v0.1.3
 
-Sprint 2.14 – On-Balance Volume (OBV) Indicator Engine
+Sprint 2.15 – Chaikin Money Flow (CMF) Indicator Engine
 
 Follow MASTER_PROJECT.md.
 
@@ -463,13 +468,13 @@ This document is the single source of truth.
 
 # Upcoming Sprint
 
-Sprint 2.14 – On-Balance Volume (OBV) Indicator Engine
+Sprint 2.15 – Chaikin Money Flow (CMF) Indicator Engine
 
 Objectives
 
-• Learn OBV
-• Build OBV Indicator
-• Understand Volume Flow
+• Learn CMF
+• Build CMF Indicator
+• Understand Money Flow Strength
 • Add Validation
 • Add Logging
 • Add Unit Tests
@@ -555,6 +560,10 @@ Indicators should reuse existing indicators whenever doing so avoids duplicate l
 AD-012
 
 VWAP is implemented as an independent indicator because its calculation is based directly on price and volume data and does not reuse other indicators.
+
+AD-013
+
+OBV is implemented as a stateful indicator because each OBV value depends on the previous OBV value.
 
 
 # Development Rules

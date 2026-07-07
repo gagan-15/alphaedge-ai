@@ -31,6 +31,7 @@ from backend.indicators.volume_confirmation_indicator import (
     VolumeConfirmationIndicator
 )
 from backend.indicators.vwap_indicator import VWAPIndicator
+from backend.indicators.obv_indicator import OBVIndicator
 
 
 class IndicatorService:
@@ -54,6 +55,7 @@ class IndicatorService:
             VolumeConfirmationIndicator()
         )
         self.vwap_indicator = VWAPIndicator()
+        self.obv_indicator = OBVIndicator()
 
     def calculate_sma(
         self,
@@ -136,6 +138,23 @@ class IndicatorService:
         return self.vwap_indicator.calculate(
             data
         )
+    
+    def calculate_obv(
+        self,
+        data
+   ):
+        """
+        Calculate On-Balance Volume (OBV).
+
+        Args:
+            data:
+                Market data.
+
+        Returns:
+            pd.DataFrame
+        """
+
+        return self.obv_indicator.calculate(data)
 
     def calculate_rsi(
         self,
