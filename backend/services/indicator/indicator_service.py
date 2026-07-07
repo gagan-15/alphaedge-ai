@@ -33,6 +33,7 @@ from backend.indicators.volume_confirmation_indicator import (
 from backend.indicators.vwap_indicator import VWAPIndicator
 from backend.indicators.obv_indicator import OBVIndicator
 from backend.indicators.cmf_indicator import CMFIndicator
+from backend.indicators.mfi_indicator import MFIIndicator
 
 
 class IndicatorService:
@@ -58,6 +59,7 @@ class IndicatorService:
         self.vwap_indicator = VWAPIndicator()
         self.obv_indicator = OBVIndicator()
         self.cmf_indicator = CMFIndicator()
+        self.mfi_indicator = MFIIndicator()
 
     def calculate_sma(
         self,
@@ -165,6 +167,30 @@ class IndicatorService:
             period
        )
     
+    def calculate_mfi(
+        self,
+        data,
+        period: int = 14
+     ):
+        """
+        Calculate Money Flow Index (MFI).
+
+        Args:
+            data:
+                Market data.
+
+            period:
+                MFI calculation period.
+
+        Returns:
+            pd.DataFrame
+        """
+
+        return self.mfi_indicator.calculate(
+            data,
+            period
+        )
+            
     def calculate_obv(
         self,
         data

@@ -18,15 +18,15 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.1.4
+> **Current Version:** v0.1.5
 
 ---
 
 # Project Metrics
 
-Current Version: v0.1.4
+Current Version: v0.1.5
 
-Total Sprints Completed: 16
+Total Sprints Completed: 17
 
 Python Files: 22
 
@@ -40,7 +40,7 @@ Validators: 2
 MarketDataValidator
 IndicatorValidator
 
-Indicators: 12
+Indicators: 13
 
 BaseIndicator
 SMAIndicator
@@ -55,12 +55,12 @@ VolumeConfirmationIndicator
 VWAPIndicator
 OBVIndicator
 CMFIndicator
-
+MFIIndicator
 Configuration Modules: 1
 
 Entry Points: 1
 
-Tests: 27 Passing
+Tests: 28 Passing
 
 Git Commits: 12
 
@@ -130,6 +130,7 @@ v0.1.1  Volume Confirmation Engine
 v0.1.2  VWAP Indicator Engine
 v0.1.3 — OBV Indicator Engine
 v0.1.4 — Chaikin Money Flow (CMF) Indicator Engine
+v0.1.5 — Money Flow Index (MFI) Indicator Engine
 
 # Sprint History
 
@@ -150,11 +151,12 @@ v0.1.4 — Chaikin Money Flow (CMF) Indicator Engine
 | Sprint 2.12 | ✅ | Volume Confirmation Engine |
 | Sprint 2.13 | ✅ | VWAP Indicator Engine |
 | Sprint 2.14 | ✅ | On-Balance Volume (OBV) Indicator Engine |
-| Sprint 2.15 | ✅ | Chaikin Money Flow (CMF) Indicator Engine
+| Sprint 2.15 | ✅ | Chaikin Money Flow (CMF) Indicator Engine |
+| Sprint 2.16 | ✅ | Money Flow Index (MFI) Indicator Engine |
 
 # Current Sprint
 
-Sprint 2.16 – Money Flow Index (MFI) Indicator Engine
+Sprint 2.17 – Average Directional Index (ADX) Indicator Engine
 
 # Sprint Completion Checklist
 
@@ -169,16 +171,16 @@ Sprint 2.16 – Money Flow Index (MFI) Indicator Engine
 
 ## Objective
 
-Build the Money Flow Index (MFI) Indicator Engine.
+Build the Average Directional Index (ADX) Indicator Engine.
 
 Objectives
 
-Learn MFI
-Build MFI Indicator
-Understand Money Flow Index
-Add Validation
-Add Logging
-Add Unit Tests
+• Learn ADX
+• Build ADX Indicator
+• Understand Trend Strength
+• Add Validation
+• Add Logging
+• Add Unit Tests
 
 ---
 
@@ -270,7 +272,7 @@ Add Unit Tests
 
 # In Progress
 
-* Money Flow Index (MFI) Indicator Engine
+* Average Directional Index (ADX) Indicator Engine
 
 ---
 
@@ -289,7 +291,8 @@ BaseIndicator
       ├── Volume Confirmation
       ├── VWAP
       ├── OBV
-      └── CMF          
+      ├── CMF
+      └── MFI  
 
 # Pending Modules
 
@@ -383,13 +386,13 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Sprint 2.15: Build Chaikin Money Flow (CMF) Indicator Engine
+Sprint 2.16: Build Money Flow Index (MFI) Indicator Engine
 
 ---
 
 # Immediate Next Task
 
-Money Flow Index (MFI) Indicator Engine
+Average Directional Index (ADX) Indicator Engine
 
 ---
 
@@ -455,9 +458,9 @@ Future additions (new indicators, AI models, timeframes, markets, strategies, ne
 
 Continue AlphaEdge AI.
 
-Current Version: v0.1.4
+Current Version: v0.1.5
 
-Sprint 2.16 – Money Flow Index (MFI) Indicator Engine
+Sprint 2.17 – Average Directional Index (ADX) Indicator Engine
 
 Follow MASTER_PROJECT.md.
 
@@ -471,13 +474,13 @@ This document is the single source of truth.
 
 # Upcoming Sprint
 
-Sprint 2.16 – Money Flow Index (MFI) Indicator Engine
+Sprint 2.17 – Average Directional Index (ADX) Indicator Engine
 
 Objectives
 
-• Learn MFI
-• Build MFI Indicator
-• Understand Money Flow Index
+• Learn ADX
+• Build ADX Indicator
+• Understand Trend Strength
 • Add Validation
 • Add Logging
 • Add Unit Tests
