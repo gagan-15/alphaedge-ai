@@ -18,17 +18,17 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.1.3
+> **Current Version:** v0.1.4
 
 ---
 
 # Project Metrics
 
-Current Version: v0.1.3
+Current Version: v0.1.4
 
-Total Sprints Completed: 15
+Total Sprints Completed: 16
 
-Python Files: 21
+Python Files: 22
 
 Services: 2
 MarketDataService
@@ -54,14 +54,15 @@ RelativeVolumeIndicator
 VolumeConfirmationIndicator
 VWAPIndicator
 OBVIndicator
+CMFIndicator
 
 Configuration Modules: 1
 
 Entry Points: 1
 
-Tests: 26 Passing
+Tests: 27 Passing
 
-Git Commits: 11
+Git Commits: 12
 
 # Vision
 
@@ -128,6 +129,7 @@ v0.1.0  Relative Volume Engine
 v0.1.1  Volume Confirmation Engine
 v0.1.2  VWAP Indicator Engine
 v0.1.3 — OBV Indicator Engine
+v0.1.4 — Chaikin Money Flow (CMF) Indicator Engine
 
 # Sprint History
 
@@ -148,34 +150,35 @@ v0.1.3 — OBV Indicator Engine
 | Sprint 2.12 | ✅ | Volume Confirmation Engine |
 | Sprint 2.13 | ✅ | VWAP Indicator Engine |
 | Sprint 2.14 | ✅ | On-Balance Volume (OBV) Indicator Engine |
+| Sprint 2.15 | ✅ | Chaikin Money Flow (CMF) Indicator Engine
 
 # Current Sprint
 
-Sprint 2.15 – Chaikin Money Flow (CMF) Indicator Engine
+Sprint 2.16 – Money Flow Index (MFI) Indicator Engine
 
 # Sprint Completion Checklist
 
-□ Architecture
-□ Code
-□ Validation
-□ Logging
-□ Tests
-□ Documentation
-□ Git Commit
-□ Git Push
+✅ Architecture
+✅ Code
+✅ Validation
+✅ Logging
+✅ Tests
+✅ Documentation
+⏳ Git Commit
+⏳ Git Push
 
 ## Objective
 
-Build the Chaikin Money Flow (CMF) Indicator Engine.
+Build the Money Flow Index (MFI) Indicator Engine.
 
 Objectives
 
-• Learn CMF
-• Build CMF Indicator
-• Understand Money Flow Strength
-• Add Validation
-• Add Logging
-• Add Unit Tests
+Learn MFI
+Build MFI Indicator
+Understand Money Flow Index
+Add Validation
+Add Logging
+Add Unit Tests
 
 ---
 
@@ -267,13 +270,13 @@ Objectives
 
 # In Progress
 
-* Chaikin Money Flow (CMF) Indicator Engine
+* Money Flow Index (MFI) Indicator Engine
 
 ---
 
 # Core Runtime Architecture
 
-   BaseIndicator
+BaseIndicator
       │
       ├── SMA
       ├── EMA
@@ -285,8 +288,8 @@ Objectives
       ├── Relative Volume
       ├── Volume Confirmation
       ├── VWAP
-      └── OBV
-                               
+      ├── OBV
+      └── CMF          
 
 # Pending Modules
 
@@ -380,13 +383,13 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Sprint 2.14: Build On-Balance Volume (OBV) Indicator Engine
+Sprint 2.15: Build Chaikin Money Flow (CMF) Indicator Engine
 
 ---
 
 # Immediate Next Task
 
-Chaikin Money Flow (CMF) Indicator Engine
+Money Flow Index (MFI) Indicator Engine
 
 ---
 
@@ -452,9 +455,9 @@ Future additions (new indicators, AI models, timeframes, markets, strategies, ne
 
 Continue AlphaEdge AI.
 
-Current Version: v0.1.3
+Current Version: v0.1.4
 
-Sprint 2.15 – Chaikin Money Flow (CMF) Indicator Engine
+Sprint 2.16 – Money Flow Index (MFI) Indicator Engine
 
 Follow MASTER_PROJECT.md.
 
@@ -468,15 +471,15 @@ This document is the single source of truth.
 
 # Upcoming Sprint
 
-Sprint 2.15 – Chaikin Money Flow (CMF) Indicator Engine
+Sprint 2.16 – Money Flow Index (MFI) Indicator Engine
 
 Objectives
 
-• Learn CMF
-• Build CMF Indicator
-• Understand Money Flow Strength
+• Learn MFI
+• Build MFI Indicator
+• Understand Money Flow Index
 • Add Validation
-• Add Logging     
+• Add Logging
 • Add Unit Tests
 
 

@@ -32,6 +32,7 @@ from backend.indicators.volume_confirmation_indicator import (
 )
 from backend.indicators.vwap_indicator import VWAPIndicator
 from backend.indicators.obv_indicator import OBVIndicator
+from backend.indicators.cmf_indicator import CMFIndicator
 
 
 class IndicatorService:
@@ -56,6 +57,7 @@ class IndicatorService:
         )
         self.vwap_indicator = VWAPIndicator()
         self.obv_indicator = OBVIndicator()
+        self.cmf_indicator = CMFIndicator()
 
     def calculate_sma(
         self,
@@ -139,6 +141,30 @@ class IndicatorService:
             data
         )
     
+    def calculate_cmf(
+        self,
+        data,
+        period: int = 20
+    ):
+        """
+        Calculate Chaikin Money Flow (CMF).
+
+        Args:
+            data:
+                Market data.
+
+            period:
+                CMF calculation period.
+
+        Returns:
+            pd.DataFrame
+        """
+
+        return self.cmf_indicator.calculate(
+            data,
+            period
+       )
+    
     def calculate_obv(
         self,
         data
@@ -217,3 +243,6 @@ class IndicatorService:
         )
 
         return indicator.calculate(data)
+    
+
+   

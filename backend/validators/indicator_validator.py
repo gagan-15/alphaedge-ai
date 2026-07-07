@@ -132,14 +132,24 @@ class IndicatorValidator:
                     f"Required column '{column}' not found."
                 )
             
-
     @staticmethod
-    def validate_obv_input(data: pd.DataFrame) -> None:
+    def validate_cmf_input(data: pd.DataFrame) -> None:
         """
-        Validate input data required for OBV calculation.
+        Validate input data required for
+        Chaikin Money Flow (CMF) calculation.
+
+        Args:
+            data (pd.DataFrame):
+                Market data.
+
+        Raises:
+            ValueError:
+                If required columns are missing.
         """
 
         required_columns = [
+            "High",
+            "Low",
             "Close",
             "Volume"
         ]
