@@ -18,15 +18,15 @@
 > **Project Status:** Active Development
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Version:** v0.1.5
+> **Current Version:** v0.1.6
 
 ---
 
 # Project Metrics
 
-Current Version: v0.1.5
+Current Version: v0.1.6
 
-Total Sprints Completed: 17
+Total Sprints Completed: 18
 
 Python Files: 22
 
@@ -40,7 +40,7 @@ Validators: 2
 MarketDataValidator
 IndicatorValidator
 
-Indicators: 13
+Indicators: 14
 
 BaseIndicator
 SMAIndicator
@@ -56,11 +56,13 @@ VWAPIndicator
 OBVIndicator
 CMFIndicator
 MFIIndicator
+ADXIndicator
+
 Configuration Modules: 1
 
 Entry Points: 1
 
-Tests: 28 Passing
+Tests: 29 Passing
 
 Git Commits: 12
 
@@ -131,6 +133,7 @@ v0.1.2  VWAP Indicator Engine
 v0.1.3 — OBV Indicator Engine
 v0.1.4 — Chaikin Money Flow (CMF) Indicator Engine
 v0.1.5 — Money Flow Index (MFI) Indicator Engine
+v0.1.6 — Average Directional Index (ADX) Indicator Engine
 
 # Sprint History
 
@@ -153,31 +156,31 @@ v0.1.5 — Money Flow Index (MFI) Indicator Engine
 | Sprint 2.14 | ✅ | On-Balance Volume (OBV) Indicator Engine |
 | Sprint 2.15 | ✅ | Chaikin Money Flow (CMF) Indicator Engine |
 | Sprint 2.16 | ✅ | Money Flow Index (MFI) Indicator Engine |
+| Sprint 2.17 | ✅ | Average Directional Index (ADX) Indicator Engine
 
 # Current Sprint
 
-Sprint 2.17 – Average Directional Index (ADX) Indicator Engine
+Sprint 2.18 – SuperTrend Indicator Engine
 
 # Sprint Completion Checklist
 
-✅ Architecture
-✅ Code
-✅ Validation
-✅ Logging
-✅ Tests
-✅ Documentation
+⏳ Architecture
+⏳ Code
+⏳ Validation
+⏳ Logging
+⏳ Tests
+⏳ Documentation
 ⏳ Git Commit
 ⏳ Git Push
 
 ## Objective
 
-Build the Average Directional Index (ADX) Indicator Engine.
+Build the SuperTrend Indicator Engine.
 
 Objectives
 
-• Learn ADX
-• Build ADX Indicator
-• Understand Trend Strength
+• Learn SuperTrend
+• Build SuperTrend Indicator
 • Add Validation
 • Add Logging
 • Add Unit Tests
@@ -272,7 +275,7 @@ Objectives
 
 # In Progress
 
-* Average Directional Index (ADX) Indicator Engine
+* SuperTrend Indicator Engine
 
 ---
 
@@ -292,7 +295,8 @@ BaseIndicator
       ├── VWAP
       ├── OBV
       ├── CMF
-      └── MFI  
+      ├── MFI
+      └── ADX
 
 # Pending Modules
 
@@ -386,13 +390,13 @@ https://github.com/gagan-15/alphaedge-ai
 
 # Latest Commit
 
-Sprint 2.16: Build Money Flow Index (MFI) Indicator Engine
+Sprint 2.17: Build Average Directional Index (ADX) Indicator Engine
 
 ---
 
 # Immediate Next Task
 
-Average Directional Index (ADX) Indicator Engine
+SuperTrend Indicator Engine
 
 ---
 
@@ -458,9 +462,9 @@ Future additions (new indicators, AI models, timeframes, markets, strategies, ne
 
 Continue AlphaEdge AI.
 
-Current Version: v0.1.5
+Current Version: v0.1.6
 
-Sprint 2.17 – Average Directional Index (ADX) Indicator Engine
+Sprint 2.18 – SuperTrend Indicator Engine
 
 Follow MASTER_PROJECT.md.
 
@@ -474,13 +478,13 @@ This document is the single source of truth.
 
 # Upcoming Sprint
 
-Sprint 2.17 – Average Directional Index (ADX) Indicator Engine
+Sprint 2.18 – SuperTrend Indicator Engine
 
 Objectives
 
-• Learn ADX
-• Build ADX Indicator
-• Understand Trend Strength
+• Learn SuperTrend
+• Build SuperTrend Indicator
+• Understand Trend Reversal
 • Add Validation
 • Add Logging
 • Add Unit Tests

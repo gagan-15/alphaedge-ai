@@ -34,6 +34,7 @@ from backend.indicators.vwap_indicator import VWAPIndicator
 from backend.indicators.obv_indicator import OBVIndicator
 from backend.indicators.cmf_indicator import CMFIndicator
 from backend.indicators.mfi_indicator import MFIIndicator
+from backend.indicators.adx_indicator import ADXIndicator
 
 
 class IndicatorService:
@@ -60,6 +61,7 @@ class IndicatorService:
         self.obv_indicator = OBVIndicator()
         self.cmf_indicator = CMFIndicator()
         self.mfi_indicator = MFIIndicator()
+        self.adx_indicator = ADXIndicator()
 
     def calculate_sma(
         self,
@@ -167,6 +169,32 @@ class IndicatorService:
             period
        )
     
+    def calculate_adx(
+    self,
+    data,
+    period: int = 14
+):
+        """
+        Calculate Average Directional Index (ADX),
+        Positive Directional Indicator (+DI),
+        and Negative Directional Indicator (-DI).
+
+        Args:
+            data:
+                Market data.
+
+            period:
+                ADX calculation period.
+
+        Returns:
+            pd.DataFrame
+        """
+
+        return self.adx_indicator.calculate(
+            data,
+            period
+        )
+        
     def calculate_mfi(
         self,
         data,
