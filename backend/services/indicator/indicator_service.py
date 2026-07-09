@@ -36,6 +36,7 @@ from backend.indicators.cmf_indicator import CMFIndicator
 from backend.indicators.mfi_indicator import MFIIndicator
 from backend.indicators.adx_indicator import ADXIndicator
 from backend.indicators.supertrend_indicator import SuperTrendIndicator
+from backend.indicators.parabolic_sar_indicator import ParabolicSARIndicator
 
 
 class IndicatorService:
@@ -64,6 +65,7 @@ class IndicatorService:
         self.mfi_indicator = MFIIndicator()
         self.adx_indicator = ADXIndicator()
         self.supertrend_indicator = SuperTrendIndicator()
+        self.parabolic_sar_indicator = ParabolicSARIndicator()
 
     def calculate_sma(
         self,
@@ -234,6 +236,23 @@ class IndicatorService:
         indicator = SuperTrendIndicator(
             period=period,
             multiplier=multiplier
+        )
+
+        return indicator.calculate(data)
+    
+    def calculate_parabolic_sar(
+        self,
+        data,
+        acceleration: float = 0.02,
+        maximum_acceleration: float = 0.20
+    ):
+        """
+        Calculate Parabolic SAR Indicator.
+        """
+
+        indicator = ParabolicSARIndicator(
+            acceleration=acceleration,
+            maximum_acceleration=maximum_acceleration
         )
 
         return indicator.calculate(data)

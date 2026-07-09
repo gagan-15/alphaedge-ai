@@ -240,3 +240,32 @@ class IndicatorValidator:
                 raise ValueError(
                     f"Required column '{column}' not found."
                 )
+            
+
+    @staticmethod
+    def validate_parabolic_sar_input(
+        data: pd.DataFrame
+    ) -> None:
+        """
+        Validate input data required
+        for Parabolic SAR calculation.
+
+        Args:
+            data (pd.DataFrame):
+                Market data.
+
+        Raises:
+            ValueError:
+                If required columns are missing.
+        """
+
+        required_columns = [
+            "High",
+            "Low"
+        ]
+
+        for column in required_columns:
+            if column not in data.columns:
+                raise ValueError(
+                    f"Required column '{column}' not found."
+                )
