@@ -265,6 +265,14 @@ Stateful indicators (for example OBV and Parabolic SAR) manage previous values i
 
 ---
 
+AD-014
+
+The Rule Engine combines outputs from independent indicators to produce deterministic Buy, Sell and Hold decisions.
+
+Indicators calculate.
+
+Rule Engine interprets.
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

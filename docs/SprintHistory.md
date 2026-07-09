@@ -30,29 +30,17 @@
 | Sprint 2.17 | v0.1.8 | ✅ | Average Directional Index (ADX) Indicator Engine | Passing | ADX |
 | Sprint 2.18 | v0.1.7 | ✅ | SuperTrend Indicator Engine | Passing | SuperTrend |
 | Sprint 2.19 | v0.1.8 | ✅ | Parabolic SAR Indicator Engine | Passing | Parabolic SAR |
-| Sprint 2.20 | v0.1.9 | 🔄 | Ichimoku Cloud Indicator Engine | 44 Passing | Pending |
+| Sprint 2.20 | v0.1.9 | ✅ | Ichimoku Cloud Indicator Engine | 44 Passing | Sprint 2.20 – Build Ichimoku Cloud Indicator Engine |
 
 ---
 
-# Project Milestones
+# Current Phase
 
-## Phase 1
+Phase 3
 
-- ✅ Project Foundation
+Current Work
 
-## Phase 2
-
-- 🔄 Indicator Engine Development
-
-## Phase 3
-
-- ⬜ Rule Engine
-- ⬜ Demand & Supply Engine
-- ⬜ Screener Engine
-- ⬜ Risk Engine
-- ⬜ AI Engine
-- ⬜ Portfolio Engine
-- ⬜ Backtesting Engine
+🎯 Rule Engine Development
 
 ---
 
@@ -60,34 +48,26 @@
 
 Every sprint must satisfy:
 
-- ✅ Architecture Completed
-- ✅ Implementation Completed
-- ✅ Validation Added
-- ✅ Logging Added
-- ✅ Unit Tests Added
+- ✅ Architecture
+- ✅ Implementation
+- ✅ Validation
+- ✅ Logging
+- ✅ Unit Tests
 - ✅ Pytest Passing
 - ✅ Documentation Updated
 - ✅ Git Commit
 - ✅ Git Push
 
-Only then should the sprint status change to:
-
-**✅ Complete**
+Only then may the sprint be marked complete.
 
 ---
 
 # History Rules
 
-1. Completed sprint history is read-only unless correcting a verified error.
+1. Completed sprint history is read-only.
 2. Append new sprints only.
-3. Every sprint must record:
-   - Sprint Number
-   - Version
-   - Status
-   - Description
-   - Pytest Result
-   - Git Commit
-4. This document is the historical source of truth for completed work.
+3. Never rewrite history.
+4. Record Version, Tests and Commit for every sprint.
 
 ---
 

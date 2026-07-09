@@ -4,7 +4,7 @@
 > **Project Type:** AI-Assisted Trading Intelligence Platform
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
-> **Current Phase:** Phase 2 – Indicator Engine Development
+> **Current Phase:** Phase 3 – Rule Engine Development
 
 ---
 
@@ -12,13 +12,17 @@
 
 Current Version: **v0.1.9**
 
-Current Sprint: **Sprint 2.20 – Ichimoku Cloud Indicator Engine**
+Current Sprint:
+**Sprint 2.21 – Rule Engine Foundation**
 
-Overall Progress: **29%**
+Overall Progress:
+**29%**
 
-Core Platform Progress: **52%**
+Core Platform Progress:
+**52%**
 
-Commercial Readiness: **10%**
+Commercial Readiness:
+**10%**
 
 ---
 
@@ -35,7 +39,24 @@ Commercial Readiness: **10%**
 | Configuration Modules | 1 |
 | Entry Points | 1 |
 | Pytest | 44 Passing |
-| Git Commits | 14 |
+| Git Commits | 15 |
+
+---
+
+# Vision
+
+Build the world's most intelligent AI-assisted Trading Intelligence Platform.
+
+AlphaEdge AI helps traders make explainable, repeatable and high-quality trading decisions using technical analysis, AI-assisted insights and rule-based logic.
+
+The platform will always be:
+
+- Data First
+- AI Assisted (Not AI Dependent)
+- Modular
+- Scalable
+- Explainable
+- Enterprise Ready
 
 ---
 
@@ -43,39 +64,72 @@ Commercial Readiness: **10%**
 
 ## Completed
 
+- ✅ Project Foundation
 - ✅ Market Data Engine
 - ✅ Validation Framework
+- ✅ Logging Framework
 - ✅ Indicator Foundation
 - ✅ Momentum Indicators
 - ✅ Volatility Indicators
 - ✅ Volume Indicators
 - ✅ Trend Indicators
 
-## Next
+## Current Milestone
 
-- 🎯 Rule Engine
+🎯 Rule Engine Development
+
+---
+
+# Version History
+
+| Version | Description |
+|----------|-------------|
+| v0.0.1 | Project Foundation |
+| v0.0.2 | Market Data Engine |
+| v0.0.3 | Validation & Logging |
+| v0.0.4 | Indicator Foundation (SMA & EMA) |
+| v0.0.5 | RSI Indicator Engine |
+| v0.0.6 | MACD Indicator Engine |
+| v0.0.7 | ATR Indicator Engine |
+| v0.0.8 | Bollinger Bands Indicator Engine |
+| v0.0.9 | Volume SMA Indicator Engine |
+| v0.1.0 | Relative Volume Indicator Engine |
+| v0.1.1 | Volume Confirmation Indicator Engine |
+| v0.1.2 | VWAP Indicator Engine |
+| v0.1.3 | On-Balance Volume (OBV) Indicator Engine |
+| v0.1.4 | Chaikin Money Flow (CMF) Indicator Engine |
+| v0.1.5 | Money Flow Index (MFI) Indicator Engine |
+| v0.1.6 | Average Directional Index (ADX) Indicator Engine |
+| v0.1.7 | SuperTrend Indicator Engine |
+| v0.1.8 | Parabolic SAR Indicator Engine |
+| **v0.1.9** | **Ichimoku Cloud Indicator Engine** |
 
 ---
 
 # Current Sprint
 
-## Sprint 2.20 – Ichimoku Cloud Indicator Engine
+## Sprint 2.21 – Rule Engine Foundation
 
 ### Objective
 
-Build the Ichimoku Cloud Indicator Engine.
+Build the Rule Engine that combines multiple technical indicators into deterministic Buy, Sell and Hold decisions.
 
-### Status
+### Sprint Status
 
-✅ Architecture
-✅ Implementation
-✅ Validation
-✅ Logging
-✅ IndicatorService Integration
-✅ Unit Tests
-✅ Pytest (44 Passing)
-✅ Documentation
+⬜ Architecture
+
+⬜ Implementation
+
+⬜ Validation
+
+⬜ Logging
+
+⬜ Unit Tests
+
+⬜ Documentation
+
 ⬜ Git Commit
+
 ⬜ Git Push
 
 ---
@@ -111,20 +165,74 @@ Build the Ichimoku Cloud Indicator Engine.
 
 ---
 
+# Pending Modules
+
+The following modules are planned for future development:
+
+- ⬜ Rule Engine
+- ⬜ Demand & Supply Engine
+- ⬜ Screener Engine
+- ⬜ Risk Management Engine
+- ⬜ Backtesting Engine
+- ⬜ AI Decision Engine
+- ⬜ Portfolio Engine
+- ⬜ Alert Engine
+- ⬜ News Engine
+- ⬜ Dashboard
+- ⬜ Deployment
+
+---
+
+# Technology Stack
+
+## Backend
+
+- Python
+- FastAPI
+
+## Frontend
+
+- React (Planned)
+
+## Database
+
+- PostgreSQL (Planned)
+
+## Testing
+
+- pytest
+
+## Version Control
+
+- Git
+
+---
+
+# Engineering Principles
+
+AlphaEdge AI follows these principles:
+
+- Data First
+- AI Assisted (Not AI Dependent)
+- Clean Architecture
+- Modular Design
+- Scalable Design
+- Explainable Decisions
+- Enterprise Coding Standards
+- Configuration Driven
+- Rule-Based Decision Making
+
+---
 
 # Latest Commit
 
-Sprint 2.19 – Build Parabolic SAR Indicator Engine
+Sprint 2.20 – Build Ichimoku Cloud Indicator Engine
 
 ---
 
 # Immediate Next Task
 
-Close Sprint 2.20
-
-↓
-
-Begin Sprint 2.21
+Sprint 2.21 – Rule Engine Foundation
 
 ---
 
@@ -132,26 +240,27 @@ Begin Sprint 2.21
 
 Continue AlphaEdge AI.
 
-Read documents in this order:
+Read the documentation in this order:
 
-1. MASTER_PROJECT.md (Current Status)
-2. DeveloperGuide.md (Development Rules)
+1. MASTER_PROJECT.md (Current Project Status)
+2. DeveloperGuide.md (Development Standards)
 3. Architecture.md (Architecture Decisions)
 4. SprintHistory.md (Project History)
 5. Roadmap.md (Future Development)
 
 Development Rules
 
-- Completed sprints are read-only unless a verified bug is found.
-- Verify dependent modules before generating new code.
 - Architecture before coding.
-- Validation, Logging and Unit Tests are mandatory.
-- Keep modules reusable and scalable.
+- Validate before calculation.
+- Logging is mandatory.
+- Unit Tests are mandatory.
+- Reuse existing modules whenever possible.
+- Completed sprints are read-only unless a verified bug is found.
 - Every sprint ends with:
-  - Tests Passing
-  - Documentation Updated
-  - Git Commit
-  - Git Push
+  - ✅ Tests Passing
+  - ✅ Documentation Updated
+  - ✅ Git Commit
+  - ✅ Git Push
 
 ---
 
