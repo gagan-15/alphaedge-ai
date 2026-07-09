@@ -35,6 +35,7 @@ from backend.indicators.obv_indicator import OBVIndicator
 from backend.indicators.cmf_indicator import CMFIndicator
 from backend.indicators.mfi_indicator import MFIIndicator
 from backend.indicators.adx_indicator import ADXIndicator
+from backend.indicators.supertrend_indicator import SuperTrendIndicator
 
 
 class IndicatorService:
@@ -62,6 +63,7 @@ class IndicatorService:
         self.cmf_indicator = CMFIndicator()
         self.mfi_indicator = MFIIndicator()
         self.adx_indicator = ADXIndicator()
+        self.supertrend_indicator = SuperTrendIndicator()
 
     def calculate_sma(
         self,
@@ -218,6 +220,23 @@ class IndicatorService:
             data,
             period
         )
+    
+    def calculate_supertrend(
+        self,
+        data,
+        period: int = 10,
+        multiplier: float = 3.0
+    ):
+        """
+        Calculate SuperTrend Indicator.
+        """
+
+        indicator = SuperTrendIndicator(
+            period=period,
+            multiplier=multiplier
+        )
+
+        return indicator.calculate(data)
             
     def calculate_obv(
         self,

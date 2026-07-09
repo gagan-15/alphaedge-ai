@@ -218,3 +218,25 @@ class IndicatorValidator:
                 raise ValueError(
                     f"Required column '{column}' not found."
                 )
+            
+
+    @staticmethod
+    def validate_supertrend_input(
+        data: pd.DataFrame
+    ) -> None:
+        """
+        Validate input data required
+        for SuperTrend calculation.
+        """
+
+        required_columns = [
+            "High",
+            "Low",
+            "Close"
+        ]
+
+        for column in required_columns:
+            if column not in data.columns:
+                raise ValueError(
+                    f"Required column '{column}' not found."
+                )
