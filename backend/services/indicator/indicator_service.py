@@ -37,7 +37,7 @@ from backend.indicators.mfi_indicator import MFIIndicator
 from backend.indicators.adx_indicator import ADXIndicator
 from backend.indicators.supertrend_indicator import SuperTrendIndicator
 from backend.indicators.parabolic_sar_indicator import ParabolicSARIndicator
-
+from backend.indicators.ichimoku_cloud_indicator import IchimokuCloudIndicator
 
 class IndicatorService:
     """
@@ -66,6 +66,7 @@ class IndicatorService:
         self.adx_indicator = ADXIndicator()
         self.supertrend_indicator = SuperTrendIndicator()
         self.parabolic_sar_indicator = ParabolicSARIndicator()
+        self.ichimoku_cloud_indicator = IchimokuCloudIndicator()
 
     def calculate_sma(
         self,
@@ -253,6 +254,28 @@ class IndicatorService:
         indicator = ParabolicSARIndicator(
             acceleration=acceleration,
             maximum_acceleration=maximum_acceleration
+        )
+
+        return indicator.calculate(data)
+    
+
+    def calculate_ichimoku_cloud(
+        self,
+        data,
+        conversion_period: int = 9,
+        base_period: int = 26,
+        leading_span_b_period: int = 52,
+        displacement: int = 26
+    ):
+        """
+        Calculate Ichimoku Cloud Indicator.
+        """
+
+        indicator = IchimokuCloudIndicator(
+            conversion_period=conversion_period,
+            base_period=base_period,
+            leading_span_b_period=leading_span_b_period,
+            displacement=displacement
         )
 
         return indicator.calculate(data)
