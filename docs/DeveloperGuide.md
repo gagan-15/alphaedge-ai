@@ -369,6 +369,10 @@ Readable code always wins.
 
 ---
 
+## DR-11 – Future Compatibility
+
+Every new module must be designed so that future features can be added with minimal changes to existing code. Prefer extension over modification whenever practical.
+
 # 11. Documentation Rules
 
 MASTER_PROJECT.md
