@@ -12,8 +12,8 @@ from typing import Any
 
 from backend.core.logger import logger
 from backend.validators.rule_validator import RuleValidator
-from backend.config.settings import RSI_NEUTRAL_LEVEL
 from backend.models.trading_signal import TradingSignal
+from backend.engines.rule_engine.rule_builder import RuleBuilder
 
 
 class RuleEngine:
@@ -32,22 +32,14 @@ class RuleEngine:
         Initialize Rule Engine.
         """
         logger.info("RuleEngine initialized.")
+        self.rule_builder = RuleBuilder()
 
     def evaluate(
-    self,
-    indicator_results: dict[str, Any]
-) -> TradingSignal:
+        self,
+        indicator_results: dict[str, Any]
+    ) -> TradingSignal:
         """
         Evaluate indicator outputs.
-
-        Args:
-            indicator_results:
-                Dictionary containing
-                calculated indicator outputs.
-
-        Returns:
-            str:
-                BUY, SELL or HOLD.
         """
 
         logger.info("Starting rule evaluation.")
@@ -56,15 +48,10 @@ class RuleEngine:
             indicator_results
         )
 
-        rsi = indicator_results["rsi"]
+        decision = self.rule_builder.evaluate(
+            indicator_results
+        )
 
-        if rsi > RSI_NEUTRAL_LEVEL:
-            logger.info("Trading decision: BUY")
-            return TradingSignal.BUY
-        
-        if rsi < RSI_NEUTRAL_LEVEL:
-            logger.info("Trading decision: SELL")
-            return TradingSignal.SELL
+        logger.info("Rule evaluation completed.")
 
-        logger.info("Trading decision: HOLD")
-        return TradingSignal.HOLD
+        return decision

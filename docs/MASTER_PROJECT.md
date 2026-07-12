@@ -13,13 +13,13 @@
 Current Version: **v0.2.0**
 
 Current Sprint:
-**Sprint 2.21 – Rule Engine Foundation**
+**Sprint 2.22 – Rule Builder**
 
 Overall Progress:
-**29%**
+29%
 
 Core Platform Progress:
-**52%**
+52%
 
 Commercial Readiness:
 **10%**
@@ -30,16 +30,17 @@ Commercial Readiness:
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 20 |
-| Python Files | 26 |
+| Total Sprints Completed | 21 |
+| Python Files | 29 |
 | Services | 2 |
 | Providers | 1 |
 | Validators | 3 |
 | Indicators | 17 |
 | Configuration Modules | 1 |
 | Entry Points | 1 |
-| Pytest | 54 Passing |
+| Pytest | 57 Passing |
 | Git Commits | 16 |
+| Rule Engine Modules | 2 |
 
 ---
 
@@ -110,20 +111,20 @@ The platform will always be:
 
 # Current Sprint
 
-## Sprint 2.21 – Rule Engine Foundation
+## Sprint 2.22 – Rule Builder
 
 ### Objective
 
-Build the Rule Engine that combines multiple technical indicators into deterministic Buy, Sell and Hold decisions.
+Build the Rule Builder capable of creating reusable and configurable trading rules by combining multiple technical indicators.
 
 ### Sprint Status
 
 ✅ Architecture
 ✅ Implementation
-✅ Validation
+⬜ Validation
 ✅ Logging
 ✅ Unit Tests
-✅ Documentation
+⬜ Documentation
 ⬜ Git Commit
 ⬜ Git Push
 
@@ -137,6 +138,7 @@ Build the Rule Engine that combines multiple technical indicators into determini
 - ✅ Validation Framework
 - ✅ Logging Framework
 - ✅ Indicator Foundation
+- ✅ Rule Engine Foundation
 
 ## Indicators
 
@@ -221,7 +223,7 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.20 – Build Ichimoku Cloud Indicator Engine
+Sprint 2.21 – Rule Engine Foundation
 
 ---
 

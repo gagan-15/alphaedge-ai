@@ -31,6 +31,8 @@
 | Sprint 2.18 | v0.1.7 | ✅ | SuperTrend Indicator Engine | Passing | SuperTrend |
 | Sprint 2.19 | v0.1.8 | ✅ | Parabolic SAR Indicator Engine | Passing | Parabolic SAR |
 | Sprint 2.20 | v0.1.9 | ✅ | Ichimoku Cloud Indicator Engine | 44 Passing | Sprint 2.20 – Build Ichimoku Cloud Indicator Engine |
+| Sprint 2.21 | v0.2.0 | ✅ | Rule Engine Foundation | 54 Passing | Sprint 2.21 – Rule Engine Foundation |
+
 
 ---
 
