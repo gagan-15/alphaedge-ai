@@ -45,7 +45,7 @@ class RuleBuilder:
                 rule.signal.name
             )
 
-        return rule.signal
+        return rule
     
     def _evaluate_rsi_rule(
         self,

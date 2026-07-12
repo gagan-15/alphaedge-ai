@@ -32,10 +32,11 @@
 | Sprint 2.19 | v0.1.8 | ✅ | Parabolic SAR Indicator Engine | Passing | Parabolic SAR |
 | Sprint 2.20 | v0.1.9 | ✅ | Ichimoku Cloud Indicator Engine | 44 Passing | Sprint 2.20 – Build Ichimoku Cloud Indicator Engine |
 | Sprint 2.21 | v0.2.0 | ✅ | Rule Engine Foundation | 54 Passing | Sprint 2.21 – Rule Engine Foundation |
-
+| Sprint 2.22	v0.2.1 | ✅ | Rule Builder	57 Passing | Sprint 2.22 – Rule Builder |
+| Sprint 2.23	v0.2.2 | ✅ | Rule Evaluator	61 Passing |Sprint 2.23 – Rule Evaluator |
 
 ---
-
+ 
 # Current Phase
 
 Phase 3

@@ -19,30 +19,30 @@ class TestRuleBuilder:
             "rsi": 55
         }
 
-        decision = self.rule_builder.evaluate(
+        rule = self.rule_builder.evaluate(
             indicator_results
         )
 
-        assert decision == TradingSignal.BUY
+        assert rule.signal == TradingSignal.BUY
 
     def test_returns_sell(self):
         indicator_results = {
             "rsi": 45
         }
 
-        decision = self.rule_builder.evaluate(
+        rule = self.rule_builder.evaluate(
             indicator_results
         )
 
-        assert decision == TradingSignal.SELL
+        assert rule.signal == TradingSignal.SELL
 
     def test_returns_hold(self):
         indicator_results = {
             "rsi": 50
         }
 
-        decision = self.rule_builder.evaluate(
+        rule = self.rule_builder.evaluate(
             indicator_results
         )
 
-        assert decision == TradingSignal.HOLD
+        assert rule.signal == TradingSignal.HOLD

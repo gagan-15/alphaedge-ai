@@ -14,6 +14,7 @@ from backend.core.logger import logger
 from backend.validators.rule_validator import RuleValidator
 from backend.models.trading_signal import TradingSignal
 from backend.engines.rule_engine.rule_builder import RuleBuilder
+from backend.engines.rule_engine.rule_evaluator import RuleEvaluator
 
 
 class RuleEngine:
@@ -33,6 +34,7 @@ class RuleEngine:
         """
         logger.info("RuleEngine initialized.")
         self.rule_builder = RuleBuilder()
+        self.rule_evaluator = RuleEvaluator()
 
     def evaluate(
         self,
@@ -48,9 +50,11 @@ class RuleEngine:
             indicator_results
         )
 
-        decision = self.rule_builder.evaluate(
+        rule = self.rule_builder.evaluate(
             indicator_results
         )
+
+        decision = self.rule_evaluator.evaluate(rule)
 
         logger.info("Rule evaluation completed.")
 
