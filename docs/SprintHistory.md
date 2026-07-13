@@ -35,6 +35,7 @@
 | Sprint 2.22 | v0.2.1 | ✅ | Rule Builder | 57 Passing | Sprint 2.22 – Rule Builder |
 | Sprint 2.23 | v0.2.2 | ✅ | Rule Evaluator | 61 Passing | Sprint 2.23 – Rule Evaluator |
 | Sprint 2.24 | v0.2.3 | ✅ | Multi Rule Engine | 67 Passing | Sprint 2.24 – Multi Rule Engine |
+| Sprint 2.25 | v0.2.4 | ✅ | Demand & Supply Foundation | 73 Passing | Sprint 2.25 – Demand & Supply Foundation |
 
 ---
  
@@ -42,9 +43,16 @@
 
 Phase 3
 
-Current Work
+✅ Rule Engine
 
-🎯 Sprint 2.25 – Decision Engine
+- Rule Engine Foundation
+- Rule Builder
+- Rule Evaluator
+- Multi Rule Engine
+
+Phase 4
+
+🎯 Demand & Supply Engine
 
 ---
 

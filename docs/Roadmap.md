@@ -35,21 +35,29 @@
 ✅ Rule Evaluator
 ✅ Multi Rule Engine
 
-⬜ Decision Engine
+
+⬜ Moving Average Crossover Engine
+   - Golden Cross Detection
+   - Death Cross Detection
+   - EMA Crossovers
+   - SMA Crossovers
+   - User-configurable MA periods
+   - Multi-timeframe crossover confirmation
+   - Fresh crossover detection
 
 ---
 
 ## Phase 4
 
-⬜ Demand & Supply Engine
+✅ Demand & Supply Foundation
 
-⬜ Zone Detection
+⬜ Zone Detection Engine
 
-⬜ Zone Freshness
+⬜ Zone Freshness Engine
 
-⬜ Zone Scoring
+⬜ Zone Scoring Engine
 
-⬜ Multi-Timeframe Zones
+⬜ Multi-Timeframe Zone Engine
 
 ---
 

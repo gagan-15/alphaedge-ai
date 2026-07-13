@@ -267,11 +267,44 @@ Configuration is preferred over hardcoding.
 
 ---
 
+
+# 10. Sprint Completion Workflow
+
+Before a sprint is considered complete, verify:
+
+□ Code Review Completed
+
+□ All Dependencies Verified
+
+□ Architecture Matches Documentation
+
+□ Unit Tests Passing
+
+□ Documentation Synchronized
+
+□ Git Commit
+
+□ Git Push
+
+Completed sprints become read-only after this checklist is finished.
+
+_ _ _
+
 # 10. Development Rules
 
 ## DR-001
 
-Completed sprints are read-only unless a verified bug is found.
+## DR-001
+
+Completed sprints are read-only.
+
+Modifications are allowed only when:
+
+- A verified bug exists.
+- A documentation correction is required.
+- A security issue must be fixed.
+
+New features must always be implemented in new sprints.
 
 ---
 
@@ -389,6 +422,19 @@ Historical Record
 
 Roadmap.md
 Future Development
+
+---
+
+## DR-012 – Documentation Synchronization
+
+Before closing a sprint, ensure the following documents are synchronized:
+
+- MASTER_PROJECT.md
+- SprintHistory.md
+- Architecture.md
+- Roadmap.md (if affected)
+
+Project documentation must accurately reflect the implemented architecture before a sprint is considered complete.
 
 ---
 

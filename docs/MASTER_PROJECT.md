@@ -5,24 +5,39 @@
 > **Project Owner:** Gagan Devali
 > **Technical Partner:** ChatGPT
 > **Current Phase:** Phase 3 – Rule Engine Development
+> **Project Started:** July 1, 2026
+
+---
+
+
+# Project Information
+
+Project Started: July 1, 2026
+
+Current Stable Version: v0.2.4
+
+Current Stable Sprint: Sprint 2.25 – Demand & Supply Foundation
+
+Next Sprint:
+Sprint 2.26 – Zone Detection Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: **v0.2.3**
+Current Version: **v0.2.4**
 
 Current Sprint:
-## Sprint 2.25 – Decision Engine
+## Sprint 2.26 – Zone Detection Engine
 
 Overall Progress:
-29%
+31%
 
 Core Platform Progress:
-52%
+55%
 
 Commercial Readiness:
-**10%**
+10%
 
 ---
 
@@ -30,17 +45,17 @@ Commercial Readiness:
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 24 |
-| Backend Python Files | 46 |
-| Test Python Files | 24 |
+| Total Sprints Completed | 25 |
+| Backend Application Files | 47 |
+| Test Python Files | 25 |
 | Services | 2 |
 | Providers | 1 |
-| Validators | 4 |
+| Validators | 5 |
 | Indicators | 17 |
 | Configuration Modules | 1 |
 | Entry Points | 1 |
-| Pytest | 67 Passing |
-| Git Commits | 19 |
+| Pytest | 73 Passing |
+| Git Commits | 20 |
 | Rule Engine Modules | 4 |
 
 ---
@@ -82,7 +97,7 @@ The platform will always be:
 
 ## Current Milestone
 
-🎯 Rule Engine Development
+🎯 Demand & Supply Development
 
 ---
 
@@ -113,16 +128,17 @@ The platform will always be:
 | v0.2.1 | Rule Builder |
 | v0.2.2 | Rule Evaluator |
 | v0.2.3 | Multi Rule Engine |
+| v0.2.4 | Demand & Supply Foundation |
       
 ---
 
 # Current Sprint
 
-## Sprint 2.25 – Decision Engine
+## Sprint 2.26 – Zone Detection Engine
 
 ### Objective
 
-Build the Decision Engine responsible for converting the final evaluated trading signal into a standardized trading decision object that can be consumed by downstream modules such as Risk Management, Portfolio Management, Alerts, and AI Explanation.
+Implement the first zone detection algorithm capable of identifying potential Demand and Supply zones from validated OHLCV market data.
 
 ### Sprint Status
 
@@ -149,6 +165,7 @@ Build the Decision Engine responsible for converting the final evaluated trading
 - ✅ Rule Builder
 - ✅ Rule Evaluator
 - ✅ Multi Rule Engine
+- ✅ Demand & Supply Foundation
 
 ## Indicators
 
@@ -207,10 +224,12 @@ Trading Signal
 
 The following modules are planned for future development:
 
-⬜ Demand & Supply Engine
+⬜ Zone Detection Engine
+⬜ Zone Scoring Engine
+⬜ Zone Freshness Engine
+⬜ Multi-Timeframe Zone Engine
 ⬜ Screener Engine
 ⬜ Risk Management Engine
-⬜ Backtesting Engine
 ⬜ AI Decision Engine
 ⬜ Portfolio Engine
 ⬜ Alert Engine
@@ -263,15 +282,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.24 – Multi Rule Engine
+Sprint 2.25 – Demand & Supply Foundation
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.25 – Decision Engine
-
----
+Sprint 2.26 – Zone Detection Engine
 
 # Project Automation
 

@@ -1,12 +1,78 @@
 # AlphaEdge AI - Future Ideas
 
-> This document contains future ideas, innovations, and long-term concepts for AlphaEdge AI.
->
 > These ideas are NOT committed features.
+>
+> Ideas in this document are intentionally independent of the current roadmap.
+>
+> An idea may become:
+> - A future sprint
+> - A new engine
+> - A new module
+> - A research project
+>
+> or may never be implemented.
+>
+> Implementation priority is determined by business value, architecture, and project roadmap rather than the order in this document.
 >
 > Every idea must be architected, implemented, tested, validated, and backtested before becoming part of AlphaEdge AI.
 
 ---
+
+# Quick Index
+
+## Trading Intelligence
+
+- Trade Readiness Engine
+- Decision Gate Engine
+- Market Intelligence Engine
+- Multi Rule Engine
+- Moving Average Crossover Engine
+- Trade Confidence Engine
+- Trend Alignment Engine
+- Demand & Supply Intelligence
+- Risk Intelligence Engine
+- Historical Validation Engine
+- Strategy Verification Engine
+
+## Market Intelligence
+
+- News Intelligence Engine
+- Institutional Activity Engine
+- Sector Strength Engine
+- Market Breadth Engine
+
+## Portfolio Intelligence
+
+- Portfolio Health Engine
+- Portfolio Optimizer
+
+## AI Intelligence
+
+- AI Decision Engine
+- AI Learning Engine
+- Trade Review Engine
+- Strategy Analytics Engine
+- Strategy Optimization Engine
+
+## Trading Styles
+
+- Multi-Style Trading Framework
+
+## User Experience
+
+- Professional Dashboard
+- Personalized Dashboard
+- Smart Alerts
+- Explainable Recommendations
+
+## Reporting
+
+- Professional Reports
+
+## Performance Analytics
+
+- Trading Performance Metrics
+
 
 # Trading Intelligence
 
@@ -157,6 +223,60 @@ Deprecated
 Needs Review
 
 ---
+
+## Moving Average Crossover Engine
+
+Support configurable moving average crossover detection across all supported timeframes.
+
+Features:
+
+- Golden Cross Detection
+- Death Cross Detection
+- EMA Crossovers
+- SMA Crossovers
+- User-configurable moving average periods
+- Multi-timeframe crossover confirmation
+- Fresh crossover detection
+- Crossover strength scoring
+- Time since crossover
+- Crossover history tracking
+
+Examples:
+
+- EMA 9 × EMA 21
+- EMA 20 × EMA 50
+- EMA 50 × EMA 200
+- SMA 50 × SMA 200
+- Custom combinations
+
+The engine should integrate with the Rule Engine and contribute to overall trading decisions rather than acting as a standalone signal.
+
+--- 
+
+## Multi-Timeframe Confluence Engine
+
+Evaluate whether a trading opportunity is supported across multiple timeframes.
+
+Examples:
+
+- Weekly Demand + Daily Confirmation
+- Daily Trend + 125-minute Entry
+- 125-minute Trend + 75-minute Trigger
+
+Generate an overall Confluence Score.
+
+The engine should combine:
+
+- Trend Alignment
+- Demand & Supply
+- Moving Average Crossovers
+- Volume Confirmation
+- Momentum Indicators
+- Market Context
+
+The Confluence Score should contribute to the overall Trade Readiness Score.
+
+- - -
 
 # Market Intelligence
 

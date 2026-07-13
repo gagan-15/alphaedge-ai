@@ -89,8 +89,7 @@ Upcoming
 - Demand & Supply Engine
 - Screener Engine
 - Risk Management Engine
-- Decision Engine
-- AI Engine
+- AI Explanation Engine
 - Backtesting Engine
 - Portfolio Engine
 - Alert Engine  

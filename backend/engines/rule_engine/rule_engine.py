@@ -12,10 +12,10 @@ from typing import Any
 
 from backend.core.logger import logger
 from backend.validators.rule_validator import RuleValidator
-from backend.models.trading_signal import TradingSignal
 from backend.engines.rule_engine.rule_builder import RuleBuilder
 from backend.engines.rule_engine.rule_evaluator import RuleEvaluator
 from backend.engines.rule_engine.multi_rule_engine import MultiRuleEngine
+from backend.models.trading_signal import TradingSignal
 
 class RuleEngine:
     """
@@ -59,10 +59,10 @@ class RuleEngine:
                 [rule]
             )
 
-        decision = self.rule_evaluator.evaluate(
-                final_rule
-            )
+        signal = self.rule_evaluator.evaluate(
+            final_rule
+        )
 
         logger.info("Rule evaluation completed.")
 
-        return decision
+        return signal
