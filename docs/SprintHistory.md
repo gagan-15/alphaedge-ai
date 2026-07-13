@@ -28,12 +28,13 @@
 | Sprint 2.15 | v0.1.6 | ✅ | Chaikin Money Flow (CMF) Indicator Engine | Passing | CMF |
 | Sprint 2.16 | v0.1.7 | ✅ | Money Flow Index (MFI) Indicator Engine | Passing | MFI |
 | Sprint 2.17 | v0.1.8 | ✅ | Average Directional Index (ADX) Indicator Engine | Passing | ADX |
-| Sprint 2.18 | v0.1.7 | ✅ | SuperTrend Indicator Engine | Passing | SuperTrend |
-| Sprint 2.19 | v0.1.8 | ✅ | Parabolic SAR Indicator Engine | Passing | Parabolic SAR |
+| Sprint 2.18 | v0.1.9 | ✅ | SuperTrend Indicator Engine | Passing | SuperTrend |
+| Sprint 2.19 | v0.1.9 | ✅ | Parabolic SAR Indicator Engine | Passing | Parabolic SAR |
 | Sprint 2.20 | v0.1.9 | ✅ | Ichimoku Cloud Indicator Engine | 44 Passing | Sprint 2.20 – Build Ichimoku Cloud Indicator Engine |
 | Sprint 2.21 | v0.2.0 | ✅ | Rule Engine Foundation | 54 Passing | Sprint 2.21 – Rule Engine Foundation |
-| Sprint 2.22	v0.2.1 | ✅ | Rule Builder	57 Passing | Sprint 2.22 – Rule Builder |
-| Sprint 2.23	v0.2.2 | ✅ | Rule Evaluator	61 Passing |Sprint 2.23 – Rule Evaluator |
+| Sprint 2.22 | v0.2.1 | ✅ | Rule Builder | 57 Passing | Sprint 2.22 – Rule Builder |
+| Sprint 2.23 | v0.2.2 | ✅ | Rule Evaluator | 61 Passing | Sprint 2.23 – Rule Evaluator |
+| Sprint 2.24 | v0.2.3 | ✅ | Multi Rule Engine | 67 Passing | Sprint 2.24 – Multi Rule Engine |
 
 ---
  
@@ -43,7 +44,7 @@ Phase 3
 
 Current Work
 
-🎯 Rule Engine Development
+🎯 Sprint 2.25 – Decision Engine
 
 ---
 

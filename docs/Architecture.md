@@ -50,31 +50,27 @@ Future capabilities include:
 # 3. High-Level Architecture
 
 ```
-                Market Data Providers
-                        │
-                        ▼
-               Market Data Engine
-                        │
-                        ▼
-                Validation Engine
-                        │
-                        ▼
-               Technical Indicators
-                        │
-                        ▼
-                 Rule Engine
-                        │
-                        ▼
-              Risk Management Engine
-                        │
-                        ▼
-              AI Explanation Engine
-                        │
-                        ▼
-             Buy / Sell / Hold Decision
-                        │
-                        ▼
-              Portfolio / Alerts / API
+        Rule Engine Internal Architecture
+
+Indicator Results
+        │
+        ▼
+Rule Builder
+        │
+        ▼
+Rule
+        │
+        ▼
+Multi Rule Engine
+        │
+        ▼
+Rule
+        │
+        ▼
+Rule Evaluator
+        │
+        ▼
+Trading Signal
 ```
 
 ---
@@ -86,18 +82,18 @@ Current
 - Market Data Engine
 - Validation Engine
 - Indicator Engine
+- Rule Engine
 
 Upcoming
 
-- Rule Engine
 - Demand & Supply Engine
 - Screener Engine
-- Risk Engine
+- Risk Management Engine
+- Decision Engine
 - AI Engine
 - Backtesting Engine
 - Portfolio Engine
-- Alert Engine
-
+- Alert Engine  
 ---
 
 # 5. Folder Structure
@@ -265,13 +261,19 @@ Stateful indicators (for example OBV and Parabolic SAR) manage previous values i
 
 ---
 
-AD-014
+## AD-014
 
 The Rule Engine combines outputs from independent indicators to produce deterministic Buy, Sell and Hold decisions.
 
 Indicators calculate.
 
 Rule Engine interprets.
+
+## AD-015
+
+The Multi Rule Engine combines one or more Rule objects into a single consolidated Rule before the Rule Evaluator produces the final TradingSignal.
+
+This separation keeps rule aggregation independent from rule evaluation and allows new trading rules to be added without modifying the evaluation workflow.
 
 # 9. Coding Philosophy
 

@@ -10,10 +10,10 @@
 
 # Project Dashboard
 
-Current Version: **v0.2.2**
+Current Version: **v0.2.3**
 
 Current Sprint:
-## Sprint 2.24 – Multi Rule Engine
+## Sprint 2.25 – Decision Engine
 
 Overall Progress:
 29%
@@ -30,18 +30,18 @@ Commercial Readiness:
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 23 |
-| Backend Python Files | 45 |
-| Test Python Files | 23 |
+| Total Sprints Completed | 24 |
+| Backend Python Files | 46 |
+| Test Python Files | 24 |
 | Services | 2 |
 | Providers | 1 |
-| Validators | 3 |
+| Validators | 4 |
 | Indicators | 17 |
 | Configuration Modules | 1 |
 | Entry Points | 1 |
-| Pytest | 61 Passing |
-| Git Commits | 18 |
-| Rule Engine Modules | 3 |
+| Pytest | 67 Passing |
+| Git Commits | 19 |
+| Rule Engine Modules | 4 |
 
 ---
 
@@ -112,16 +112,17 @@ The platform will always be:
 | v0.2.0 | Rule Engine Foundation |
 | v0.2.1 | Rule Builder |
 | v0.2.2 | Rule Evaluator |
-
+| v0.2.3 | Multi Rule Engine |
+      
 ---
 
 # Current Sprint
 
-## Sprint 2.24 – Multi Rule Engine
+## Sprint 2.25 – Decision Engine
 
 ### Objective
 
-Build the Multi Rule Engine capable of evaluating multiple trading rules and producing a single explainable trading decision.
+Build the Decision Engine responsible for converting the final evaluated trading signal into a standardized trading decision object that can be consumed by downstream modules such as Risk Management, Portfolio Management, Alerts, and AI Explanation.
 
 ### Sprint Status
 
@@ -147,6 +148,7 @@ Build the Multi Rule Engine capable of evaluating multiple trading rules and pro
 - ✅ Rule Engine Foundation
 - ✅ Rule Builder
 - ✅ Rule Evaluator
+- ✅ Multi Rule Engine
 
 ## Indicators
 
@@ -185,7 +187,13 @@ Indicator Results
 Rule Builder
       │
       ▼
-Rule(s)
+     Rule
+      │
+      ▼
+Multi Rule Engine
+      │
+      ▼
+     Rule
       │
       ▼
 Rule Evaluator
@@ -199,7 +207,6 @@ Trading Signal
 
 The following modules are planned for future development:
 
-⬜ Multi Rule Engine
 ⬜ Demand & Supply Engine
 ⬜ Screener Engine
 ⬜ Risk Management Engine
@@ -256,13 +263,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.23 – Rule Evaluator
+Sprint 2.24 – Multi Rule Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.24 – Multi Rule Engine
+Sprint 2.25 – Decision Engine
 
 ---
 
