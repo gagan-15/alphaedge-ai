@@ -308,6 +308,22 @@ Each detector has a single responsibility.
 
 The ZoneDetectionEngine orchestrates the workflow without duplicating detection logic.
 
+---
+
+AD-017 – Role-Based Multi-Timeframe Architecture
+
+AlphaEdge AI separates analysis into three independent roles:
+
+Location – Finds where high-quality trading opportunities exist.
+Trend – Validates whether market structure supports trading at that location.
+Execution – Determines the precise entry timing.
+
+The timeframes assigned to these roles are configurable. All future engines (Freshness, Strength, BOS, CHoCH, Scoring, Ranking, Screener, Alerts, and AI Explanation) operate on these roles rather than hardcoded timeframes.
+
+---
+
+
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

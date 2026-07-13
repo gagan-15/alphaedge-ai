@@ -34,6 +34,7 @@ class TestDemandSupplyEngine:
             zone_type=ZoneType.DEMAND,
             upper_price=250.0,
             lower_price=240.0,
+            created_index=10,
         )
 
         result = self.engine.validate(zone)
@@ -49,6 +50,7 @@ class TestDemandSupplyEngine:
             zone_type=ZoneType.DEMAND,
             upper_price=0.0,
             lower_price=240.0,
+            created_index=10,
         )
 
         with pytest.raises(ValueError):
@@ -63,6 +65,7 @@ class TestDemandSupplyEngine:
             zone_type=ZoneType.SUPPLY,
             upper_price=250.0,
             lower_price=0.0,
+            created_index=10,
         )
 
         with pytest.raises(ValueError):
@@ -77,6 +80,7 @@ class TestDemandSupplyEngine:
             zone_type=ZoneType.DEMAND,
             upper_price=240.0,
             lower_price=250.0,
+            created_index=10,
         )
 
         with pytest.raises(ValueError):

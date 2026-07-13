@@ -22,20 +22,7 @@ class ZoneType(Enum):
 
 @dataclass(frozen=True)
 class Zone:
-    """
-    Represents a price zone.
-
-    Attributes:
-        zone_type:
-            Demand or Supply.
-
-        upper_price:
-            Upper boundary of the zone.
-
-        lower_price:
-            Lower boundary of the zone.
-    """
-
     zone_type: ZoneType
     upper_price: float
     lower_price: float
+    created_index: int
