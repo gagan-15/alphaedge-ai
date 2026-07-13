@@ -29,16 +29,11 @@ class TestRuleEngine:
         when RSI is greater than 50.
         """
 
-        indicator_results = {
-            "rsi": 55
-        }
+        indicator_results = {"rsi": 55}
 
-        decision = self.rule_engine.evaluate(
-            indicator_results
-        )
+        decision = self.rule_engine.evaluate(indicator_results)
 
         assert decision == TradingSignal.BUY
-
 
     def test_evaluate_returns_sell(self):
         """
@@ -46,13 +41,9 @@ class TestRuleEngine:
         when RSI is less than 50.
         """
 
-        indicator_results = {
-            "rsi": 45
-        }
+        indicator_results = {"rsi": 45}
 
-        decision = self.rule_engine.evaluate(
-            indicator_results
-        )
+        decision = self.rule_engine.evaluate(indicator_results)
 
         assert decision == TradingSignal.SELL
 

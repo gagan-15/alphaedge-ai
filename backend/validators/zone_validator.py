@@ -14,9 +14,7 @@ class ZoneValidator:
     """
 
     @staticmethod
-    def validate_zone(
-        zone: Zone
-    ) -> None:
+    def validate_zone(zone: Zone) -> None:
         """
         Validate a Zone.
 
@@ -33,21 +31,13 @@ class ZoneValidator:
         """
 
         if not isinstance(zone, Zone):
-            raise TypeError(
-                "zone must be a Zone."
-            )
+            raise TypeError("zone must be a Zone.")
 
         if zone.upper_price <= 0:
-            raise ValueError(
-                "upper_price must be greater than zero."
-            )
+            raise ValueError("upper_price must be greater than zero.")
 
         if zone.lower_price <= 0:
-            raise ValueError(
-                "lower_price must be greater than zero."
-            )
+            raise ValueError("lower_price must be greater than zero.")
 
         if zone.upper_price <= zone.lower_price:
-            raise ValueError(
-                "upper_price must be greater than lower_price."
-            )
+            raise ValueError("upper_price must be greater than lower_price.")

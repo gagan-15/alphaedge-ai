@@ -49,14 +49,8 @@ class VolumeSMAIndicator(BaseIndicator):
         IndicatorValidator.validate_period(period)
         IndicatorValidator.validate_minimum_rows(data, period)
 
-        data[f"Volume_SMA_{period}"] = (
-            data["Volume"]
-            .rolling(window=period)
-            .mean()
-        )
+        data[f"Volume_SMA_{period}"] = data["Volume"].rolling(window=period).mean()
 
-        logger.info(
-            f"Calculated {period}-period Volume SMA successfully."
-        )
+        logger.info(f"Calculated {period}-period Volume SMA successfully.")
 
         return data

@@ -24,10 +24,7 @@ def test_obv_indicator_creates_column():
     """
 
     data = pd.DataFrame(
-        {
-            "Close": [100, 105, 103, 106],
-            "Volume": [1000, 500, 700, 1000]
-        }
+        {"Close": [100, 105, 103, 106], "Volume": [1000, 500, 700, 1000]}
     )
 
     indicator = OBVIndicator()

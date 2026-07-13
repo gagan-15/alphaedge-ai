@@ -49,22 +49,16 @@ class OBVIndicator(BaseIndicator):
             current_volume = data["Volume"].iloc[index]
 
             if current_close > previous_close:
-                obv_values.append(
-                    previous_obv + current_volume
-                )
+                obv_values.append(previous_obv + current_volume)
 
             elif current_close < previous_close:
-                obv_values.append(
-                    previous_obv - current_volume
-                )
+                obv_values.append(previous_obv - current_volume)
 
             else:
                 obv_values.append(previous_obv)
 
         data["OBV"] = obv_values
 
-        logger.info(
-            "Calculated OBV successfully."
-        )
+        logger.info("Calculated OBV successfully.")
 
         return data

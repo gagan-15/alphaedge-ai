@@ -46,22 +46,13 @@ class ATRIndicator(BaseIndicator):
             pd.Series: ATR values.
         """
 
-        IndicatorValidator.validate_common_input(
-            data,
-            self.period
-        )
+        IndicatorValidator.validate_common_input(data, self.period)
 
-        IndicatorValidator.validate_minimum_rows(
-            data,
-            self.period
-        )
+        IndicatorValidator.validate_minimum_rows(data, self.period)
 
         IndicatorValidator.validate_atr_input(data)
 
-        self.logger.info(
-            "Starting ATR calculation with period=%s",
-            self.period
-        )
+        self.logger.info("Starting ATR calculation with period=%s", self.period)
 
         # Extract required price columns
         high = data["High"]
@@ -74,32 +65,18 @@ class ATRIndicator(BaseIndicator):
         # Calculate the three True Range values
         high_low = high - low
 
-        high_previous_close = (
-            high - previous_close
-        ).abs()
+        high_previous_close = (high - previous_close).abs()
 
-        low_previous_close = (
-            low - previous_close
-        ).abs()
+        low_previous_close = (low - previous_close).abs()
 
         # Calculate the True Range (TR)
         true_range = pd.concat(
-            [
-                high_low,
-                high_previous_close,
-                low_previous_close
-            ],
-            axis=1
+            [high_low, high_previous_close, low_previous_close], axis=1
         ).max(axis=1)
 
         # Calculate Average True Range (ATR)
-        atr = true_range.ewm(
-            alpha=1 / self.period,
-            adjust=False
-        ).mean()
+        atr = true_range.ewm(alpha=1 / self.period, adjust=False).mean()
 
-        self.logger.info(
-            "ATR calculation completed successfully."
-        )
+        self.logger.info("ATR calculation completed successfully.")
 
         return atr

@@ -4,12 +4,14 @@ import pandas as pd
 from backend.indicators.base_indicator import BaseIndicator
 from backend.validators.indicator_validator import IndicatorValidator
 
+
 class RSIIndicator(BaseIndicator):
     """
     Relative Strength Index (RSI) Indicator.
 
     Calculates RSI using Wilder's smoothing method.
     """
+
     def __init__(self, period: int = 14):
         """
         Initialize the RSI Indicator.
@@ -31,20 +33,11 @@ class RSIIndicator(BaseIndicator):
             pd.Series: RSI values.
         """
 
-        IndicatorValidator.validate_common_input(
-            data,
-            self.period
-        )
+        IndicatorValidator.validate_common_input(data, self.period)
 
-        IndicatorValidator.validate_minimum_rows(
-            data,
-            self.period
-        )
+        IndicatorValidator.validate_minimum_rows(data, self.period)
 
-        self.logger.info(
-            "Starting RSI calculation with period=%s",
-            self.period
-        )
+        self.logger.info("Starting RSI calculation with period=%s", self.period)
 
         # Extract closing prices
         close_prices = data["Close"]
@@ -57,15 +50,9 @@ class RSIIndicator(BaseIndicator):
         losses = -price_change.where(price_change < 0, 0.0)
 
         # Wilder's smoothing
-        average_gain = gains.ewm(
-            alpha=1 / self.period,
-            adjust=False
-        ).mean()
+        average_gain = gains.ewm(alpha=1 / self.period, adjust=False).mean()
 
-        average_loss = losses.ewm(
-            alpha=1 / self.period,
-            adjust=False
-        ).mean()
+        average_loss = losses.ewm(alpha=1 / self.period, adjust=False).mean()
 
         # Relative Strength
         relative_strength = average_gain / average_loss

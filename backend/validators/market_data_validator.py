@@ -33,7 +33,6 @@ class MarketDataValidator:
 
         if data.empty:
             raise ValueError("Market data is empty.")
-        
 
     @staticmethod
     def validate_required_columns(data: pd.DataFrame):
@@ -51,10 +50,8 @@ class MarketDataValidator:
 
         for column in required_columns:
             if column not in data.columns:
-                raise ValueError(
-                    f"Required column '{column}' is missing."
-                )  
-            
+                raise ValueError(f"Required column '{column}' is missing.")
+
     @staticmethod
     def validate_missing_values(data: pd.DataFrame):
         """
@@ -63,10 +60,8 @@ class MarketDataValidator:
         """
 
         if data.isnull().values.any():
-            raise ValueError(
-                "Market data contains missing values."
-            )
-        
+            raise ValueError("Market data contains missing values.")
+
     @staticmethod
     def validate_duplicate_dates(data: pd.DataFrame):
         """
@@ -75,10 +70,8 @@ class MarketDataValidator:
         """
 
         if data.index.duplicated().any():
-            raise ValueError(
-                "Market data contains duplicate dates."
-            )
-        
+            raise ValueError("Market data contains duplicate dates.")
+
     @staticmethod
     def validate_sorted_dates(data: pd.DataFrame):
         """
@@ -87,10 +80,8 @@ class MarketDataValidator:
         """
 
         if not data.index.is_monotonic_increasing:
-            raise ValueError(
-                "Market data is not sorted by date."
-            )
-        
+            raise ValueError("Market data is not sorted by date.")
+
     @staticmethod
     def validate(data: pd.DataFrame):
         """

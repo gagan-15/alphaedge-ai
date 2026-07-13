@@ -47,7 +47,7 @@ class IndicatorValidator:
             raise ValueError(
                 f"Not enough data to calculate a {period}-period indicator."
             )
-        
+
     @staticmethod
     def validate_period(period: int) -> None:
         """
@@ -64,7 +64,6 @@ class IndicatorValidator:
 
         if period <= 0:
             raise ValueError("Indicator period must be greater than zero.")
-        
 
     @staticmethod
     def validate_atr_input(data: pd.DataFrame) -> None:
@@ -78,18 +77,12 @@ class IndicatorValidator:
             ValueError: If required columns are missing.
         """
 
-        required_columns = [
-            "High",
-            "Low",
-            "Close"
-        ]
+        required_columns = ["High", "Low", "Close"]
 
         for column in required_columns:
             if column not in data.columns:
-                raise ValueError(
-                    f"Required column '{column}' not found."
-                )
-            
+                raise ValueError(f"Required column '{column}' not found.")
+
     @staticmethod
     def validate_vwap_input(data: pd.DataFrame) -> None:
         """
@@ -102,36 +95,24 @@ class IndicatorValidator:
             ValueError: If required columns are missing.
         """
 
-        required_columns = [
-            "High",
-            "Low",
-            "Close",
-            "Volume"
-        ]
+        required_columns = ["High", "Low", "Close", "Volume"]
 
         for column in required_columns:
             if column not in data.columns:
-                raise ValueError(
-                    f"Required column '{column}' not found."
-                )
-            
+                raise ValueError(f"Required column '{column}' not found.")
+
     @staticmethod
     def validate_obv_input(data: pd.DataFrame) -> None:
         """
         Validate input data required for OBV calculation.
         """
 
-        required_columns = [
-            "Close",
-            "Volume"
-        ]
+        required_columns = ["Close", "Volume"]
 
         for column in required_columns:
             if column not in data.columns:
-                raise ValueError(
-                    f"Required column '{column}' not found."
-                )
-            
+                raise ValueError(f"Required column '{column}' not found.")
+
     @staticmethod
     def validate_cmf_input(data: pd.DataFrame) -> None:
         """
@@ -147,19 +128,12 @@ class IndicatorValidator:
                 If required columns are missing.
         """
 
-        required_columns = [
-            "High",
-            "Low",
-            "Close",
-            "Volume"
-        ]
+        required_columns = ["High", "Low", "Close", "Volume"]
 
         for column in required_columns:
             if column not in data.columns:
-                raise ValueError(
-                    f"Required column '{column}' not found."
-                )
-            
+                raise ValueError(f"Required column '{column}' not found.")
+
     @staticmethod
     def validate_mfi_input(data: pd.DataFrame) -> None:
         """
@@ -175,24 +149,14 @@ class IndicatorValidator:
                 If required columns are missing.
         """
 
-        required_columns = [
-            "High",
-            "Low",
-            "Close",
-            "Volume"
-        ]
+        required_columns = ["High", "Low", "Close", "Volume"]
 
         for column in required_columns:
             if column not in data.columns:
-                raise ValueError(
-                    f"Required column '{column}' not found."
-                )
-            
+                raise ValueError(f"Required column '{column}' not found.")
 
     @staticmethod
-    def validate_adx_input(
-        data: pd.DataFrame
-    ) -> None:
+    def validate_adx_input(data: pd.DataFrame) -> None:
         """
         Validate input data required
         for ADX calculation.
@@ -207,45 +171,27 @@ class IndicatorValidator:
                 are missing.
         """
 
-        required_columns = [
-            "High",
-            "Low",
-            "Close"
-        ]
+        required_columns = ["High", "Low", "Close"]
 
         for column in required_columns:
             if column not in data.columns:
-                raise ValueError(
-                    f"Required column '{column}' not found."
-                )
-            
+                raise ValueError(f"Required column '{column}' not found.")
 
     @staticmethod
-    def validate_supertrend_input(
-        data: pd.DataFrame
-    ) -> None:
+    def validate_supertrend_input(data: pd.DataFrame) -> None:
         """
         Validate input data required
         for SuperTrend calculation.
         """
 
-        required_columns = [
-            "High",
-            "Low",
-            "Close"
-        ]
+        required_columns = ["High", "Low", "Close"]
 
         for column in required_columns:
             if column not in data.columns:
-                raise ValueError(
-                    f"Required column '{column}' not found."
-                )
-            
+                raise ValueError(f"Required column '{column}' not found.")
 
     @staticmethod
-    def validate_parabolic_sar_input(
-        data: pd.DataFrame
-    ) -> None:
+    def validate_parabolic_sar_input(data: pd.DataFrame) -> None:
         """
         Validate input data required
         for Parabolic SAR calculation.
@@ -259,35 +205,21 @@ class IndicatorValidator:
                 If required columns are missing.
         """
 
-        required_columns = [
-            "High",
-            "Low"
-        ]
+        required_columns = ["High", "Low"]
 
         for column in required_columns:
             if column not in data.columns:
-                raise ValueError(
-                    f"Required column '{column}' not found."
-                )
-            
+                raise ValueError(f"Required column '{column}' not found.")
 
     @staticmethod
-    def validate_ichimoku_input(
-        data: pd.DataFrame
-    ) -> None:
+    def validate_ichimoku_input(data: pd.DataFrame) -> None:
         """
         Validate input data required
         for Ichimoku Cloud calculation.
         """
 
-        required_columns = [
-            "High",
-            "Low",
-            "Close"
-        ]
+        required_columns = ["High", "Low", "Close"]
 
         for column in required_columns:
             if column not in data.columns:
-                raise ValueError(
-                    f"Required column '{column}' not found."
-                )
+                raise ValueError(f"Required column '{column}' not found.")

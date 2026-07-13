@@ -9,20 +9,56 @@ def sample_market_data():
     return pd.DataFrame(
         {
             "High": [
-                110, 112, 115, 117, 119,
-                121, 123, 125, 127, 130,
-                132, 134, 136, 138, 140
+                110,
+                112,
+                115,
+                117,
+                119,
+                121,
+                123,
+                125,
+                127,
+                130,
+                132,
+                134,
+                136,
+                138,
+                140,
             ],
             "Low": [
-                100, 101, 103, 105, 107,
-                109, 111, 113, 115, 117,
-                119, 121, 123, 125, 127
+                100,
+                101,
+                103,
+                105,
+                107,
+                109,
+                111,
+                113,
+                115,
+                117,
+                119,
+                121,
+                123,
+                125,
+                127,
             ],
             "Close": [
-                105, 108, 112, 114, 116,
-                118, 120, 122, 124, 128,
-                130, 132, 134, 136, 138
-            ]
+                105,
+                108,
+                112,
+                114,
+                116,
+                118,
+                120,
+                122,
+                124,
+                128,
+                130,
+                132,
+                134,
+                136,
+                138,
+            ],
         }
     )
 
@@ -30,10 +66,7 @@ def sample_market_data():
 def test_supertrend_returns_dataframe():
     data = sample_market_data()
 
-    indicator = SuperTrendIndicator(
-        period=10,
-        multiplier=3.0
-    )
+    indicator = SuperTrendIndicator(period=10, multiplier=3.0)
 
     result = indicator.calculate(data)
 
@@ -43,10 +76,7 @@ def test_supertrend_returns_dataframe():
 def test_supertrend_columns_exist():
     data = sample_market_data()
 
-    indicator = SuperTrendIndicator(
-        period=10,
-        multiplier=3.0
-    )
+    indicator = SuperTrendIndicator(period=10, multiplier=3.0)
 
     result = indicator.calculate(data)
 
@@ -57,9 +87,7 @@ def test_supertrend_columns_exist():
 
 
 def test_supertrend_missing_high_column_raises_error():
-    data = sample_market_data().drop(
-        columns=["High"]
-    )
+    data = sample_market_data().drop(columns=["High"])
 
     indicator = SuperTrendIndicator()
 

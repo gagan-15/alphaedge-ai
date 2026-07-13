@@ -18,10 +18,7 @@ class TestRuleEvaluator:
 
     def test_returns_buy_signal(self):
         rule = Rule(
-            name="RSI Rule",
-            passed=True,
-            signal=TradingSignal.BUY,
-            reason="RSI > 50"
+            name="RSI Rule", passed=True, signal=TradingSignal.BUY, reason="RSI > 50"
         )
 
         decision = self.rule_evaluator.evaluate(rule)
@@ -30,10 +27,7 @@ class TestRuleEvaluator:
 
     def test_returns_sell_signal(self):
         rule = Rule(
-            name="RSI Rule",
-            passed=True,
-            signal=TradingSignal.SELL,
-            reason="RSI < 50"
+            name="RSI Rule", passed=True, signal=TradingSignal.SELL, reason="RSI < 50"
         )
 
         decision = self.rule_evaluator.evaluate(rule)
@@ -42,17 +36,13 @@ class TestRuleEvaluator:
 
     def test_returns_hold_signal(self):
         rule = Rule(
-            name="RSI Rule",
-            passed=False,
-            signal=TradingSignal.HOLD,
-            reason="RSI = 50"
+            name="RSI Rule", passed=False, signal=TradingSignal.HOLD, reason="RSI = 50"
         )
 
         decision = self.rule_evaluator.evaluate(rule)
 
         assert decision == TradingSignal.HOLD
 
-
     def test_rule_cannot_be_none(self):
-     with pytest.raises(ValueError):
-      self.rule_evaluator.evaluate(None)
+        with pytest.raises(ValueError):
+            self.rule_evaluator.evaluate(None)

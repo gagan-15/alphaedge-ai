@@ -15,34 +15,22 @@ class TestRuleBuilder:
         self.rule_builder = RuleBuilder()
 
     def test_returns_buy(self):
-        indicator_results = {
-            "rsi": 55
-        }
+        indicator_results = {"rsi": 55}
 
-        rule = self.rule_builder.evaluate(
-            indicator_results
-        )
+        rule = self.rule_builder.evaluate(indicator_results)
 
         assert rule.signal == TradingSignal.BUY
 
     def test_returns_sell(self):
-        indicator_results = {
-            "rsi": 45
-        }
+        indicator_results = {"rsi": 45}
 
-        rule = self.rule_builder.evaluate(
-            indicator_results
-        )
+        rule = self.rule_builder.evaluate(indicator_results)
 
         assert rule.signal == TradingSignal.SELL
 
     def test_returns_hold(self):
-        indicator_results = {
-            "rsi": 50
-        }
+        indicator_results = {"rsi": 50}
 
-        rule = self.rule_builder.evaluate(
-            indicator_results
-        )
+        rule = self.rule_builder.evaluate(indicator_results)
 
         assert rule.signal == TradingSignal.HOLD

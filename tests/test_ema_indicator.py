@@ -23,11 +23,7 @@ def test_ema_indicator_creates_column():
     the expected EMA column.
     """
 
-    data = pd.DataFrame(
-        {
-            "Close": list(range(1, 31))
-        }
-    )
+    data = pd.DataFrame({"Close": list(range(1, 31))})
 
     indicator = EMAIndicator()
 

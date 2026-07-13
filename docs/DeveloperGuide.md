@@ -290,9 +290,7 @@ Completed sprints become read-only after this checklist is finished.
 
 _ _ _
 
-# 10. Development Rules
-
-## DR-001
+# 11. Development Rules
 
 ## DR-001
 
@@ -402,11 +400,11 @@ Readable code always wins.
 
 ---
 
-## DR-11 – Future Compatibility
+## DR-011 – Future Compatibility
 
 Every new module must be designed so that future features can be added with minimal changes to existing code. Prefer extension over modification whenever practical.
 
-# 11. Documentation Rules
+# 12. Documentation Rules
 
 MASTER_PROJECT.md
 Current Project Dashboard
@@ -438,7 +436,17 @@ Project documentation must accurately reflect the implemented architecture befor
 
 ---
 
-# 12. AI Collaboration Rules
+## DR-013
+
+Never redesign architecture after implementation begins.
+
+Freeze the architecture before creating implementation files.
+
+Architecture changes are allowed only before coding starts or when fixing a verified architectural defect.
+
+---
+
+# 13. AI Collaboration Rules
 
 ChatGPT assists development.
 

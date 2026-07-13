@@ -27,7 +27,7 @@ class ParabolicSARIndicator(BaseIndicator):
     def __init__(
         self,
         acceleration: float = 0.02,
-        maximum_acceleration: float = 0.20
+        maximum_acceleration: float = 0.20,
     ):
         """
         Initialize Parabolic SAR Indicator.
@@ -37,10 +37,7 @@ class ParabolicSARIndicator(BaseIndicator):
         self.maximum_acceleration = maximum_acceleration
         self.logger = logging.getLogger(__name__)
 
-    def calculate(
-        self,
-        data: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate Parabolic SAR.
         """
@@ -48,9 +45,11 @@ class ParabolicSARIndicator(BaseIndicator):
         IndicatorValidator.validate_parabolic_sar_input(data)
 
         self.logger.info(
-            "Starting Parabolic SAR calculation with acceleration=%s, maximum_acceleration=%s",
+            "Starting Parabolic SAR calculation with "
+            "acceleration=%s, "
+            "maximum_acceleration=%s",
             self.acceleration,
-            self.maximum_acceleration
+            self.maximum_acceleration,
         )
 
         result = data.copy()
@@ -58,15 +57,9 @@ class ParabolicSARIndicator(BaseIndicator):
         high = result["High"]
         low = result["Low"]
 
-        sar = pd.Series(
-            index=result.index,
-            dtype="float64"
-        )
+        sar = pd.Series(index=result.index, dtype="float64")
 
-        trend = pd.Series(
-            index=result.index,
-            dtype="object"
-        )
+        trend = pd.Series(index=result.index, dtype="object")
 
         if len(result) < 2:
             raise ValueError(
@@ -92,16 +85,12 @@ class ParabolicSARIndicator(BaseIndicator):
             previous_sar = sar.iloc[previous_index]
 
             current_sar = previous_sar + (
-                acceleration_factor * (
-                    extreme_point - previous_sar
-                )
+                acceleration_factor * (extreme_point - previous_sar)
             )
 
             if is_uptrend:
                 current_sar = min(
-                    current_sar,
-                    low.iloc[previous_index],
-                    low.iloc[index]
+                    current_sar, low.iloc[previous_index], low.iloc[index]
                 )
 
                 if low.iloc[index] < current_sar:
@@ -115,16 +104,14 @@ class ParabolicSARIndicator(BaseIndicator):
                         extreme_point = high.iloc[index]
                         acceleration_factor = min(
                             acceleration_factor + self.acceleration,
-                            self.maximum_acceleration
+                            self.maximum_acceleration,
                         )
 
                     trend.iloc[index] = "Bullish"
 
             else:
                 current_sar = max(
-                    current_sar,
-                    high.iloc[previous_index],
-                    high.iloc[index]
+                    current_sar, high.iloc[previous_index], high.iloc[index]
                 )
 
                 if high.iloc[index] > current_sar:
@@ -138,7 +125,7 @@ class ParabolicSARIndicator(BaseIndicator):
                         extreme_point = low.iloc[index]
                         acceleration_factor = min(
                             acceleration_factor + self.acceleration,
-                            self.maximum_acceleration
+                            self.maximum_acceleration,
                         )
 
                     trend.iloc[index] = "Bearish"
@@ -148,13 +135,6 @@ class ParabolicSARIndicator(BaseIndicator):
         result["ParabolicSAR"] = sar
         result["ParabolicSAR_Trend"] = trend
 
-        self.logger.info(
-            "Parabolic SAR calculation completed successfully."
-        )
+        self.logger.info("Parabolic SAR calculation completed successfully.")
 
-        return result[
-            [
-                "ParabolicSAR",
-                "ParabolicSAR_Trend"
-            ]
-        ]
+        return result[["ParabolicSAR", "ParabolicSAR_Trend"]]

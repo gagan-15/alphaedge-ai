@@ -42,17 +42,10 @@ class RelativeVolumeIndicator(BaseIndicator):
 
         volume_sma_indicator = VolumeSMAIndicator()
 
-        data = volume_sma_indicator.calculate(
-            data,
-            period
-        )
+        data = volume_sma_indicator.calculate(data, period)
 
-        data[f"RVOL_{period}"] = (
-            data["Volume"] / data[f"Volume_SMA_{period}"]
-        )
+        data[f"RVOL_{period}"] = data["Volume"] / data[f"Volume_SMA_{period}"]
 
-        logger.info(
-            f"Calculated {period}-period RVOL successfully."
-        )
+        logger.info(f"Calculated {period}-period RVOL successfully.")
 
         return data

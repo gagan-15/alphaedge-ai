@@ -29,7 +29,7 @@ class IchimokuCloudIndicator(BaseIndicator):
         conversion_period: int = 9,
         base_period: int = 26,
         leading_span_b_period: int = 52,
-        displacement: int = 26
+        displacement: int = 26,
     ):
         """
         Initialize Ichimoku Cloud Indicator.
@@ -41,19 +41,14 @@ class IchimokuCloudIndicator(BaseIndicator):
         self.displacement = displacement
         self.logger = logging.getLogger(__name__)
 
-    def calculate(
-        self,
-        data: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate(self, data: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate Ichimoku Cloud.
         """
 
         IndicatorValidator.validate_ichimoku_input(data)
 
-        self.logger.info(
-            "Starting Ichimoku Cloud calculation."
-        )
+        self.logger.info("Starting Ichimoku Cloud calculation.")
 
         result = data.copy()
 
@@ -62,46 +57,26 @@ class IchimokuCloudIndicator(BaseIndicator):
         close = result["Close"]
 
         conversion_line = (
-            high.rolling(
-                window=self.conversion_period
-            ).max()
-            +
-            low.rolling(
-                window=self.conversion_period
-            ).min()
+            high.rolling(window=self.conversion_period).max()
+            + low.rolling(window=self.conversion_period).min()
         ) / 2
 
         base_line = (
-            high.rolling(
-                window=self.base_period
-            ).max()
-            +
-            low.rolling(
-                window=self.base_period
-            ).min()
+            high.rolling(window=self.base_period).max()
+            + low.rolling(window=self.base_period).min()
         ) / 2
 
-        leading_span_a = (
-            (
-                conversion_line + base_line
-            ) / 2
-        ).shift(self.displacement)
+        leading_span_a = ((conversion_line + base_line) / 2).shift(self.displacement)
 
         leading_span_b = (
             (
-                high.rolling(
-                    window=self.leading_span_b_period
-                ).max()
-                +
-                low.rolling(
-                    window=self.leading_span_b_period
-                ).min()
-            ) / 2
+                high.rolling(window=self.leading_span_b_period).max()
+                + low.rolling(window=self.leading_span_b_period).min()
+            )
+            / 2
         ).shift(self.displacement)
 
-        lagging_span = close.shift(
-            -self.displacement
-        )
+        lagging_span = close.shift(-self.displacement)
 
         result["Ichimoku_ConversionLine"] = conversion_line
         result["Ichimoku_BaseLine"] = base_line
@@ -109,9 +84,7 @@ class IchimokuCloudIndicator(BaseIndicator):
         result["Ichimoku_LeadingSpanB"] = leading_span_b
         result["Ichimoku_LaggingSpan"] = lagging_span
 
-        self.logger.info(
-            "Ichimoku Cloud calculation completed successfully."
-        )
+        self.logger.info("Ichimoku Cloud calculation completed successfully.")
 
         return result[
             [
@@ -119,6 +92,6 @@ class IchimokuCloudIndicator(BaseIndicator):
                 "Ichimoku_BaseLine",
                 "Ichimoku_LeadingSpanA",
                 "Ichimoku_LeadingSpanB",
-                "Ichimoku_LaggingSpan"
+                "Ichimoku_LaggingSpan",
             ]
         ]

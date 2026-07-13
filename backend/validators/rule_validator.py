@@ -16,9 +16,7 @@ class RuleValidator:
     """
 
     @staticmethod
-    def validate_indicator_results(
-        indicator_results: dict[str, Any]
-    ) -> None:
+    def validate_indicator_results(indicator_results: dict[str, Any]) -> None:
         """
         Validate indicator results.
 
@@ -35,21 +33,13 @@ class RuleValidator:
         """
 
         if indicator_results is None:
-            raise ValueError(
-                "Indicator results cannot be None."
-            )
+            raise ValueError("Indicator results cannot be None.")
 
         if not isinstance(indicator_results, dict):
-            raise TypeError(
-                "Indicator results must be a dictionary."
-            )
+            raise TypeError("Indicator results must be a dictionary.")
 
         if not indicator_results:
-            raise ValueError(
-                "Indicator results cannot be empty."
-            )
-        
+            raise ValueError("Indicator results cannot be empty.")
+
         if "rsi" not in indicator_results:
-            raise ValueError(
-                "RSI result is required."
-            )
+            raise ValueError("RSI result is required.")

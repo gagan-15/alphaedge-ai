@@ -141,6 +141,29 @@ Confidence should always be explainable.
 
 ---
 
+## Zone Quality Engine
+
+Evaluate every detected Demand or Supply Zone using independent scoring factors.
+
+Examples:
+
+- Freshness
+- Strength
+- Base Quality
+- Departure Quality
+- Origin Quality
+- Timeframe Weight
+- Number of Retests
+- Distance from Current Price
+- Confluence with Trend
+- Liquidity Context
+
+Generate an explainable Zone Quality Score (0–100).
+
+The Zone Quality Score should integrate with the Trade Readiness Engine.
+
+---
+
 ## Trend Alignment Engine
 
 Evaluate trend across multiple timeframes.
@@ -173,6 +196,13 @@ Analyze:
 - Break of Structure
 - Change of Character
 - Liquidity Areas
+- Zone Scoring
+- Zone Ranking
+- Zone Lifecycle
+- Zone Merge
+- Zone Invalidation
+- Zone Retest Probability
+- Multi-Timeframe Zone Confluence
 
 ---
 
@@ -277,6 +307,23 @@ The engine should combine:
 The Confluence Score should contribute to the overall Trade Readiness Score.
 
 - - -
+
+## Market Structure Engine
+
+Analyze overall market structure using:
+
+- Break of Structure (BOS)
+- Change of Character (CHoCH)
+- Higher Highs
+- Higher Lows
+- Lower Highs
+- Lower Lows
+- Swing Detection
+- Trend Transitions
+
+The Market Structure Engine should integrate with the Demand & Supply Engine and contribute to overall trade quality rather than acting as an independent signal.
+
+---
 
 # Market Intelligence
 

@@ -14,9 +14,7 @@ Project:
 
 import pandas as pd
 
-from backend.indicators.volume_confirmation_indicator import (
-    VolumeConfirmationIndicator
-)
+from backend.indicators.volume_confirmation_indicator import VolumeConfirmationIndicator
 
 
 def test_volume_confirmation_indicator_creates_column():
@@ -25,11 +23,7 @@ def test_volume_confirmation_indicator_creates_column():
     creates the expected output column.
     """
 
-    data = pd.DataFrame(
-        {
-            "Volume": list(range(100, 130))
-        }
-    )
+    data = pd.DataFrame({"Volume": list(range(100, 130))})
 
     indicator = VolumeConfirmationIndicator()
 

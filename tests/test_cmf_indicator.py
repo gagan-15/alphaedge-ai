@@ -28,15 +28,12 @@ def test_cmf_indicator_creates_column():
             "High": [110, 112, 115, 116, 118],
             "Low": [100, 102, 104, 105, 107],
             "Close": [108, 111, 114, 115, 117],
-            "Volume": [1000, 1200, 1100, 1300, 1400]
+            "Volume": [1000, 1200, 1100, 1300, 1400],
         }
     )
 
     indicator = CMFIndicator()
 
-    result = indicator.calculate(
-        data,
-        period=3
-    )
+    result = indicator.calculate(data, period=3)
 
     assert "CMF" in result.columns

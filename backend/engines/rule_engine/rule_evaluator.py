@@ -16,26 +16,18 @@ class RuleEvaluator:
     the final trading signal.
     """
 
-    def evaluate(
-        self,
-        rule: Rule
-    ) -> TradingSignal:
+    def evaluate(self, rule: Rule) -> TradingSignal:
         """
         Evaluate a Rule and return
         the trading signal.
         """
         if rule is None:
-            raise ValueError(
-                "Rule cannot be None."
-            )
-        
+            raise ValueError("Rule cannot be None.")
+
         logger.info("Starting Rule Evaluator.")
 
         decision = rule.signal
 
-        logger.info(
-            "Rule evaluated: %s",
-            rule.name
-               )
+        logger.info("Rule evaluated: %s", rule.name)
 
         return decision

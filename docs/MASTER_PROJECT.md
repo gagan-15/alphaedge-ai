@@ -14,21 +14,21 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.4
+Current Stable Version: v0.2.5
 
-Current Stable Sprint: Sprint 2.25 – Demand & Supply Foundation
+Current Stable Sprint: Sprint 2.26 – Zone Detection Engine
 
 Next Sprint:
-Sprint 2.26 – Zone Detection Engine
+Sprint 2.26 – Zone Freshness Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: **v0.2.4**
+Current Version: **v0.2.5**
 
 Current Sprint:
-## Sprint 2.26 – Zone Detection Engine
+## Sprint 2.27 – Zone Freshness Engine
 
 Overall Progress:
 31%
@@ -45,7 +45,7 @@ Commercial Readiness:
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 25 |
+| Total Sprints Completed | 26 |
 | Backend Application Files | 47 |
 | Test Python Files | 25 |
 | Services | 2 |
@@ -93,6 +93,7 @@ The platform will always be:
 - ✅ Volume Indicators
 - ✅ Trend Indicators
 - ✅ Rule Engine Foundation
+- ✅ Zone Detection Engine
 
 
 ## Current Milestone
@@ -224,7 +225,6 @@ Trading Signal
 
 The following modules are planned for future development:
 
-⬜ Zone Detection Engine
 ⬜ Zone Scoring Engine
 ⬜ Zone Freshness Engine
 ⬜ Multi-Timeframe Zone Engine
@@ -282,13 +282,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.25 – Demand & Supply Foundation
+Sprint 2.26 – Zone Detection Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.26 – Zone Detection Engine
+Sprint 2.27 – Zone Freshness Engine
 
 # Project Automation
 

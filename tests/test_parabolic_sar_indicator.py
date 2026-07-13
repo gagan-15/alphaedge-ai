@@ -8,14 +8,8 @@ from backend.services.indicator.indicator_service import IndicatorService
 def sample_market_data():
     return pd.DataFrame(
         {
-            "High": [
-                110, 112, 115, 117, 119,
-                121, 123, 125, 127, 130
-            ],
-            "Low": [
-                100, 101, 103, 105, 107,
-                109, 111, 113, 115, 117
-            ]
+            "High": [110, 112, 115, 117, 119, 121, 123, 125, 127, 130],
+            "Low": [100, 101, 103, 105, 107, 109, 111, 113, 115, 117],
         }
     )
 
@@ -42,9 +36,7 @@ def test_parabolic_sar_columns_exist():
 
 
 def test_parabolic_sar_missing_high_column_raises_error():
-    data = sample_market_data().drop(
-        columns=["High"]
-    )
+    data = sample_market_data().drop(columns=["High"])
 
     indicator = ParabolicSARIndicator()
 
@@ -53,9 +45,7 @@ def test_parabolic_sar_missing_high_column_raises_error():
 
 
 def test_parabolic_sar_missing_low_column_raises_error():
-    data = sample_market_data().drop(
-        columns=["Low"]
-    )
+    data = sample_market_data().drop(columns=["Low"])
 
     indicator = ParabolicSARIndicator()
 

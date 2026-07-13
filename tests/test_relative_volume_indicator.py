@@ -14,9 +14,7 @@ Project:
 
 import pandas as pd
 
-from backend.indicators.relative_volume_indicator import (
-    RelativeVolumeIndicator
-)
+from backend.indicators.relative_volume_indicator import RelativeVolumeIndicator
 
 
 def test_relative_volume_indicator_creates_column():
@@ -25,11 +23,7 @@ def test_relative_volume_indicator_creates_column():
     the expected RVOL column.
     """
 
-    data = pd.DataFrame(
-        {
-            "Volume": list(range(100, 130))
-        }
-    )
+    data = pd.DataFrame({"Volume": list(range(100, 130))})
 
     indicator = RelativeVolumeIndicator()
 

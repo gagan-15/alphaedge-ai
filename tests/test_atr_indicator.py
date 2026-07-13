@@ -9,19 +9,61 @@ def test_atr_returns_series():
     Test that ATR returns a Pandas Series.
     """
 
-    data = pd.DataFrame({
-        "High": [102, 103, 104, 105, 106,
-                 107, 108, 109, 110, 111,
-                 112, 113, 114, 115, 116],
-
-        "Low": [99, 100, 101, 102, 103,
-                104, 105, 106, 107, 108,
-                109, 110, 111, 112, 113],
-
-        "Close": [100, 101, 102, 103, 104,
-                  105, 106, 107, 108, 109,
-                  110, 111, 112, 113, 114]
-    })
+    data = pd.DataFrame(
+        {
+            "High": [
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+            ],
+            "Low": [
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+            ],
+            "Close": [
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+            ],
+        }
+    )
 
     indicator = ATRIndicator()
 
@@ -35,19 +77,61 @@ def test_atr_output_length():
     Test that ATR output length matches input length.
     """
 
-    data = pd.DataFrame({
-        "High": [102, 103, 104, 105, 106,
-                 107, 108, 109, 110, 111,
-                 112, 113, 114, 115, 116],
-
-        "Low": [99, 100, 101, 102, 103,
-                104, 105, 106, 107, 108,
-                109, 110, 111, 112, 113],
-
-        "Close": [100, 101, 102, 103, 104,
-                  105, 106, 107, 108, 109,
-                  110, 111, 112, 113, 114]
-    })
+    data = pd.DataFrame(
+        {
+            "High": [
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+                115,
+                116,
+            ],
+            "Low": [
+                99,
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+            ],
+            "Close": [
+                100,
+                101,
+                102,
+                103,
+                104,
+                105,
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114,
+            ],
+        }
+    )
 
     indicator = ATRIndicator()
 
@@ -74,10 +158,7 @@ def test_missing_high_column():
     Test ATR when High column is missing.
     """
 
-    data = pd.DataFrame({
-        "Low": [100, 101],
-        "Close": [101, 102]
-    })
+    data = pd.DataFrame({"Low": [100, 101], "Close": [101, 102]})
 
     indicator = ATRIndicator()
 
@@ -90,10 +171,7 @@ def test_missing_low_column():
     Test ATR when Low column is missing.
     """
 
-    data = pd.DataFrame({
-        "High": [101, 102],
-        "Close": [100, 101]
-    })
+    data = pd.DataFrame({"High": [101, 102], "Close": [100, 101]})
 
     indicator = ATRIndicator()
 
@@ -106,11 +184,9 @@ def test_invalid_period():
     Test ATR with invalid period.
     """
 
-    data = pd.DataFrame({
-        "High": [101, 102, 103],
-        "Low": [99, 100, 101],
-        "Close": [100, 101, 102]
-    })
+    data = pd.DataFrame(
+        {"High": [101, 102, 103], "Low": [99, 100, 101], "Close": [100, 101, 102]}
+    )
 
     indicator = ATRIndicator(period=0)
 

@@ -14,7 +14,7 @@ class TestMultiRuleEngine:
         rules = [
             Rule("RSI", True, TradingSignal.BUY, ""),
             Rule("MACD", True, TradingSignal.BUY, ""),
-            Rule("ADX", True, TradingSignal.SELL, "")
+            Rule("ADX", True, TradingSignal.SELL, ""),
         ]
 
         result = self.engine.evaluate(rules)
@@ -25,7 +25,7 @@ class TestMultiRuleEngine:
         rules = [
             Rule("RSI", True, TradingSignal.SELL, ""),
             Rule("MACD", True, TradingSignal.SELL, ""),
-            Rule("ADX", True, TradingSignal.BUY, "")
+            Rule("ADX", True, TradingSignal.BUY, ""),
         ]
 
         result = self.engine.evaluate(rules)
@@ -36,7 +36,7 @@ class TestMultiRuleEngine:
         rules = [
             Rule("RSI", True, TradingSignal.HOLD, ""),
             Rule("MACD", True, TradingSignal.HOLD, ""),
-            Rule("ADX", True, TradingSignal.BUY, "")
+            Rule("ADX", True, TradingSignal.BUY, ""),
         ]
 
         result = self.engine.evaluate(rules)

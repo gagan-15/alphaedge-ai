@@ -23,11 +23,7 @@ def test_sma_indicator_creates_column():
     the expected SMA column.
     """
 
-    data = pd.DataFrame(
-        {
-            "Close": list(range(1, 31))
-        }
-    )
+    data = pd.DataFrame({"Close": list(range(1, 31))})
 
     indicator = SMAIndicator()
 

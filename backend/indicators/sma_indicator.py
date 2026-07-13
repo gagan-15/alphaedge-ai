@@ -16,6 +16,7 @@ from backend.indicators.base_indicator import BaseIndicator
 from backend.validators.indicator_validator import IndicatorValidator
 from backend.core.logger import logger
 
+
 class SMAIndicator(BaseIndicator):
     """
     Simple Moving Average (SMA) indicator.
@@ -31,12 +32,8 @@ class SMAIndicator(BaseIndicator):
         IndicatorValidator.validate_common_input(data, period)
         IndicatorValidator.validate_minimum_rows(data, period)
 
-        data[f"SMA_{period}"] = data["Close"].rolling(
-            window=period
-        ).mean()
+        data[f"SMA_{period}"] = data["Close"].rolling(window=period).mean()
 
-        logger.info(
-             f"Calculating {period}-period SMA."
-         )
+        logger.info(f"Calculating {period}-period SMA.")
 
         return data

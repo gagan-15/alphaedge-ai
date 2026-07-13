@@ -25,36 +25,15 @@ def test_adx_indicator_creates_columns():
 
     data = pd.DataFrame(
         {
-            "High": [
-                110,
-                112,
-                115,
-                116,
-                118
-            ],
-            "Low": [
-                100,
-                102,
-                104,
-                105,
-                107
-            ],
-            "Close": [
-                108,
-                111,
-                114,
-                115,
-                117
-            ]
+            "High": [110, 112, 115, 116, 118],
+            "Low": [100, 102, 104, 105, 107],
+            "Close": [108, 111, 114, 115, 117],
         }
     )
 
     indicator = ADXIndicator()
 
-    result = indicator.calculate(
-        data,
-        period=3
-    )
+    result = indicator.calculate(data, period=3)
 
     assert "ADX" in result.columns
 

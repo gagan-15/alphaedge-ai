@@ -23,11 +23,7 @@ def test_volume_sma_indicator_creates_column():
     the expected Volume SMA column.
     """
 
-    data = pd.DataFrame(
-        {
-            "Volume": list(range(100, 130))
-        }
-    )
+    data = pd.DataFrame({"Volume": list(range(100, 130))})
 
     indicator = VolumeSMAIndicator()
 

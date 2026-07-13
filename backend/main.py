@@ -32,6 +32,7 @@ from backend.config.settings import (
 )
 from backend.core.logger import logger
 
+
 def main():
     """
     Main entry point of the AlphaEdge AI application.
@@ -50,22 +51,23 @@ def main():
         # Request one year of daily historical data
         # for Tata Consultancy Services (TCS).
         stock_data = market_service.get_stock_data(
-        symbol=DEFAULT_SYMBOL,
-        period=DEFAULT_PERIOD,
-        interval=DEFAULT_INTERVAL,
+            symbol=DEFAULT_SYMBOL,
+            period=DEFAULT_PERIOD,
+            interval=DEFAULT_INTERVAL,
         )
 
         indicator_service = IndicatorService()
 
         result = indicator_service.calculate_ema(stock_data)
 
-         # Display the first five rows of the downloaded data.
+        # Display the first five rows of the downloaded data.
         print(result.head())
 
     except ValueError as error:
-       logger.error(error)
-       print("\n❌ Error")
-       print(error)
+        logger.error(error)
+        print("\n❌ Error")
+        print(error)
+
 
 # Execute the application only when this file
 # is run directly.

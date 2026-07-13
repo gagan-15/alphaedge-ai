@@ -6,13 +6,9 @@ from backend.validators.rule_validator import RuleValidator
 def test_validate_indicator_results_success():
     """Validation should succeed for a valid dictionary."""
 
-    indicator_results = {
-        "rsi": 55
-    }
+    indicator_results = {"rsi": 55}
 
-    RuleValidator.validate_indicator_results(
-        indicator_results
-    )
+    RuleValidator.validate_indicator_results(indicator_results)
 
 
 def test_validate_indicator_results_none():
@@ -35,14 +31,11 @@ def test_validate_indicator_results_wrong_type():
     with pytest.raises(TypeError):
         RuleValidator.validate_indicator_results([])
 
+
 def test_validate_indicator_results_missing_rsi():
     """Validation should fail when RSI is missing."""
 
-    indicator_results = {
-        "macd": 1.2
-    }
+    indicator_results = {"macd": 1.2}
 
     with pytest.raises(ValueError):
-        RuleValidator.validate_indicator_results(
-            indicator_results
-        )
+        RuleValidator.validate_indicator_results(indicator_results)

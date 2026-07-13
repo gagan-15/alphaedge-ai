@@ -10,15 +10,13 @@ from backend.models.zone import Zone
 from backend.validators.zone_validator import ZoneValidator
 from pandas import DataFrame
 
+
 class DemandSupplyEngine:
     """
     Foundation for all future Demand & Supply analysis.
     """
 
-    def validate(
-        self,
-        zone: Zone
-    ) -> Zone:
+    def validate(self, zone: Zone) -> Zone:
         """
         Validate a zone.
 
@@ -30,26 +28,15 @@ class DemandSupplyEngine:
             Zone
         """
 
-        logger.info(
-            "Starting zone validation."
-        )
+        logger.info("Starting zone validation.")
 
-        ZoneValidator.validate_zone(
-            zone
-        )
+        ZoneValidator.validate_zone(zone)
 
-        logger.info(
-            "Zone validation completed."
-        )
+        logger.info("Zone validation completed.")
 
         return zone
-    
-    
 
-    def prepare_data(
-        self,
-        market_data: DataFrame
-    ) -> DataFrame:
+    def prepare_data(self, market_data: DataFrame) -> DataFrame:
         """
         Prepare market data for future
         Demand & Supply analysis.
@@ -62,8 +49,6 @@ class DemandSupplyEngine:
             DataFrame
         """
 
-        logger.info(
-            "Preparing market data for Demand & Supply analysis."
-        )
+        logger.info("Preparing market data for Demand & Supply analysis.")
 
         return market_data.copy()

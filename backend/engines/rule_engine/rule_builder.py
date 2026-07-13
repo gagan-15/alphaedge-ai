@@ -18,10 +18,7 @@ class RuleBuilder:
     Builds and evaluates trading rules.
     """
 
-    def evaluate(
-        self,
-        indicator_results: dict[str, Any]
-    ) -> TradingSignal:
+    def evaluate(self, indicator_results: dict[str, Any]) -> TradingSignal:
         """
         Evaluate trading rules.
 
@@ -40,27 +37,21 @@ class RuleBuilder:
 
         logger.info("RSI rule evaluated successfully.")
 
-        logger.info(
-                "Trading decision: %s",
-                rule.signal.name
-            )
+        logger.info("Trading decision: %s", rule.signal.name)
 
         return rule
-    
-    def _evaluate_rsi_rule(
-        self,
-        rsi: float
-    ) -> Rule:
+
+    def _evaluate_rsi_rule(self, rsi: float) -> Rule:
         """
         Evaluate the RSI trading rule.
         """
 
         if rsi > RSI_NEUTRAL_LEVEL:
-           return Rule(
+            return Rule(
                 name="RSI Rule",
                 passed=True,
                 signal=TradingSignal.BUY,
-                reason="RSI is above the neutral level."
+                reason="RSI is above the neutral level.",
             )
 
         if rsi < RSI_NEUTRAL_LEVEL:
@@ -68,20 +59,17 @@ class RuleBuilder:
                 name="RSI Rule",
                 passed=True,
                 signal=TradingSignal.SELL,
-                reason="RSI is below the neutral level."
+                reason="RSI is below the neutral level.",
             )
 
         return Rule(
             name="RSI Rule",
             passed=False,
             signal=TradingSignal.HOLD,
-            reason="RSI is at the neutral level."
+            reason="RSI is at the neutral level.",
         )
-                
-    def _evaluate_macd_rule(
-    self,
-    indicator_results: dict[str, Any]
-) -> bool:
+
+    def _evaluate_macd_rule(self, indicator_results: dict[str, Any]) -> bool:
         """
         Placeholder for MACD rule.
         """

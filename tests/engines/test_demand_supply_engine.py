@@ -82,7 +82,6 @@ class TestDemandSupplyEngine:
         with pytest.raises(ValueError):
             self.engine.validate(zone)
 
-
     def test_prepare_data_returns_copy(self) -> None:
         """
         prepare_data should return a copy
@@ -99,9 +98,7 @@ class TestDemandSupplyEngine:
             }
         )
 
-        result = self.engine.prepare_data(
-            market_data
-        )
+        result = self.engine.prepare_data(market_data)
 
         assert result.equals(market_data)
         assert result is not market_data
@@ -122,9 +119,7 @@ class TestDemandSupplyEngine:
             }
         )
 
-        result = self.engine.prepare_data(
-            market_data
-        )
+        result = self.engine.prepare_data(market_data)
 
         result.loc[0, "Close"] = 999.0
 

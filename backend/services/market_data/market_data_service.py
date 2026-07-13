@@ -34,7 +34,7 @@ class MarketDataService:
         MarketDataValidator.validate(data)
 
         logger.info("Market data validation completed successfully.")
-    
+
         # Return validated market data.
 
         return data

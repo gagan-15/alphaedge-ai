@@ -39,31 +39,16 @@ class VWAPIndicator(BaseIndicator):
 
         IndicatorValidator.validate_vwap_input(data)
 
-        typical_price = (
-            data["High"] +
-            data["Low"] +
-            data["Close"]
-        ) / 3
+        typical_price = (data["High"] + data["Low"] + data["Close"]) / 3
 
-        tp_volume = (
-            typical_price *
-            data["Volume"]
-        )
+        tp_volume = typical_price * data["Volume"]
 
         cumulative_tp_volume = tp_volume.cumsum()
 
-        cumulative_volume = (
-            data["Volume"]
-            .cumsum()
-        )
+        cumulative_volume = data["Volume"].cumsum()
 
-        data["VWAP"] = (
-            cumulative_tp_volume /
-            cumulative_volume
-        )
+        data["VWAP"] = cumulative_tp_volume / cumulative_volume
 
-        logger.info(
-            "Calculated Session VWAP successfully."
-        )
+        logger.info("Calculated Session VWAP successfully.")
 
         return data

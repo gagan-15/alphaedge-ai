@@ -49,31 +49,43 @@ Future capabilities include:
 
 # 3. High-Level Architecture
 
-```
-        Rule Engine Internal Architecture
-
-Indicator Results
-        │
-        ▼
-Rule Builder
-        │
-        ▼
-Rule
-        │
-        ▼
-Multi Rule Engine
-        │
-        ▼
-Rule
-        │
-        ▼
-Rule Evaluator
-        │
-        ▼
+Market Data
+      │
+      ▼
+Validation Engine
+      │
+      ▼
+Indicator Engine
+      │
+      ▼
+Rule Engine
+      │
+      ▼
+Demand & Supply Engine
+      │
+      ▼
 Trading Signal
-```
 
 ---
+
+Demand & Supply Engine
+
+Market Data
+      │
+      ▼
+Base Detector
+      │
+      ▼
+Departure Detector
+      │
+      ▼
+Pattern Detector
+      │
+      ▼
+Zone Detection Engine
+      │
+      ▼
+Zone
 
 # 4. Core Modules
 
@@ -83,16 +95,16 @@ Current
 - Validation Engine
 - Indicator Engine
 - Rule Engine
+- Demand & Supply Engine
 
 Upcoming
 
-- Demand & Supply Engine
 - Screener Engine
 - Risk Management Engine
 - AI Explanation Engine
 - Backtesting Engine
 - Portfolio Engine
-- Alert Engine  
+- Alert Engine
 ---
 
 # 5. Folder Structure
@@ -273,6 +285,28 @@ Rule Engine interprets.
 The Multi Rule Engine combines one or more Rule objects into a single consolidated Rule before the Rule Evaluator produces the final TradingSignal.
 
 This separation keeps rule aggregation independent from rule evaluation and allows new trading rules to be added without modifying the evaluation workflow.
+
+## AD-016
+
+The Demand & Supply Engine is composed of independent detectors.
+
+BaseDetector
+
+↓
+
+DepartureDetector
+
+↓
+
+PatternDetector
+
+↓
+
+ZoneDetectionEngine
+
+Each detector has a single responsibility.
+
+The ZoneDetectionEngine orchestrates the workflow without duplicating detection logic.
 
 # 9. Coding Philosophy
 

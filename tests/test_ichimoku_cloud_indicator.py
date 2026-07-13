@@ -10,7 +10,7 @@ def sample_market_data():
         {
             "High": list(range(110, 170)),
             "Low": list(range(100, 160)),
-            "Close": list(range(105, 165))
+            "Close": list(range(105, 165)),
         }
     )
 
@@ -40,9 +40,7 @@ def test_ichimoku_columns_exist():
 
 
 def test_ichimoku_missing_high_column_raises_error():
-    data = sample_market_data().drop(
-        columns=["High"]
-    )
+    data = sample_market_data().drop(columns=["High"])
 
     indicator = IchimokuCloudIndicator()
 
@@ -51,9 +49,7 @@ def test_ichimoku_missing_high_column_raises_error():
 
 
 def test_ichimoku_missing_low_column_raises_error():
-    data = sample_market_data().drop(
-        columns=["Low"]
-    )
+    data = sample_market_data().drop(columns=["Low"])
 
     indicator = IchimokuCloudIndicator()
 
@@ -62,9 +58,7 @@ def test_ichimoku_missing_low_column_raises_error():
 
 
 def test_ichimoku_missing_close_column_raises_error():
-    data = sample_market_data().drop(
-        columns=["Close"]
-    )
+    data = sample_market_data().drop(columns=["Close"])
 
     indicator = IchimokuCloudIndicator()
 

@@ -28,7 +28,7 @@ def test_vwap_indicator_creates_column():
             "High": list(range(110, 140)),
             "Low": list(range(100, 130)),
             "Close": list(range(105, 135)),
-            "Volume": list(range(1000, 1030))
+            "Volume": list(range(1000, 1030)),
         }
     )
 

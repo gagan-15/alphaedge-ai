@@ -47,18 +47,27 @@
 
 ---
 
-## Phase 4
+## Phase 4 (Current)
 
 ✅ Demand & Supply Foundation
 
-⬜ Zone Detection Engine
+✅ Zone Detection Engine
 
-⬜ Zone Freshness Engine
+🎯 Zone Freshness Engine
+
+⬜ Zone Strength Engine
 
 ⬜ Zone Scoring Engine
 
+⬜ Break of Structure (BOS)
+
+⬜ Change of Character (CHoCH)
+
 ⬜ Multi-Timeframe Zone Engine
 
+⬜ Zone Merge Engine
+
+⬜ Zone Ranking Engine
 ---
 
 ## Phase 5
