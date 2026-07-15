@@ -14,28 +14,28 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.6
+Current Stable Version: v0.2.7
 
 Current Stable Sprint:
-Sprint 2.27 – Zone Freshness Engine
+Sprint 2.28 – Zone Strength Engine
 
 Next Sprint:
-Sprint 2.28 – Zone Strength Engine
+Sprint 2.29 – Break of Structure (BOS) Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: **v0.2.6**
+Current Version: v0.2.7
 
 Current Sprint:
-## Sprint 2.27 – Zone Freshness Engine
+## Sprint 2.28 – Zone Strength Engine
 
 Overall Progress:
-31%
+33%
 
 Core Platform Progress:
-55%
+58%   
 
 Commercial Readiness:
 10%
@@ -55,8 +55,8 @@ Commercial Readiness:
 | Indicators | 17 |
 | Configuration Modules | 2 |
 | Entry Points | 1 |
-| Pytest | 82 Passing |
-| Git Commits | 35|
+| Pytest | 100 Passing |
+| Git Commits | 35 |
 | Rule Engine Modules | 4 |
 
 ---
@@ -95,6 +95,8 @@ The platform will always be:
 - ✅ Trend Indicators
 - ✅ Rule Engine Foundation
 - ✅ Zone Detection Engine
+- ✅ Zone Freshness Engine
+- ✅ Zone Strength Engine
 
 
 ## Current Milestone
@@ -133,16 +135,17 @@ The platform will always be:
 | v0.2.4 | Demand & Supply Foundation |
 | v0.2.5 | Zone Detection Engine |
 | v0.2.6 | Zone Freshness Engine |
+| v0.2.7 | Zone Strength Engine |
       
 ---
 
 # Current Sprint
 
-## Sprint 2.27 – Zone Freshness Engine
+## Sprint 2.28 – Zone Strength Engine
 
 ### Objective
 
-Implement the Zone Freshness Engine capable of evaluating whether a detected Demand or Supply Zone remains fresh, tested, weak, or broken using subsequent market price action.
+Implement the Zone Strength Engine capable of evaluating the quality of Demand and Supply zones using departure distance, departure candles, departure speed, volume confirmation, and gap detection.
 
 ### Sprint Status
 
@@ -172,6 +175,7 @@ Implement the Zone Freshness Engine capable of evaluating whether a detected Dem
 - ✅ Demand & Supply Foundation
 - ✅ Zone Detection Engine
 - ✅ Zone Freshness Engine
+- ✅ Zone Strength Engine
 
 ## Indicators
 
@@ -230,7 +234,6 @@ Trading Signal
 
 The following modules are planned for future development:
 
-⬜ Zone Strength Engine
 ⬜ BOS Engine
 ⬜ CHoCH Engine
 ⬜ Multi-Timeframe Zone Engine
@@ -290,13 +293,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.27 – Zone Freshness Engine
+Sprint 2.28 – Zone Strength Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.28 – Zone Strength Engine
+Sprint 2.29 – Break of Structure (BOS) Engine
 
 # Project Automation
 

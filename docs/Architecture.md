@@ -64,6 +64,15 @@ Rule Engine
 Demand & Supply Engine
       │
       ▼
+Market Structure Engine
+      │
+      ▼
+Scoring Engine
+      │
+      ▼
+AI Decision Engine
+      │
+      ▼
 Trading Signal
 
 ---
@@ -85,7 +94,13 @@ Pattern Detector
 Zone Detection Engine
       │
       ▼
-Zone
+Zone Freshness Engine
+      │
+      ▼
+Zone Strength Engine
+      │
+      ▼
+Validated Zone
 
 # 4. Core Modules
 
@@ -96,6 +111,9 @@ Current
 - Indicator Engine
 - Rule Engine
 - Demand & Supply Engine
+- Zone Detection Engine
+- Zone Freshness Engine
+- Zone Strength Engine
 
 Upcoming
 
@@ -322,6 +340,23 @@ The timeframes assigned to these roles are configurable. All future engines (Fre
 
 ---
 
+---
+
+## AD-018
+
+Zone quality evaluation is performed as independent stages.
+
+Zone Detection Engine
+        ↓
+Zone Freshness Engine
+        ↓
+Zone Strength Engine
+
+Each engine has a single responsibility.
+
+Future engines such as BOS, CHoCH, Zone Scoring, and Zone Ranking will build upon these outputs rather than duplicating calculations.
+
+---
 
 
 # 9. Coding Philosophy
