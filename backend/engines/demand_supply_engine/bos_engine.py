@@ -43,13 +43,9 @@ class BOSEngine:
 
         self._config = config or BOSConfig()
 
-        self._swing_detector = SwingDetector(
-            self._config
-        )
+        self._swing_detector = SwingDetector(self._config)
 
-        self._bos_detector = BOSDetector(
-            self._config
-        )
+        self._bos_detector = BOSDetector(self._config)
 
     def detect(
         self,
@@ -59,35 +55,23 @@ class BOSEngine:
         Detect Break Of Structure.
         """
 
-        logger.info(
-            "Starting Break Of Structure detection."
-        )
+        logger.info("Starting Break Of Structure detection.")
 
         BOSValidator.validate(
             market_data,
             self._config,
         )
 
-        swings = self._swing_detector.detect(
-            market_data
-        )
+        swings = self._swing_detector.detect(market_data)
 
         events = self._bos_detector.detect(
             market_data,
             swings,
         )
 
-        bullish = [
-            event
-            for event in events
-            if event.direction == BOSDirection.BULLISH
-        ]
+        bullish = [event for event in events if event.direction == BOSDirection.BULLISH]
 
-        bearish = [
-            event
-            for event in events
-            if event.direction == BOSDirection.BEARISH
-        ]
+        bearish = [event for event in events if event.direction == BOSDirection.BEARISH]
 
         logger.info(
             "%d BOS event(s) found.",
@@ -99,14 +83,6 @@ class BOSEngine:
             swings_evaluated=len(swings),
             bullish_events=len(bullish),
             bearish_events=len(bearish),
-            latest_bullish_event=(
-                bullish[-1]
-                if bullish
-                else None
-            ),
-            latest_bearish_event=(
-                bearish[-1]
-                if bearish
-                else None
-            ),
+            latest_bullish_event=(bullish[-1] if bullish else None),
+            latest_bearish_event=(bearish[-1] if bearish else None),
         )

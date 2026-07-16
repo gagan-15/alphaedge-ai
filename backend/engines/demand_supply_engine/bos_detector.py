@@ -49,10 +49,7 @@ class BOSDetector:
 
         for swing in swings:
 
-            if (
-                self._config.deduplicate_events
-                and swing.index in broken_swings
-            ):
+            if self._config.deduplicate_events and swing.index in broken_swings:
                 continue
 
             event = self._detect_break(
@@ -84,10 +81,7 @@ class BOSDetector:
         swing has been broken.
         """
 
-        start = (
-            swing.confirmation_index
-            + self._config.minimum_bars_after_swing
-        )
+        start = swing.confirmation_index + self._config.minimum_bars_after_swing
 
         for index in range(
             start,
@@ -131,9 +125,9 @@ class BOSDetector:
         return None
 
     def _is_bullish_break(
-    self,
-    price: float,
-    swing_price: float,
+        self,
+        price: float,
+        swing_price: float,
     ) -> bool:
 
         required = self._apply_break_buffer(
@@ -170,13 +164,9 @@ class BOSDetector:
         break_price: float,
     ) -> BOSEvent:
 
-        distance = abs(
-            break_price - swing.price
-        )
+        distance = abs(break_price - swing.price)
 
-        percentage = (
-            distance / swing.price
-        ) * 100
+        percentage = (distance / swing.price) * 100
 
         return BOSEvent(
             direction=direction,
@@ -193,12 +183,12 @@ class BOSDetector:
                 f"swing {swing.index}"
             ),
         )
-    
+
     def _get_confirmation_price(
-    self,
-    market_data: DataFrame,
-    index: int,
-    swing_type: SwingType,
+        self,
+        market_data: DataFrame,
+        index: int,
+        swing_type: SwingType,
     ) -> float:
         """
         Return the configured
@@ -218,14 +208,12 @@ class BOSDetector:
         if source == "low":
             return float(candle["Low"])
 
-        raise ValueError(
-            f"Unsupported confirmation_source: {source}"
-    )
+        raise ValueError(f"Unsupported confirmation_source: {source}")
 
     def _apply_break_buffer(
-    self,
-    price: float,
-    bullish: bool,
+        self,
+        price: float,
+        bullish: bool,
     ) -> float:
         """
         Apply configured break buffer.
@@ -235,23 +223,14 @@ class BOSDetector:
 
         if self._config.break_buffer_type == "percentage":
 
-            multiplier = (
-                1 + buffer_value / 100
-                if bullish
-                else 1 - buffer_value / 100
-            )
+            multiplier = 1 + buffer_value / 100 if bullish else 1 - buffer_value / 100
 
             return price * multiplier
 
         if self._config.break_buffer_type == "points":
 
-            return (
-                price + buffer_value
-                if bullish
-                else price - buffer_value
-            )
+            return price + buffer_value if bullish else price - buffer_value
 
         raise ValueError(
-            f"Unsupported break_buffer_type: "
-            f"{self._config.break_buffer_type}"
+            f"Unsupported break_buffer_type: " f"{self._config.break_buffer_type}"
         )

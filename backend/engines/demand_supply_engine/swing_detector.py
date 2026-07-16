@@ -62,9 +62,7 @@ class SwingDetector:
                 swings.append(
                     SwingPoint(
                         index=index,
-                        price=float(
-                            market_data.iloc[index]["High"]
-                        ),
+                        price=float(market_data.iloc[index]["High"]),
                         swing_type=SwingType.HIGH,
                         confirmation_index=index + right,
                     )
@@ -78,9 +76,7 @@ class SwingDetector:
                 swings.append(
                     SwingPoint(
                         index=index,
-                        price=float(
-                            market_data.iloc[index]["Low"]
-                        ),
+                        price=float(market_data.iloc[index]["Low"]),
                         swing_type=SwingType.LOW,
                         confirmation_index=index + right,
                     )
@@ -99,9 +95,7 @@ class SwingDetector:
         index: int,
     ) -> bool:
 
-        current = float(
-            market_data.iloc[index]["High"]
-        )
+        current = float(market_data.iloc[index]["High"])
 
         left = self._config.swing_left_bars
         right = self._config.swing_right_bars
@@ -114,12 +108,7 @@ class SwingDetector:
             if i == index:
                 continue
 
-            if (
-                float(
-                    market_data.iloc[i]["High"]
-                )
-                >= current
-            ):
+            if float(market_data.iloc[i]["High"]) >= current:
                 return False
 
         return True
@@ -130,9 +119,7 @@ class SwingDetector:
         index: int,
     ) -> bool:
 
-        current = float(
-            market_data.iloc[index]["Low"]
-        )
+        current = float(market_data.iloc[index]["Low"])
 
         left = self._config.swing_left_bars
         right = self._config.swing_right_bars
@@ -145,12 +132,7 @@ class SwingDetector:
             if i == index:
                 continue
 
-            if (
-                float(
-                    market_data.iloc[i]["Low"]
-                )
-                <= current
-            ):
+            if float(market_data.iloc[i]["Low"]) <= current:
                 return False
 
         return True

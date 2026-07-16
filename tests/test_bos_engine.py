@@ -125,10 +125,7 @@ class TestBOSEngine:
             market_data,
         )
 
-        assert (
-            result.latest_bullish_event.direction
-            == BOSDirection.BULLISH
-        )
+        assert result.latest_bullish_event.direction == BOSDirection.BULLISH
 
     def test_bearish_bos_detected(self) -> None:
 
@@ -148,10 +145,7 @@ class TestBOSEngine:
             market_data,
         )
 
-        assert (
-            result.latest_bearish_event.direction
-            == BOSDirection.BEARISH
-        )
+        assert result.latest_bearish_event.direction == BOSDirection.BEARISH
 
     def test_no_bos_detected(self) -> None:
 
@@ -369,10 +363,13 @@ class TestBOSEngine:
             config,
         )
 
-        assert detector._is_bullish_break(
-            110.0,
-            110.0,
-        ) is False
+        assert (
+            detector._is_bullish_break(
+                110.0,
+                110.0,
+            )
+            is False
+        )
 
     def test_equal_bullish_break_allowed(self) -> None:
 
@@ -384,10 +381,13 @@ class TestBOSEngine:
             config,
         )
 
-        assert detector._is_bullish_break(
-            110.0,
-            110.0,
-        ) is True
+        assert (
+            detector._is_bullish_break(
+                110.0,
+                110.0,
+            )
+            is True
+        )
 
     def test_equal_bearish_break_not_allowed_by_default(self) -> None:
 
@@ -399,10 +399,13 @@ class TestBOSEngine:
             config,
         )
 
-        assert detector._is_bearish_break(
-            100.0,
-            100.0,
-        ) is False
+        assert (
+            detector._is_bearish_break(
+                100.0,
+                100.0,
+            )
+            is False
+        )
 
     def test_equal_bearish_break_allowed(self) -> None:
 
@@ -414,10 +417,13 @@ class TestBOSEngine:
             config,
         )
 
-        assert detector._is_bearish_break(
-            100.0,
-            100.0,
-        ) is True
+        assert (
+            detector._is_bearish_break(
+                100.0,
+                100.0,
+            )
+            is True
+        )
 
     def test_percentage_buffer_for_bullish_break(self) -> None:
 
@@ -430,10 +436,13 @@ class TestBOSEngine:
             config,
         )
 
-        assert detector._is_bullish_break(
-            106.0,
-            100.0,
-        ) is True
+        assert (
+            detector._is_bullish_break(
+                106.0,
+                100.0,
+            )
+            is True
+        )
 
     def test_percentage_buffer_rejects_small_bullish_break(self) -> None:
 
@@ -446,10 +455,13 @@ class TestBOSEngine:
             config,
         )
 
-        assert detector._is_bullish_break(
-            104.0,
-            100.0,
-        ) is False
+        assert (
+            detector._is_bullish_break(
+                104.0,
+                100.0,
+            )
+            is False
+        )
 
     def test_percentage_buffer_for_bearish_break(self) -> None:
 
@@ -462,10 +474,13 @@ class TestBOSEngine:
             config,
         )
 
-        assert detector._is_bearish_break(
-            94.0,
-            100.0,
-        ) is True
+        assert (
+            detector._is_bearish_break(
+                94.0,
+                100.0,
+            )
+            is True
+        )
 
     def test_points_buffer_for_bullish_break(self) -> None:
 
@@ -478,10 +493,13 @@ class TestBOSEngine:
             config,
         )
 
-        assert detector._is_bullish_break(
-            106.0,
-            100.0,
-        ) is True
+        assert (
+            detector._is_bullish_break(
+                106.0,
+                100.0,
+            )
+            is True
+        )
 
     def test_points_buffer_for_bearish_break(self) -> None:
 
@@ -494,10 +512,13 @@ class TestBOSEngine:
             config,
         )
 
-        assert detector._is_bearish_break(
-            94.0,
-            100.0,
-        ) is True
+        assert (
+            detector._is_bearish_break(
+                94.0,
+                100.0,
+            )
+            is True
+        )
 
     def test_invalid_break_buffer_type_raises_value_error(self) -> None:
 
