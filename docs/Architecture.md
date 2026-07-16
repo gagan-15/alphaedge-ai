@@ -77,7 +77,7 @@ Trading Signal
 
 ---
 
-Demand & Supply Engine
+Demand & Supply and Market Structure Engine
 
 Market Data
       │
@@ -100,7 +100,13 @@ Zone Freshness Engine
 Zone Strength Engine
       │
       ▼
-Validated Zone
+Swing Detector
+      │
+      ▼
+Break of Structure Engine
+      │
+      ▼
+Validated Market Structure
 
 # 4. Core Modules
 
@@ -114,6 +120,8 @@ Current
 - Zone Detection Engine
 - Zone Freshness Engine
 - Zone Strength Engine
+- Swing Detector
+- Break of Structure Engine
 
 Upcoming
 
@@ -354,7 +362,63 @@ Zone Strength Engine
 
 Each engine has a single responsibility.
 
-Future engines such as BOS, CHoCH, Zone Scoring, and Zone Ranking will build upon these outputs rather than duplicating calculations.
+BOS builds upon confirmed swing structure, while future engines such as CHoCH, Zone Scoring, and Zone Ranking will consume existing zone-quality and market-structure outputs without duplicating calculations.
+
+---
+
+## AD-019 – Break of Structure Architecture
+
+Break of Structure analysis is implemented using independent and reusable components.
+
+Market Data
+        ↓
+Swing Detector
+        ↓
+BOS Detector
+        ↓
+BOS Engine
+        ↓
+BOS Result
+
+The Swing Detector identifies confirmed swing highs and swing lows.
+
+The BOS Detector evaluates whether a confirmed swing level has been broken.
+
+The BOS Engine orchestrates validation, swing detection, BOS detection and result construction.
+
+Each component has one responsibility.
+
+The Swing Detector and BOS results may be reused by future engines such as:
+
+- Change of Character
+- Market Structure Classification
+- Multi-Timeframe Structure
+- Zone Scoring
+- Zone Ranking
+- Trade Setup Engine
+
+BOS detection remains rule-based, configurable and explainable.
+
+---
+
+## AD-020 – Configurable Structure Confirmation
+
+Break of Structure confirmation is configuration-driven.
+
+Supported confirmation sources:
+
+- Close
+- High
+- Low
+
+Supported break buffers:
+
+- Percentage
+- Points
+
+The default confirmation source is Close.
+
+Wick-based confirmation is available only when explicitly configured.
 
 ---
 

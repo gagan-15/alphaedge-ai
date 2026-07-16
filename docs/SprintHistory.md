@@ -39,6 +39,7 @@
 | Sprint 2.26 | v0.2.5 | ✅ | Zone Detection Engine | 73 Passing | Sprint 2.26 – Zone Detection Engine |
 | Sprint 2.27 | v0.2.6 | ✅ | Zone Freshness Engine | 82 Passing | Sprint 2.27 – Zone Freshness Engine |
 | Sprint 2.28 | v0.2.7 | ✅ | Zone Strength Engine | 100 Passing | Sprint 2.28 – Zone Strength Engine |
+| Sprint 2.29 | v0.2.8 | ✅ | Break of Structure (BOS) Engine | 135 Passing | Sprint 2.29 – Break of Structure Engine |
 
 ---
  
@@ -65,10 +66,10 @@ Completed
 - ✅ Zone Detection Engine
 - ✅ Zone Freshness Engine
 - ✅ Zone Strength Engine
+- ✅ Break of Structure (BOS) Engine
 
 Upcoming
 
-- ⬜ Break of Structure (BOS)
 - ⬜ Change of Character (CHoCH)
 - ⬜ Multi-Timeframe Zone Engine
 - ⬜ Zone Scoring Engine

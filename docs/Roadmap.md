@@ -57,9 +57,9 @@
 
 ✅ Zone Strength Engine
 
-⬜ Zone Scoring Engine
+✅ Break of Structure (BOS)
 
-⬜ Break of Structure (BOS)
+⬜ Zone Scoring Engine
 
 ⬜ Change of Character (CHoCH)
 

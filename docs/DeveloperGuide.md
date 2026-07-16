@@ -446,6 +446,34 @@ Architecture changes are allowed only before coding starts or when fixing a veri
 
 ---
 
+## DR-014 – Test Synchronization
+
+Unit tests must target the final approved public interface of the sprint.
+
+If an implementation changes before sprint closure:
+
+- Review all affected tests.
+- Remove obsolete test assumptions.
+- Verify tests against the final source code.
+- Run the complete regression suite.
+
+Tests must validate expected behaviour rather than internal implementation details whenever practical.
+
+---
+
+## DR-015 – Configuration Integrity
+
+Every configuration field introduced by a sprint must be:
+
+- Validated
+- Used by production logic
+- Covered by unit tests
+- Documented
+
+Unused or placeholder configuration fields are not allowed in completed sprints.
+
+---
+
 # 13. AI Collaboration Rules
 
 ChatGPT assists development.

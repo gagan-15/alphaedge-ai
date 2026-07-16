@@ -14,22 +14,22 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.7
+Current Stable Version: v0.2.8
 
 Current Stable Sprint:
-Sprint 2.28 – Zone Strength Engine
+Sprint 2.29 – Break of Structure (BOS) Engine
 
 Next Sprint:
-Sprint 2.29 – Break of Structure (BOS) Engine
+Sprint 2.30 – Change of Character (CHoCH) Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: v0.2.7
+Current Version: v0.2.8
 
 Current Sprint:
-## Sprint 2.28 – Zone Strength Engine
+## Sprint 2.29 – Break of Structure (BOS) Engine
 
 Overall Progress:
 33%
@@ -46,16 +46,16 @@ Commercial Readiness:
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 27 |
-| Backend Application Files | 62 |
-| Test Python Files | 26 |
+| Total Sprints Completed | 28 |
+| Backend Application Files | 69 |
+| Test Python Files | 27 |
 | Services | 2 |
 | Providers | 1 |
-| Validators | 6 |
+| Validators | 7 |
 | Indicators | 17 |
-| Configuration Modules | 2 |
+| Configuration Modules | 3 |
 | Entry Points | 1 |
-| Pytest | 100 Passing |
+| Pytest | 135 Passing |
 | Git Commits | 35 |
 | Rule Engine Modules | 4 |
 
@@ -97,6 +97,7 @@ The platform will always be:
 - ✅ Zone Detection Engine
 - ✅ Zone Freshness Engine
 - ✅ Zone Strength Engine
+- ✅ Break of Structure (BOS) Engine
 
 
 ## Current Milestone
@@ -136,27 +137,42 @@ The platform will always be:
 | v0.2.5 | Zone Detection Engine |
 | v0.2.6 | Zone Freshness Engine |
 | v0.2.7 | Zone Strength Engine |
+| v0.2.8 | Break of Structure (BOS) Engine |
       
 ---
 
 # Current Sprint
 
-## Sprint 2.28 – Zone Strength Engine
+
+## Sprint 2.29 – Break of Structure (BOS) Engine
 
 ### Objective
 
-Implement the Zone Strength Engine capable of evaluating the quality of Demand and Supply zones using departure distance, departure candles, departure speed, volume confirmation, and gap detection.
+Implement a deterministic and configuration-driven Break of Structure Engine capable of detecting confirmed bullish and bearish structural breaks using validated OHLC data and confirmed swing points.
+
+### Capabilities
+
+- Confirmed Swing High Detection
+- Confirmed Swing Low Detection
+- Bullish BOS Detection
+- Bearish BOS Detection
+- Close, High and Low Confirmation Sources
+- Percentage and Point-Based Break Buffers
+- Equal Break Configuration
+- Duplicate BOS Prevention
+- Explainable BOS Events
 
 ### Sprint Status
 
-✅ Architecture
-✅ Implementation
-✅ Validation
-✅ Logging
-✅ Unit Tests
-✅ Documentation
-✅ Git Commit
-✅ Git Push
+✅ Architecture  
+✅ Implementation  
+✅ Validation  
+✅ Logging  
+✅ Unit Tests  
+✅ 135 Pytest Passing  
+✅ Documentation  
+⬜ Git Commit  
+⬜ Git Push
 
 ---
 
@@ -176,6 +192,7 @@ Implement the Zone Strength Engine capable of evaluating the quality of Demand a
 - ✅ Zone Detection Engine
 - ✅ Zone Freshness Engine
 - ✅ Zone Strength Engine
+- ✅ Break of Structure (BOS) Engine
 
 ## Indicators
 
@@ -234,7 +251,6 @@ Trading Signal
 
 The following modules are planned for future development:
 
-⬜ BOS Engine
 ⬜ CHoCH Engine
 ⬜ Multi-Timeframe Zone Engine
 ⬜ Zone Scoring Engine
@@ -293,13 +309,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.28 – Zone Strength Engine
+Sprint 2.29 – Break of Structure (BOS) Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.29 – Break of Structure (BOS) Engine
+Sprint 2.30 – Change of Character (CHoCH) Engine
 
 # Project Automation
 
