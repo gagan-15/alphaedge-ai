@@ -69,7 +69,7 @@
 
 ✅ Zone Scoring Engine
 
-⬜ Zone Ranking Engine
+✅ Zone Ranking Engine
 
 ⬜ Trade Setup Engine
 
