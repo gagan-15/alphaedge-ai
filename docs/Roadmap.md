@@ -67,7 +67,7 @@
 
 ✅ Zone Merge Engine
 
-⬜ Zone Scoring Engine
+✅ Zone Scoring Engine
 
 ⬜ Zone Ranking Engine
 

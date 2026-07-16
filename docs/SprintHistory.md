@@ -44,6 +44,7 @@
 | Sprint 2.31 | v0.2.10 | ✅ | Market Structure Engine | 162 Passing | Sprint 2.31 – Market Structure Engine |
 | Sprint 2.32 | v0.2.11 | ✅ | Multi-Timeframe Engine | 162 Passing | Sprint 2.32 – Multi-Timeframe Engine |
 | Sprint 2.33 | v0.2.12 | ✅ | Zone Merge Engine | 162 Passing | Sprint 2.33 – Zone Merge Engine |
+| Sprint 2.34 | v0.2.13 | ✅ | Zone Scoring Engine | 162 Passing | Sprint 2.34 – Zone Scoring Engine |
 
 ---
  
@@ -77,11 +78,13 @@ Completed
 ✅ Market Structure Engine
 ✅ Multi-Timeframe Engine
 ✅ Zone Merge Engine
+✅ Zone Scoring Engine
 
-- ⬜ Zone Scoring Engine
+
 - ⬜ Zone Ranking Engine
 - ⬜ Trade Setup Engine
 - ⬜ Entry Confirmation Engine
+- ⬜ Risk Management Engine
 
 ---
 
