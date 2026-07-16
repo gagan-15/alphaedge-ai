@@ -14,32 +14,31 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.15
+Current Stable Version: v0.2.16
 
 Current Stable Sprint:
-Sprint 2.36 – Trade Setup Engine
+Sprint 2.37 – Entry Confirmation Engine
 
 Next Sprint:
-Sprint 2.37 – Entry Confirmation Engine
+Sprint 2.38 – Risk Management Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: v0.2.15
+Current Version: v0.2.16
 
 Current Sprint:
-## Sprint 2.37 – Entry Confirmation Engine
+## Sprint 2.38 – Risk Management Engine
 
 Overall Progress:
-48%
+50%
 
 Core Platform Progress:
-88%
+92%
 
 Commercial Readiness:
-20%
-
+22%
 ---
 
 # Project Metrics
@@ -114,10 +113,12 @@ The platform will always be:
 
 - ✅ Trade Setup Engine
 
+- ✅ Entry Confirmation Engine
+
 
 ## Current Milestone
 
-🚧 Trade Execution Development
+🚧 Risk & Execution Development
 
 ---
 
@@ -160,26 +161,27 @@ The platform will always be:
 | v0.2.13 | Zone Scoring Engine |
 | v0.2.14 | Zone Ranking Engine |
 | v0.2.15 | Trade Setup Engine |
+| v0.2.16 | Entry Confirmation Engine |
       
 ---
 
 # Current Sprint
 
 
-## Sprint 2.37 – Entry Confirmation Engine
+## Sprint 2.38 – Risk Management Engine
 
 ### Objective
 
-Validate generated trade setups using configurable confirmation rules before producing final trading signals.
+Implement configurable risk management for generated trade setups, including position sizing, maximum risk exposure, and capital allocation.
 
 ### Planned Capabilities
 
-- Entry Confirmation
-- Volume Confirmation
-- Trend Confirmation
-- Momentum Confirmation
-- Confirmation Score
-- Final Trade Signal
+- Position Sizing
+- Capital Allocation
+- Maximum Risk Per Trade
+- Portfolio Exposure Limits
+- Trade Validation
+- Risk Summary
 
 ### Sprint Status
 
@@ -226,6 +228,7 @@ Validate generated trade setups using configurable confirmation rules before pro
 - ✅ Zone Scoring Engine
 - ✅ Zone Ranking Engine
 - ✅ Trade Setup Engine
+- ✅ Entry Confirmation Engine
 
 ## Indicators
 
@@ -342,13 +345,15 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.36 – Trade Setup Engine
+Sprint 2.37 – Entry Confirmation Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.37 – Entry Confirmation Engine
+Sprint 2.38 – Risk Management Engine
+
+---
 
 # Project Automation
 
