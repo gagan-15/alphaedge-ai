@@ -47,7 +47,7 @@
 
 ---
 
-## Phase 4 🎯 Current
+## Phase 4 🚧 In Progress
 
 ✅ Demand & Supply Foundation
 
@@ -59,9 +59,11 @@
 
 ✅ Break of Structure (BOS)
 
-⬜ Zone Scoring Engine
+✅ Change of Character (CHoCH)
 
-⬜ Change of Character (CHoCH)
+⬜ Market Structure Engine
+
+⬜ Zone Scoring Engine
 
 ⬜ Multi-Timeframe Zone Engine
 
@@ -89,8 +91,6 @@
 ---
 
 ## Phase 6
-
-⬜ Risk Management Engine
 
 ⬜ Position Sizing
 

@@ -14,31 +14,31 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.8
+Current Stable Version: v0.2.9
 
 Current Stable Sprint:
-Sprint 2.29 – Break of Structure (BOS) Engine
+Sprint 2.30 – Change of Character (CHoCH) Engine
 
 Next Sprint:
-Sprint 2.30 – Change of Character (CHoCH) Engine
+Sprint 2.31 – Market Structure Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: v0.2.8
+Current Version: v0.2.9
 
 Current Sprint:
-## Sprint 2.29 – Break of Structure (BOS) Engine
+## Sprint 2.31 – Market Structure Engine
 
 Overall Progress:
-33%
+36%
 
 Core Platform Progress:
-58%   
+63%
 
 Commercial Readiness:
-10%
+12%
 
 ---
 
@@ -46,7 +46,7 @@ Commercial Readiness:
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 28 |
+| Total Sprints Completed | 29 |
 | Backend Application Files | 69 |
 | Test Python Files | 27 |
 | Services | 2 |
@@ -55,7 +55,7 @@ Commercial Readiness:
 | Indicators | 17 |
 | Configuration Modules | 3 |
 | Entry Points | 1 |
-| Pytest | 135 Passing |
+| Pytest | 162 Passing |
 | Git Commits | 35 |
 | Rule Engine Modules | 4 |
 
@@ -82,27 +82,34 @@ The platform will always be:
 
 ## Completed
 
-- ✅ Rule Builder
-- ✅ Rule Evaluator
 - ✅ Project Foundation
 - ✅ Market Data Engine
 - ✅ Validation Framework
 - ✅ Logging Framework
+
 - ✅ Indicator Foundation
 - ✅ Momentum Indicators
 - ✅ Volatility Indicators
 - ✅ Volume Indicators
 - ✅ Trend Indicators
+
 - ✅ Rule Engine Foundation
+- ✅ Rule Builder
+- ✅ Rule Evaluator
+- ✅ Multi Rule Engine
+
+- ✅ Demand & Supply Foundation
 - ✅ Zone Detection Engine
 - ✅ Zone Freshness Engine
 - ✅ Zone Strength Engine
+
 - ✅ Break of Structure (BOS) Engine
+- ✅ Change of Character (CHoCH) Engine
 
 
 ## Current Milestone
 
-🎯 Demand & Supply Development
+🚧 Market Structure Development
 
 ---
 
@@ -138,29 +145,48 @@ The platform will always be:
 | v0.2.6 | Zone Freshness Engine |
 | v0.2.7 | Zone Strength Engine |
 | v0.2.8 | Break of Structure (BOS) Engine |
+| v0.2.9 | Change of Character (CHoCH) Engine |
       
 ---
 
 # Current Sprint
 
 
-## Sprint 2.29 – Break of Structure (BOS) Engine
+## Sprint 2.31 – Market Structure Engine
 
 ### Objective
 
-Implement a deterministic and configuration-driven Break of Structure Engine capable of detecting confirmed bullish and bearish structural breaks using validated OHLC data and confirmed swing points.
+Implement a complete Market Structure Engine capable of classifying confirmed swing points into Higher Highs, Higher Lows, Lower Highs, Lower Lows, Equal Highs and Equal Lows while maintaining the current market structure state.
 
-### Capabilities
+### Planned Capabilities
 
-- Confirmed Swing High Detection
-- Confirmed Swing Low Detection
-- Bullish BOS Detection
-- Bearish BOS Detection
-- Close, High and Low Confirmation Sources
-- Percentage and Point-Based Break Buffers
-- Equal Break Configuration
-- Duplicate BOS Prevention
-- Explainable BOS Events
+- Higher High (HH)
+- Higher Low (HL)
+- Lower High (LH)
+- Lower Low (LL)
+- Equal High (EH)
+- Equal Low (EL)
+- Market Structure State
+- Structure Events
+- Structure Result
+
+### Sprint Status
+
+🚧 Architecture
+
+⬜ Implementation
+
+⬜ Validation
+
+⬜ Logging
+
+⬜ Unit Tests
+
+⬜ Documentation
+
+⬜ Git Commit
+
+⬜ Git Push
 
 ### Sprint Status
 
@@ -180,19 +206,29 @@ Implement a deterministic and configuration-driven Break of Structure Engine cap
 
 ## Core
 
+## Core
+
+- ✅ Project Foundation
+
 - ✅ Market Data Engine
 - ✅ Validation Framework
 - ✅ Logging Framework
+
 - ✅ Indicator Foundation
+- ✅ Indicator Engines
+
 - ✅ Rule Engine Foundation
 - ✅ Rule Builder
 - ✅ Rule Evaluator
 - ✅ Multi Rule Engine
+
 - ✅ Demand & Supply Foundation
 - ✅ Zone Detection Engine
 - ✅ Zone Freshness Engine
 - ✅ Zone Strength Engine
+
 - ✅ Break of Structure (BOS) Engine
+- ✅ Change of Character (CHoCH) Engine
 
 ## Indicators
 
@@ -251,17 +287,22 @@ Trading Signal
 
 The following modules are planned for future development:
 
-⬜ CHoCH Engine
+⬜ Market Structure Engine
 ⬜ Multi-Timeframe Zone Engine
+⬜ Zone Merge Engine
 ⬜ Zone Scoring Engine
 ⬜ Zone Ranking Engine
+
 ⬜ Screener Engine
 ⬜ Risk Management Engine
 ⬜ AI Decision Engine
+
 ⬜ Portfolio Engine
+
 ⬜ Alert Engine
-⬜ News Engine
+
 ⬜ Dashboard
+
 ⬜ Deployment
 
 ---
@@ -309,13 +350,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.29 – Break of Structure (BOS) Engine
+Sprint 2.30 – Change of Character (CHoCH) Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.30 – Change of Character (CHoCH) Engine
+Sprint 2.31 – Market Structure Engine
 
 # Project Automation
 

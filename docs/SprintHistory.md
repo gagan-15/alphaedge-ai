@@ -40,6 +40,7 @@
 | Sprint 2.27 | v0.2.6 | ✅ | Zone Freshness Engine | 82 Passing | Sprint 2.27 – Zone Freshness Engine |
 | Sprint 2.28 | v0.2.7 | ✅ | Zone Strength Engine | 100 Passing | Sprint 2.28 – Zone Strength Engine |
 | Sprint 2.29 | v0.2.8 | ✅ | Break of Structure (BOS) Engine | 135 Passing | Sprint 2.29 – Break of Structure Engine |
+| Sprint 2.30 | v0.2.9 | ✅ | Change of Character (CHoCH) Engine | 162 Passing | Sprint 2.30 – Change of Character Engine |
 
 ---
  
@@ -56,9 +57,11 @@ Rule Engine
 - Rule Evaluator
 - Multi Rule Engine
 
-## Phase 4 🎯 Current
+## Phase 4 🚧 In Progress
 
 Demand & Supply & Market Structure Development
+
+Completed
 
 Completed
 
@@ -67,10 +70,11 @@ Completed
 - ✅ Zone Freshness Engine
 - ✅ Zone Strength Engine
 - ✅ Break of Structure (BOS) Engine
+- ✅ Change of Character (CHoCH) Engine
 
 Upcoming
 
-- ⬜ Change of Character (CHoCH)
+- ⬜ Market Structure Engine
 - ⬜ Multi-Timeframe Zone Engine
 - ⬜ Zone Scoring Engine
 - ⬜ Zone Ranking Engine
