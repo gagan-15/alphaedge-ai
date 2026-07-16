@@ -2,7 +2,7 @@
 Market Structure Event.
 
 Sprint:
-    2.30 - Market Structure Foundation
+    2.31 - Market Structure Engine
 """
 
 from dataclasses import dataclass
@@ -42,3 +42,11 @@ class StructureEvent:
     candle_index: int
 
     explanation: str
+
+    @property
+    def index(self) -> int:
+        """
+        Return event candle index.
+        """
+
+        return self.candle_index

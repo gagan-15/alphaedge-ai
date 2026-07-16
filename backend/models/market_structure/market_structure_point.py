@@ -2,7 +2,7 @@
 Market Structure Point model.
 
 Sprint:
-    2.30 - Market Structure Foundation
+    2.31 - Market Structure Engine
 """
 
 from dataclasses import dataclass
@@ -35,3 +35,19 @@ class StructurePoint:
     point_type: StructurePointType
 
     previous_swing: SwingPoint | None = None
+
+    @property
+    def price(self) -> float:
+        """
+        Structure point price.
+        """
+
+        return self.swing.price
+
+    @property
+    def index(self) -> int:
+        """
+        Structure point index.
+        """
+
+        return self.swing.index

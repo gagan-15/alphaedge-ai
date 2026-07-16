@@ -93,15 +93,11 @@ class CHoCHEngine:
         )
 
         bullish = [
-            event
-            for event in choch_events
-            if event.direction == BOSDirection.BULLISH
+            event for event in choch_events if event.direction == BOSDirection.BULLISH
         ]
 
         bearish = [
-            event
-            for event in choch_events
-            if event.direction == BOSDirection.BEARISH
+            event for event in choch_events if event.direction == BOSDirection.BEARISH
         ]
 
         return CHoCHResult(

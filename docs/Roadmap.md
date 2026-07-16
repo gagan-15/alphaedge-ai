@@ -61,13 +61,13 @@
 
 ✅ Change of Character (CHoCH)
 
-⬜ Market Structure Engine
+✅ Market Structure Engine
 
-⬜ Zone Scoring Engine
-
-⬜ Multi-Timeframe Zone Engine
+✅ Multi-Timeframe Engine
 
 ⬜ Zone Merge Engine
+
+⬜ Zone Scoring Engine
 
 ⬜ Zone Ranking Engine
 

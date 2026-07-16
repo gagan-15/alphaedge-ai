@@ -41,6 +41,8 @@
 | Sprint 2.28 | v0.2.7 | ✅ | Zone Strength Engine | 100 Passing | Sprint 2.28 – Zone Strength Engine |
 | Sprint 2.29 | v0.2.8 | ✅ | Break of Structure (BOS) Engine | 135 Passing | Sprint 2.29 – Break of Structure Engine |
 | Sprint 2.30 | v0.2.9 | ✅ | Change of Character (CHoCH) Engine | 162 Passing | Sprint 2.30 – Change of Character Engine |
+| Sprint 2.31 | v0.2.10 | ✅ | Market Structure Engine | 162 Passing | Sprint 2.31 – Market Structure Engine |
+| Sprint 2.32 | v0.2.11 | ✅ | Multi-Timeframe Engine | 162 Passing | Sprint 2.32 – Multi-Timeframe Engine |
 
 ---
  
@@ -65,20 +67,21 @@ Completed
 
 Completed
 
-- ✅ Demand & Supply Foundation
-- ✅ Zone Detection Engine
-- ✅ Zone Freshness Engine
-- ✅ Zone Strength Engine
-- ✅ Break of Structure (BOS) Engine
-- ✅ Change of Character (CHoCH) Engine
+✅ Demand & Supply Foundation
+✅ Zone Detection Engine
+✅ Zone Freshness Engine
+✅ Zone Strength Engine
+✅ Break of Structure (BOS)
+✅ Change of Character (CHoCH)
+✅ Market Structure Engine
+✅ Multi-Timeframe Engine
 
-Upcoming
-
-- ⬜ Market Structure Engine
-- ⬜ Multi-Timeframe Zone Engine
-- ⬜ Zone Scoring Engine
-- ⬜ Zone Ranking Engine
-
+⬜ Zone Merge Engine
+⬜ Zone Scoring Engine
+⬜ Zone Ranking Engine
+⬜ Trade Setup Engine
+⬜ Entry Confirmation Engine
+⬜ Risk Management Engine
 ---
 
 

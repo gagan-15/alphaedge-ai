@@ -2,7 +2,7 @@
 Market Structure State.
 
 Sprint:
-    2.30 - Market Structure Foundation
+    2.31 - Market Structure Engine
 """
 
 from dataclasses import dataclass
@@ -36,3 +36,27 @@ class StructureState:
     last_lower_high: float | None = None
 
     last_lower_low: float | None = None
+
+    @property
+    def is_bullish(self) -> bool:
+        """
+        Return True if trend is bullish.
+        """
+
+        return self.trend == StructureTrend.BULLISH
+
+    @property
+    def is_bearish(self) -> bool:
+        """
+        Return True if trend is bearish.
+        """
+
+        return self.trend == StructureTrend.BEARISH
+
+    @property
+    def is_sideways(self) -> bool:
+        """
+        Return True if trend is sideways.
+        """
+
+        return self.trend == StructureTrend.SIDEWAYS

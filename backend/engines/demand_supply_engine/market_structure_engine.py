@@ -2,11 +2,13 @@
 Market Structure Engine.
 
 Sprint:
-    2.30 - Market Structure Foundation
+    2.31 - Market Structure Engine
 """
 
 from pandas import DataFrame
 
+from backend.config.bos_config import BOSConfig
+from backend.core.logger import logger
 from backend.engines.demand_supply_engine.swing_detector import (
     SwingDetector,
 )
@@ -28,18 +30,18 @@ from backend.models.swing_point import (
 from backend.validators.market_structure_validator import (
     MarketStructureValidator,
 )
-from backend.core.logger import logger
 
 
 class MarketStructureEngine:
     """
-    Build canonical market structure from confirmed swing points.
+    Build canonical market structure.
     """
 
     def __init__(self) -> None:
-        self._swing_detector = SwingDetector()
 
-    logger.info("Analyzing market structure.")
+        self._swing_detector = SwingDetector(
+            BOSConfig(),
+        )
 
     def analyze(
         self,
@@ -48,6 +50,10 @@ class MarketStructureEngine:
         """
         Analyze market structure.
         """
+
+        logger.info(
+            "Analyzing market structure.",
+        )
 
         MarketStructureValidator.validate_market_data(
             market_data,
@@ -65,6 +71,11 @@ class MarketStructureEngine:
             structure_points,
         )
 
+        logger.info(
+            "%d structure point(s) detected.",
+            len(structure_points),
+        )
+
         return MarketStructureResult(
             state=state,
             structure_points=structure_points,
@@ -74,9 +85,6 @@ class MarketStructureEngine:
         self,
         swings: list[SwingPoint],
     ) -> list[StructurePoint]:
-        """
-        Classify swings as HH, HL, LH, LL, equal high or equal low.
-        """
 
         structure_points: list[StructurePoint] = []
 
@@ -126,9 +134,6 @@ class MarketStructureEngine:
         swing: SwingPoint,
         previous_high: SwingPoint | None,
     ) -> StructurePointType:
-        """
-        Classify a swing high.
-        """
 
         if previous_high is None:
             return StructurePointType.EQUAL_HIGH
@@ -146,9 +151,6 @@ class MarketStructureEngine:
         swing: SwingPoint,
         previous_low: SwingPoint | None,
     ) -> StructurePointType:
-        """
-        Classify a swing low.
-        """
 
         if previous_low is None:
             return StructurePointType.EQUAL_LOW
@@ -165,26 +167,23 @@ class MarketStructureEngine:
         self,
         structure_points: list[StructurePoint],
     ) -> StructureState:
-        """
-        Resolve the latest market structure trend and levels.
-        """
 
-        latest_higher_high = self._latest_price(
+        higher_high = self._latest_price(
             structure_points,
             StructurePointType.HIGHER_HIGH,
         )
 
-        latest_higher_low = self._latest_price(
+        higher_low = self._latest_price(
             structure_points,
             StructurePointType.HIGHER_LOW,
         )
 
-        latest_lower_high = self._latest_price(
+        lower_high = self._latest_price(
             structure_points,
             StructurePointType.LOWER_HIGH,
         )
 
-        latest_lower_low = self._latest_price(
+        lower_low = self._latest_price(
             structure_points,
             StructurePointType.LOWER_LOW,
         )
@@ -192,30 +191,27 @@ class MarketStructureEngine:
         trend = StructureTrend.SIDEWAYS
 
         if (
-            latest_higher_high is not None
-            and latest_higher_low is not None
-            and latest_lower_high is None
-            and latest_lower_low is None
+            higher_high is not None
+            and higher_low is not None
+            and lower_high is None
+            and lower_low is None
         ):
             trend = StructureTrend.BULLISH
 
         elif (
-            latest_lower_high is not None
-            and latest_lower_low is not None
-            and latest_higher_high is None
-            and latest_higher_low is None
+            lower_high is not None
+            and lower_low is not None
+            and higher_high is None
+            and higher_low is None
         ):
             trend = StructureTrend.BEARISH
 
-        else:
-            trend = StructureTrend.SIDEWAYS
-
         return StructureState(
             trend=trend,
-            last_higher_high=latest_higher_high,
-            last_higher_low=latest_higher_low,
-            last_lower_high=latest_lower_high,
-            last_lower_low=latest_lower_low,
+            last_higher_high=higher_high,
+            last_higher_low=higher_low,
+            last_lower_high=lower_high,
+            last_lower_low=lower_low,
         )
 
     @staticmethod
@@ -223,20 +219,12 @@ class MarketStructureEngine:
         structure_points: list[StructurePoint],
         point_type: StructurePointType,
     ) -> float | None:
-        """
-        Return the latest price for the requested structure point type.
-        """
 
-        matching_points = [
+        matching = [
             point for point in structure_points if point.point_type == point_type
         ]
 
-        if not matching_points:
+        if not matching:
             return None
 
-        logger.info(
-            "Detected %d structure point(s).",
-            len(structure_points),
-        )
-
-        return matching_points[-1].swing.price
+        return matching[-1].price

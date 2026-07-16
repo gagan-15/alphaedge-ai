@@ -493,3 +493,18 @@ Always optimize for maintainability.
 # Developer Motto
 
 > Build software that another engineer can understand in one day and confidently extend for years.
+
+# Architecture Planning Rule
+
+Before implementing any sprint, AlphaEdge AI must be planned with a minimum 5-sprint horizon.
+
+For every sprint:
+
+- Identify dependencies from previous sprints.
+- Identify dependencies for the next five planned sprints.
+- Avoid introducing designs that require rewriting completed modules.
+- Treat completed sprint interfaces as stable contracts unless a verified bug requires a change.
+- Architecture review is mandatory before implementation begins.
+
+Goal:
+Build a forward-compatible, extensible platform with minimal rework.
