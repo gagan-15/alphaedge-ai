@@ -46,6 +46,7 @@
 | Sprint 2.33 | v0.2.12 | ✅ | Zone Merge Engine | 162 Passing | Sprint 2.33 – Zone Merge Engine |
 | Sprint 2.34 | v0.2.13 | ✅ | Zone Scoring Engine | 162 Passing | Sprint 2.34 – Zone Scoring Engine |
 | Sprint 2.35 | v0.2.14 | ✅ | Zone Ranking Engine | 162 Passing | Sprint 2.35 – Zone Ranking Engine |
+| Sprint 2.36 | v0.2.15 | ✅ | Trade Setup Engine | 162 Passing | Sprint 2.36 – Trade Setup Engine |
 
 ---
  
@@ -81,12 +82,14 @@ Completed
 ✅ Zone Merge Engine
 ✅ Zone Scoring Engine
 ✅ Zone Ranking Engine
+✅ Trade Setup Engine
 
 
-- ⬜ Trade Setup Engine
+
 - ⬜ Entry Confirmation Engine
 - ⬜ Risk Management Engine
 - ⬜ Screener Engine
+- ⬜ Backtesting Engine
 
 ---
 

@@ -14,31 +14,31 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.14
+Current Stable Version: v0.2.15
 
 Current Stable Sprint:
-Sprint 2.35 – Zone Ranking Engine
+Sprint 2.36 – Trade Setup Engine
 
 Next Sprint:
-Sprint 2.36 – Trade Setup Engine
+Sprint 2.37 – Entry Confirmation Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: v0.2.14
+Current Version: v0.2.15
 
 Current Sprint:
-## Sprint 2.36 – Trade Setup Engine
+## Sprint 2.37 – Entry Confirmation Engine
 
 Overall Progress:
-46%
+48%
 
 Core Platform Progress:
-84%
+88%
 
 Commercial Readiness:
-19%
+20%
 
 ---
 
@@ -112,10 +112,12 @@ The platform will always be:
 - ✅ Zone Scoring Engine
 - ✅ Zone Ranking Engine
 
+- ✅ Trade Setup Engine
+
 
 ## Current Milestone
 
-🚧 Trade Decision Development
+🚧 Trade Execution Development
 
 ---
 
@@ -157,26 +159,27 @@ The platform will always be:
 | v0.2.12 | Zone Merge Engine |
 | v0.2.13 | Zone Scoring Engine |
 | v0.2.14 | Zone Ranking Engine |
+| v0.2.15 | Trade Setup Engine |
       
 ---
 
 # Current Sprint
 
 
-## Sprint 2.36 – Trade Setup Engine
+## Sprint 2.37 – Entry Confirmation Engine
 
 ### Objective
 
-Generate complete trade setups from ranked demand and supply zones using configurable entry, stop-loss, and target rules.
+Validate generated trade setups using configurable confirmation rules before producing final trading signals.
 
 ### Planned Capabilities
 
-- Buy Setup
-- Sell Setup
-- Entry Price
-- Stop Loss
-- Target Price
-- Risk/Reward Calculation
+- Entry Confirmation
+- Volume Confirmation
+- Trend Confirmation
+- Momentum Confirmation
+- Confirmation Score
+- Final Trade Signal
 
 ### Sprint Status
 
@@ -222,6 +225,7 @@ Generate complete trade setups from ranked demand and supply zones using configu
 - ✅ Zone Merge Engine
 - ✅ Zone Scoring Engine
 - ✅ Zone Ranking Engine
+- ✅ Trade Setup Engine
 
 ## Indicators
 
@@ -280,7 +284,7 @@ Trading Signal
 
 The following modules are planned for future development:
 
-⬜ Trade Setup Engine
+⬜ Entry Confirmation Engine
 ⬜ Screener Engine
 ⬜ Risk Management Engine
 ⬜ AI Decision Engine
@@ -338,13 +342,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.35 – Zone Ranking Engine
+Sprint 2.36 – Trade Setup Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.36 – Trade Setup Engine
+Sprint 2.37 – Entry Confirmation Engine
 
 # Project Automation
 
