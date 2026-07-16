@@ -65,7 +65,7 @@
 
 ✅ Multi-Timeframe Engine
 
-⬜ Zone Merge Engine
+✅ Zone Merge Engine
 
 ⬜ Zone Scoring Engine
 

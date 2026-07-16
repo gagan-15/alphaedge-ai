@@ -14,31 +14,31 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.11
+Current Stable Version: v0.2.12
 
 Current Stable Sprint:
-Sprint 2.32 – Multi-Timeframe Engine
+Sprint 2.33 – Zone Merge Engine
 
 Next Sprint:
-Sprint 2.33 – Zone Merge Engine
+Sprint 2.34 – Zone Scoring Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: v0.2.11
+Current Version: v0.2.12
 
 Current Sprint:
-## Sprint 2.33 – Zone Merge Engine
+## Sprint 2.34 – Zone Scoring Engine
 
 Overall Progress:
-40%
+42%
 
 Core Platform Progress:
-72%
+76%
 
 Commercial Readiness:
-16%
+17%
 
 
 ---
@@ -109,11 +109,12 @@ The platform will always be:
 - ✅ Market Structure Engine
 
 - ✅ Multi-Timeframe Engine
+- ✅ Zone Merge Engine
 
 
 ## Current Milestone
 
-🚧 Multi-Timeframe Development
+🚧 Zone Intelligence Development
 ---
 
 # Version History
@@ -151,26 +152,27 @@ The platform will always be:
 | v0.2.9 | Change of Character (CHoCH) Engine |
 | v0.2.10 | Market Structure Engine |
 | v0.2.11 | Multi-Timeframe Engine |
+| v0.2.12 | Zone Merge Engine |
       
 ---
 
 # Current Sprint
 
 
-## Sprint 2.33 – Zone Merge Engine
+## Sprint 2.34 – Zone Scoring Engine
 
 ### Objective
 
-Implement intelligent merging of overlapping and adjacent demand/supply zones while preserving the strongest zone characteristics.
+Implement a deterministic scoring engine that ranks demand and supply zones using configurable scoring factors.
 
 ### Planned Capabilities
 
-- Demand Zone Merge
-- Supply Zone Merge
-- Overlap Detection
-- Merge Threshold Configuration
-- Zone Priority Rules
-- Merged Zone Result
+- Freshness Scoring
+- Strength Scoring
+- Touch Count Scoring
+- Merge Bonus
+- Total Zone Score
+- Explainable Score Breakdown
 
 ### Sprint Status
 
@@ -213,6 +215,7 @@ Implement intelligent merging of overlapping and adjacent demand/supply zones wh
 - ✅ Change of Character (CHoCH) Engine
 
 - ✅ Market Structure Engine
+- ✅ Zone Merge Engine
 
 ## Indicators
 
@@ -271,7 +274,6 @@ Trading Signal
 
 The following modules are planned for future development:
 
-⬜ Zone Merge Engine
 ⬜ Zone Scoring Engine
 ⬜ Zone Ranking Engine
 
@@ -332,13 +334,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.32 – Multi-Timeframe Engine
+Sprint 2.33 – Zone Merge Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.33 – Zone Merge Engine
+Sprint 2.34 – Zone Scoring Engine
 
 # Project Automation
 
