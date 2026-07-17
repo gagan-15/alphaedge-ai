@@ -14,48 +14,49 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.20
+Current Stable Version:
+v0.2.21
 
 Current Stable Sprint:
-Sprint 2.41 – Backtesting Engine
+Sprint 2.42 – AI Explanation Engine
 
 Next Sprint:
-Sprint 2.42 – AI Explanation Engine
+Sprint 2.43 – Portfolio Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: v0.2.20
+Current Version: v0.2.21
 
 Current Sprint:
 ## Sprint 2.41 – Backtesting Engine
 
 Overall Progress:
-50%
+58%
 
 Core Platform Progress:
-92%
+80%
 
 Commercial Readiness:
-22%
+30%
 ---
 
 # Project Metrics
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 39 |
-| Backend Application Files | 89 |
-| Test Python Files | 31 |
+| Total Sprints Completed | 40 |
+| Backend Application Files | 95 |
+| Test Python Files | 32 |
 | Services | 2 |
 | Providers | 1 |
-| Validators | 11 |
+| Validators | 12 |
 | Indicators | 17 |
-| Configuration Modules | 7 |
+| Configuration Modules | 8 |
 | Entry Points | 1 |
-| Pytest | 182 Passing |
-| Git Commits | 39 |
+| Pytest | 187 Passing |
+| Git Commits | 40 |
 | Rule Engine Modules | 4 |
 
 ---
@@ -118,6 +119,7 @@ The platform will always be:
 - ✅ Screener Engine
 - ✅ Market Scanner Engine 
 - ✅ Backtesting Engine 
+- ✅ AI Explanation Engine
 
 
 ## Current Milestone
@@ -170,28 +172,31 @@ The platform will always be:
 | v0.2.18 | Screener Engine |
 | v0.2.19 | Market Scanner Engine |
 |v0.2.20 | Backtesting Engine
+| v0.2.21 | AI Explanation Engine |
       
 ---
 
 # Current Sprint
 
 
-## Sprint 2.41 – Backtesting Engine
+## Sprint 2.42 – AI Explanation Engine
 
 ### Objective
 
-Implement the Backtesting Engine to evaluate historical trading
-results and generate standardized performance metrics that
-provide a reliable foundation for future strategy analysis.
+Implement the AI Explanation Engine to transform
+rule-based trading evidence into structured,
+human-readable explanations while remaining
+deterministic and reusable across all user
+interfaces.
 
 ### Planned Capabilities
 
-- Execute historical backtests
-- Calculate total trades
-- Calculate winning trades
-- Calculate losing trades
-- Calculate win rate
-- Produce BacktestResult
+- Generate structured explanations
+- Support BUY, SELL, HOLD and WAIT decisions
+- Limit explanation reasons
+- Include optional confidence score
+- Produce AIExplanationResult
+- Support future UI consumers
 
 ### Sprint Status
 
@@ -242,6 +247,11 @@ provide a reliable foundation for future strategy analysis.
 - ✅ Screener Engine
 - ✅ Market Scanner Engine
 - ✅ Backtesting Engine
+- ✅ Risk Management Engine
+- ✅ Screener Engine
+- ✅ Market Scanner Engine
+- ✅ Backtesting Engine
+- ✅ AI Explanation Engine
 
 ## Indicators
 
@@ -326,6 +336,12 @@ Backtesting Engine
       │
       ▼
 Backtest Result
+      │
+      ▼
+AI Explanation Engine
+      │
+      ▼
+AIExplanationResult
 
 ---
 
@@ -333,9 +349,6 @@ Backtest Result
 
 The following modules are planned for future development:
 
-⬜ AI Explanation Engine
-
-⬜ AI Decision Engine
 
 ⬜ Portfolio Engine
 
@@ -390,13 +403,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.41: Implement Backtesting Engine
+Sprint 2.42: Ai Explanation Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.42 – AI Explanation Engine
+Sprint 2.43 – Portfolio Engine
 
 ---
 

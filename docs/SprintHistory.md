@@ -52,6 +52,7 @@
 | Sprint 2.39 | v0.2.18	✅ | Screener Engine | 172 Passing | Sprint 2.39 – Screener Engine |
 | Sprint 2.40  v0.2.19  ✅  Market Scanner Engine  177 Passing  Sprint 2.40 – Market Scanner Engine
 Sprint 2.41 v0.2.20 ✅ Backtesting Engine 182 Passing Sprint 2.41 – Backtesting Engine
+Sprint 2.42 v0.2.21 ✅ AI Explanation Engine 187 Passing Sprint 2.42 – AI Explanation Engine
 
 ---
 
@@ -89,8 +90,9 @@ Completed
 ✅ Screener Engine
 ✅ Market Scanner Engine
 ✅ Backtesting Engine
+✅ AI Explanation Engine
 
-⬜ AI Explanation Engine
+⬜ Portfolio Engine
 
 ---
 
@@ -129,9 +131,14 @@ Only then may the sprint be marked complete.
 # Engineering Notes
 Architecture was frozen before implementation.
 
-Backtesting Engine was intentionally designed as a foundation.
+The AI Explanation Engine was intentionally designed
+to produce structured, deterministic explanations.
 
-Advanced analytics such as Profit Factor, Sharpe Ratio,
-Sortino Ratio, Drawdown, CAGR, Monte Carlo simulation,
-and Equity Curve are planned for future enhancement
-sprints without changing the public engine interface.
+Natural language generation, LLM integration,
+localization, prompt engineering and explanation
+templating are intentionally deferred to future AI
+enhancement sprints.
+
+This separation keeps the explanation engine
+predictable, testable and reusable across dashboards,
+alerts, mobile applications and future AI assistants.
