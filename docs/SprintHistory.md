@@ -54,6 +54,7 @@
 Sprint 2.41 v0.2.20 ✅ Backtesting Engine 182 Passing Sprint 2.41 – Backtesting Engine
 Sprint 2.42 v0.2.21 ✅ AI Explanation Engine 187 Passing Sprint 2.42 – AI Explanation Engine
 Sprint 2.43	v0.2.22	✅	Portfolio Engine	192 Passing	Sprint 2.43 – Portfolio Engine
+Sprint 2.44 v0.2.23 ✅ Alert Engine  197 Passing
 
 ---
 
@@ -171,3 +172,12 @@ accept both total_positions and invested_capital.
 This ensures the engine receives portfolio state
 from its data source rather than inventing or
 deriving information it does not own.
+
+
+Alert generation was intentionally separated
+from notification delivery.
+
+AlertEngine creates AlertResult only.
+
+Email, Telegram, WhatsApp, Push and future
+delivery mechanisms remain separate adapters.

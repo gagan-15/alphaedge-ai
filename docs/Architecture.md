@@ -115,10 +115,13 @@ AI Explanation Engine
 AIExplanationResult
       │
       ▼
-Portfolio Engine
+Portfolio
       │
       ▼
-PortfolioResult
+Alert
+      │
+      ▼
+AlertResult
 
 ---
 
@@ -707,6 +710,19 @@ modules.
 The Portfolio Engine is intentionally designed
 as a state management engine rather than an
 analytics engine.
+
+---
+
+## AD-027 – Alert Architecture
+
+AlertEngine creates standardized alerts.
+
+It never sends emails,
+Telegram,
+WhatsApp,
+Push notifications.
+
+Delivery belongs to adapters.
 
 ---
 
