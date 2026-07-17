@@ -48,6 +48,7 @@
 | Sprint 2.35 | v0.2.14 | ✅ | Zone Ranking Engine | 162 Passing | Sprint 2.35 – Zone Ranking Engine |
 | Sprint 2.36 | v0.2.15 | ✅ | Trade Setup Engine | 162 Passing | Sprint 2.36 – Trade Setup Engine |
 | Sprint 2.37 | v0.2.16 | ✅ | Entry Confirmation Engine | 162 Passing | Sprint 2.37 – Entry Confirmation Engine |
+| Sprint 2.38 | v0.2.17 | ✅ | Risk Management Engine | 167 Passing | Sprint 2.38 – Risk Management Engine |
 
 ---
 
@@ -68,8 +69,6 @@ Demand & Supply & Market Structure Development
 
 Completed
 
-Completed
-
 ✅ Demand & Supply Foundation
 ✅ Zone Detection Engine
 ✅ Zone Freshness Engine
@@ -83,17 +82,12 @@ Completed
 ✅ Zone Ranking Engine
 ✅ Trade Setup Engine
 ✅ Entry Confirmation Engine
-
-
-
-- ⬜ Risk Management Engine
-- ⬜ Screener Engine
-- ⬜ Backtesting Engine
-- ⬜ AI Explanation Engine
+✅ Risk Management Engine
+⬜ Screener Engine
+⬜ Backtesting Engine
+⬜ AI Explanation Engine
 
 ---
-
-
 
 # Sprint Closing Checklist
 

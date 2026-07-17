@@ -75,7 +75,8 @@
 
 ✅ Entry Confirmation Engine
 
-⬜ Risk Management Engine
+✅ Risk Management Engine
+
 ---
 
 ## Phase 5

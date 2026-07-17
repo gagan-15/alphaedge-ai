@@ -67,13 +67,25 @@ Demand & Supply Engine
 Market Structure Engine
       │
       ▼
-Scoring Engine
+Zone Merge Engine
       │
       ▼
-AI Decision Engine
+Zone Scoring Engine
       │
       ▼
-Trading Signal
+Zone Ranking Engine
+      │
+      ▼
+Trade Setup Engine
+      │
+      ▼
+Entry Confirmation Engine
+      │
+      ▼
+Risk Management Engine
+      │
+      ▼
+Approved Trade
 
 ---
 
@@ -122,11 +134,11 @@ Current
 - Zone Strength Engine
 - Swing Detector
 - Break of Structure Engine
+- Risk Management Engine
 
 Upcoming
 
 - Screener Engine
-- Risk Management Engine
 - AI Explanation Engine
 - Backtesting Engine
 - Portfolio Engine
@@ -336,7 +348,7 @@ The ZoneDetectionEngine orchestrates the workflow without duplicating detection 
 
 ---
 
-AD-017 – Role-Based Multi-Timeframe Architecture
+## AD-017 – Role-Based Multi-Timeframe Architecture
 
 AlphaEdge AI separates analysis into three independent roles:
 
@@ -345,8 +357,6 @@ Trend – Validates whether market structure supports trading at that location.
 Execution – Determines the precise entry timing.
 
 The timeframes assigned to these roles are configurable. All future engines (Freshness, Strength, BOS, CHoCH, Scoring, Ranking, Screener, Alerts, and AI Explanation) operate on these roles rather than hardcoded timeframes.
-
----
 
 ---
 
@@ -419,6 +429,35 @@ Supported break buffers:
 The default confirmation source is Close.
 
 Wick-based confirmation is available only when explicitly configured.
+
+---
+
+## AD-021 – Risk Management Architecture
+
+Risk Management is implemented as an independent engine that
+operates only after Entry Confirmation.
+
+Pipeline
+
+Entry Confirmation
+        ↓
+Risk Management Engine
+        ↓
+Approved Trade
+
+The engine is responsible for:
+
+- Position sizing
+- Capital allocation
+- Risk/reward validation
+- Trade approval
+
+Future engines such as Screener, Backtesting, Portfolio,
+Broker Integration and Alerts consume the approved trade
+without duplicating risk calculations.
+
+This keeps risk evaluation centralized, reusable and
+consistent across the platform.
 
 ---
 
