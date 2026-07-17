@@ -51,6 +51,7 @@
 | Sprint 2.38 | v0.2.17 | ✅ | Risk Management Engine | 167 Passing | Sprint 2.38 – Risk Management Engine |
 | Sprint 2.39 | v0.2.18	✅ | Screener Engine | 172 Passing | Sprint 2.39 – Screener Engine |
 | Sprint 2.40  v0.2.19  ✅  Market Scanner Engine  177 Passing  Sprint 2.40 – Market Scanner Engine
+Sprint 2.41 v0.2.20 ✅ Backtesting Engine 182 Passing Sprint 2.41 – Backtesting Engine
 
 ---
 
@@ -87,8 +88,8 @@ Completed
 ✅ Risk Management Engine
 ✅ Screener Engine
 ✅ Market Scanner Engine
+✅ Backtesting Engine
 
-⬜ Backtesting Engine
 ⬜ AI Explanation Engine
 
 ---
@@ -124,8 +125,13 @@ Only then may the sprint be marked complete.
 
 > Good software is built one sprint at a time. Great software preserves its history.
 
-Sprint 2.40
-Market Scanner Engine
-v0.2.19
-177 Passing
 
+# Engineering Notes
+Architecture was frozen before implementation.
+
+Backtesting Engine was intentionally designed as a foundation.
+
+Advanced analytics such as Profit Factor, Sharpe Ratio,
+Sortino Ratio, Drawdown, CAGR, Monte Carlo simulation,
+and Equity Curve are planned for future enhancement
+sprints without changing the public engine interface.

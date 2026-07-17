@@ -100,7 +100,13 @@ Screener Result
 Market Scanner Engine
       │
       ▼
-MarketScannerResult
+Market Scanner Result
+      │
+      ▼
+Backtesting Engine
+      │
+      ▼
+Backtest Result
 
 ---
 
@@ -151,13 +157,19 @@ Current
 - Break of Structure Engine
 - Risk Management Engine
 - Market Scanner Engine
+- Backtesting Engine
+- BacktestResult
 
 Upcoming
 
-- Backtesting Engine
-- AI Explanation Engine
-- Portfolio Engine
-- Alert Engine
+AI Explanation Engine
+
+Portfolio Engine
+
+Alert Engine
+
+Dashboard
+
 ---
 
 # 5. Folder Structure
@@ -552,6 +564,44 @@ This architecture keeps the Market Scanner focused on orchestration
 while allowing future support for multiple data providers, exchanges,
 parallel execution, caching, and scheduling without changing the
 public interface.
+
+---
+## AD-024 – Backtesting Architecture
+
+The Backtesting Engine evaluates historical trading outcomes
+and produces standardized performance metrics.
+
+Pipeline
+
+Trade Results
+      ↓
+Backtesting Engine
+      ↓
+Backtest Result
+
+Responsibilities
+
+- Evaluate completed trades
+- Calculate total trades
+- Calculate winning trades
+- Calculate losing trades
+- Calculate win rate
+- Produce a standardized BacktestResult
+
+The Backtesting Engine does not:
+
+- Generate trade signals
+- Download market data
+- Evaluate indicators
+- Execute orders
+- Perform portfolio management
+
+These responsibilities remain within their dedicated engines.
+
+Future metrics such as Profit Factor, Maximum Drawdown,
+Sharpe Ratio, Sortino Ratio, CAGR, Equity Curve,
+Expectancy, and Monte Carlo simulation will extend
+BacktestResult without changing the public engine interface.
 
 ---
 

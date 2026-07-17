@@ -14,22 +14,22 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.19
+Current Stable Version: v0.2.20
 
 Current Stable Sprint:
-Sprint 2.40 – Market Scanner Engine
+Sprint 2.41 – Backtesting Engine
 
 Next Sprint:
-Sprint 2.41 – Backtesting Engine
+Sprint 2.42 – AI Explanation Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: v0.2.19
+Current Version: v0.2.20
 
 Current Sprint:
-## Sprint 2.38 – Risk Management Engine
+## Sprint 2.41 – Backtesting Engine
 
 Overall Progress:
 50%
@@ -45,17 +45,17 @@ Commercial Readiness:
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 38 |
-| Backend Application Files | 84 |
-| Test Python Files | 30 |
+| Total Sprints Completed | 39 |
+| Backend Application Files | 89 |
+| Test Python Files | 31 |
 | Services | 2 |
 | Providers | 1 |
-| Validators | 10 |
+| Validators | 11 |
 | Indicators | 17 |
-| Configuration Modules | 1 |
+| Configuration Modules | 7 |
 | Entry Points | 1 |
-| Pytest | 177 Passing |
-| Git Commits | 38 |
+| Pytest | 182 Passing |
+| Git Commits | 39 |
 | Rule Engine Modules | 4 |
 
 ---
@@ -117,6 +117,7 @@ The platform will always be:
 - ✅ Risk Management Engine
 - ✅ Screener Engine
 - ✅ Market Scanner Engine 
+- ✅ Backtesting Engine 
 
 
 ## Current Milestone
@@ -168,28 +169,29 @@ The platform will always be:
 | v0.2.17 | Risk Management Engine |
 | v0.2.18 | Screener Engine |
 | v0.2.19 | Market Scanner Engine |
+|v0.2.20 | Backtesting Engine
       
 ---
 
 # Current Sprint
 
 
-## Sprint 2.40 – Market Scanner Engine
+## Sprint 2.41 – Backtesting Engine
 
 ### Objective
 
-Implement the Market Scanner Engine to coordinate the scanning of a stock universe, enforce configurable scanning limits, and produce standardized market scanning results by integrating with the existing AlphaEdge AI screening pipeline.
+Implement the Backtesting Engine to evaluate historical trading
+results and generate standardized performance metrics that
+provide a reliable foundation for future strategy analysis.
 
 ### Planned Capabilities
 
-- Scan a list of stock symbols
-- Respect maximum symbols configuration
-- Produce MarketScannerResult
-- Integrate with Screener Engine
-- Configuration Validation
-- Scanner Summary
-
-### Sprint Status
+- Execute historical backtests
+- Calculate total trades
+- Calculate winning trades
+- Calculate losing trades
+- Calculate win rate
+- Produce BacktestResult
 
 ### Sprint Status
 
@@ -201,6 +203,7 @@ Implement the Market Scanner Engine to coordinate the scanning of a stock univer
 ✅ Documentation
 ⬜ Git Commit
 ⬜ Git Push
+
 ---
 
 # Completed Modules
@@ -235,6 +238,10 @@ Implement the Market Scanner Engine to coordinate the scanning of a stock univer
 - ✅ Zone Ranking Engine
 - ✅ Trade Setup Engine
 - ✅ Entry Confirmation Engine
+- ✅ Risk Management Engine
+- ✅ Screener Engine
+- ✅ Market Scanner Engine
+- ✅ Backtesting Engine
 
 ## Indicators
 
@@ -313,6 +320,12 @@ Market Scanner Engine
       │
       ▼
 Market Scanner Result
+      │
+      ▼
+Backtesting Engine
+      │
+      ▼
+Backtest Result
 
 ---
 
@@ -320,8 +333,7 @@ Market Scanner Result
 
 The following modules are planned for future development:
 
-
-⬜ Backtesting Engine
+⬜ AI Explanation Engine
 
 ⬜ AI Decision Engine
 
@@ -378,13 +390,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.38 – Risk Management Engine
+Sprint 2.41: Implement Backtesting Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.41 – Backtesting Engine
+Sprint 2.42 – AI Explanation Engine
 
 ---
 
