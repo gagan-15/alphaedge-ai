@@ -85,8 +85,9 @@
 ✅ Market Scanner Engine
 ✅ Backtesting Engine
 ✅ AI Explanation Engine
+✅ Portfolio Engine
 
-⬜ Portfolio Engine
+⬜ Alert Engine
 ⬜ Watchlists
 ⬜ Custom Filters
 ⬜ Portfolio Scanner
@@ -211,3 +212,5 @@ Market Scanner
 Backtesting
         ↓
 AI Explanation
+        ↓
+Portfolio

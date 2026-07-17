@@ -15,22 +15,22 @@
 Project Started: July 1, 2026
 
 Current Stable Version:
-v0.2.21
+v0.2.22
 
 Current Stable Sprint:
-Sprint 2.42 – AI Explanation Engine
+Sprint 2.43 – Portfolio Engine
 
 Next Sprint:
-Sprint 2.43 – Portfolio Engine
+Sprint 2.44 – Alert Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: v0.2.21
+Current Version: v0.2.22
 
 Current Sprint:
-## Sprint 2.41 – Backtesting Engine
+## Sprint 2.43 – Portfolio Engine
 
 Overall Progress:
 58%
@@ -46,17 +46,17 @@ Commercial Readiness:
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 40 |
-| Backend Application Files | 95 |
-| Test Python Files | 32 |
+| Total Sprints Completed | 41 |
+| Backend Application Files | 101 |
+| Test Python Files | 33 |
 | Services | 2 |
 | Providers | 1 |
-| Validators | 12 |
+| Validators | 13 |
 | Indicators | 17 |
-| Configuration Modules | 8 |
+| Configuration Modules | 9 |
 | Entry Points | 1 |
-| Pytest | 187 Passing |
-| Git Commits | 40 |
+| Pytest | 192 Passing |
+| Git Commits | 41 |
 | Rule Engine Modules | 4 |
 
 ---
@@ -120,7 +120,7 @@ The platform will always be:
 - ✅ Market Scanner Engine 
 - ✅ Backtesting Engine 
 - ✅ AI Explanation Engine
-
+- ✅ Portfolio Engine
 
 ## Current Milestone
 
@@ -173,30 +173,30 @@ The platform will always be:
 | v0.2.19 | Market Scanner Engine |
 |v0.2.20 | Backtesting Engine
 | v0.2.21 | AI Explanation Engine |
+| v0.2.22 | Portfolio Engine |
       
 ---
 
 # Current Sprint
 
 
-## Sprint 2.42 – AI Explanation Engine
+## Sprint 2.43 – Portfolio Engine
 
 ### Objective
 
-Implement the AI Explanation Engine to transform
-rule-based trading evidence into structured,
-human-readable explanations while remaining
-deterministic and reusable across all user
-interfaces.
+Implement the Portfolio Engine to maintain
+portfolio state, capital allocation, and
+position tracking while providing a stable
+foundation for dashboards, alerts, broker
+integration and portfolio analytics.
 
 ### Planned Capabilities
 
-- Generate structured explanations
-- Support BUY, SELL, HOLD and WAIT decisions
-- Limit explanation reasons
-- Include optional confidence score
-- Produce AIExplanationResult
-- Support future UI consumers
+- Track total positions
+- Track invested capital
+- Track available capital
+- Track total capital
+- Produce PortfolioResult
 
 ### Sprint Status
 
@@ -252,6 +252,7 @@ interfaces.
 - ✅ Market Scanner Engine
 - ✅ Backtesting Engine
 - ✅ AI Explanation Engine
+- ✅ Portfolio Engine
 
 ## Indicators
 
@@ -342,6 +343,12 @@ AI Explanation Engine
       │
       ▼
 AIExplanationResult
+      │
+      ▼
+Portfolio Engine
+      │
+      ▼
+PortfolioResult
 
 ---
 
@@ -349,8 +356,6 @@ AIExplanationResult
 
 The following modules are planned for future development:
 
-
-⬜ Portfolio Engine
 
 ⬜ Alert Engine
 
@@ -403,13 +408,13 @@ AlphaEdge AI follows these principles:
 
 # Latest Commit
 
-Sprint 2.42: Ai Explanation Engine
+Sprint 2.43: Portfolio Engine
 
 ---
 
 # Immediate Next Task
 
-Sprint 2.43 – Portfolio Engine
+Sprint 2.44 – Alert Engine
 
 ---
 

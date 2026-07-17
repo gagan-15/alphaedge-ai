@@ -53,6 +53,7 @@
 | Sprint 2.40  v0.2.19  ✅  Market Scanner Engine  177 Passing  Sprint 2.40 – Market Scanner Engine
 Sprint 2.41 v0.2.20 ✅ Backtesting Engine 182 Passing Sprint 2.41 – Backtesting Engine
 Sprint 2.42 v0.2.21 ✅ AI Explanation Engine 187 Passing Sprint 2.42 – AI Explanation Engine
+Sprint 2.43	v0.2.22	✅	Portfolio Engine	192 Passing	Sprint 2.43 – Portfolio Engine
 
 ---
 
@@ -91,8 +92,9 @@ Completed
 ✅ Market Scanner Engine
 ✅ Backtesting Engine
 ✅ AI Explanation Engine
+✅ Portfolio Engine
 
-⬜ Portfolio Engine
+⬜ Alert Engine
 
 ---
 
@@ -142,3 +144,30 @@ enhancement sprints.
 This separation keeps the explanation engine
 predictable, testable and reusable across dashboards,
 alerts, mobile applications and future AI assistants.
+
+
+Architecture was frozen before implementation.
+
+The Portfolio Engine was intentionally designed
+as a portfolio state manager.
+
+It maintains portfolio information such as
+positions and capital allocation while avoiding
+performance analytics.
+
+Portfolio metrics such as P&L, exposure,
+drawdown, equity curve, Sharpe Ratio and
+performance reporting are intentionally deferred
+to future Portfolio Analytics sprints.
+
+This separation keeps the Portfolio Engine
+focused, reusable and easy to extend.
+
+Architecture refinement before implementation:
+
+The Portfolio Engine interface was updated to
+accept both total_positions and invested_capital.
+
+This ensures the engine receives portfolio state
+from its data source rather than inventing or
+deriving information it does not own.
