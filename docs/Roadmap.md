@@ -81,13 +81,15 @@
 
 ## Phase 5
 
-⬜ Screener Engine
+✅ Screener Engine
 
 ⬜ Market Scanner
 
+⬜ Watchlists
+
 ⬜ Custom Filters
 
-⬜ Watchlists
+⬜ Portfolio Scanner
 
 ---
 

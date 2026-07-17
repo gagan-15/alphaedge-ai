@@ -49,6 +49,7 @@
 | Sprint 2.36 | v0.2.15 | ✅ | Trade Setup Engine | 162 Passing | Sprint 2.36 – Trade Setup Engine |
 | Sprint 2.37 | v0.2.16 | ✅ | Entry Confirmation Engine | 162 Passing | Sprint 2.37 – Entry Confirmation Engine |
 | Sprint 2.38 | v0.2.17 | ✅ | Risk Management Engine | 167 Passing | Sprint 2.38 – Risk Management Engine |
+| Sprint 2.39 | v0.2.18	✅ | Screener Engine | 172 Passing | Sprint 2.39 – Screener Engine |
 
 ---
 
@@ -83,7 +84,9 @@ Completed
 ✅ Trade Setup Engine
 ✅ Entry Confirmation Engine
 ✅ Risk Management Engine
-⬜ Screener Engine
+✅ Screener Engine
+
+⬜ Market Scanner
 ⬜ Backtesting Engine
 ⬜ AI Explanation Engine
 

@@ -14,19 +14,19 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.17
+Current Stable Version: v0.2.18
 
 Current Stable Sprint:
-Sprint 2.38 – Risk Management Engine
+Sprint 2.39 – Screener Engine
 
 Next Sprint:
-Sprint 2.39 – Screener Engine
+Sprint 2.40 – Market Scanner
 
 ---
 
 # Project Dashboard
 
-Current Version: v0.2.17
+Current Version: v0.2.18
 
 Current Sprint:
 ## Sprint 2.38 – Risk Management Engine
@@ -45,17 +45,17 @@ Commercial Readiness:
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 36 |
-| Backend Application Files | 74 |
-| Test Python Files | 28 |
+| Total Sprints Completed | 37 |
+| Backend Application Files | 79 |
+| Test Python Files | 29 |
 | Services | 2 |
 | Providers | 1 |
-| Validators | 8 |
+| Validators | 9 |
 | Indicators | 17 |
-| Configuration Modules | 4 |
+| Configuration Modules | 5 |
 | Entry Points | 1 |
-| Pytest | 167 Passing |
-| Git Commits | 36 |
+| Pytest | 172 Passing |
+| Git Commits | 37 |
 | Rule Engine Modules | 4 |
 
 ---
@@ -115,6 +115,7 @@ The platform will always be:
 
 - ✅ Entry Confirmation Engine
 - ✅ Risk Management Engine
+- ✅ Screener Engine
 
 
 ## Current Milestone
@@ -164,6 +165,7 @@ The platform will always be:
 | v0.2.15 | Trade Setup Engine |
 | v0.2.16 | Entry Confirmation Engine |
 | v0.2.17 | Risk Management Engine |
+| v0.2.18 | Screener Engine
       
 ---
 
@@ -294,6 +296,12 @@ Risk Management Engine
       │
       ▼
 Approved Trade
+      │
+      ▼
+Screener Engine
+      │
+      ▼
+Screener Result
 
 ---
 
@@ -302,7 +310,7 @@ Approved Trade
 The following modules are planned for future development:
 
 
-⬜ Screener Engine
+⬜ Market Scanner
 
 ⬜ AI Decision Engine
 
@@ -365,7 +373,7 @@ Sprint 2.38 – Risk Management Engine
 
 # Immediate Next Task
 
-Sprint 2.39 – Screener Engine
+Sprint 2.40 – Market Scanner
 
 ---
 

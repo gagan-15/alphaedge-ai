@@ -86,6 +86,15 @@ Risk Management Engine
       │
       ▼
 Approved Trade
+      │
+      ▼
+Screened Opportunity
+      │
+      ▼
+Screener Engine
+      │
+      ▼
+Screener Result
 
 ---
 
@@ -458,6 +467,43 @@ without duplicating risk calculations.
 
 This keeps risk evaluation centralized, reusable and
 consistent across the platform.
+
+---
+
+## AD-022 – Screener Architecture
+
+The Screener Engine is responsible for transforming approved
+trading opportunities into a collection of screened results.
+
+Pipeline
+
+Approved Trade
+        ↓
+Screened Opportunity
+        ↓
+Screener Engine
+        ↓
+Screener Result
+
+Responsibilities
+
+- Filter rejected opportunities
+- Respect maximum configured results
+- Return a collection of screened opportunities
+
+The Screener Engine does not:
+
+- Download market data
+- Calculate indicators
+- Evaluate trading rules
+- Perform risk management
+
+Those responsibilities remain in their dedicated engines.
+
+This keeps the Screener Engine focused on orchestration and
+screening while maintaining a stable interface for future
+consumers such as the Dashboard, Alerts, Portfolio, Mobile App,
+Desktop App, and AI Explanation Engine.
 
 ---
 
