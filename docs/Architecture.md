@@ -95,6 +95,12 @@ Screener Engine
       │
       ▼
 Screener Result
+      │
+      ▼
+Market Scanner Engine
+      │
+      ▼
+MarketScannerResult
 
 ---
 
@@ -144,12 +150,12 @@ Current
 - Swing Detector
 - Break of Structure Engine
 - Risk Management Engine
+- Market Scanner Engine
 
 Upcoming
 
-- Screener Engine
-- AI Explanation Engine
 - Backtesting Engine
+- AI Explanation Engine
 - Portfolio Engine
 - Alert Engine
 ---
@@ -507,6 +513,47 @@ Desktop App, and AI Explanation Engine.
 
 ---
 
+## AD-023 – Market Scanner Architecture
+
+The Market Scanner Engine coordinates the scanning of a stock
+universe using the existing AlphaEdge AI trading pipeline.
+
+Pipeline
+
+Stock Universe
+        ↓
+Market Scanner Engine
+        ↓
+Trading Pipeline
+        ↓
+Screener Engine
+        ↓
+MarketScannerResult
+
+Responsibilities
+
+- Coordinate symbol scanning
+- Enforce maximum symbol limits
+- Produce standardized scanning results
+- Integrate with the Screener Engine
+
+The Market Scanner Engine does not:
+
+- Download market data
+- Calculate indicators
+- Evaluate trading rules
+- Perform risk management
+- Rank opportunities
+
+These responsibilities remain in their dedicated engines and
+services.
+
+This architecture keeps the Market Scanner focused on orchestration
+while allowing future support for multiple data providers, exchanges,
+parallel execution, caching, and scheduling without changing the
+public interface.
+
+---
 
 # 9. Coding Philosophy
 

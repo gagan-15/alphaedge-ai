@@ -83,12 +83,11 @@
 
 ✅ Screener Engine
 
-⬜ Market Scanner
+✅ Market Scanner Engine
 
+⬜ Backtesting Engine
 ⬜ Watchlists
-
 ⬜ Custom Filters
-
 ⬜ Portfolio Scanner
 
 ---

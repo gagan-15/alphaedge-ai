@@ -50,6 +50,7 @@
 | Sprint 2.37 | v0.2.16 | ✅ | Entry Confirmation Engine | 162 Passing | Sprint 2.37 – Entry Confirmation Engine |
 | Sprint 2.38 | v0.2.17 | ✅ | Risk Management Engine | 167 Passing | Sprint 2.38 – Risk Management Engine |
 | Sprint 2.39 | v0.2.18	✅ | Screener Engine | 172 Passing | Sprint 2.39 – Screener Engine |
+| Sprint 2.40  v0.2.19  ✅  Market Scanner Engine  177 Passing  Sprint 2.40 – Market Scanner Engine
 
 ---
 
@@ -85,8 +86,8 @@ Completed
 ✅ Entry Confirmation Engine
 ✅ Risk Management Engine
 ✅ Screener Engine
+✅ Market Scanner Engine
 
-⬜ Market Scanner
 ⬜ Backtesting Engine
 ⬜ AI Explanation Engine
 
@@ -122,4 +123,9 @@ Only then may the sprint be marked complete.
 # Historical Motto
 
 > Good software is built one sprint at a time. Great software preserves its history.
+
+Sprint 2.40
+Market Scanner Engine
+v0.2.19
+177 Passing
 

@@ -14,19 +14,19 @@
 
 Project Started: July 1, 2026
 
-Current Stable Version: v0.2.18
+Current Stable Version: v0.2.19
 
 Current Stable Sprint:
-Sprint 2.39 – Screener Engine
+Sprint 2.40 – Market Scanner Engine
 
 Next Sprint:
-Sprint 2.40 – Market Scanner
+Sprint 2.41 – Backtesting Engine
 
 ---
 
 # Project Dashboard
 
-Current Version: v0.2.18
+Current Version: v0.2.19
 
 Current Sprint:
 ## Sprint 2.38 – Risk Management Engine
@@ -45,17 +45,17 @@ Commercial Readiness:
 
 | Metric | Count |
 |---------|------:|
-| Total Sprints Completed | 37 |
-| Backend Application Files | 79 |
-| Test Python Files | 29 |
+| Total Sprints Completed | 38 |
+| Backend Application Files | 84 |
+| Test Python Files | 30 |
 | Services | 2 |
 | Providers | 1 |
-| Validators | 9 |
+| Validators | 10 |
 | Indicators | 17 |
-| Configuration Modules | 5 |
+| Configuration Modules | 1 |
 | Entry Points | 1 |
-| Pytest | 172 Passing |
-| Git Commits | 37 |
+| Pytest | 177 Passing |
+| Git Commits | 38 |
 | Rule Engine Modules | 4 |
 
 ---
@@ -116,6 +116,7 @@ The platform will always be:
 - ✅ Entry Confirmation Engine
 - ✅ Risk Management Engine
 - ✅ Screener Engine
+- ✅ Market Scanner Engine 
 
 
 ## Current Milestone
@@ -165,27 +166,28 @@ The platform will always be:
 | v0.2.15 | Trade Setup Engine |
 | v0.2.16 | Entry Confirmation Engine |
 | v0.2.17 | Risk Management Engine |
-| v0.2.18 | Screener Engine
+| v0.2.18 | Screener Engine |
+| v0.2.19 | Market Scanner Engine |
       
 ---
 
 # Current Sprint
 
 
-## Sprint 2.38 – Risk Management Engine
+## Sprint 2.40 – Market Scanner Engine
 
 ### Objective
 
-Implement configurable risk management for generated trade setups, including position sizing, maximum risk exposure, and capital allocation.
+Implement the Market Scanner Engine to coordinate the scanning of a stock universe, enforce configurable scanning limits, and produce standardized market scanning results by integrating with the existing AlphaEdge AI screening pipeline.
 
 ### Planned Capabilities
 
-- Position Sizing
-- Capital Allocation
-- Maximum Risk Per Trade
-- Portfolio Exposure Limits
-- Trade Validation
-- Risk Summary
+- Scan a list of stock symbols
+- Respect maximum symbols configuration
+- Produce MarketScannerResult
+- Integrate with Screener Engine
+- Configuration Validation
+- Scanner Summary
 
 ### Sprint Status
 
@@ -298,10 +300,19 @@ Risk Management Engine
 Approved Trade
       │
       ▼
+Screened Opportunity
+      │
+      ▼
 Screener Engine
       │
       ▼
 Screener Result
+      │
+      ▼
+Market Scanner Engine
+      │
+      ▼
+Market Scanner Result
 
 ---
 
@@ -310,7 +321,7 @@ Screener Result
 The following modules are planned for future development:
 
 
-⬜ Market Scanner
+⬜ Backtesting Engine
 
 ⬜ AI Decision Engine
 
@@ -373,7 +384,7 @@ Sprint 2.38 – Risk Management Engine
 
 # Immediate Next Task
 
-Sprint 2.40 – Market Scanner
+Sprint 2.41 – Backtesting Engine
 
 ---
 
