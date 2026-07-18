@@ -176,7 +176,7 @@ Current
 - BacktestResult
 - AI Explanation Engine
 - AIExplanationResult
-- ExplanationDecision
+- AIExplanationDecision
 - Portfolio Engine
 - PortfolioResult
 

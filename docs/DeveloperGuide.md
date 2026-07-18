@@ -508,3 +508,16 @@ For every sprint:
 
 Goal:
 Build a forward-compatible, extensible platform with minimal rework.
+
+
+## Rule #14 — Legal First
+
+Before implementing any feature:
+
+1. Is it legal in India?
+2. Does it require SEBI registration or another license?
+3. Does it execute trades?
+4. Does it manage money?
+5. Does it provide regulated financial services?
+
+If there is uncertainty, stop and review before implementation.

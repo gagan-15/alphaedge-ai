@@ -16,8 +16,8 @@ from backend.engines.ai_explanation.ai_explanation_engine import (
 from backend.models.ai_explanation.ai_explanation_result import (
     AIExplanationResult,
 )
-from backend.models.ai_explanation.explanation_decision import (
-    ExplanationDecision,
+from backend.models.ai_explanation.ai_explanation_decision import (
+    AIExplanationDecision,
 )
 
 
@@ -56,7 +56,7 @@ def test_explanation_result() -> None:
     )
 
     result = engine.explain(
-        decision=ExplanationDecision.BUY,
+        decision=AIExplanationDecision.BUY,
         reasons=[
             "Fresh Weekly Demand",
             "Daily BOS",
@@ -70,7 +70,7 @@ def test_explanation_result() -> None:
         AIExplanationResult,
     )
 
-    assert result.decision == ExplanationDecision.BUY
+    assert result.decision == AIExplanationDecision.BUY
     assert len(result.reasons) == 3
     assert result.confidence_score == 91.0
 
@@ -87,7 +87,7 @@ def test_maximum_reasons() -> None:
     )
 
     result = engine.explain(
-        decision=ExplanationDecision.BUY,
+        decision=AIExplanationDecision.BUY,
         reasons=[
             "A",
             "B",
@@ -111,7 +111,7 @@ def test_hide_confidence_score() -> None:
     )
 
     result = engine.explain(
-        decision=ExplanationDecision.SELL,
+        decision=AIExplanationDecision.SELL,
         reasons=[
             "Weak Trend",
         ],

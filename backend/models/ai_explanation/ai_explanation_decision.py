@@ -1,5 +1,5 @@
 """
-Explanation Decision.
+AI Explanation Decision.
 
 Sprint:
     2.42 - AI Explanation Engine
@@ -8,15 +8,12 @@ Sprint:
 from enum import Enum
 
 
-class ExplanationDecision(str, Enum):
+class AIExplanationDecision(str, Enum):
     """
     Supported explanation decisions.
     """
 
     BUY = "BUY"
-
     SELL = "SELL"
-
     HOLD = "HOLD"
-
     WAIT = "WAIT"

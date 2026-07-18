@@ -11,8 +11,8 @@ from backend.config.ai_explanation_config import (
 from backend.models.ai_explanation.ai_explanation_result import (
     AIExplanationResult,
 )
-from backend.models.ai_explanation.explanation_decision import (
-    ExplanationDecision,
+from backend.models.ai_explanation.ai_explanation_decision import (
+    AIExplanationDecision,
 )
 from backend.validators.ai_explanation_validator import (
     AIExplanationValidator,
@@ -38,7 +38,7 @@ class AIExplanationEngine:
 
     def explain(
         self,
-        decision: ExplanationDecision,
+        decision: AIExplanationDecision,
         reasons: list[str],
         confidence_score: float,
     ) -> AIExplanationResult:

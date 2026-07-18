@@ -7,6 +7,10 @@ Sprint:
 
 from dataclasses import dataclass
 
+from backend.models.ai_explanation.ai_explanation_decision import (
+    AIExplanationDecision,
+)
+
 
 @dataclass(frozen=True)
 class AIExplanationResult:
@@ -15,11 +19,7 @@ class AIExplanationResult:
     rule-based trading decision.
     """
 
-    from backend.models.ai_explanation.explanation_decision import (
-        ExplanationDecision,
-    )
-
-    decision: ExplanationDecision
+    decision: AIExplanationDecision
 
     reasons: tuple[str, ...]
 

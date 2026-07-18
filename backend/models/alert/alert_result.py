@@ -7,6 +7,10 @@ Sprint:
 
 from dataclasses import dataclass
 
+from backend.models.alert.alert_priority import (
+    AlertPriority,
+)
+
 
 @dataclass(frozen=True)
 class AlertResult:
@@ -17,10 +21,6 @@ class AlertResult:
     title: str
 
     message: str
-
-    from backend.models.alert.alert_priority import (
-        AlertPriority,
-    )
 
     priority: AlertPriority
 
