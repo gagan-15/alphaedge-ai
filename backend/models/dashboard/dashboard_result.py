@@ -22,7 +22,9 @@ from backend.models.market_scanner.market_scanner_result import (
 from backend.models.portfolio.portfolio_result import (
     PortfolioResult,
 )
-
+from backend.models.dashboard.market_overview_result import (
+    MarketOverviewResult,
+)
 
 @dataclass(frozen=True)
 class DashboardResult:
@@ -30,6 +32,7 @@ class DashboardResult:
     Represents all information required
     by the Dashboard.
     """
+    market: MarketOverviewResult
 
     portfolio: PortfolioResult
 
@@ -40,3 +43,4 @@ class DashboardResult:
     backtest: BacktestResult
 
     ai_explanation: AIExplanationResult
+

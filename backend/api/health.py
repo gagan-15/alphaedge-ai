@@ -2,10 +2,14 @@
 Health API.
 
 Sprint:
-    2.46 - FastAPI Foundation
+    2.48 - Dashboard Service Enhancement
 """
 
 from fastapi import APIRouter
+
+from backend.api.models.health_response import (
+    HealthResponse,
+)
 
 health_router = APIRouter(
     prefix="/health",
@@ -13,11 +17,15 @@ health_router = APIRouter(
 )
 
 
-@health_router.get("/")
-def health() -> dict[str, str]:
+@health_router.get(
+    "/",
+    response_model=HealthResponse,
+)
+def health() -> HealthResponse:
     """
     Health check endpoint.
     """
-    return {
-        "status": "healthy",
-    }
+
+    return HealthResponse(
+        status="healthy",
+    )

@@ -29,6 +29,9 @@ from backend.models.portfolio.portfolio_result import (
 from backend.validators.dashboard_validator import (
     DashboardValidator,
 )
+from backend.models.dashboard.market_overview_result import (
+    MarketOverviewResult,
+)
 
 
 class DashboardEngine:
@@ -52,6 +55,7 @@ class DashboardEngine:
 
     def build(
         self,
+        market: MarketOverviewResult,
         portfolio: PortfolioResult,
         alerts: tuple[AlertResult, ...],
         scanner: MarketScannerResult,
@@ -63,6 +67,7 @@ class DashboardEngine:
         """
 
         return DashboardResult(
+            market=market,
             portfolio=portfolio,
             alerts=alerts,
             scanner=scanner,

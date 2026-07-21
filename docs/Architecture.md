@@ -50,78 +50,81 @@ Future capabilities include:
 # 3. High-Level Architecture
 
 Market Data
-      │
-      ▼
+        │
+        ▼
 Validation Engine
-      │
-      ▼
+        │
+        ▼
 Indicator Engine
-      │
-      ▼
+        │
+        ▼
 Rule Engine
-      │
-      ▼
+        │
+        ▼
 Demand & Supply Engine
-      │
-      ▼
+        │
+        ▼
 Market Structure Engine
-      │
-      ▼
+        │
+        ▼
 Zone Merge Engine
-      │
-      ▼
+        │
+        ▼
 Zone Scoring Engine
-      │
-      ▼
+        │
+        ▼
 Zone Ranking Engine
-      │
-      ▼
+        │
+        ▼
 Trade Setup Engine
-      │
-      ▼
+        │
+        ▼
 Entry Confirmation Engine
-      │
-      ▼
+        │
+        ▼
 Risk Management Engine
-      │
-      ▼
-Approved Trade
-      │
-      ▼
-Screened Opportunity
-      │
-      ▼
+        │
+        ▼
 Screener Engine
-      │
-      ▼
-Screener Result
-      │
-      ▼
+        │
+        ▼
 Market Scanner Engine
-      │
-      ▼
-Market Scanner Result
-      │
-      ▼
+        │
+        ▼
 Backtesting Engine
-      │
-      ▼
-Backtest Result
-      │
-      ▼
+        │
+        ▼
 AI Explanation Engine
-      │
-      ▼
-AIExplanationResult
-      │
-      ▼
-Portfolio
-      │
-      ▼
-Alert
-      │
-      ▼
-AlertResult
+        │
+        ▼
+Portfolio Engine
+        │
+        ▼
+Alert Engine
+        │
+        ▼
+Dashboard Engine
+        │
+        ▼
+Dashboard Service
+        │
+        ▼
+FastAPI
+        │
+        ▼
+REST API
+        │
+        ▼
+React API Layer
+        │
+        ▼
+Dashboard Page
+        │
+        ▼
+Dashboard Components
+        │
+        ▼
+TradingView Widget
 
 ---
 
@@ -200,27 +203,25 @@ Strategy Repository
 AlphaEdgeAI/
 
 backend/
-    config/
-    data_providers/
-    services/
-    validators/
-    indicators/
-    engines/
-    strategies/
-    models/
-    utils/
     api/
-    database/
+    config/
+    services/
+    engines/
+    models/
+    validators/
+    providers/
+    indicators/
+    utils/
 
-tests/
-
-docs/
-
-scripts/
-
-logs/
-
-data/
+frontend/
+    src/
+        api/
+        components/
+        layouts/
+        pages/
+        theme/
+        types/
+        hooks/
 ```
 
 ---
@@ -234,7 +235,12 @@ Backend
 
 Frontend
 
-- React
+- React 19
+TypeScript
+Material UI
+Axios
+Vite
+TradingView Widget (Temporary)
 
 Database
 
@@ -723,6 +729,48 @@ WhatsApp,
 Push notifications.
 
 Delivery belongs to adapters.
+
+---
+
+## AD-028 – Frontend Architecture
+
+The React frontend follows a presentation-only architecture.
+
+Pages
+      ↓
+Components
+      ↓
+API Layer
+      ↓
+REST API
+
+Business logic is never implemented inside React components.
+
+Trading calculations, validation, portfolio logic, scanner logic, AI explanation, and market analysis remain exclusively within backend services and engines.
+
+This separation allows independent evolution of the user interface while preserving a stable backend architecture.
+
+---
+
+## AD-029 – Backend Layering
+
+Backend requests always follow:
+
+API
+      ↓
+Service
+      ↓
+Engine
+      ↓
+Models
+      ↓
+Validators
+      ↓
+Config
+
+Each layer has one responsibility.
+
+No layer may bypass another without explicit architectural approval.
 
 ---
 

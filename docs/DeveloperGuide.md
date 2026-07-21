@@ -474,6 +474,63 @@ Unused or placeholder configuration fields are not allowed in completed sprints.
 
 ---
 
+## DR-016 – Backend Layering
+
+Every backend request must follow:
+
+API
+↓
+
+Service
+↓
+
+Engine
+↓
+
+Models
+↓
+
+Validators
+↓
+
+Config
+
+Business logic belongs only inside Services and Engines.
+
+---
+
+## DR-017 – Frontend Architecture
+
+React components must remain presentation-only.
+
+Pages
+↓
+
+Components
+↓
+
+API Layer
+↓
+
+REST API
+
+No business logic inside React components.
+
+---
+
+## DR-018 – Verify Existing Implementation
+
+Before implementing any sprint:
+
+- Inspect existing files.
+- Never assume constructors.
+- Never assume APIs.
+- Never assume folder structures.
+
+Existing implementation is the source of truth.
+
+---
+
 # 13. AI Collaboration Rules
 
 ChatGPT assists development.
