@@ -9,12 +9,24 @@ import axios from "axios";
 
 import type { DashboardResult } from "../types/dashboard";
 
-const BASE_URL = "http://127.0.0.1:8000";
+const api = axios.create({
+    baseURL: "http://127.0.0.1:8000",
+    timeout: 10000,
+});
 
 export async function getDashboard(): Promise<DashboardResult> {
-    const response = await axios.get<DashboardResult>(
-        `${BASE_URL}/dashboard/`,
-    );
+    try {
+        const response = await api.get<DashboardResult>(
+            "/dashboard/",
+        );
 
-    return response.data;
+        return response.data;
+    } catch (error) {
+        console.error(
+            "Failed to fetch dashboard data.",
+            error,
+        );
+
+        throw error;
+    }
 }

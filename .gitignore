@@ -62,3 +62,5 @@ dist/
 
 __pycache__/
 *.py[cod]
+
+frontend_old/

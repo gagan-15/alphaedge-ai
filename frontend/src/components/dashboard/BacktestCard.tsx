@@ -22,7 +22,12 @@ function BacktestCard({
     backtest,
 }: BacktestCardProps) {
     return (
-        <Card sx={{ height: "100%" }}>
+        <Card
+            elevation={2}
+            sx={{
+                height: "100%",
+            }}
+        >
             <CardContent>
                 <Box
                     sx={{
@@ -34,7 +39,9 @@ function BacktestCard({
                 >
                     <AssessmentIcon color="primary" />
 
-                    <Typography variant="h6">
+                    <Typography
+                        variant="h6"
+                    >
                         Backtest Summary
                     </Typography>
                 </Box>
@@ -42,7 +49,10 @@ function BacktestCard({
                 <Box
                     sx={{
                         display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
+                        gridTemplateColumns: {
+                            xs: "1fr",
+                            sm: "1fr 1fr",
+                        },
                         gap: 2,
                     }}
                 >
@@ -54,7 +64,9 @@ function BacktestCard({
                             Total Trades
                         </Typography>
 
-                        <Typography variant="h6">
+                        <Typography
+                            variant="h6"
+                        >
                             {backtest.total_trades}
                         </Typography>
                     </Box>
@@ -67,7 +79,9 @@ function BacktestCard({
                             Win Rate
                         </Typography>
 
-                        <Typography variant="h6">
+                        <Typography
+                            variant="h6"
+                        >
                             {backtest.win_rate}%
                         </Typography>
                     </Box>

@@ -15,6 +15,7 @@ import ListItem from "@mui/material/ListItem";
 import Typography from "@mui/material/Typography";
 
 import type { AlertResult } from "../../types/dashboard";
+import Box from "@mui/material/Box";
 
 interface AlertCardProps {
     alerts: AlertResult[];
@@ -24,7 +25,7 @@ function AlertCard({
     alerts,
 }: AlertCardProps) {
     return (
-        <Card sx={{ mt: 3 }}>
+        <Card elevation={2}>
             <CardContent>
                 <Typography
                     variant="h6"
@@ -39,14 +40,18 @@ function AlertCard({
                     Alerts
                 </Typography>
 
-                <List>
+                <List disablePadding>
                     {alerts.map((alert) => (
                         <ListItem
                             key={alert.title}
                             divider
+                            sx={{
+                                py: 2,
+                            }}
                         >
-                            <div>
+                            <Box>
                                 <Typography
+                                    variant="body1"
                                     sx={{
                                         fontWeight: 600,
                                     }}
@@ -63,11 +68,17 @@ function AlertCard({
 
                                 <Chip
                                     size="small"
-                                    color="warning"
+                                    color={
+                                        alert.priority === "HIGH"
+                                            ? "error"
+                                            : alert.priority === "MEDIUM"
+                                                ? "warning"
+                                                : "success"
+                                    }
                                     label={alert.priority}
                                     sx={{ mt: 1 }}
                                 />
-                            </div>
+                            </Box>
                         </ListItem>
                     ))}
                 </List>

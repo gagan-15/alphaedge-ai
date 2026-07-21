@@ -64,13 +64,13 @@ Every new sprint follows this sequence.
 1. Revision
 2. Concept Explanation
 3. Architecture
-4. Complete Implementation
+4. Implementation
 5. Code Review
 6. Validation
-7. Logging
-8. Integration
-9. Unit Tests
-10. Run Pytest
+7. Integration
+8. Unit Tests
+9. Run Pytest
+10. UI Review (Frontend Only)
 11. Documentation
 12. Git Commit
 13. Git Push
@@ -114,6 +114,60 @@ abc
 except inside very small loops.
 
 ---
+
+# React Development Standards
+
+Every React component must follow these rules.
+
+## Component Design
+
+- One component, one responsibility.
+- Keep components reusable.
+- Prefer composition over duplication.
+- Keep pages responsible for orchestration only.
+
+## API Access
+
+React components never call backend services directly.
+
+Pages
+↓
+
+API Layer
+↓
+
+REST API
+
+## Business Logic
+
+Business logic belongs only in the backend.
+
+React components should only:
+
+- Display data
+- Collect user input
+- Trigger API requests
+- Render UI
+
+## Layout
+
+The application shell follows:
+
+App
+↓
+
+AppLayout
+↓
+
+Header + Sidebar
+↓
+
+Pages
+↓
+
+Components
+
+This layout must remain reusable for future modules.
 
 ## Functions
 
@@ -279,6 +333,8 @@ Before a sprint is considered complete, verify:
 □ Architecture Matches Documentation
 
 □ Unit Tests Passing
+
+□ Frontend Tested (if applicable)
 
 □ Documentation Synchronized
 
@@ -518,7 +574,32 @@ No business logic inside React components.
 
 ---
 
-## DR-018 – Verify Existing Implementation
+## DR-018– Frontend Component Hierarchy
+
+Frontend components must follow:
+
+App
+↓
+
+AppLayout
+↓
+
+Pages
+↓
+
+Reusable Components
+
+Reusable components must never contain page-specific business logic.
+
+Pages orchestrate.
+
+Components render.
+
+API Layer communicates with the backend.
+
+---
+
+## DR-019– Verify Existing Implementation
 
 Before implementing any sprint:
 

@@ -113,18 +113,20 @@ FastAPI
         │
         ▼
 REST API
-        │
-        ▼
+    ↓
 React API Layer
-        │
-        ▼
+    ↓
+App
+    ↓
+AppLayout
+    ↓
+Header + Sidebar
+    ↓
 Dashboard Page
-        │
-        ▼
+    ↓
 Dashboard Components
-        │
-        ▼
-TradingView Widget
+    ↓
+TradingView Widget (Temporary)
 
 ---
 
@@ -182,6 +184,11 @@ Current
 - AIExplanationDecision
 - Portfolio Engine
 - PortfolioResult
+- React Application Shell
+- Header
+- Sidebar
+- Dashboard Layout
+- Material UI Theme
 
 Upcoming
 
@@ -216,7 +223,11 @@ backend/
 frontend/
     src/
         api/
+        assets/
         components/
+            dashboard/
+            header/
+            sidebar/
         layouts/
         pages/
         theme/
@@ -236,11 +247,11 @@ Backend
 Frontend
 
 - React 19
-TypeScript
-Material UI
-Axios
-Vite
-TradingView Widget (Temporary)
+- TypeScript
+- Material UI
+- Axios
+- Vite
+- TradingView Widget (Temporary)
 
 Database
 
@@ -773,6 +784,42 @@ Each layer has one responsibility.
 No layer may bypass another without explicit architectural approval.
 
 ---
+
+## AD-030 – React Application Shell
+
+The frontend follows a reusable application shell architecture.
+
+Pipeline
+
+App
+    ↓
+AppLayout
+    ↓
+Header + Sidebar
+    ↓
+Pages
+    ↓
+Dashboard Components
+    ↓
+API Layer
+    ↓
+REST API
+
+Responsibilities
+
+- App initializes the application.
+- AppLayout manages the overall page layout.
+- Header provides global actions and branding.
+- Sidebar manages navigation.
+- Pages orchestrate screen composition.
+- Components remain presentation-only.
+- API Layer communicates with the backend.
+
+Business logic remains exclusively within backend services and engines.
+
+This architecture allows additional pages such as Signals, Scanner, Portfolio, Risk Dashboard, Watchlist and AI Assistant to reuse the same application shell without modification.
+
+--
 
 # 9. Coding Philosophy
 

@@ -20,10 +20,6 @@ function TradingChart() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const existingScript = document.getElementById(
-            "tradingview-widget-script",
-        );
-
         const createWidget = () => {
             if (
                 window.TradingView &&
@@ -47,24 +43,37 @@ function TradingChart() {
             }
         };
 
-        if (!existingScript) {
+        const existingScript = document.getElementById(
+            "tradingview-widget-script",
+        );
+
+        if (existingScript) {
+            createWidget();
+        } else {
             const script = document.createElement("script");
 
             script.id = "tradingview-widget-script";
-
-            script.src =
-                "https://s3.tradingview.com/tv.js";
-
+            script.src = "https://s3.tradingview.com/tv.js";
+            script.async = true;
             script.onload = createWidget;
 
             document.body.appendChild(script);
-        } else {
-            createWidget();
         }
+
+        return () => {
+            if (containerRef.current) {
+                containerRef.current.innerHTML = "";
+            }
+        };
     }, []);
 
     return (
-        <Card sx={{ height: 720 }}>
+        <Card
+            elevation={2}
+            sx={{
+                height: 720,
+            }}
+        >
             <CardContent
                 sx={{
                     height: "100%",

@@ -22,9 +22,16 @@ function PortfolioSummary({
     return (
         <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 3 }}>
-                <Card>
+                <Card
+                    sx={{
+                        height: "100%",
+                    }}
+                >
                     <CardContent>
-                        <Typography variant="subtitle2">
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                        >
                             Total Capital
                         </Typography>
 
@@ -36,9 +43,16 @@ function PortfolioSummary({
             </Grid>
 
             <Grid size={{ xs: 12, md: 3 }}>
-                <Card>
+                <Card
+                    sx={{
+                        height: "100%",
+                    }}
+                >
                     <CardContent>
-                        <Typography variant="subtitle2">
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                        >
                             Invested Capital
                         </Typography>
 
@@ -50,9 +64,16 @@ function PortfolioSummary({
             </Grid>
 
             <Grid size={{ xs: 12, md: 3 }}>
-                <Card>
+                <Card
+                    sx={{
+                        height: "100%",
+                    }}
+                >
                     <CardContent>
-                        <Typography variant="subtitle2">
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                        >
                             Available Capital
                         </Typography>
 
@@ -64,9 +85,16 @@ function PortfolioSummary({
             </Grid>
 
             <Grid size={{ xs: 12, md: 3 }}>
-                <Card>
+                <Card
+                    sx={{
+                        height: "100%",
+                    }}
+                >
                     <CardContent>
-                        <Typography variant="subtitle2">
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                        >
                             Win Rate
                         </Typography>
 

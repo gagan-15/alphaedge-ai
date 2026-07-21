@@ -7,27 +7,22 @@
 
 import { useEffect, useState } from "react";
 
+import Grid from "@mui/material/Grid";
+import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 import { getDashboard } from "../api/dashboardApi";
 
 import type { DashboardResult } from "../types/dashboard";
 
-import PortfolioSummary from "../components/dashboard/PortfolioSummary";
-
 import AIInsightCard from "../components/dashboard/AIInsightCard";
-
 import AlertCard from "../components/dashboard/AlertCard";
-
-import Grid from "@mui/material/Grid";
-
 import BacktestCard from "../components/dashboard/BacktestCard";
-
 import MarketOverview from "../components/dashboard/MarketOverview";
-
+import PortfolioSummary from "../components/dashboard/PortfolioSummary";
 import TradingChart from "../components/dashboard/TradingChart";
-
-import Stack from "@mui/material/Stack";
 
 function Dashboard() {
     const [dashboard, setDashboard] =
@@ -37,10 +32,9 @@ function Dashboard() {
         async function loadDashboard() {
             try {
                 const result = await getDashboard();
-
                 setDashboard(result);
             } catch (error) {
-                console.error(error);
+                console.error("Failed to load dashboard.", error);
             }
         }
 
@@ -49,51 +43,58 @@ function Dashboard() {
 
     if (!dashboard) {
         return (
-            <Typography variant="h5">
-                Loading Dashboard...
-            </Typography>
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minHeight: "60vh",
+                    gap: 2,
+                }}
+            >
+                <CircularProgress />
+
+                <Typography color="text.secondary">
+                    Loading dashboard...
+                </Typography>
+            </Box>
         );
     }
 
-    console.log("Dashboard object:", dashboard);
-    console.log("Market object:", dashboard.market);
+    return (
+        <Stack spacing={3}>
+            <MarketOverview market={dashboard.market} />
 
-   return (
-    <>
+            <PortfolioSummary dashboard={dashboard} />
 
+            <Grid
+                container
+                spacing={3}
+            >
+                <Grid size={{ xs: 12, xl: 9 }}>
+                    <TradingChart />
+                </Grid>
 
-        <MarketOverview market={dashboard.market} />
+                <Grid size={{ xs: 12, xl: 3 }}>
+                    <Stack spacing={3}>
+                        <AIInsightCard
+                            insight={dashboard.ai_explanation}
+                        />
 
-        <PortfolioSummary dashboard={dashboard} />
+                        <AlertCard
+                            alerts={dashboard.alerts}
+                        />
+                    </Stack>
+                </Grid>
 
-        <Grid
-            container
-            spacing={3}
-            sx={{ mt: 1 }}
-        >
-            <Grid size={{ xs: 12, xl: 9 }}>
-                <TradingChart />
-            </Grid>
-
-            <Grid size={{ xs: 12, xl: 3 }}>
-                <Stack spacing={3}>
-                    <AIInsightCard
-                        insight={dashboard.ai_explanation}
+                <Grid size={{ xs: 12 }}>
+                    <BacktestCard
+                        backtest={dashboard.backtest}
                     />
-
-                    <AlertCard
-                        alerts={dashboard.alerts}
-                    />
-                </Stack>
+                </Grid>
             </Grid>
-
-            <Grid size={{ xs: 12 }}>
-                <BacktestCard
-                    backtest={dashboard.backtest}
-                />
-            </Grid>
-        </Grid>
-    </>
+        </Stack>
     );
 }
 

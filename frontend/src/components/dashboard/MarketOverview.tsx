@@ -12,6 +12,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 
 import type { MarketOverviewResult } from "../../types/dashboard";
 
@@ -48,15 +49,19 @@ function MarketOverview({
     return (
         <Grid
             container
-            spacing={2}
-            sx={{ mb: 3 }}
+            spacing={3}
         >
             {items.map((item) => (
                 <Grid
                     key={item.title}
                     size={{ xs: 12, sm: 6, lg: 3 }}
                 >
-                    <Card>
+                    <Card
+                        elevation={2}
+                        sx={{
+                            height: "100%",
+                        }}
+                    >
                         <CardContent>
                             <Typography
                                 variant="body2"
@@ -65,28 +70,44 @@ function MarketOverview({
                                 {item.title}
                             </Typography>
 
-                            <Typography variant="h5">
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    mt: 1,
+                                    fontWeight: 600,
+                                }}
+                            >
                                 {item.value.toLocaleString()}
                             </Typography>
 
-                            <Typography
+                            <Box
                                 sx={{
                                     display: "flex",
                                     alignItems: "center",
                                     gap: 0.5,
+                                    mt: 1,
                                     color:
                                         item.change >= 0
                                             ? "success.main"
                                             : "error.main",
                                 }}
                             >
-                                {item.change >= 0
-                                    ? <TrendingUpIcon fontSize="small" />
-                                    : <TrendingDownIcon fontSize="small" />
-                                }
+                                {item.change >= 0 ? (
+                                    <TrendingUpIcon fontSize="small" />
+                                ) : (
+                                    <TrendingDownIcon fontSize="small" />
+                                )}
 
-                                {item.change}%
-                            </Typography>
+                                <Typography
+                                    variant="body2"
+                                    color="inherit"
+                                    sx={{
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    {item.change}%
+                                </Typography>
+                            </Box>
                         </CardContent>
                     </Card>
                 </Grid>

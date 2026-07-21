@@ -26,11 +26,11 @@ function AIInsightCard({
         insight.decision === "BUY"
             ? "success"
             : insight.decision === "SELL"
-              ? "error"
-              : "warning";
+                ? "error"
+                : "warning";
 
     return (
-        <Card sx={{ mt: 3 }}>
+        <Card elevation={2}>
             <CardContent>
                 <Box
                     sx={{
@@ -63,7 +63,8 @@ function AIInsightCard({
                 <Typography
                     variant="body1"
                     sx={{
-                        fontWeight: 600,
+                        fontWeight: 500,
+                        lineHeight: 1.6,
                         mb: 1,
                     }}
                 >
@@ -82,15 +83,20 @@ function AIInsightCard({
 
                 <Box sx={{ mt: 2 }}>
                     <Typography
-                        variant="caption"
+                        variant="body2"
+                        color="text.secondary"
                     >
-                        Confidence {insight.confidence_score}%
+                        Confidence Score: {insight.confidence_score}%
                     </Typography>
 
                     <LinearProgress
                         variant="determinate"
                         value={insight.confidence_score}
-                        sx={{ mt: 1 }}
+                        sx={{
+                            mt: 1,
+                            height: 8,
+                            borderRadius: 5,
+                        }}
                     />
                 </Box>
             </CardContent>
