@@ -2,7 +2,7 @@
  * Dashboard Models.
  *
  * Sprint:
- *     2.50 - Frontend Foundation
+ *     2.61 - Signals Panel
  */
 
 export interface MarketOverviewResult {
@@ -24,6 +24,13 @@ export interface PortfolioResult {
     invested_capital: number;
     available_capital: number;
     total_capital: number;
+}
+
+export interface SignalResult {
+    symbol: string;
+    action: string;
+    price: number;
+    confidence: number;
 }
 
 export interface AlertResult {
@@ -54,6 +61,7 @@ export interface AIExplanationResult {
 export interface DashboardResult {
     market: MarketOverviewResult;
     portfolio: PortfolioResult;
+    signals: SignalResult[];
     alerts: AlertResult[];
     scanner: MarketScannerResult;
     backtest: BacktestResult;

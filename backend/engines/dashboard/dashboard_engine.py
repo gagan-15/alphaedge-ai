@@ -2,7 +2,7 @@
 Dashboard Engine.
 
 Sprint:
-    2.45 - Dashboard Backend API
+    2.61 - Signals Panel
 """
 
 from backend.config.dashboard_config import (
@@ -20,6 +20,12 @@ from backend.models.backtesting.backtest_result import (
 from backend.models.dashboard.dashboard_result import (
     DashboardResult,
 )
+from backend.models.dashboard.market_overview_result import (
+    MarketOverviewResult,
+)
+from backend.models.dashboard.signals_result import (
+    SignalResult,
+)
 from backend.models.market_scanner.market_scanner_result import (
     MarketScannerResult,
 )
@@ -28,9 +34,6 @@ from backend.models.portfolio.portfolio_result import (
 )
 from backend.validators.dashboard_validator import (
     DashboardValidator,
-)
-from backend.models.dashboard.market_overview_result import (
-    MarketOverviewResult,
 )
 
 
@@ -57,6 +60,7 @@ class DashboardEngine:
         self,
         market: MarketOverviewResult,
         portfolio: PortfolioResult,
+        signals: tuple[SignalResult, ...],
         alerts: tuple[AlertResult, ...],
         scanner: MarketScannerResult,
         backtest: BacktestResult,
@@ -69,6 +73,7 @@ class DashboardEngine:
         return DashboardResult(
             market=market,
             portfolio=portfolio,
+            signals=signals,
             alerts=alerts,
             scanner=scanner,
             backtest=backtest,

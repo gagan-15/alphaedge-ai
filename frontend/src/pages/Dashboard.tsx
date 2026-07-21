@@ -2,16 +2,16 @@
  * Dashboard Page.
  *
  * Sprint:
- *     2.52 - Dashboard Page
+ *     2.61 - Signals Panel
  */
 
 import { useEffect, useState } from "react";
 
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
 
 import { getDashboard } from "../api/dashboardApi";
 
@@ -22,6 +22,7 @@ import AlertCard from "../components/dashboard/AlertCard";
 import BacktestCard from "../components/dashboard/BacktestCard";
 import MarketOverview from "../components/dashboard/MarketOverview";
 import PortfolioSummary from "../components/dashboard/PortfolioSummary";
+import SignalsPanel from "../components/dashboard/SignalsPanel";
 import TradingChart from "../components/dashboard/TradingChart";
 
 function Dashboard() {
@@ -34,7 +35,10 @@ function Dashboard() {
                 const result = await getDashboard();
                 setDashboard(result);
             } catch (error) {
-                console.error("Failed to load dashboard.", error);
+                console.error(
+                    "Failed to load dashboard.",
+                    error,
+                );
             }
         }
 
@@ -68,6 +72,10 @@ function Dashboard() {
 
             <PortfolioSummary dashboard={dashboard} />
 
+            <SignalsPanel
+                signals={dashboard.signals}
+            />
+
             <Grid
                 container
                 spacing={3}
@@ -79,7 +87,9 @@ function Dashboard() {
                 <Grid size={{ xs: 12, xl: 3 }}>
                     <Stack spacing={3}>
                         <AIInsightCard
-                            insight={dashboard.ai_explanation}
+                            insight={
+                                dashboard.ai_explanation
+                            }
                         />
 
                         <AlertCard

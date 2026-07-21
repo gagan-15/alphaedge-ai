@@ -71,7 +71,7 @@
 | Sprint 2.58	v0.3.11	✅	Market Overview	Passing	Sprint 2.58 – Market Overview
 | Sprint 2.59	v0.3.12	✅	TradingView Dashboard Integration	Passing	Sprint 2.59 – TradingView Dashboard Integration
 | Sprint 2.60 | v0.3.13 | ✅ | Professional Application Shell | Frontend Passing | Sprint 2.60 – Professional Application    Shell |
- 
+| Sprint 2.61 | v0.3.14 | ✅ | Signals Panel | Frontend Passing | Sprint 2.61 – Signals Panel |
 ---
 
 # Current Phase
@@ -152,11 +152,10 @@ Completed
 
 Current Focus
 
-🚧 Professional Application Shell
+🚧 Scanner Results Panel
 
 Upcoming
 
-⬜ Signals Panel
 ⬜ Scanner Results
 ⬜ Market Breadth
 ⬜ Portfolio Analytics

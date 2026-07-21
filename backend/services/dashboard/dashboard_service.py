@@ -2,7 +2,7 @@
 Dashboard Service.
 
 Sprint:
-    2.48 - Dashboard Service Enhancement
+    2.61 - Signals Panel
 """
 
 from backend.config.dashboard_config import (
@@ -29,6 +29,12 @@ from backend.models.backtesting.backtest_result import (
 from backend.models.dashboard.dashboard_result import (
     DashboardResult,
 )
+from backend.models.dashboard.market_overview_result import (
+    MarketOverviewResult,
+)
+from backend.models.dashboard.signals_result import (
+    SignalResult,
+)
 from backend.models.market_scanner.market_scanner_result import (
     MarketScannerResult,
 )
@@ -37,9 +43,6 @@ from backend.models.portfolio.portfolio_result import (
 )
 from backend.models.screener.screener_result import (
     ScreenerResult,
-)
-from backend.models.dashboard.market_overview_result import (
-    MarketOverviewResult,
 )
 
 
@@ -67,20 +70,46 @@ class DashboardService:
 
         return self._engine.build(
             market=MarketOverviewResult(
-            nifty50=24731.45,
-            nifty_change=0.85,
-            sensex=81214.85,
-            sensex_change=0.78,
-            bank_nifty=54372.15,
-            bank_nifty_change=1.15,
-            india_vix=12.45,
-            india_vix_change=-2.35,
+                nifty50=24731.45,
+                nifty_change=0.85,
+                sensex=81214.85,
+                sensex_change=0.78,
+                bank_nifty=54372.15,
+                bank_nifty_change=1.15,
+                india_vix=12.45,
+                india_vix_change=-2.35,
             ),
             portfolio=PortfolioResult(
                 total_positions=3,
                 invested_capital=25000,
                 available_capital=75000,
                 total_capital=100000,
+            ),
+            signals=(
+                SignalResult(
+                    symbol="INFY",
+                    action="BUY",
+                    price=1642.50,
+                    confidence=95.0,
+                ),
+                SignalResult(
+                    symbol="TCS",
+                    action="BUY",
+                    price=3980.75,
+                    confidence=91.0,
+                ),
+                SignalResult(
+                    symbol="HDFCBANK",
+                    action="SELL",
+                    price=1785.20,
+                    confidence=88.0,
+                ),
+                SignalResult(
+                    symbol="RELIANCE",
+                    action="WAIT",
+                    price=2910.80,
+                    confidence=74.0,
+                ),
             ),
             alerts=(
                 AlertResult(
@@ -104,7 +133,9 @@ class DashboardService:
             ),
             ai_explanation=AIExplanationResult(
                 decision=AIExplanationDecision.BUY,
-                reasons=("Weekly Demand Zone",),
+                reasons=(
+                    "Weekly Demand Zone",
+                ),
                 confidence_score=92.0,
                 summary="Weekly Demand Zone",
             ),

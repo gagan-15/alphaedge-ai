@@ -2,11 +2,14 @@
 Dashboard API.
 
 Sprint:
-    2.48 - Dashboard Service Enhancement
+    2.61 - Signals Panel
 """
 
 from fastapi import APIRouter
 
+from backend.api.models.dashboard_response import (
+    DashboardResponse,
+)
 from backend.services.dashboard.dashboard_service import (
     DashboardService,
 )
@@ -19,10 +22,15 @@ dashboard_router = APIRouter(
 _dashboard_service = DashboardService()
 
 
-@dashboard_router.get("/")
-def get_dashboard():
+@dashboard_router.get(
+    "/",
+    response_model=DashboardResponse,
+)
+def get_dashboard() -> DashboardResponse:
     """
-    Return dashboard data.
+    Return the complete dashboard data.
     """
 
-    return _dashboard_service.get_dashboard()
+    return DashboardResponse.model_validate(
+        _dashboard_service.get_dashboard(),
+    )
