@@ -7,6 +7,9 @@ Sprint:
 
 from fastapi import APIRouter
 
+from backend.api.auth import (
+    auth_router,
+)
 from backend.api.dashboard import (
     dashboard_router,
 )
@@ -18,6 +21,10 @@ from backend.api.scanner import (
 )
 
 api_router = APIRouter()
+
+api_router.include_router(
+    auth_router,
+)
 
 api_router.include_router(
     health_router,

@@ -61,6 +61,28 @@ http://127.0.0.1:8000/openapi.json
 
 # Implemented APIs
 
+## Registration API
+
+### Endpoint
+
+```text
+POST /auth/register
+```
+
+### Purpose
+
+Creates a minimum-data AlphaEdge AI account. Registration requires acceptance
+of the Terms, market-risk disclosure, and adult confirmation.
+
+Stored account data is limited to full name, email, country, password hash,
+consent timestamps, account state, and audit timestamps. Plain passwords are
+never stored.
+
+New accounts remain unverified until the future local email-verification flow
+is completed.
+
+---
+
 ## Health API
 
 ### Endpoint

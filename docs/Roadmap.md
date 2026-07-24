@@ -179,8 +179,11 @@ Current authentication state:
 - Argon2 password hashing implemented
 - Strong password policy implemented
 - Access and refresh token services implemented
-- PostgreSQL user and session models pending
-- Registration, login, refresh and logout APIs pending
+- PostgreSQL user model implemented
+- Registration API implemented
+- Database migration foundation implemented
+- Session model pending
+- Login, refresh and logout APIs pending
 
 ## Frontend Dashboard Foundation
 

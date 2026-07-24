@@ -941,6 +941,21 @@ test storage and never depend on the production database.
 
 ---
 
+## AD-035 - Minimum User Data
+
+Registration stores only full name, email, country, password hash, adult
+confirmation, Terms acceptance time, risk-disclosure acceptance time, account
+state, email-verification state, and audit timestamps.
+
+The platform does not collect PAN, Aadhaar, bank, broker, or payment
+information in the current product scope.
+
+Production account data uses PostgreSQL and versioned Alembic migrations.
+Registration normalizes email and country values, rejects duplicate accounts,
+and requires all safety consent before creating a user.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:
