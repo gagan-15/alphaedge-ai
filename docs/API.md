@@ -83,6 +83,37 @@ is completed.
 
 ---
 
+## Login API
+
+```text
+POST /auth/login
+```
+
+Creates one revocable device session after email and password verification.
+The response contains a short access token. The refresh token is stored in a
+Secure, HttpOnly cookie and is not exposed to frontend JavaScript.
+
+## Refresh API
+
+```text
+POST /auth/refresh
+```
+
+Rotates the current refresh token. The old device session is revoked and a new
+session and token pair are created.
+
+## Logout APIs
+
+```text
+POST /auth/logout
+POST /auth/logout-all
+```
+
+Logout revokes the current device. Logout-all revokes every active device
+session for the account.
+
+---
+
 ## Health API
 
 ### Endpoint

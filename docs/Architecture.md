@@ -956,6 +956,21 @@ and requires all safety consent before creating a user.
 
 ---
 
+## AD-036 - Revocable Multi-Device Sessions
+
+Each successful login creates a separate AuthSession for one device. Only the
+refresh token identifier is stored; the full refresh token is never stored in
+the database.
+
+Refresh rotates the token and revokes the previous session. Logout revokes one
+device, while logout-all revokes every active session owned by the user.
+
+Unverified, inactive, expired, and revoked sessions cannot create new access
+tokens. Access tokens remain short lived and refresh tokens remain isolated in
+Secure, HttpOnly, SameSite cookies.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

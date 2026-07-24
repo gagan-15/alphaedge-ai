@@ -182,8 +182,11 @@ Current authentication state:
 - PostgreSQL user model implemented
 - Registration API implemented
 - Database migration foundation implemented
-- Session model pending
-- Login, refresh and logout APIs pending
+- Multi-device session model implemented
+- Login API implemented
+- Refresh-token rotation implemented
+- Current-device and all-device logout implemented
+- Local email verification flow pending
 
 ## Frontend Dashboard Foundation
 

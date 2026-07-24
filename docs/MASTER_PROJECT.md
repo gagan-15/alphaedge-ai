@@ -62,15 +62,15 @@ Commercial Readiness:
 | Metric | Count |
 |---------|------:|
 | Total Sprints Completed | 59 |
-| Backend Application Files | 221 |
-| Test Python Files | 48 |
+| Backend Application Files | 223 |
+| Test Python Files | 49 |
 | Services | 5 |
 | Providers | 1 |
 | Validators | 25 |
 | Indicators | 17 |
 | Configuration Modules | 22 |
 | Entry Points | 1 |
-| Pytest | 229 Passing |
+| Pytest | 234 Passing |
 | Git Commits | 58 |
 | Rule Engine Modules | 4 |
 
@@ -288,7 +288,10 @@ Verified current capabilities:
 - PostgreSQL user model and Alembic migration
 - Minimum-data registration API
 - Terms, risk and adult consent enforcement
-- 229 backend tests passing
+- Multi-device login and session model
+- Refresh-token rotation
+- Current-device and all-device logout
+- 234 backend tests passing
 
 Important limitations:
 
