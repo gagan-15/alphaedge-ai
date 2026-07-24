@@ -39,3 +39,9 @@ class AuthenticationResponse(BaseModel):
     token_type: str = "bearer"
     expires_in: int
     user: UserResponse
+
+
+class MessageResponse(BaseModel):
+    """Safe generic operation result."""
+
+    message: str

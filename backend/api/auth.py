@@ -5,9 +5,15 @@ Authentication API.
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
-from backend.api.models.auth_request import LoginRequest, RegistrationRequest
+from backend.api.models.auth_request import (
+    EmailVerificationRequest,
+    LoginRequest,
+    RegistrationRequest,
+    VerifyEmailRequest,
+)
 from backend.api.models.auth_response import (
     AuthenticationResponse,
+    MessageResponse,
     RegistrationResponse,
     UserResponse,
 )
@@ -18,6 +24,9 @@ from backend.services.auth.authentication_service import (
     AuthenticationResult,
     AuthenticationService,
 )
+from backend.services.auth.email_verification_service import (
+    EmailVerificationService,
+)
 from backend.services.auth.registration_service import RegistrationService
 
 auth_router = APIRouter(
@@ -26,6 +35,7 @@ auth_router = APIRouter(
 )
 
 _registration_service = RegistrationService()
+_email_verification_service = EmailVerificationService()
 
 
 def get_authentication_service() -> AuthenticationService:
@@ -265,4 +275,50 @@ def logout_all(
     response.delete_cookie(
         key=config.refresh_cookie_name,
         path="/auth",
+    )
+
+
+@auth_router.post(
+    "/email-verification/request",
+    response_model=MessageResponse,
+)
+def request_email_verification(
+    request: EmailVerificationRequest,
+    session: Session = Depends(get_database_session),
+) -> MessageResponse:
+    """Create a local verification link without revealing account existence."""
+
+    _email_verification_service.request_verification(
+        email=str(request.email),
+        session=session,
+    )
+
+    return MessageResponse(
+        message=("If an eligible account exists, a verification link was created.")
+    )
+
+
+@auth_router.post(
+    "/email-verification/verify",
+    response_model=MessageResponse,
+)
+def verify_email(
+    request: VerifyEmailRequest,
+    session: Session = Depends(get_database_session),
+) -> MessageResponse:
+    """Verify one valid, unused email token."""
+
+    try:
+        _email_verification_service.verify(
+            raw_token=request.token,
+            session=session,
+        )
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error),
+        ) from error
+
+    return MessageResponse(
+        message="Email verified successfully.",
     )

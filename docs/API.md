@@ -112,6 +112,16 @@ POST /auth/logout-all
 Logout revokes the current device. Logout-all revokes every active device
 session for the account.
 
+## Email Verification APIs
+
+```text
+POST /auth/email-verification/request
+POST /auth/email-verification/verify
+```
+
+Development verification links are written only to local backend logs. Tokens
+are one-time, expire, and are stored only as hashes.
+
 ---
 
 ## Health API

@@ -186,7 +186,8 @@ Current authentication state:
 - Login API implemented
 - Refresh-token rotation implemented
 - Current-device and all-device logout implemented
-- Local email verification flow pending
+- Local email verification flow implemented
+- Production email delivery pending approval before public launch
 
 ## Frontend Dashboard Foundation
 

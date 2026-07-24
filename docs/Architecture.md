@@ -971,6 +971,15 @@ Secure, HttpOnly, SameSite cookies.
 
 ---
 
+## AD-037 - Local Email Verification
+
+Development verification uses secure one-time tokens. Only token hashes are
+stored. Tokens expire, cannot be reused, and verification links are written
+only to local backend logs. Public API responses never expose tokens or reveal
+whether an email account exists.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

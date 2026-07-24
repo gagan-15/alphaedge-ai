@@ -64,3 +64,15 @@ class LoginRequest(BaseModel):
         default=None,
         max_length=120,
     )
+
+
+class EmailVerificationRequest(BaseModel):
+    """Request a new local development verification link."""
+
+    email: EmailStr
+
+
+class VerifyEmailRequest(BaseModel):
+    """Consume a one-time email verification token."""
+
+    token: str = Field(min_length=20, max_length=200)
