@@ -884,6 +884,24 @@ independent from network access.
 
 ---
 
+## AD-032 - Responsive Dark Trading Shell
+
+The React application uses one shared dark trading shell for every page.
+
+The Material UI theme owns colors, typography, card borders, navigation
+states, and common component styling. AppLayout owns responsive page spacing.
+Header owns global search and account actions. Sidebar owns navigation only.
+
+The expanded sidebar is used on large screens. A compact icon sidebar is used
+on smaller screens so the application remains usable without changing page
+components.
+
+Dashboard pages and reusable cards must use theme values instead of hardcoded
+light backgrounds. This keeps the full product visually consistent and allows
+future dashboard panels to match the approved AlphaEdge AI design.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

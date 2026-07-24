@@ -277,6 +277,9 @@ Verified current capabilities:
 - Frontend lint passing
 - Frontend production build passing
 - GitHub CI for backend and frontend quality gates
+- Responsive dark trading application shell
+- Compact desktop and small-screen navigation
+- Professional AlphaEdge AI header and global theme
 
 Important limitations:
 

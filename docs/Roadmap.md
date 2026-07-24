@@ -130,6 +130,9 @@ Current working state:
 - Loading, refresh, search and error handling implemented
 - Scheduled scans and stored results pending
 - Multi-timeframe scanner confirmation pending
+- Dark trading application shell implemented
+- Responsive compact navigation implemented
+- Target dashboard panel layout pending
 
 ⬜ Market Breadth
 

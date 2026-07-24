@@ -9,24 +9,50 @@ interface AppLayoutProps {
 
 function AppLayout({ children }: AppLayoutProps) {
     return (
-        <Box sx={{ display: "flex" }}>
+        <Box
+            sx={{
+                display: "flex",
+                minHeight: "100vh",
+                backgroundColor: "background.default",
+            }}
+        >
             <Header />
             <Sidebar />
 
             <Box
                 component="main"
                 sx={{
-                        flexGrow: 1,
-                        p: 3,
-                        pt: 10,
-                        pl: "240px",
-                        pr: 3,
-                        pb: 3,
-                        minHeight: "100vh",
-                        backgroundColor: "background.default",
-                    }}
+                    width: {
+                        xs: "calc(100% - 76px)",
+                        lg: "calc(100% - 240px)",
+                    },
+                    ml: {
+                        xs: "76px",
+                        lg: "240px",
+                    },
+                    pt: {
+                        xs: "76px",
+                        md: "88px",
+                    },
+                    px: {
+                        xs: 1.5,
+                        sm: 2,
+                        xl: 2.5,
+                    },
+                    pb: 3,
+                    minHeight: "100vh",
+                    overflow: "hidden",
+                }}
             >
-                {children}
+                <Box
+                    sx={{
+                        width: "100%",
+                        maxWidth: 1600,
+                        mx: "auto",
+                    }}
+                >
+                    {children}
+                </Box>
             </Box>
         </Box>
     );
