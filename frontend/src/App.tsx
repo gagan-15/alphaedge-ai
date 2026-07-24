@@ -12,6 +12,7 @@ import {
 } from "react-router-dom";
 
 import AppLayout from "./layouts/AppLayout";
+import ProtectedRoute from "./auth/ProtectedRoute";
 
 import AIAssistant from "./pages/AIAssistant";
 import Backtest from "./pages/Backtest";
@@ -24,77 +25,61 @@ import Scanner from "./pages/Scanner";
 import Settings from "./pages/Settings";
 import Signals from "./pages/Signals";
 import Watchlist from "./pages/Watchlist";
+import VerifyEmail from "./pages/VerifyEmail";
+
+function PrivatePage({ children }: { children: React.ReactNode }) {
+    return (
+        <ProtectedRoute>
+            <AppLayout>{children}</AppLayout>
+        </ProtectedRoute>
+    );
+}
 
 function App() {
     return (
         <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route
-                    path="/"
-                    element={
-                        <Navigate
-                            to="/dashboard"
-                            replace
-                        />
-                    }
-                />
-
-                <Route
-                    path="/dashboard"
-                    element={<AppLayout><Dashboard /></AppLayout>}
-                />
-
-                <Route
-                    path="/scanner"
-                    element={<AppLayout><Scanner /></AppLayout>}
-                />
-
-                <Route
-                    path="/signals"
-                    element={<AppLayout><Signals /></AppLayout>}
-                />
-
-                <Route
-                    path="/holdings"
-                    element={<AppLayout><MyHoldings /></AppLayout>}
-                />
-
-                <Route
-                    path="/watchlist"
-                    element={<AppLayout><Watchlist /></AppLayout>}
-                />
-
-                <Route
-                    path="/backtest"
-                    element={<AppLayout><Backtest /></AppLayout>}
-                />
-
-                <Route
-                    path="/ai-assistant"
-                    element={<AppLayout><AIAssistant /></AppLayout>}
-                />
-
-                <Route
-                    path="/reports"
-                    element={<AppLayout><Reports /></AppLayout>}
-                />
-
-                <Route
-                    path="/settings"
-                    element={<AppLayout><Settings /></AppLayout>}
-                />
-
-                <Route
-                    path="*"
-                    element={
-                        <Navigate
-                            to="/dashboard"
-                            replace
-                        />
-                    }
-                />
-            </Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route
+                path="/dashboard"
+                element={<PrivatePage><Dashboard /></PrivatePage>}
+            />
+            <Route
+                path="/scanner"
+                element={<PrivatePage><Scanner /></PrivatePage>}
+            />
+            <Route
+                path="/signals"
+                element={<PrivatePage><Signals /></PrivatePage>}
+            />
+            <Route
+                path="/holdings"
+                element={<PrivatePage><MyHoldings /></PrivatePage>}
+            />
+            <Route
+                path="/watchlist"
+                element={<PrivatePage><Watchlist /></PrivatePage>}
+            />
+            <Route
+                path="/backtest"
+                element={<PrivatePage><Backtest /></PrivatePage>}
+            />
+            <Route
+                path="/ai-assistant"
+                element={<PrivatePage><AIAssistant /></PrivatePage>}
+            />
+            <Route
+                path="/reports"
+                element={<PrivatePage><Reports /></PrivatePage>}
+            />
+            <Route
+                path="/settings"
+                element={<PrivatePage><Settings /></PrivatePage>}
+            />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
     );
 }
 

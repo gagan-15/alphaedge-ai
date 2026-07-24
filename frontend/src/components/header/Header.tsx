@@ -1,6 +1,7 @@
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -9,8 +10,20 @@ import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
+import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "../../auth/AuthState";
 
 function Header() {
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
+
+    async function handleLogout() {
+        await logout();
+        navigate("/login", { replace: true });
+    }
+
     return (
         <AppBar
             position="fixed"
@@ -143,7 +156,7 @@ function Header() {
                     </IconButton>
 
                     <Avatar
-                        aria-label="User account"
+                        aria-label={user?.full_name ?? "User account"}
                         sx={{
                             ml: 0.5,
                             width: 30,
@@ -154,8 +167,23 @@ function Header() {
                             fontWeight: 800,
                         }}
                     >
-                        GD
+                        {user?.full_name
+                            ?.split(" ")
+                            .map((part) => part[0])
+                            .join("")
+                            .slice(0, 2)
+                            .toUpperCase() ?? "AE"}
                     </Avatar>
+                    <Tooltip title="Log out">
+                        <IconButton
+                            aria-label="Log out"
+                            color="inherit"
+                            size="small"
+                            onClick={() => void handleLogout()}
+                        >
+                            <LogoutOutlinedIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
             </Toolbar>
         </AppBar>

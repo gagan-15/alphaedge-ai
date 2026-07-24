@@ -980,6 +980,18 @@ whether an email account exists.
 
 ---
 
+## AD-038 - Protected Web Sessions
+
+Private frontend routes require an authenticated user. On page load, the web
+application restores a session through the Secure, HttpOnly refresh cookie.
+Short-lived access tokens stay only in JavaScript memory and are not written to
+local storage or session storage. Logout clears local state even if the backend
+is temporarily unavailable.
+
+Development CORS allows both `localhost:5173` and `127.0.0.1:5173`.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

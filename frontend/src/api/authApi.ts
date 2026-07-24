@@ -39,3 +39,16 @@ export async function verifyEmail(token: string) {
     );
     return response.data;
 }
+
+export async function refreshSession() {
+    const response = await authApi.post("/refresh");
+    return response.data;
+}
+
+export async function logoutSession() {
+    await authApi.post("/logout");
+}
+
+export async function logoutAllSessions() {
+    await authApi.post("/logout-all");
+}

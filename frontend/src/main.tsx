@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 
 import App from "./App";
+import { AuthProvider } from "./auth/AuthContext";
 import theme from "./theme/theme";
 
 createRoot(
@@ -25,7 +26,9 @@ createRoot(
             <ThemeProvider theme={theme}>
                 <CssBaseline />
 
-                <App />
+                <AuthProvider>
+                    <App />
+                </AuthProvider>
             </ThemeProvider>
         </BrowserRouter>
     </StrictMode>,

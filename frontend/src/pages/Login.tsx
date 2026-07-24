@@ -12,9 +12,11 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
 import { loginAccount } from "../api/authApi";
+import { useAuth } from "../auth/AuthState";
 
 function Login() {
     const navigate = useNavigate();
+    const { setAuthentication } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -31,9 +33,9 @@ function Login() {
                 password,
                 device_name: "Web browser",
             });
-            sessionStorage.setItem(
-                "alphaedge_access_token",
+            setAuthentication(
                 result.access_token,
+                result.user,
             );
             navigate("/dashboard");
         } catch {

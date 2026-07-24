@@ -295,6 +295,9 @@ Verified current capabilities:
 - 236 backend tests passing
 - Login and minimum-data registration screens
 - Frontend authentication API integration
+- Protected application routes with automatic session restore
+- In-memory access tokens and secure refresh-cookie sessions
+- Email verification result screen and user logout control
 
 Important limitations:
 

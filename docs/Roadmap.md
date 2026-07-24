@@ -187,6 +187,9 @@ Current authentication state:
 - Refresh-token rotation implemented
 - Current-device and all-device logout implemented
 - Local email verification flow implemented
+- Protected frontend routes and automatic session restore implemented
+- Access tokens kept in browser memory, not persistent web storage
+- Email verification and logout user interface implemented
 - Production email delivery pending approval before public launch
 - Login and registration UI implemented
 - Protected-route refresh bootstrap pending
