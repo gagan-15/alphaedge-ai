@@ -29,8 +29,12 @@ class YahooProvider(BaseMarketDataProvider):
         Download and clean historical stock data.
         """
 
+        provider_symbol = self._normalize_symbol(
+            symbol,
+        )
+
         data = yf.download(
-            tickers=symbol,
+            tickers=provider_symbol,
             period=period,
             interval=interval,
             progress=False,
@@ -45,3 +49,18 @@ class YahooProvider(BaseMarketDataProvider):
         data = data.sort_index()
 
         return data
+
+    @staticmethod
+    def _normalize_symbol(
+        symbol: str,
+    ) -> str:
+        """
+        Add the NSE suffix to plain equity symbols.
+        """
+
+        normalized = symbol.strip().upper()
+
+        if "." not in normalized and not normalized.startswith("^"):
+            return f"{normalized}.NS"
+
+        return normalized

@@ -841,13 +841,17 @@ React Scanner API Layer
     ↓
 Scanner Page and Components
 
-The Scanner Service currently creates deterministic sample opportunities.
-This allows the API and frontend contract to be tested before live market
-analysis is connected.
+The Scanner Service analyzes each configured symbol independently. A provider
+or analysis failure for one symbol is logged and does not stop the remaining
+scan.
 
-The sample layer must later be replaced by an orchestration service that
-connects market data, indicators, rules, zones, trade setup, entry
-confirmation, risk management, screening and scanning.
+The Market Opportunity Service connects validated market data, demand-zone
+detection, zone scoring and ranking, trade setup, entry confirmation, risk
+management, screening, and scanning.
+
+The current scanner supports long opportunities from fresh demand zones near
+the current price. Short opportunities remain disabled until short-trade
+position sizing and risk calculations are implemented.
 
 The API response mapper is kept at the API boundary so domain models do not
 contain FastAPI route logic.

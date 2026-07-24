@@ -70,7 +70,7 @@ Commercial Readiness:
 | Indicators | 17 |
 | Configuration Modules | 20 |
 | Entry Points | 1 |
-| Pytest | 210 Passing |
+| Pytest | 214 Passing |
 | Git Commits | 58 |
 | Rule Engine Modules | 4 |
 
@@ -258,7 +258,7 @@ Verified current capabilities:
 - Scanner page, toolbar, summary and results table
 - Scanner REST API
 - Scanner domain-to-API response mapping
-- Controlled sample scanner opportunities
+- Real market-data scanner opportunities
 - Scanner loading, error, refresh and search behaviour
 - Multi-Timeframe Engine implementation restored
 - Demand and Supply detection work in progress
@@ -268,7 +268,11 @@ Verified current capabilities:
 - Yahoo Finance development adapter
 - Dependency-injected Market Data Service
 - Provider boundary unit tests
-- 210 backend tests passing
+- Fresh demand-zone distance filtering
+- Volume, trend and momentum confirmation
+- Risk approval requires confirmed entry
+- Per-symbol scanner error isolation
+- 214 backend tests passing
 - Backend lint passing
 - Frontend lint passing
 - Frontend production build passing
@@ -276,14 +280,14 @@ Verified current capabilities:
 
 Important limitations:
 
-- Scanner opportunities are controlled sample data
-- Live market data is not connected to the scanner pipeline
+- Scanner currently supports long opportunities only
+- Live scans run during the API request and are not cached or scheduled
 - Multi-timeframe minimum alignment configuration is not yet used
 - Dashboard data remains sample data
 - Scanner export is not implemented
 
-The scanner product sprint remains open until real market analysis replaces
-controlled sample opportunities and the end-to-end scanner flow is verified.
+The scanner product sprint remains open until scheduled scans, stored results,
+multi-timeframe confirmation, and frontend live-data behavior are verified.
 
 ---
 

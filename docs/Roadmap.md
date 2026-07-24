@@ -120,12 +120,16 @@ Current working state:
 
 - Scanner page and reusable components implemented
 - Scanner API implemented
-- Controlled sample opportunities implemented
+- Real market-data opportunity analysis implemented
 - Replaceable market data provider contract implemented
 - Yahoo Finance development adapter connected through Market Data Service
 - Market data validation enforced at the service boundary
+- Fresh demand-zone filtering implemented
+- Volume, trend, momentum and risk confirmation implemented
+- Per-symbol error isolation implemented
 - Loading, refresh, search and error handling implemented
-- Real market pipeline integration pending
+- Scheduled scans and stored results pending
+- Multi-timeframe scanner confirmation pending
 
 ⬜ Market Breadth
 

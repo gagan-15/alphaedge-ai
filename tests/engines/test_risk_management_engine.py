@@ -120,6 +120,36 @@ def test_trade_is_rejected() -> None:
     assert result.rejection_reason is not None
 
 
+def test_unconfirmed_trade_is_rejected() -> None:
+    """
+    Good risk/reward cannot approve an unconfirmed entry.
+    """
+
+    engine = RiskManagementEngine(
+        RiskManagementConfig(),
+    )
+    confirmed_entry = _create_entry_confirmation()
+    unconfirmed_entry = EntryConfirmation(
+        trade_setup=confirmed_entry.trade_setup,
+        volume_confirmed=True,
+        trend_confirmed=False,
+        momentum_confirmed=True,
+        confirmation_score=80.0,
+        confirmed=False,
+    )
+
+    result = engine.evaluate(
+        entry_confirmation=unconfirmed_entry,
+        account_balance=1_000_000.0,
+        entry_price=100.0,
+        stop_loss_price=95.0,
+        target_price=115.0,
+    )
+
+    assert result.approved is False
+    assert result.rejection_reason == ("Entry confirmation requirements were not met.")
+
+
 def test_invalid_stop_loss() -> None:
 
     engine = RiskManagementEngine(

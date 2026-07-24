@@ -204,9 +204,13 @@ GET /scanner/
 
 Returns scanner results for the React Scanner page.
 
-The current implementation uses controlled sample opportunities. It uses the
-Entry Confirmation and Risk Management engines so the response follows real
-domain contracts. Live market scanning is not connected yet.
+The current implementation downloads and validates market data for configured
+symbols. It detects nearby fresh demand zones, scores and ranks them, builds
+trade setups, checks volume, trend, and momentum, and applies risk management
+before returning approved opportunities.
+
+The current scanner supports long opportunities only. One symbol failure does
+not stop the remaining scan.
 
 ## Response
 

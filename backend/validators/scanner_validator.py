@@ -37,3 +37,24 @@ class ScannerValidator:
             raise ValueError(
                 "account_balance must be greater than zero.",
             )
+
+        if config.maximum_zone_distance_percent < 0:
+            raise ValueError(
+                "maximum_zone_distance_percent cannot be negative.",
+            )
+
+        periods = (
+            config.volume_period,
+            config.trend_period,
+            config.momentum_period,
+        )
+
+        if any(period <= 0 for period in periods):
+            raise ValueError(
+                "indicator periods must be greater than zero.",
+            )
+
+        if not 0 <= config.minimum_momentum < config.maximum_momentum <= 100:
+            raise ValueError(
+                "momentum range must be between zero and 100.",
+            )
