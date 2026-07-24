@@ -8,11 +8,13 @@ Author:
     AlphaEdge AI
 """
 
-import yfinance as yf
 import pandas as pd
+import yfinance as yf
+
+from backend.data_providers.base_market_data_provider import BaseMarketDataProvider
 
 
-class YahooProvider:
+class YahooProvider(BaseMarketDataProvider):
     """
     Yahoo Finance Provider
     """
@@ -27,8 +29,12 @@ class YahooProvider:
         Download and clean historical stock data.
         """
 
+        provider_symbol = self._normalize_symbol(
+            symbol,
+        )
+
         data = yf.download(
-            tickers=symbol,
+            tickers=provider_symbol,
             period=period,
             interval=interval,
             progress=False,
@@ -43,3 +49,18 @@ class YahooProvider:
         data = data.sort_index()
 
         return data
+
+    @staticmethod
+    def _normalize_symbol(
+        symbol: str,
+    ) -> str:
+        """
+        Add the NSE suffix to plain equity symbols.
+        """
+
+        normalized = symbol.strip().upper()
+
+        if "." not in normalized and not normalized.startswith("^"):
+            return f"{normalized}.NS"
+
+        return normalized

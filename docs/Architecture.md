@@ -821,6 +821,165 @@ This architecture allows additional pages such as Signals, Scanner, Portfolio, R
 
 --
 
+## Current Scanner Integration
+
+The current Scanner Results flow follows:
+
+Scanner API
+    ↓
+Scanner Service
+    ↓
+Entry Confirmation Engine
+    ↓
+Risk Management Engine
+    ↓
+Market Scanner Engine
+    ↓
+Scanner API Response Mapper
+    ↓
+React Scanner API Layer
+    ↓
+Scanner Page and Components
+
+The Scanner Service analyzes each configured symbol independently. A provider
+or analysis failure for one symbol is logged and does not stop the remaining
+scan.
+
+The Market Opportunity Service connects validated market data, demand-zone
+detection, zone scoring and ranking, trade setup, entry confirmation, risk
+management, screening, and scanning.
+
+The current scanner supports long opportunities from fresh demand zones near
+the current price. Short opportunities remain disabled until short-trade
+position sizing and risk calculations are implemented.
+
+The API response mapper is kept at the API boundary so domain models do not
+contain FastAPI route logic.
+
+---
+
+## AD-031 - Replaceable Market Data Providers
+
+External market data access follows:
+
+MarketDataService
+    â†“
+BaseMarketDataProvider
+    â†“
+Provider Adapter
+
+`BaseMarketDataProvider` defines the normalized historical OHLCV contract.
+`YahooProvider` is the current development adapter.
+
+Application services depend on the provider contract rather than a vendor.
+This allows future NSE-compatible, broker, licensed data, cached, and test
+providers to be introduced without changing trading engines.
+
+All provider output must pass through `MarketDataValidator` before it reaches
+indicators, scanners, backtests, or other trading intelligence engines.
+
+Provider implementations own vendor-specific symbol and response handling.
+Application services own orchestration and validation. Trading engines remain
+independent from network access.
+
+---
+
+## AD-032 - Responsive Dark Trading Shell
+
+The React application uses one shared dark trading shell for every page.
+
+The Material UI theme owns colors, typography, card borders, navigation
+states, and common component styling. AppLayout owns responsive page spacing.
+Header owns global search and account actions. Sidebar owns navigation only.
+
+The expanded sidebar is used on large screens. A compact icon sidebar is used
+on smaller screens so the application remains usable without changing page
+components.
+
+Dashboard pages and reusable cards must use theme values instead of hardcoded
+light backgrounds. This keeps the full product visually consistent and allows
+future dashboard panels to match the approved AlphaEdge AI design.
+
+---
+
+## AD-033 - Research-Only Product Boundary
+
+AlphaEdge AI is a market research and educational analytics platform.
+
+The platform does not execute orders, connect to brokers, manage user money,
+promise returns, or present results as guaranteed outcomes.
+
+Internal engines may use deterministic BUY, SELL, HOLD, and WAIT values for
+calculation compatibility. User-facing surfaces translate these values into
+Bullish Setup, Bearish Setup, and Watch.
+
+User-facing trade-plan fields use Possible Entry, Invalidation Level, Scenario
+Target, Conditions Matched, and Risk Check. Historical performance always
+states that past results do not guarantee future performance.
+
+Research disclaimers are displayed throughout the private application. Legal
+and compliance review remains required before charging for stock-specific
+research or adding any regulated service.
+
+---
+
+## AD-034 - Authentication Security Foundation
+
+Authentication uses Argon2 password hashing, short-lived signed access tokens,
+and separate refresh tokens.
+
+Refresh tokens include unique identifiers so rotation, session revocation, and
+logout can be implemented without changing token contracts. Refresh tokens
+will be stored in Secure, HttpOnly cookies. Access tokens will not be stored in
+browser local storage.
+
+Authentication secrets and token lifetimes come from environment variables.
+Weak secrets and invalid lifetimes are rejected before token services start.
+
+PostgreSQL owns production user and session data. Automated tests use isolated
+test storage and never depend on the production database.
+
+---
+
+## AD-035 - Minimum User Data
+
+Registration stores only full name, email, country, password hash, adult
+confirmation, Terms acceptance time, risk-disclosure acceptance time, account
+state, email-verification state, and audit timestamps.
+
+The platform does not collect PAN, Aadhaar, bank, broker, or payment
+information in the current product scope.
+
+Production account data uses PostgreSQL and versioned Alembic migrations.
+Registration normalizes email and country values, rejects duplicate accounts,
+and requires all safety consent before creating a user.
+
+---
+
+## AD-036 - Revocable Multi-Device Sessions
+
+Each successful login creates a separate AuthSession for one device. Only the
+refresh token identifier is stored; the full refresh token is never stored in
+the database.
+
+Refresh rotates the token and revokes the previous session. Logout revokes one
+device, while logout-all revokes every active session owned by the user.
+
+Unverified, inactive, expired, and revoked sessions cannot create new access
+tokens. Access tokens remain short lived and refresh tokens remain isolated in
+Secure, HttpOnly, SameSite cookies.
+
+---
+
+## AD-037 - Local Email Verification
+
+Development verification uses secure one-time tokens. Only token hashes are
+stored. Tokens expire, cannot be reused, and verification links are written
+only to local backend logs. Public API responses never expose tokens or reveal
+whether an email account exists.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

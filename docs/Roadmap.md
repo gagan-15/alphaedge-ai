@@ -114,7 +114,27 @@ Trading Intelligence Dashboard
 
 ✅ Signals Panel
 
-⬜ Scanner Results
+🚧 Scanner Results
+
+Current working state:
+
+- Scanner page and reusable components implemented
+- Scanner API implemented
+- Real market-data opportunity analysis implemented
+- Replaceable market data provider contract implemented
+- Yahoo Finance development adapter connected through Market Data Service
+- Market data validation enforced at the service boundary
+- Fresh demand-zone filtering implemented
+- Volume, trend, momentum and risk confirmation implemented
+- Per-symbol error isolation implemented
+- Loading, refresh, search and error handling implemented
+- Scheduled scans and stored results pending
+- Multi-timeframe scanner confirmation pending
+- Dark trading application shell implemented
+- Responsive compact navigation implemented
+- Target dashboard panel layout pending
+- Research-only language and disclaimer implemented
+- Broker execution removed from the current product scope
 
 ⬜ Market Breadth
 
@@ -153,6 +173,24 @@ Enterprise Platform
 ⬜ Subscription Management
 
 ⬜ Settings
+
+Current authentication state:
+
+- Argon2 password hashing implemented
+- Strong password policy implemented
+- Access and refresh token services implemented
+- PostgreSQL user model implemented
+- Registration API implemented
+- Database migration foundation implemented
+- Multi-device session model implemented
+- Login API implemented
+- Refresh-token rotation implemented
+- Current-device and all-device logout implemented
+- Local email verification flow implemented
+- Production email delivery pending approval before public launch
+- Login and registration UI implemented
+- Protected-route refresh bootstrap pending
+- Landing page pending
 
 ## Frontend Dashboard Foundation
 
@@ -213,7 +251,7 @@ Cloud & DevOps
 ## Trading Intelligence Expansion
 
 - ✅ Signals Panel
-- ⬜ Scanner Results
+- 🚧 Scanner Results
 - ⬜ Market Breadth
 - ⬜ Portfolio Analytics
 - ⬜ Risk Dashboard

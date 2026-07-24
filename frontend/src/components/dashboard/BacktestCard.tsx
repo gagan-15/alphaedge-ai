@@ -76,7 +76,7 @@ function BacktestCard({
                             variant="body2"
                             color="text.secondary"
                         >
-                            Win Rate
+                            Historical Win Rate
                         </Typography>
 
                         <Typography
@@ -120,6 +120,17 @@ function BacktestCard({
                         </Typography>
                     </Box>
                 </Box>
+
+                <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{
+                        display: "block",
+                        mt: 2,
+                    }}
+                >
+                    Historical results do not guarantee future performance.
+                </Typography>
             </CardContent>
         </Card>
     );

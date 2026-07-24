@@ -10,9 +10,29 @@ import { useEffect, useRef } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 
+interface TradingViewWidgetOptions {
+    autosize: boolean;
+    symbol: string;
+    interval: string;
+    timezone: string;
+    theme: string;
+    style: string;
+    locale: string;
+    enable_publishing: boolean;
+    hide_side_toolbar: boolean;
+    allow_symbol_change: boolean;
+    container_id: string;
+}
+
+interface TradingViewApi {
+    widget: new (
+        options: TradingViewWidgetOptions,
+    ) => object;
+}
+
 declare global {
     interface Window {
-        TradingView: any;
+        TradingView?: TradingViewApi;
     }
 }
 
@@ -20,12 +40,14 @@ function TradingChart() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        const container = containerRef.current;
+
         const createWidget = () => {
             if (
                 window.TradingView &&
-                containerRef.current
+                container
             ) {
-                containerRef.current.innerHTML = "";
+                container.innerHTML = "";
 
                 new window.TradingView.widget({
                     autosize: true,
@@ -38,7 +60,7 @@ function TradingChart() {
                     enable_publishing: false,
                     hide_side_toolbar: false,
                     allow_symbol_change: true,
-                    container_id: containerRef.current.id,
+                    container_id: container.id,
                 });
             }
         };
@@ -61,8 +83,8 @@ function TradingChart() {
         }
 
         return () => {
-            if (containerRef.current) {
-                containerRef.current.innerHTML = "";
+            if (container) {
+                container.innerHTML = "";
             }
         };
     }, []);
