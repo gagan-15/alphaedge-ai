@@ -821,6 +821,39 @@ This architecture allows additional pages such as Signals, Scanner, Portfolio, R
 
 --
 
+## Current Scanner Integration
+
+The current Scanner Results flow follows:
+
+Scanner API
+    ↓
+Scanner Service
+    ↓
+Entry Confirmation Engine
+    ↓
+Risk Management Engine
+    ↓
+Market Scanner Engine
+    ↓
+Scanner API Response Mapper
+    ↓
+React Scanner API Layer
+    ↓
+Scanner Page and Components
+
+The Scanner Service currently creates deterministic sample opportunities.
+This allows the API and frontend contract to be tested before live market
+analysis is connected.
+
+The sample layer must later be replaced by an orchestration service that
+connects market data, indicators, rules, zones, trade setup, entry
+confirmation, risk management, screening and scanning.
+
+The API response mapper is kept at the API boundary so domain models do not
+contain FastAPI route logic.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

@@ -101,6 +101,7 @@ Current modules include:
 
 - Market Overview
 - Portfolio Summary
+- Signals
 - Alerts
 - Scanner
 - Backtest Summary
@@ -126,6 +127,7 @@ JSON Response
 
 - Market
 - Portfolio
+- Signals
 - Alerts
 - Scanner
 - Backtest
@@ -149,6 +151,14 @@ Example
         "available_capital": 75000,
         "total_capital": 100000
     },
+    "signals": [
+        {
+            "symbol": "INFY",
+            "action": "BUY",
+            "price": 1642.5,
+            "confidence": 95.0
+        }
+    ],
     "alerts": [
         {
             "title": "BUY",
@@ -182,10 +192,52 @@ Example
 
 ---
 
+# Scanner API
+
+## Endpoint
+
+```text
+GET /scanner/
+```
+
+## Purpose
+
+Returns scanner results for the React Scanner page.
+
+The current implementation uses controlled sample opportunities. It uses the
+Entry Confirmation and Risk Management engines so the response follows real
+domain contracts. Live market scanning is not connected yet.
+
+## Response
+
+```json
+{
+    "total_scanned": 4,
+    "total_matches": 2,
+    "results": [
+        {
+            "symbol": "INFY",
+            "entry_price": 1642.5,
+            "stop_loss": 1602.5,
+            "target_price": 1722.5,
+            "risk_reward_ratio": 2.0,
+            "confirmation_score": 92.0,
+            "volume_confirmed": true,
+            "trend_confirmed": true,
+            "momentum_confirmed": true,
+            "confirmed": true,
+            "approved": true,
+            "rejection_reason": null
+        }
+    ]
+}
+```
+
+---
+
 # Planned APIs
 
 - Market API
-- Scanner API
 - Signals API
 - Portfolio API
 - Risk API

@@ -13,6 +13,9 @@ from backend.api.dashboard import (
 from backend.api.health import (
     health_router,
 )
+from backend.api.scanner import (
+    scanner_router,
+)
 
 api_router = APIRouter()
 
@@ -22,4 +25,8 @@ api_router.include_router(
 
 api_router.include_router(
     dashboard_router,
+)
+
+api_router.include_router(
+    scanner_router,
 )
