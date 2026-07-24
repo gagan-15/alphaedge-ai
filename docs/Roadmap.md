@@ -188,6 +188,9 @@ Current authentication state:
 - Current-device and all-device logout implemented
 - Local email verification flow implemented
 - Production email delivery pending approval before public launch
+- Login and registration UI implemented
+- Protected-route refresh bootstrap pending
+- Landing page pending
 
 ## Frontend Dashboard Foundation
 

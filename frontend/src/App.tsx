@@ -16,8 +16,10 @@ import AppLayout from "./layouts/AppLayout";
 import AIAssistant from "./pages/AIAssistant";
 import Backtest from "./pages/Backtest";
 import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
 import MyHoldings from "./pages/MyHoldings";
 import Reports from "./pages/Reports";
+import Register from "./pages/Register";
 import Scanner from "./pages/Scanner";
 import Settings from "./pages/Settings";
 import Signals from "./pages/Signals";
@@ -25,8 +27,9 @@ import Watchlist from "./pages/Watchlist";
 
 function App() {
     return (
-        <AppLayout>
-            <Routes>
+        <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
                 <Route
                     path="/"
                     element={
@@ -39,47 +42,47 @@ function App() {
 
                 <Route
                     path="/dashboard"
-                    element={<Dashboard />}
+                    element={<AppLayout><Dashboard /></AppLayout>}
                 />
 
                 <Route
                     path="/scanner"
-                    element={<Scanner />}
+                    element={<AppLayout><Scanner /></AppLayout>}
                 />
 
                 <Route
                     path="/signals"
-                    element={<Signals />}
+                    element={<AppLayout><Signals /></AppLayout>}
                 />
 
                 <Route
                     path="/holdings"
-                    element={<MyHoldings />}
+                    element={<AppLayout><MyHoldings /></AppLayout>}
                 />
 
                 <Route
                     path="/watchlist"
-                    element={<Watchlist />}
+                    element={<AppLayout><Watchlist /></AppLayout>}
                 />
 
                 <Route
                     path="/backtest"
-                    element={<Backtest />}
+                    element={<AppLayout><Backtest /></AppLayout>}
                 />
 
                 <Route
                     path="/ai-assistant"
-                    element={<AIAssistant />}
+                    element={<AppLayout><AIAssistant /></AppLayout>}
                 />
 
                 <Route
                     path="/reports"
-                    element={<Reports />}
+                    element={<AppLayout><Reports /></AppLayout>}
                 />
 
                 <Route
                     path="/settings"
-                    element={<Settings />}
+                    element={<AppLayout><Settings /></AppLayout>}
                 />
 
                 <Route
@@ -92,7 +95,6 @@ function App() {
                     }
                 />
             </Routes>
-        </AppLayout>
     );
 }
 

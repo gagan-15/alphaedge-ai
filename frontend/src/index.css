@@ -49,3 +49,14 @@ input {
 ::-webkit-scrollbar-thumb:hover {
     background: #344861;
 }
+
+.auth-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+        radial-gradient(circle at 20% 10%, rgba(77, 66, 255, 0.2), transparent 35%),
+        radial-gradient(circle at 85% 80%, rgba(147, 51, 234, 0.16), transparent 35%),
+        #050b17;
+}

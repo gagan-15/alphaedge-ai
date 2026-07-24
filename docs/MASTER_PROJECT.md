@@ -293,6 +293,8 @@ Verified current capabilities:
 - Current-device and all-device logout
 - Free local one-time email verification
 - 236 backend tests passing
+- Login and minimum-data registration screens
+- Frontend authentication API integration
 
 Important limitations:
 
