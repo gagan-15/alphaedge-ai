@@ -190,6 +190,8 @@ Current authentication state:
 - Protected frontend routes and automatic session restore implemented
 - Access tokens kept in browser memory, not persistent web storage
 - Email verification and logout user interface implemented
+- Reference UI workspaces added for market overview, market breadth, news,
+  alerts, economic calendar, option chain and calculators
 - Production email delivery pending approval before public launch
 - Login and registration UI implemented
 - Protected-route refresh bootstrap pending

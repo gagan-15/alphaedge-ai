@@ -26,6 +26,15 @@ import Settings from "./pages/Settings";
 import Signals from "./pages/Signals";
 import Watchlist from "./pages/Watchlist";
 import VerifyEmail from "./pages/VerifyEmail";
+import {
+    AlertsPage,
+    CalculatorsPage,
+    EconomicCalendarPage,
+    MarketBreadthPage,
+    MarketOverviewPage,
+    NewsInsightsPage,
+    OptionChainPage,
+} from "./pages/WorkspaceScreens";
 
 function PrivatePage({ children }: { children: React.ReactNode }) {
     return (
@@ -78,6 +87,13 @@ function App() {
                 path="/settings"
                 element={<PrivatePage><Settings /></PrivatePage>}
             />
+            <Route path="/market-overview" element={<PrivatePage><MarketOverviewPage /></PrivatePage>} />
+            <Route path="/market-breadth" element={<PrivatePage><MarketBreadthPage /></PrivatePage>} />
+            <Route path="/news" element={<PrivatePage><NewsInsightsPage /></PrivatePage>} />
+            <Route path="/alerts" element={<PrivatePage><AlertsPage /></PrivatePage>} />
+            <Route path="/economic-calendar" element={<PrivatePage><EconomicCalendarPage /></PrivatePage>} />
+            <Route path="/option-chain" element={<PrivatePage><OptionChainPage /></PrivatePage>} />
+            <Route path="/calculators" element={<PrivatePage><CalculatorsPage /></PrivatePage>} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
     );

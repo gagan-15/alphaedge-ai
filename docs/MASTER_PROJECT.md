@@ -298,6 +298,9 @@ Verified current capabilities:
 - Protected application routes with automatic session restore
 - In-memory access tokens and secure refresh-cookie sessions
 - Email verification result screen and user logout control
+- Full reference navigation for market overview, breadth, news, alerts,
+  economic calendar, option chain and calculators
+- Responsive research workspaces with tables, filters and a position-size tool
 
 Important limitations:
 
@@ -305,6 +308,8 @@ Important limitations:
 - Live scans run during the API request and are not cached or scheduled
 - Multi-timeframe minimum alignment configuration is not yet used
 - Dashboard data remains sample data
+- Newly added reference workspaces use clearly identifiable demonstration data
+  until their live backend endpoints are completed
 - Scanner export is not implemented
 
 The scanner product sprint remains open until scheduled scans, stored results,

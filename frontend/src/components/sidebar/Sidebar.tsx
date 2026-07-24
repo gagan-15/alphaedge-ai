@@ -7,6 +7,12 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ShowChartOutlinedIcon from "@mui/icons-material/ShowChartOutlined";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
+import CalculateOutlinedIcon from "@mui/icons-material/CalculateOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
+import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
+import TableChartOutlinedIcon from "@mui/icons-material/TableChartOutlined";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -28,6 +34,11 @@ const menuItems = [
         path: "/scanner",
     },
     {
+        text: "Market Overview",
+        icon: <QueryStatsOutlinedIcon />,
+        path: "/market-overview",
+    },
+    {
         text: "Signals",
         icon: <CandlestickChartOutlinedIcon />,
         path: "/signals",
@@ -43,6 +54,16 @@ const menuItems = [
         path: "/watchlist",
     },
     {
+        text: "Market Breadth",
+        icon: <PieChartOutlineOutlinedIcon />,
+        path: "/market-breadth",
+    },
+    {
+        text: "News & Insights",
+        icon: <NewspaperOutlinedIcon />,
+        path: "/news",
+    },
+    {
         text: "Backtest",
         icon: <QueryStatsOutlinedIcon />,
         path: "/backtest",
@@ -56,6 +77,26 @@ const menuItems = [
         text: "Reports",
         icon: <AssessmentOutlinedIcon />,
         path: "/reports",
+    },
+    {
+        text: "Alerts",
+        icon: <AddAlertOutlinedIcon />,
+        path: "/alerts",
+    },
+    {
+        text: "Economic Calendar",
+        icon: <CalendarMonthOutlinedIcon />,
+        path: "/economic-calendar",
+    },
+    {
+        text: "Option Chain",
+        icon: <TableChartOutlinedIcon />,
+        path: "/option-chain",
+    },
+    {
+        text: "Calculators",
+        icon: <CalculateOutlinedIcon />,
+        path: "/calculators",
     },
     {
         text: "Settings",
