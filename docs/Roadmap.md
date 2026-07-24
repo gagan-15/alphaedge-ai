@@ -133,6 +133,8 @@ Current working state:
 - Dark trading application shell implemented
 - Responsive compact navigation implemented
 - Target dashboard panel layout pending
+- Research-only language and disclaimer implemented
+- Broker execution removed from the current product scope
 
 ⬜ Market Breadth
 

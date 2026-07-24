@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 
 import Header from "../components/header/Header";
+import ResearchDisclaimer from "../components/shared/ResearchDisclaimer";
 import Sidebar from "../components/sidebar/Sidebar";
 
 interface AppLayoutProps {
@@ -52,6 +53,8 @@ function AppLayout({ children }: AppLayoutProps) {
                     }}
                 >
                     {children}
+
+                    <ResearchDisclaimer />
                 </Box>
             </Box>
         </Box>

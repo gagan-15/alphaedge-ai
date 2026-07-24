@@ -55,7 +55,7 @@ function ScannerResultsTable({
                             sx={{ pb: 6 }}
                         >
                             Click "Run Scan" to analyze the market and
-                            discover trading opportunities.
+                            find research setups that match your rules.
                         </Typography>
                     </>
                 ) : (
@@ -68,15 +68,15 @@ function ScannerResultsTable({
                                     </TableCell>
 
                                     <TableCell align="right">
-                                        Entry
+                                        Possible Entry
                                     </TableCell>
 
                                     <TableCell align="right">
-                                        Stop Loss
+                                        Invalidation
                                     </TableCell>
 
                                     <TableCell align="right">
-                                        Target
+                                        Scenario Target
                                     </TableCell>
 
                                     <TableCell align="right">
@@ -84,15 +84,15 @@ function ScannerResultsTable({
                                     </TableCell>
 
                                     <TableCell align="right">
-                                        Score
+                                        Conditions
                                     </TableCell>
 
                                     <TableCell align="center">
-                                        Approved
+                                        Risk Check
                                     </TableCell>
 
                                     <TableCell align="center">
-                                        Confirmed
+                                        Setup Valid
                                     </TableCell>
                                 </TableRow>
                             </TableHead>

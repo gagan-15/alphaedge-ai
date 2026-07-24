@@ -15,6 +15,10 @@ import ListItem from "@mui/material/ListItem";
 import Typography from "@mui/material/Typography";
 
 import type { AlertResult } from "../../types/dashboard";
+import {
+    getResearchLabel,
+    getResearchText,
+} from "../../utils/researchLanguage";
 import Box from "@mui/material/Box";
 
 interface AlertCardProps {
@@ -56,14 +60,18 @@ function AlertCard({
                                         fontWeight: 600,
                                     }}
                                 >
-                                    {alert.title}
+                                    {getResearchLabel(
+                                        alert.title,
+                                    )}
                                 </Typography>
 
                                 <Typography
                                     variant="body2"
                                     color="text.secondary"
                                 >
-                                    {alert.message}
+                                    {getResearchText(
+                                        alert.message,
+                                    )}
                                 </Typography>
 
                                 <Chip

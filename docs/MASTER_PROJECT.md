@@ -280,6 +280,9 @@ Verified current capabilities:
 - Responsive dark trading application shell
 - Compact desktop and small-screen navigation
 - Professional AlphaEdge AI header and global theme
+- Research-only user-facing language
+- Platform-wide market-risk disclaimer
+- No broker execution or guaranteed-return claims
 
 Important limitations:
 

@@ -902,6 +902,27 @@ future dashboard panels to match the approved AlphaEdge AI design.
 
 ---
 
+## AD-033 - Research-Only Product Boundary
+
+AlphaEdge AI is a market research and educational analytics platform.
+
+The platform does not execute orders, connect to brokers, manage user money,
+promise returns, or present results as guaranteed outcomes.
+
+Internal engines may use deterministic BUY, SELL, HOLD, and WAIT values for
+calculation compatibility. User-facing surfaces translate these values into
+Bullish Setup, Bearish Setup, and Watch.
+
+User-facing trade-plan fields use Possible Entry, Invalidation Level, Scenario
+Target, Conditions Matched, and Risk Check. Historical performance always
+states that past results do not guarantee future performance.
+
+Research disclaimers are displayed throughout the private application. Legal
+and compliance review remains required before charging for stock-specific
+research or adding any regulated service.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:
