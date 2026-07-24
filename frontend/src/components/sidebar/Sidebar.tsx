@@ -13,6 +13,7 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 import TableChartOutlinedIcon from "@mui/icons-material/TableChartOutlined";
+import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -97,6 +98,11 @@ const menuItems = [
         text: "Calculators",
         icon: <CalculateOutlinedIcon />,
         path: "/calculators",
+    },
+    {
+        text: "Risk Management",
+        icon: <SecurityOutlinedIcon />,
+        path: "/risk-management",
     },
     {
         text: "Settings",

@@ -301,6 +301,8 @@ Verified current capabilities:
 - Full reference navigation for market overview, breadth, news, alerts,
   economic calendar, option chain and calculators
 - Responsive research workspaces with tables, filters and a position-size tool
+- Functional research signal cards, portfolio view, backtest controls and risk
+  management workspace
 
 Important limitations:
 

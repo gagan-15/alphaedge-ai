@@ -295,3 +295,101 @@ export function CalculatorsPage() {
         </Stack>
     );
 }
+
+export function ResearchSignalsPage() {
+    return (
+        <Stack spacing={2.5}>
+            <PageTitle title="AI Trading Signals" subtitle="Explainable research setups. No broker orders or guaranteed outcomes." />
+            <Grid container spacing={2}>
+                {stocks.slice(0, 4).map(([symbol, price, , view], index) => (
+                    <Grid key={symbol} size={{ xs: 12, lg: 6 }}>
+                        <Card><CardContent>
+                            <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                                <Typography variant="h6">{symbol}</Typography>
+                                <Chip label={view} color={view === "Bullish Setup" ? "success" : "default"} />
+                            </Stack>
+                            <Typography variant="h5" sx={{ my: 1 }}>₹{price}</Typography>
+                            <Typography color="text.secondary">Conditions matched: price trend, momentum and volume.</Typography>
+                            <Grid container spacing={1.5} sx={{ mt: 1 }}>
+                                <Grid size={4}><Typography variant="body2">Possible entry<br />₹{[2965, 3570, 1645, 1500][index]}</Typography></Grid>
+                                <Grid size={4}><Typography variant="body2">Invalidation<br />₹{[2890, 3480, 1590, 1450][index]}</Typography></Grid>
+                                <Grid size={4}><Typography variant="body2">Confidence<br />{[82, 62, 79, 65][index]}%</Typography></Grid>
+                            </Grid>
+                        </CardContent></Card>
+                    </Grid>
+                ))}
+            </Grid>
+        </Stack>
+    );
+}
+
+export function PortfolioPage() {
+    return (
+        <Stack spacing={2.5}>
+            <PageTitle title="My Portfolio" subtitle="Track manually entered holdings and research performance." />
+            <Grid container spacing={2}>
+                <Grid size={{ xs: 12, md: 4 }}><MetricCard label="Illustrative value" value="₹12,45,300" note="+1.53% today" /></Grid>
+                <Grid size={{ xs: 12, md: 4 }}><MetricCard label="Overall P&L" value="+₹1,25,320" note="+11.22%" /></Grid>
+                <Grid size={{ xs: 12, md: 4 }}><MetricCard label="Holdings" value="18" note="Diversification review available" /></Grid>
+            </Grid>
+            <Card><CardContent><StockTable /></CardContent></Card>
+        </Stack>
+    );
+}
+
+export function BacktestingPage() {
+    const [ran, setRan] = useState(false);
+    return (
+        <Stack spacing={2.5}>
+            <PageTitle title="Backtesting Engine" subtitle="Test rule-based strategies on historical data. Past results do not predict future performance." />
+            <Grid container spacing={2}>
+                <Grid size={{ xs: 12, lg: 4 }}>
+                    <Card><CardContent><Stack spacing={2}>
+                        <TextField select label="Strategy" defaultValue="Trend following"><MenuItem value="Trend following">Trend following</MenuItem><MenuItem value="Breakout">Breakout with volume</MenuItem></TextField>
+                        <TextField select label="Period" defaultValue="1 year"><MenuItem value="1 year">1 year</MenuItem><MenuItem value="3 years">3 years</MenuItem></TextField>
+                        <Button variant="contained" onClick={() => setRan(true)}>Run backtest</Button>
+                    </Stack></CardContent></Card>
+                </Grid>
+                <Grid size={{ xs: 12, lg: 8 }}>
+                    <Card><CardContent>
+                        <Typography variant="h6">Backtest results</Typography>
+                        {ran ? (
+                            <Grid container spacing={2} sx={{ mt: 1 }}>
+                                <Grid size={3}><MetricCard label="Return" value="+28.45%" note="Historical" /></Grid>
+                                <Grid size={3}><MetricCard label="Max drawdown" value="-12.35%" note="Historical" /></Grid>
+                                <Grid size={3}><MetricCard label="Win rate" value="68.75%" note="156 trades" /></Grid>
+                                <Grid size={3}><MetricCard label="Profit factor" value="1.85" note="Before costs" /></Grid>
+                            </Grid>
+                        ) : <Typography color="text.secondary" sx={{ mt: 3 }}>Choose settings and run the test.</Typography>}
+                    </CardContent></Card>
+                </Grid>
+            </Grid>
+        </Stack>
+    );
+}
+
+export function RiskManagementPage() {
+    return (
+        <Stack spacing={2.5}>
+            <PageTitle title="Risk Management" subtitle="Monitor limits before considering any market idea." />
+            <Grid container spacing={2}>
+                {[
+                    ["Account risk", "1.25%", "Within 2% limit"],
+                    ["Maximum drawdown", "8.50%", "Monitor closely"],
+                    ["Risk–reward", "1 : 2.35", "Illustrative"],
+                    ["Total exposure", "68.25%", "Within set limit"],
+                ].map(([label, value, note]) => (
+                    <Grid key={label} size={{ xs: 12, sm: 6 }}>
+                        <MetricCard label={label} value={value} note={note} />
+                    </Grid>
+                ))}
+            </Grid>
+            <Card><CardContent>
+                <Typography variant="h6" sx={{ mb: 2 }}>Safety checks</Typography>
+                {["Position stays within chosen account risk", "Invalidation level is defined", "No guaranteed-return assumption", "Liquidity and market conditions reviewed"].map((x) => (
+                    <Typography key={x} sx={{ py: 0.75 }}>✓ {x}</Typography>
+                ))}
+            </CardContent></Card>
+        </Stack>
+    );
+}

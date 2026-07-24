@@ -192,6 +192,7 @@ Current authentication state:
 - Email verification and logout user interface implemented
 - Reference UI workspaces added for market overview, market breadth, news,
   alerts, economic calendar, option chain and calculators
+- Signals, portfolio, backtesting and risk-management reference screens added
 - Production email delivery pending approval before public launch
 - Login and registration UI implemented
 - Protected-route refresh bootstrap pending
