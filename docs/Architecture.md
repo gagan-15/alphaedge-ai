@@ -854,6 +854,32 @@ contain FastAPI route logic.
 
 ---
 
+## AD-031 - Replaceable Market Data Providers
+
+External market data access follows:
+
+MarketDataService
+    â†“
+BaseMarketDataProvider
+    â†“
+Provider Adapter
+
+`BaseMarketDataProvider` defines the normalized historical OHLCV contract.
+`YahooProvider` is the current development adapter.
+
+Application services depend on the provider contract rather than a vendor.
+This allows future NSE-compatible, broker, licensed data, cached, and test
+providers to be introduced without changing trading engines.
+
+All provider output must pass through `MarketDataValidator` before it reaches
+indicators, scanners, backtests, or other trading intelligence engines.
+
+Provider implementations own vendor-specific symbol and response handling.
+Application services own orchestration and validation. Trading engines remain
+independent from network access.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

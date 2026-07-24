@@ -121,6 +121,9 @@ Current working state:
 - Scanner page and reusable components implemented
 - Scanner API implemented
 - Controlled sample opportunities implemented
+- Replaceable market data provider contract implemented
+- Yahoo Finance development adapter connected through Market Data Service
+- Market data validation enforced at the service boundary
 - Loading, refresh, search and error handling implemented
 - Real market pipeline integration pending
 

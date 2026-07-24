@@ -8,11 +8,13 @@ Author:
     AlphaEdge AI
 """
 
-import yfinance as yf
 import pandas as pd
+import yfinance as yf
+
+from backend.data_providers.base_market_data_provider import BaseMarketDataProvider
 
 
-class YahooProvider:
+class YahooProvider(BaseMarketDataProvider):
     """
     Yahoo Finance Provider
     """
