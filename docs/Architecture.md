@@ -923,6 +923,24 @@ research or adding any regulated service.
 
 ---
 
+## AD-034 - Authentication Security Foundation
+
+Authentication uses Argon2 password hashing, short-lived signed access tokens,
+and separate refresh tokens.
+
+Refresh tokens include unique identifiers so rotation, session revocation, and
+logout can be implemented without changing token contracts. Refresh tokens
+will be stored in Secure, HttpOnly cookies. Access tokens will not be stored in
+browser local storage.
+
+Authentication secrets and token lifetimes come from environment variables.
+Weak secrets and invalid lifetimes are rejected before token services start.
+
+PostgreSQL owns production user and session data. Automated tests use isolated
+test storage and never depend on the production database.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

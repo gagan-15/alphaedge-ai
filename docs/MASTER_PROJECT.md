@@ -62,15 +62,15 @@ Commercial Readiness:
 | Metric | Count |
 |---------|------:|
 | Total Sprints Completed | 59 |
-| Backend Application Files | 206 |
-| Test Python Files | 44 |
+| Backend Application Files | 210 |
+| Test Python Files | 46 |
 | Services | 5 |
 | Providers | 1 |
 | Validators | 25 |
 | Indicators | 17 |
-| Configuration Modules | 20 |
+| Configuration Modules | 21 |
 | Entry Points | 1 |
-| Pytest | 214 Passing |
+| Pytest | 223 Passing |
 | Git Commits | 58 |
 | Rule Engine Modules | 4 |
 
@@ -283,6 +283,9 @@ Verified current capabilities:
 - Research-only user-facing language
 - Platform-wide market-risk disclaimer
 - No broker execution or guaranteed-return claims
+- Argon2 password security foundation
+- Access and refresh token foundation
+- 223 backend tests passing
 
 Important limitations:
 
