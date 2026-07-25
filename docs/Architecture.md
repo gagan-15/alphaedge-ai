@@ -1002,6 +1002,16 @@ Production builds never enable it. Developers can set
 
 ---
 
+## AD-040 - Interactive Research Charts
+
+The dashboard uses the free Apache-2.0 TradingView Lightweight Charts package,
+not the restricted hosted TradingView widget. Market data remains owned by the
+AlphaEdge data-provider boundary. The chart provides pan, zoom, crosshair,
+time-range selection and optional indicators, and includes the required
+TradingView attribution.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:
