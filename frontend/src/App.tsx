@@ -17,6 +17,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import AIAssistant from "./pages/AIAssistant";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
+import MyHoldings from "./pages/MyHoldings";
 import Reports from "./pages/Reports";
 import Register from "./pages/Register";
 import Scanner from "./pages/Scanner";
@@ -33,7 +34,6 @@ import {
     NewsInsightsPage,
     OptionChainPage,
     BacktestingPage,
-    PortfolioPage,
     RiskManagementPage,
 } from "./pages/WorkspaceScreens";
 
@@ -66,7 +66,7 @@ function App() {
             />
             <Route
                 path="/holdings"
-                element={<PrivatePage><PortfolioPage /></PrivatePage>}
+                element={<PrivatePage><MyHoldings /></PrivatePage>}
             />
             <Route
                 path="/watchlist"

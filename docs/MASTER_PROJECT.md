@@ -325,6 +325,8 @@ Verified current capabilities:
   refresh, loading, error, empty and explainable risk-detail states
 - Watchlist supports validated add/remove, browser persistence, refresh and
   delayed backend candle prices with daily change and failure states
+- Portfolio supports manual holdings, browser persistence, delayed prices,
+  calculated value and P&L, validation and removal without broker connectivity
 
 Important limitations:
 

@@ -197,6 +197,7 @@ Current authentication state:
 - Scanner filtering and CSV export implemented
 - Signals workspace connected to scanner and risk-engine results
 - Local-development watchlist connected to delayed market prices
+- Manual research portfolio with delayed valuation implemented
 - Production email delivery pending approval before public launch
 - Login and registration UI implemented
 - Protected-route refresh bootstrap pending
