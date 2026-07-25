@@ -91,6 +91,27 @@ def test_timeframe_data_aggregates_daily_candles() -> None:
     assert weekly.iloc[0]["Volume"] == 150
 
 
+def test_timeframe_data_builds_75_minute_candles_from_intraday_data() -> None:
+    data = DataFrame(
+        {
+            "Open": [100, 101, 102, 103, 104],
+            "High": [102, 103, 104, 105, 106],
+            "Low": [99, 100, 101, 102, 103],
+            "Close": [101, 102, 103, 104, 105],
+            "Volume": [10, 20, 30, 40, 50],
+        },
+        index=date_range("2026-07-20 09:15", periods=5, freq="15min"),
+    )
+
+    result = _timeframe_data(data, "MINUTE_75")
+
+    assert len(result) == 1
+    assert result.iloc[0]["Open"] == 100
+    assert result.iloc[0]["High"] == 106
+    assert result.iloc[0]["Close"] == 105
+    assert result.iloc[0]["Volume"] == 150
+
+
 def test_measure_zone_penalizes_departure_without_follow_through() -> None:
     """A short move followed by immediate reversal must not score as explosive."""
 

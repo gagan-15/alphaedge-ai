@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Stack from "@mui/material/Stack";
@@ -28,6 +30,17 @@ const timeframes = [
     { value: "QUARTERLY", label: "Quarterly" },
     { value: "HALFYEARLY", label: "Half-yearly" },
     { value: "YEARLY", label: "Yearly" },
+] as const;
+
+const intradayTimeframes = [
+    { value: "MINUTE_5", label: "5m" },
+    { value: "MINUTE_15", label: "15m" },
+    { value: "MINUTE_75", label: "75m" },
+    { value: "MINUTE_125", label: "125m" },
+    { value: "HOUR_1", label: "1H" },
+    { value: "HOUR_2", label: "2H" },
+    { value: "HOUR_4", label: "4H" },
+    { value: "HOUR_6", label: "6H" },
 ] as const;
 
 function Scanner() {
@@ -199,6 +212,18 @@ function Scanner() {
                 <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
                     DELAYED ZONES
                 </Typography>
+                <Select
+                    size="small"
+                    displayEmpty
+                    value={intradayTimeframes.some((item) => item.value === timeframe) ? timeframe : ""}
+                    onChange={(event) => changeTimeframe(event.target.value)}
+                    sx={{ minWidth: 128 }}
+                    renderValue={(value) => value
+                        ? `Intraday · ${intradayTimeframes.find((item) => item.value === value)?.label}`
+                        : "Intraday"}
+                >
+                    {intradayTimeframes.map((item) => <MenuItem key={item.value} value={item.value}>{item.label}</MenuItem>)}
+                </Select>
                 <Tabs
                     value={timeframe}
                     onChange={(_, value: string) => changeTimeframe(value)}

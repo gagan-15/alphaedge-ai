@@ -202,3 +202,14 @@ Departure detection also requires at least two closes beyond the base boundary,
 a sustained final close in the departure direction, and movement of at least
 1.5 times the full zone width. Overlapping or hesitant candles are rejected even
 when the first departure candle is larger than the incoming leg.
+
+The scanner supports 5m, 15m, 75m, 125m, 1H, 2H, 4H and 6H intraday
+research timeframes through a compact dropdown. Intraday requests use intraday
+source candles and custom aggregation where needed; intraday candles are never
+manufactured from daily data.
+
+Selecting a scanner row now opens a full-screen AlphaEdge research workspace
+instead of expanding the chart inside the table. The workspace includes the
+interactive candlestick chart, highlighted zone, crosshair, pan, wheel zoom,
+fit control, two-point price/percentage measurement and the complete evidence
+and recommendation panel. It does not copy TradingView branding or order tools.

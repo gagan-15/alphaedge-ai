@@ -10,6 +10,7 @@ from backend.api.models.market_response import (
 )
 from backend.services.market_data.market_data_service import MarketDataService
 from backend.services.market_data.timeframe_service import (
+    INTRADAY_SOURCES,
     TIMEFRAME_RULES,
     aggregate_timeframe,
 )
@@ -19,7 +20,7 @@ market_router = APIRouter(prefix="/market", tags=["Market Data"])
 _market_data_service = MarketDataService()
 _symbol_pattern = re.compile(r"^[A-Z0-9.^_-]{1,24}$")
 _allowed_periods = {"1mo", "3mo", "6mo", "1y", "2y", "5y", "10y"}
-_allowed_intervals = {"1d", "1h", "30m", "15m"}
+_allowed_intervals = {"1d", "1h", "30m", "15m", "5m"}
 
 
 @market_router.get("/candles", response_model=CandleSeriesResponse)
@@ -40,13 +41,15 @@ def get_candles(
         raise HTTPException(status_code=400, detail="Unsupported interval.")
     if timeframe not in TIMEFRAME_RULES:
         raise HTTPException(status_code=400, detail="Unsupported timeframe.")
-    if timeframe != "1D" and interval != "1d":
+    if timeframe not in INTRADAY_SOURCES and timeframe != "1D" and interval != "1d":
         raise HTTPException(
             status_code=400,
             detail="Aggregated timeframes require daily source candles.",
         )
 
     try:
+        if timeframe in INTRADAY_SOURCES:
+            period, interval = INTRADAY_SOURCES[timeframe]
         data = _market_data_service.get_stock_data(
             symbol=normalized_symbol,
             period=period,

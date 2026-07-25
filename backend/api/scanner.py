@@ -49,6 +49,14 @@ _zone_scoring_engine = ZoneScoringEngine()
 _zone_config = ScannerConfig()
 
 ZoneTimeframe = Literal[
+    "MINUTE_5",
+    "MINUTE_15",
+    "MINUTE_75",
+    "MINUTE_125",
+    "HOUR_1",
+    "HOUR_2",
+    "HOUR_4",
+    "HOUR_6",
     "DAILY",
     "WEEKLY",
     "MONTHLY",
@@ -58,12 +66,31 @@ ZoneTimeframe = Literal[
 ]
 
 _TIMEFRAME_LABELS = {
+    "MINUTE_5": "5m",
+    "MINUTE_15": "15m",
+    "MINUTE_75": "75m",
+    "MINUTE_125": "125m",
+    "HOUR_1": "1H",
+    "HOUR_2": "2H",
+    "HOUR_4": "4H",
+    "HOUR_6": "6H",
     "DAILY": "1D",
     "WEEKLY": "1W",
     "MONTHLY": "1M",
     "QUARTERLY": "3M",
     "HALFYEARLY": "6M",
     "YEARLY": "1Y",
+}
+
+_INTRADAY_SOURCE = {
+    "MINUTE_5": ("1mo", "5m"),
+    "MINUTE_15": ("1mo", "15m"),
+    "MINUTE_75": ("1mo", "15m"),
+    "MINUTE_125": ("1mo", "5m"),
+    "HOUR_1": ("1mo", "1h"),
+    "HOUR_2": ("1mo", "1h"),
+    "HOUR_4": ("1mo", "1h"),
+    "HOUR_6": ("1mo", "1h"),
 }
 
 
@@ -257,10 +284,17 @@ def get_research_zones(
     scanned = 0
     for symbol in _zone_config.symbols:
         try:
+            source_period, source_interval = _INTRADAY_SOURCE.get(
+                timeframe,
+                (
+                    "10y" if timeframe != "DAILY" else _zone_config.period,
+                    _zone_config.interval,
+                ),
+            )
             data = _zone_market_data.get_stock_data(
                 symbol=symbol,
-                period="10y" if timeframe != "DAILY" else _zone_config.period,
-                interval=_zone_config.interval,
+                period=source_period,
+                interval=source_interval,
             )
             data = _timeframe_data(data, timeframe)
             scanned += 1

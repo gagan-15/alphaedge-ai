@@ -1,10 +1,14 @@
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import KeyboardArrowRightRoundedIcon from "@mui/icons-material/KeyboardArrowRightRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import FullscreenRoundedIcon from "@mui/icons-material/FullscreenRounded";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
-import Collapse from "@mui/material/Collapse";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -14,7 +18,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Typography from "@mui/material/Typography";
-import { Fragment, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { ZoneResearchResult } from "../../types/scanner";
 import ZoneDetailChart from "./ZoneDetailChart";
@@ -46,7 +50,7 @@ function qualityLabel(score: number) {
 function ScannerResultsTable({ results }: ScannerResultsTableProps) {
     const [sortField, setSortField] = useState<"symbol" | "zone_score" | "distance_percent">("zone_score");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-    const [expandedZone, setExpandedZone] = useState<string | null>(null);
+    const [selectedZone, setSelectedZone] = useState<ZoneResearchResult | null>(null);
 
     const sortedResults = useMemo(() => [...results].sort((left, right) => {
         const first = left[sortField];
@@ -112,19 +116,12 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                             <TableBody>
                                 {sortedResults.map((result) => {
                                     const zoneKey = `${result.symbol}-${result.zone_type}-${result.base_date}-${result.proximal_price}`;
-                                    const expanded = expandedZone === zoneKey;
                                     const status = result.status;
                                     return (
-                                        <Fragment key={zoneKey}>
-                                            <TableRow
-                                                hover
-                                                selected={expanded}
-                                                onClick={() => setExpandedZone(expanded ? null : zoneKey)}
-                                                sx={{ cursor: "pointer" }}
-                                            >
+                                            <TableRow key={zoneKey} hover onClick={() => setSelectedZone(result)} sx={{ cursor: "pointer" }}>
                                                 <TableCell>
-                                                    <IconButton size="small" aria-label={`${expanded ? "Close" : "Open"} ${result.symbol} chart`}>
-                                                        {expanded ? <KeyboardArrowDownRoundedIcon /> : <KeyboardArrowRightRoundedIcon />}
+                                                    <IconButton size="small" aria-label={`Open ${result.symbol} full-screen chart`}>
+                                                        <KeyboardArrowRightRoundedIcon />
                                                     </IconButton>
                                                 </TableCell>
                                                 <TableCell sx={{ fontWeight: 850 }}>{result.symbol}</TableCell>
@@ -166,17 +163,6 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                                 <TableCell>{result.base_date}</TableCell>
                                                 <TableCell>{result.timeframe?.toUpperCase() ?? "1D"}</TableCell>
                                             </TableRow>
-                                            <TableRow>
-                                                <TableCell colSpan={12} sx={{ py: 0, borderBottom: expanded ? undefined : 0 }}>
-                                                    <Collapse in={expanded} timeout="auto" unmountOnExit>
-                                                        <Box sx={{ py: 1.5 }}>
-                                                            <ZoneExplanationPanel result={result} />
-                                                            <ZoneDetailChart result={result} />
-                                                        </Box>
-                                                    </Collapse>
-                                                </TableCell>
-                                            </TableRow>
-                                        </Fragment>
                                     );
                                 })}
                             </TableBody>
@@ -184,6 +170,33 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                     </TableContainer>
                 )}
             </CardContent>
+            <Dialog fullScreen open={selectedZone !== null} onClose={() => setSelectedZone(null)}>
+                {selectedZone && <>
+                    <DialogTitle sx={{ py: 1.25, borderBottom: "1px solid", borderColor: "divider" }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+                            <FullscreenRoundedIcon color="primary" />
+                            <Box>
+                                <Typography variant="h6">{selectedZone.symbol} · {selectedZone.zone_type} · {patternLabels[selectedZone.pattern_type ?? ""]}</Typography>
+                                <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · delayed data · no order execution</Typography>
+                            </Box>
+                            <Chip sx={{ ml: "auto" }} color={selectedZone.zone_type === "DEMAND" ? "primary" : "error"} label={`${selectedZone.zone_score.toFixed(0)} · ${qualityLabel(selectedZone.zone_score)}`} />
+                            <IconButton aria-label="Close full-screen chart" onClick={() => setSelectedZone(null)}><CloseRoundedIcon /></IconButton>
+                        </Box>
+                    </DialogTitle>
+                    <DialogContent sx={{ p: 1.5, bgcolor: "#050d18" }}>
+                        <Grid container spacing={1.5}>
+                            <Grid size={{ xs: 12, xl: 8.5 }}>
+                                <ZoneDetailChart result={selectedZone} height={680} showTools />
+                            </Grid>
+                            <Grid size={{ xs: 12, xl: 3.5 }}>
+                                <Box sx={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}>
+                                    <ZoneExplanationPanel result={selectedZone} />
+                                </Box>
+                            </Grid>
+                        </Grid>
+                    </DialogContent>
+                </>}
+            </Dialog>
         </Card>
     );
 }

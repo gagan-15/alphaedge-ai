@@ -197,6 +197,14 @@ function ScannerToolbar({
                                 value={timeframe}
                                 onChange={(event) => onTimeframeChange(event.target.value)}
                             >
+                                <MenuItem value="MINUTE_5">5 minutes</MenuItem>
+                                <MenuItem value="MINUTE_15">15 minutes</MenuItem>
+                                <MenuItem value="MINUTE_75">75 minutes</MenuItem>
+                                <MenuItem value="MINUTE_125">125 minutes</MenuItem>
+                                <MenuItem value="HOUR_1">1 hour</MenuItem>
+                                <MenuItem value="HOUR_2">2 hours</MenuItem>
+                                <MenuItem value="HOUR_4">4 hours</MenuItem>
+                                <MenuItem value="HOUR_6">6 hours</MenuItem>
                                 <MenuItem value="DAILY">
                                     Daily
                                 </MenuItem>
