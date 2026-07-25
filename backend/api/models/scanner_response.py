@@ -71,6 +71,30 @@ class ScannerResponse(APIResponseModel):
     results: tuple[ScannerResultResponse, ...]
 
 
+class ZoneExplanationFactorResponse(APIResponseModel):
+    """One available zone explanation factor."""
+
+    key: str
+    title: str
+    score: float
+    sentiment: str
+    summary: str
+    recommendation: str
+    weight: float
+
+
+class ZoneExplanationResponse(APIResponseModel):
+    """Trader-readable explanation of rule-based zone quality."""
+
+    overall_score: float
+    rating: int
+    label: str
+    summary: str
+    positive_factors: tuple[ZoneExplanationFactorResponse, ...]
+    negative_factors: tuple[ZoneExplanationFactorResponse, ...]
+    educational_insight: str
+
+
 class ZoneResearchResultResponse(APIResponseModel):
     """Detected zone context without execution claims."""
 
@@ -90,6 +114,7 @@ class ZoneResearchResultResponse(APIResponseModel):
     touch_count: int
     merged_count: int
     evidence: tuple[str, ...]
+    explanation: ZoneExplanationResponse
     current_price: float
     timeframe: str
     base_index: int

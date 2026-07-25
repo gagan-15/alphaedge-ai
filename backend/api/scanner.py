@@ -13,6 +13,8 @@ from pandas import DataFrame
 from backend.api.models.scanner_response import (
     ScannerResponse,
     ScannerResultResponse,
+    ZoneExplanationFactorResponse,
+    ZoneExplanationResponse,
     ZoneResearchResponse,
     ZoneResearchResultResponse,
 )
@@ -30,6 +32,7 @@ from backend.models.zone import Zone, ZoneType
 from backend.services.scanner.scanner_service import (
     ScannerService,
 )
+from backend.services.zone_explanation_service import ZoneExplanationService
 from backend.services.market_data.market_data_service import MarketDataService
 
 scanner_router = APIRouter(
@@ -203,6 +206,7 @@ def get_research_zones() -> ZoneResearchResponse:
                     status = "APPROACHING" if distance <= 5 else "WATCH"
 
                 zone_score = _zone_scoring_engine.score([zone]).scored_zones[0]
+                explanation = ZoneExplanationService.build(zone, zone_score)
                 demand = zone.zone_type.value == "DEMAND"
                 evidence = (
                     (
@@ -244,6 +248,39 @@ def get_research_zones() -> ZoneResearchResponse:
                         touch_count=zone.touch_count,
                         merged_count=zone.merged_count,
                         evidence=evidence,
+                        explanation=ZoneExplanationResponse(
+                            overall_score=explanation.overall_score,
+                            rating=explanation.rating,
+                            label=explanation.label,
+                            summary=explanation.summary,
+                            positive_factors=tuple(
+                                ZoneExplanationFactorResponse(
+                                    key=factor.key,
+                                    title=factor.title,
+                                    score=factor.score,
+                                    sentiment=factor.sentiment,
+                                    summary=factor.summary,
+                                    recommendation=factor.recommendation,
+                                    weight=factor.weight,
+                                )
+                                for factor in explanation.positive_factors
+                            ),
+                            negative_factors=tuple(
+                                ZoneExplanationFactorResponse(
+                                    key=factor.key,
+                                    title=factor.title,
+                                    score=factor.score,
+                                    sentiment=factor.sentiment,
+                                    summary=factor.summary,
+                                    recommendation=factor.recommendation,
+                                    weight=factor.weight,
+                                )
+                                for factor in explanation.negative_factors
+                            ),
+                            educational_insight=(
+                                explanation.educational_insight
+                            ),
+                        ),
                         current_price=current_price,
                         timeframe=_zone_config.interval,
                         base_index=zone.created_index,

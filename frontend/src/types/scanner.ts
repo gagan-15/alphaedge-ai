@@ -67,11 +67,32 @@ export interface ZoneResearchResult {
     touch_count: number;
     merged_count: number;
     evidence: string[];
+    explanation: ZoneExplanation;
     current_price: number;
     timeframe: string;
     base_index: number;
     base_date: string;
     status: string;
+}
+
+export interface ZoneExplanationFactor {
+    key: string;
+    title: string;
+    score: number;
+    sentiment: "POSITIVE" | "NEGATIVE";
+    summary: string;
+    recommendation: string;
+    weight: number;
+}
+
+export interface ZoneExplanation {
+    overall_score: number;
+    rating: number;
+    label: string;
+    summary: string;
+    positive_factors: ZoneExplanationFactor[];
+    negative_factors: ZoneExplanationFactor[];
+    educational_insight: string;
 }
 
 export interface ZoneResearchResponse {

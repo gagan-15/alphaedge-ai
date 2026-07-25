@@ -88,3 +88,17 @@ out-of-sample performance published beside it.
 The roadmap additionally requires multi-timeframe zones, BOS/CHOCH, leg-in and leg-out
 validation, freshness, merging and ranking. These requirements are not all complete in
 the current scanner and remain release gates.
+
+## Dynamic Zone Explanation
+
+Zone explanations are assembled from independent factor modules. Each available factor
+returns a title, normalized score, positive or negative status, plain-language summary,
+recommendation and weight. The UI renders only returned factors, so unfinished analysis
+such as volume, liquidity sweep or higher-timeframe alignment is never shown as a
+placeholder.
+
+The first supported factors are freshness, measured departure strength, later
+intersections/retests and overlapping-zone confluence. Planned modules include base
+quality, leg-in, leg-out, BOS, CHOCH, trend, higher-timeframe alignment, EMA alignment,
+volume, risk/reward, zone width, liquidity sweep, momentum and validated institutional
+activity evidence.
