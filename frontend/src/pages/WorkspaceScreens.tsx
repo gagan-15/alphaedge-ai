@@ -5,6 +5,7 @@ import CalculateOutlinedIcon from "@mui/icons-material/CalculateOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
@@ -92,36 +93,131 @@ function StockTable() {
 }
 
 export function MarketOverviewPage() {
+    const [range, setRange] = useState("1M");
+    const indexSeries = [
+        { name: "NIFTY 50", color: "#35d07f", points: "0,85 8,80 16,73 24,77 32,62 40,66 48,51 56,55 64,38 72,43 80,28 88,34 100,16" },
+        { name: "SENSEX", color: "#f5b942", points: "0,95 8,91 16,83 24,86 32,76 40,72 48,64 56,68 64,56 72,52 80,45 88,49 100,37" },
+        { name: "BANK NIFTY", color: "#6366f1", points: "0,91 8,86 16,89 24,78 32,81 40,70 48,74 56,61 64,65 72,53 80,57 88,43 100,49" },
+        { name: "FINNIFTY", color: "#22d3ee", points: "0,102 8,97 16,92 24,96 32,84 40,88 48,75 56,79 64,68 72,70 80,58 88,63 100,51" },
+    ];
     return (
-        <Stack spacing={2.5}>
-            <PageTitle title="Market Overview" subtitle="Indian market health and movement at a glance." />
-            <Grid container spacing={2}>
+        <Stack spacing={1.5}>
+            <Stack direction={{ xs: "column", md: "row" }} sx={{ justifyContent: "space-between", alignItems: { md: "center" } }}>
+                <PageTitle title="Market Overview" subtitle="Delayed Indian market participation and relative performance." />
+                <Chip size="small" color="warning" label="DELAYED DEVELOPMENT DATA" />
+            </Stack>
+            <Grid container spacing={1.25}>
                 {[
                     ["NIFTY 50", "24,731.45", "+0.85%"],
                     ["SENSEX", "81,214.85", "+0.78%"],
                     ["BANK NIFTY", "54,372.15", "+1.15%"],
+                    ["FINNIFTY", "24,125.20", "+1.02%"],
                     ["INDIA VIX", "12.45", "-2.35%"],
                 ].map(([label, value, note]) => (
-                    <Grid key={label} size={{ xs: 12, sm: 6, xl: 3 }}>
+                    <Grid key={label} size={{ xs: 12, sm: 6, lg: 2.4 }}>
                         <MetricCard label={label} value={value} note={note} />
                     </Grid>
                 ))}
             </Grid>
-            <Grid container spacing={2}>
+            <Grid container spacing={1.5}>
                 <Grid size={{ xs: 12, lg: 8 }}>
-                    <Card><CardContent>
-                        <Typography variant="h6" sx={{ mb: 2 }}>Top market movers</Typography>
-                        <StockTable />
+                    <Card sx={{ height: 330 }}><CardContent sx={{ height: "100%" }}>
+                        <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
+                            <Box>
+                                <Typography variant="h6">Market Performance</Typography>
+                                <Typography variant="caption" color="text.secondary">Indexed comparison for research</Typography>
+                            </Box>
+                            <Stack direction="row" spacing={0.5}>
+                                {["1D", "1W", "1M", "3M", "1Y"].map((item) => (
+                                    <Button
+                                        key={item}
+                                        size="small"
+                                        variant={range === item ? "contained" : "text"}
+                                        onClick={() => setRange(item)}
+                                    >
+                                        {item}
+                                    </Button>
+                                ))}
+                            </Stack>
+                        </Stack>
+                        <Stack direction="row" spacing={2} sx={{ mt: 1.5 }}>
+                            {indexSeries.map((series) => (
+                                <Stack key={series.name} direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+                                    <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: series.color }} />
+                                    <Typography variant="caption">{series.name}</Typography>
+                                </Stack>
+                            ))}
+                        </Stack>
+                        <Box component="svg" viewBox="0 0 100 120" preserveAspectRatio="none" sx={{ width: "100%", height: 220, mt: 1 }}>
+                            {[20, 45, 70, 95].map((y) => (
+                                <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#1d2b40" strokeWidth=".4" />
+                            ))}
+                            {indexSeries.map((series) => (
+                                <polyline key={series.name} points={series.points} fill="none" stroke={series.color} strokeWidth="1.4" />
+                            ))}
+                        </Box>
                     </CardContent></Card>
                 </Grid>
                 <Grid size={{ xs: 12, lg: 4 }}>
-                    <Card><CardContent>
-                        <Typography variant="h6">Sector performance</Typography>
-                        {["Nifty IT", "Nifty Bank", "Nifty FMCG", "Nifty Auto"].map((sector, i) => (
-                            <Stack key={sector} spacing={0.75} sx={{ mt: 2 }}>
-                                <Typography variant="body2">{sector}</Typography>
-                                <LinearProgress variant="determinate" value={[78, 67, 55, 42][i]} />
+                    <Card sx={{ height: 330 }}><CardContent>
+                        <Typography variant="h6">Market Breadth</Typography>
+                        <Stack direction="row" spacing={2.5} sx={{ mt: 2, alignItems: "center" }}>
+                            <Box sx={{
+                                width: 130,
+                                height: 130,
+                                borderRadius: "50%",
+                                background: "conic-gradient(#35d07f 0 62%, #ff5c67 62% 95%, #64748b 95% 100%)",
+                                position: "relative",
+                                "&::after": { content: '""', position: "absolute", inset: 24, borderRadius: "50%", bgcolor: "background.paper" },
+                            }} />
+                            <Stack spacing={1.5} sx={{ flex: 1 }}>
+                                {[["Advancing", "1,682", "62%", "success.main"], ["Declining", "802", "33%", "error.main"], ["Unchanged", "126", "5%", "text.secondary"]].map(([name, count, share, color]) => (
+                                    <Box key={name}>
+                                        <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                                            <Typography variant="body2" sx={{ color }}>{name}</Typography>
+                                            <Typography variant="body2" sx={{ fontWeight: 800 }}>{count}</Typography>
+                                        </Stack>
+                                        <Typography variant="caption" color="text.secondary">{share} of tracked symbols</Typography>
+                                    </Box>
+                                ))}
                             </Stack>
+                        </Stack>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 2 }}>
+                            Breadth is demo-labelled until an exchange-approved breadth source is connected.
+                        </Typography>
+                    </CardContent></Card>
+                </Grid>
+            </Grid>
+            <Grid container spacing={1.5}>
+                <Grid size={{ xs: 12, lg: 7 }}>
+                    <Card><CardContent>
+                        <Typography variant="h6" sx={{ mb: 1.5 }}>Top Market Movers</Typography>
+                        <StockTable />
+                    </CardContent></Card>
+                </Grid>
+                <Grid size={{ xs: 12, lg: 5 }}>
+                    <Card><CardContent>
+                        <Typography variant="h6">Sector Performance</Typography>
+                        {[
+                            ["Nifty IT", 82, "+1.62%"],
+                            ["Nifty Bank", 69, "+1.15%"],
+                            ["Nifty FMCG", 58, "+0.98%"],
+                            ["Nifty Auto", 34, "-0.32%"],
+                            ["Nifty Metal", 27, "-0.85%"],
+                            ["Nifty Pharma", 53, "+0.41%"],
+                        ].map(([sector, value, change]) => (
+                            <Box key={sector as string} sx={{ mt: 1.35 }}>
+                                <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                                    <Typography variant="body2">{sector}</Typography>
+                                    <Typography variant="body2" color={(change as string).startsWith("+") ? "success.main" : "error.main"}>{change}</Typography>
+                                </Stack>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={value as number}
+                                    color={(change as string).startsWith("+") ? "success" : "error"}
+                                    sx={{ mt: .5, height: 5 }}
+                                />
+                            </Box>
                         ))}
                     </CardContent></Card>
                 </Grid>

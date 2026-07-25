@@ -124,3 +124,8 @@ aligned page gutters, a correctly offset delayed ticker, larger AlphaEdge brandi
 consistent blue/violet interaction accents. The Dashboard uses aligned index cards with
 sparklines, a large interactive chart, a signal column, and a combined AI insight,
 market-breadth and sentiment column.
+
+Market Overview now includes an aligned five-index strip, working comparison-range
+controls, a four-index performance visualization, breadth donut with participation
+counts, a movers table and positive/negative sector bars. Unlicensed breadth and index
+summary values remain explicitly labelled as delayed development data.
