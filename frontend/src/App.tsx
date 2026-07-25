@@ -15,6 +15,7 @@ import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./auth/ProtectedRoute";
 
 import AIAssistant from "./pages/AIAssistant";
+import Alerts from "./pages/Alerts";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import MyHoldings from "./pages/MyHoldings";
@@ -26,7 +27,6 @@ import Settings from "./pages/Settings";
 import Watchlist from "./pages/Watchlist";
 import VerifyEmail from "./pages/VerifyEmail";
 import {
-    AlertsPage,
     CalculatorsPage,
     EconomicCalendarPage,
     MarketBreadthPage,
@@ -91,7 +91,7 @@ function App() {
             <Route path="/market-overview" element={<PrivatePage><MarketOverviewPage /></PrivatePage>} />
             <Route path="/market-breadth" element={<PrivatePage><MarketBreadthPage /></PrivatePage>} />
             <Route path="/news" element={<PrivatePage><NewsInsightsPage /></PrivatePage>} />
-            <Route path="/alerts" element={<PrivatePage><AlertsPage /></PrivatePage>} />
+            <Route path="/alerts" element={<PrivatePage><Alerts /></PrivatePage>} />
             <Route path="/economic-calendar" element={<PrivatePage><EconomicCalendarPage /></PrivatePage>} />
             <Route path="/option-chain" element={<PrivatePage><OptionChainPage /></PrivatePage>} />
             <Route path="/calculators" element={<PrivatePage><CalculatorsPage /></PrivatePage>} />

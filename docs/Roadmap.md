@@ -198,6 +198,7 @@ Current authentication state:
 - Signals workspace connected to scanner and risk-engine results
 - Local-development watchlist connected to delayed market prices
 - Manual research portfolio with delayed valuation implemented
+- Local price-condition alerts with manual delayed-price evaluation implemented
 - Production email delivery pending approval before public launch
 - Login and registration UI implemented
 - Protected-route refresh bootstrap pending

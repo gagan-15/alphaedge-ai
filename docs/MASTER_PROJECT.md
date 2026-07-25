@@ -330,6 +330,8 @@ Verified current capabilities:
 - Split-screen login explains the product without performance promises
 - Versioned first-entry risk acknowledgement blocks the workspace until the
   user accepts research-only, no-guarantee and no-execution terms
+- Alerts support local validated conditions, persistence, manual delayed-price
+  evaluation, condition status and removal
 
 Important limitations:
 
