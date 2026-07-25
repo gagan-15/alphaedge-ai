@@ -5,6 +5,7 @@ Tests for the Scanner API response mapping.
 from pandas import DataFrame, date_range
 
 from backend.api.scanner import (
+    _has_completed_test,
     _is_zone_invalidated,
     _measure_zone,
     _timeframe_data,
@@ -151,3 +152,68 @@ def test_supply_zone_is_invalid_after_close_above_distal() -> None:
     )
 
     assert _is_zone_invalidated(zone, data) is True
+
+
+def test_zone_with_completed_reaction_is_not_active() -> None:
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 102, "Low": 99, "Close": 101},
+            {"Open": 101, "High": 106, "Low": 101, "Close": 105},
+            {"Open": 105, "High": 110, "Low": 104, "Close": 109},
+            {"Open": 109, "High": 111, "Low": 106, "Close": 108},
+            {"Open": 108, "High": 109, "Low": 100, "Close": 104},
+            {"Open": 104, "High": 112, "Low": 103, "Close": 111},
+            {"Open": 111, "High": 114, "Low": 110, "Close": 113},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.DEMAND,
+        upper_price=103,
+        lower_price=99,
+        created_index=0,
+    )
+
+    assert _has_completed_test(zone, data) is True
+
+
+def test_current_first_touch_remains_active() -> None:
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 102, "Low": 99, "Close": 101},
+            {"Open": 101, "High": 106, "Low": 101, "Close": 105},
+            {"Open": 105, "High": 110, "Low": 104, "Close": 109},
+            {"Open": 109, "High": 111, "Low": 106, "Close": 108},
+            {"Open": 108, "High": 110, "Low": 107, "Close": 109},
+            {"Open": 109, "High": 110, "Low": 101, "Close": 103},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.DEMAND,
+        upper_price=103,
+        lower_price=99,
+        created_index=0,
+    )
+
+    assert _has_completed_test(zone, data) is False
+
+
+def test_completed_supply_reaction_is_not_active() -> None:
+    data = DataFrame(
+        [
+            {"Open": 105, "High": 106, "Low": 103, "Close": 104},
+            {"Open": 104, "High": 105, "Low": 98, "Close": 99},
+            {"Open": 99, "High": 100, "Low": 94, "Close": 95},
+            {"Open": 95, "High": 98, "Low": 93, "Close": 96},
+            {"Open": 96, "High": 104, "Low": 95, "Close": 101},
+            {"Open": 101, "High": 102, "Low": 92, "Close": 94},
+            {"Open": 94, "High": 95, "Low": 90, "Close": 91},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.SUPPLY,
+        upper_price=105,
+        lower_price=101,
+        created_index=0,
+    )
+
+    assert _has_completed_test(zone, data) is True

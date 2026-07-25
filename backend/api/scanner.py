@@ -144,6 +144,21 @@ def _is_zone_invalidated(zone: Zone, data: DataFrame) -> bool:
     return bool((later_closes > zone.upper_price).any())
 
 
+def _has_completed_test(zone: Zone, data: DataFrame) -> bool:
+    """Return True when price tested the zone before the current candle."""
+
+    departure_end = min(zone.created_index + 4, len(data))
+    prior_candles = data.iloc[departure_end:-1]
+    if prior_candles.empty:
+        return False
+
+    overlaps = (
+        (prior_candles["Low"] <= zone.upper_price)
+        & (prior_candles["High"] >= zone.lower_price)
+    )
+    return bool(overlaps.any())
+
+
 def build_scanner_response(
     scanner: MarketScannerResult,
 ) -> ScannerResponse:
@@ -258,6 +273,8 @@ def get_research_zones(
             )[:4]:
                 zone = _measure_zone(detected_zone, data)
                 if _is_zone_invalidated(zone, data):
+                    continue
+                if _has_completed_test(zone, data):
                     continue
                 if zone.lower_price <= current_price <= zone.upper_price:
                     distance = 0.0

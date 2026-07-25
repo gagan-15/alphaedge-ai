@@ -186,3 +186,8 @@ a later candle closes below its distal (lower) boundary; a supply zone is invali
 after a later candle closes above its distal (upper) boundary. Wicks alone remain
 classified as tests or liquidity probes, while confirmed close breaches remove
 the zone.
+
+Active scanner results now exclude zones that were tested before the latest
+candle and already produced a reaction. A first touch occurring on the current
+candle remains visible as `IN ZONE`; completed reactions are reserved for a
+future historical-validation view instead of being presented as new opportunities.
