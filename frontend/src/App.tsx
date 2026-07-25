@@ -24,6 +24,7 @@ import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import MyHoldings from "./pages/MyHoldings";
 import MarketBreadth from "./pages/MarketBreadth";
+import MarketOverview from "./pages/MarketOverview";
 import NewsEvents from "./pages/NewsEvents";
 import OptionChain from "./pages/OptionChain";
 import Reports from "./pages/Reports";
@@ -35,9 +36,6 @@ import Settings from "./pages/Settings";
 import Strategies from "./pages/Strategies";
 import Watchlist from "./pages/Watchlist";
 import VerifyEmail from "./pages/VerifyEmail";
-import {
-    MarketOverviewPage,
-} from "./pages/WorkspaceScreens";
 
 function PrivatePage({ children }: { children: React.ReactNode }) {
     return (
@@ -91,7 +89,7 @@ function App() {
                 path="/settings"
                 element={<PrivatePage><Settings /></PrivatePage>}
             />
-            <Route path="/market-overview" element={<PrivatePage><MarketOverviewPage /></PrivatePage>} />
+            <Route path="/market-overview" element={<PrivatePage><MarketOverview /></PrivatePage>} />
             <Route path="/market-breadth" element={<PrivatePage><MarketBreadth /></PrivatePage>} />
             <Route path="/news" element={<PrivatePage><NewsEvents /></PrivatePage>} />
             <Route path="/alerts" element={<PrivatePage><Alerts /></PrivatePage>} />

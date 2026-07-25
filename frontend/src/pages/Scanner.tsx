@@ -46,16 +46,11 @@ function Scanner() {
     const [patternFilter, setPatternFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
     const [proximityFilter, setProximityFilter] = useState(100);
-    const [timeframeCounts, setTimeframeCounts] = useState<Record<string, number>>({});
 
     function loadScanner(selectedTimeframe = timeframe) {
         void getResearchZones(selectedTimeframe)
             .then((data) => {
                 setScanner(data);
-                setTimeframeCounts((current) => ({
-                    ...current,
-                    [selectedTimeframe]: data.total_zones,
-                }));
             })
             .catch((error: unknown) => {
                 console.error(
@@ -217,8 +212,8 @@ function Scanner() {
                             label={(
                                 <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
                                     <span>{item.label}</span>
-                                    {timeframeCounts[item.value] !== undefined && (
-                                        <Chip size="small" label={timeframeCounts[item.value]} />
+                                    {timeframe === item.value && !isLoading && (
+                                        <Chip size="small" label={visibleResults.length} />
                                     )}
                                 </Stack>
                             )}

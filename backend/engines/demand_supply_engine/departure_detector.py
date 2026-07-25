@@ -85,6 +85,17 @@ class DepartureDetector:
 
         close_price = float(departure_candle["Close"])
 
+        if not self._leg_out_is_stronger(
+            market_data,
+            base,
+            departure_index,
+        ):
+            logger.info(
+                "Departure rejected. Leg-out is not stronger than leg-in "
+                "or lacks directional follow-through."
+            )
+            return None
+
         if (
             CandleUtils.is_bullish(
                 open_price,
@@ -116,6 +127,40 @@ class DepartureDetector:
         logger.info("No valid departure found.")
 
         return None
+
+    @staticmethod
+    def _leg_out_is_stronger(
+        market_data: DataFrame,
+        base: BaseRegion,
+        departure_index: int,
+    ) -> bool:
+        """Compare the departure with the candle immediately before the base."""
+
+        if base.start_index == 0:
+            return False
+
+        leg_in = market_data.iloc[base.start_index - 1]
+        departure = market_data.iloc[departure_index]
+        leg_in_body = abs(float(leg_in["Close"]) - float(leg_in["Open"]))
+        leg_out_body = abs(float(departure["Close"]) - float(departure["Open"]))
+
+        if leg_in_body <= 0 or leg_out_body < leg_in_body * 1.1:
+            return False
+
+        direction = (
+            1.0
+            if float(departure["Close"]) > float(departure["Open"])
+            else -1.0
+        )
+        follow_through = market_data.iloc[
+            departure_index : min(departure_index + 3, len(market_data))
+        ]
+        final_close = float(follow_through.iloc[-1]["Close"])
+        directional_move = direction * (
+            final_close - float(departure["Open"])
+        )
+
+        return directional_move > leg_in_body
 
     @staticmethod
     def _calculate_average_base_range(

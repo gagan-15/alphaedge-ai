@@ -170,3 +170,13 @@ rule templates. AI Assistant now provides working, transparent rule-based resear
 responses and explicitly states that no generative provider is connected. Portfolio
 and Watchlist retain local persistence and use the existing delayed candle service;
 neither screen implies a broker connection.
+
+The multi-timeframe scanner now enforces the leg-out rule inside the actual
+`DepartureDetector` used by `/scanner/zones`, not only the legacy detector.
+Scanner timeframe tabs show the visible filtered count on the active tab and no
+longer retain stale totals beside previously opened timeframes.
+
+Market Overview now uses a dedicated responsive screen with compact index cards,
+labelled chart axes, normalized multi-index lines, a breadth donut, a movers table
+and sector participation bars. The former oversized placeholder chart is no longer
+routed into the application.
