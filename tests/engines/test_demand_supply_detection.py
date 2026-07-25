@@ -24,32 +24,32 @@ def test_detects_fresh_demand_zone() -> None:
                 90.0,
                 100.0,
                 101.0,
-                110.0,
-                112.0,
+                116.0,
+                118.0,
             ],
             "High": [
                 92.0,
                 101.0,
                 102.0,
-                103.5,
-                112.0,
-                114.0,
+                115.0,
+                118.0,
+                120.0,
             ],
             "Low": [
                 89.0,
                 89.0,
                 99.0,
                 101.0,
-                109.0,
-                111.0,
+                115.0,
+                117.0,
             ],
             "Close": [
                 91.0,
                 100.0,
                 101.0,
-                103.0,
-                111.0,
-                113.0,
+                114.0,
+                117.0,
+                119.0,
             ],
             "Volume": [
                 1000,
@@ -90,5 +90,23 @@ def test_returns_no_zones_without_departure() -> None:
     zones = DemandSupplyEngine().detect(
         market_data,
     )
+
+    assert zones == []
+
+
+def test_rejects_zone_when_leg_out_is_weaker_than_leg_in() -> None:
+    """A large incoming leg followed by a smaller exit is not a strong zone."""
+
+    market_data = pd.DataFrame(
+        {
+            "Open": [80.0, 100.0, 101.0, 101.2, 103.0, 104.0],
+            "High": [101.0, 102.0, 101.8, 103.0, 104.0, 105.0],
+            "Low": [79.0, 99.0, 100.8, 101.0, 102.0, 103.0],
+            "Close": [100.0, 101.0, 101.2, 102.8, 103.5, 104.5],
+            "Volume": [1000, 900, 850, 1200, 1100, 1000],
+        }
+    )
+
+    zones = DemandSupplyEngine().detect(market_data)
 
     assert zones == []

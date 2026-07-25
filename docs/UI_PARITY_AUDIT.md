@@ -158,3 +158,15 @@ clear demo-feed label. Option Chain now recalculates visible strikes when the
 underlying or strike count changes and marks the illustrative ATM row. Calculators
 now use one consistent workspace with working position-size, risk/reward, profit,
 average-price, SIP and Fibonacci tools.
+
+Zone detection now rejects setups where the first leg-out body is not at least
+10 percent stronger than the incoming leg body, or where the three-candle
+directional follow-through does not exceed the incoming leg. This prevents a
+small bounce followed by immediate failure from being presented as a strong zone.
+The comparison is pattern-independent and applies to DBR, RBR, RBD and DBD zones.
+
+Strategies now supports creating, enabling, pausing and deleting locally stored
+rule templates. AI Assistant now provides working, transparent rule-based research
+responses and explicitly states that no generative provider is connected. Portfolio
+and Watchlist retain local persistence and use the existing delayed candle service;
+neither screen implies a broker connection.

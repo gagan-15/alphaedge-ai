@@ -32,6 +32,7 @@ import Register from "./pages/Register";
 import Scanner from "./pages/Scanner";
 import Signals from "./pages/Signals";
 import Settings from "./pages/Settings";
+import Strategies from "./pages/Strategies";
 import Watchlist from "./pages/Watchlist";
 import VerifyEmail from "./pages/VerifyEmail";
 import {
@@ -81,6 +82,7 @@ function App() {
                 path="/ai-assistant"
                 element={<PrivatePage><AIAssistant /></PrivatePage>}
             />
+            <Route path="/strategies" element={<PrivatePage><Strategies /></PrivatePage>} />
             <Route
                 path="/reports"
                 element={<PrivatePage><Reports /></PrivatePage>}

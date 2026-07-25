@@ -127,6 +127,14 @@ class DemandSupplyEngine:
             ):
                 continue
 
+            if not self._leg_out_exceeds_leg_in(
+                market_data,
+                base,
+                departure_candles,
+                departure.direction,
+            ):
+                continue
+
             touches = self._count_touches(
                 market_data,
                 candle["High"],
@@ -467,6 +475,40 @@ class DemandSupplyEngine:
             departure_body >= base_body * 2
             and body_percent >= 70
         )
+
+    @staticmethod
+    def _leg_out_exceeds_leg_in(
+        market_data: DataFrame,
+        base: BaseRegion,
+        departure_candles: DataFrame,
+        direction: DepartureDirection,
+    ) -> bool:
+        """Require a decisive departure that is stronger than the incoming leg."""
+
+        if base.start_index == 0 or departure_candles.empty:
+            return False
+
+        leg_in = market_data.iloc[base.start_index - 1]
+        leg_in_body = abs(float(leg_in["Close"]) - float(leg_in["Open"]))
+        first = departure_candles.iloc[0]
+        leg_out_body = abs(float(first["Close"]) - float(first["Open"]))
+
+        if leg_in_body == 0 or leg_out_body < leg_in_body * 1.1:
+            return False
+
+        base_edge = (
+            float(market_data.iloc[base.end_index]["High"])
+            if direction == DepartureDirection.BULLISH
+            else float(market_data.iloc[base.end_index]["Low"])
+        )
+        final_close = float(departure_candles.iloc[-1]["Close"])
+        directional_move = (
+            final_close - base_edge
+            if direction == DepartureDirection.BULLISH
+            else base_edge - final_close
+        )
+
+        return directional_move > leg_in_body
 
     @staticmethod
     def _base_score(

@@ -14,6 +14,7 @@ import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 import TableChartOutlinedIcon from "@mui/icons-material/TableChartOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import AccountTreeOutlinedIcon from "@mui/icons-material/AccountTreeOutlined";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -78,6 +79,12 @@ const menuItems = [
         text: "Backtest",
         icon: <QueryStatsOutlinedIcon />,
         path: "/backtest",
+    },
+    {
+        section: "ANALYSIS",
+        text: "Strategies",
+        icon: <AccountTreeOutlinedIcon />,
+        path: "/strategies",
     },
     {
         section: "ANALYSIS",
