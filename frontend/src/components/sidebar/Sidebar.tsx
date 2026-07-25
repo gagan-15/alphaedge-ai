@@ -139,13 +139,13 @@ function Sidebar() {
             sx={{
                 width: {
                     xs: 64,
-                    lg: 196,
+                    lg: 224,
                 },
                 flexShrink: 0,
                 "& .MuiDrawer-paper": {
                     width: {
                         xs: 64,
-                        lg: 196,
+                        lg: 224,
                     },
                     boxSizing: "border-box",
                     overflowX: "hidden",
@@ -158,7 +158,7 @@ function Sidebar() {
                 sx={{
                     minHeight: {
                         xs: 56,
-                        md: 56,
+                        md: 70,
                     },
                     display: "flex",
                     alignItems: "center",
@@ -168,7 +168,7 @@ function Sidebar() {
                     },
                     px: {
                         xs: 1,
-                        lg: 2,
+                        lg: 2.25,
                     },
                     borderBottom: "1px solid",
                     borderColor: "divider",
@@ -186,7 +186,7 @@ function Sidebar() {
                         xs: 1,
                         lg: 1.25,
                     },
-                    pt: 1,
+                    pt: 1.25,
                     pb: 2,
                 }}
             >
@@ -214,8 +214,8 @@ function Sidebar() {
                         onClick={() => navigate(item.path)}
                         aria-label={item.text}
                         sx={{
-                            minHeight: 34,
-                            mb: 0.25,
+                            minHeight: 38,
+                            mb: 0.35,
                             px: {
                                 xs: 1.25,
                                 lg: 1.5,
@@ -234,7 +234,7 @@ function Sidebar() {
                                 },
                                 justifyContent: "center",
                                 "& .MuiSvgIcon-root": {
-                                    fontSize: "1.15rem",
+                                    fontSize: "1.2rem",
                                 },
                             }}
                         >
@@ -252,7 +252,7 @@ function Sidebar() {
                             slotProps={{
                                 primary: {
                                     sx: {
-                                        fontSize: "0.82rem",
+                                        fontSize: "0.84rem",
                                         fontWeight: 600,
                                     },
                                 },

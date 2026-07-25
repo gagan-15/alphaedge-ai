@@ -5,7 +5,7 @@ const colors = {
     paper: "#0b1627",
     paperRaised: "#0f1c2f",
     border: "#1d2b40",
-    primary: "#4ade80",
+    primary: "#6366f1",
     text: "#f3f7fb",
     textMuted: "#8fa1b8",
 };
@@ -15,7 +15,7 @@ const theme = createTheme({
         mode: "dark",
         primary: {
             main: colors.primary,
-            contrastText: "#04110a",
+            contrastText: "#ffffff",
         },
         success: {
             main: "#35d07f",
@@ -37,7 +37,7 @@ const theme = createTheme({
         },
     },
     shape: {
-        borderRadius: 8,
+        borderRadius: 10,
     },
     typography: {
         fontFamily:
@@ -89,9 +89,9 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
                     backgroundImage:
-                        "linear-gradient(145deg, rgba(15,28,47,.97), rgba(8,19,34,.98))",
+                        "linear-gradient(145deg, rgba(12,27,48,.98), rgba(7,18,34,.99))",
                     border: `1px solid ${colors.border}`,
-                    boxShadow: "0 14px 40px rgba(0, 0, 0, 0.18)",
+                    boxShadow: "0 12px 34px rgba(0, 0, 0, 0.16)",
                 },
             },
         },
@@ -137,9 +137,9 @@ const theme = createTheme({
                     "&.Mui-selected": {
                         color: "#ffffff",
                         background:
-                            "linear-gradient(90deg, rgba(37,99,235,.4), rgba(124,58,237,.3))",
+                            "linear-gradient(100deg, #2447dc, #3d5ef4)",
                         boxShadow:
-                            "inset 3px 0 0 #60a5fa, 0 7px 20px rgba(37,99,235,.12)",
+                            "inset 3px 0 0 #8b9cff, 0 8px 22px rgba(37,99,235,.2)",
                     },
                     "&.Mui-selected:hover": {
                         background:

@@ -8,8 +8,8 @@ function BrandLogo({ compact = false }: { compact?: boolean }) {
                 aria-hidden="true"
                 sx={{
                     position: "relative",
-                    width: 32,
-                    height: 30,
+                    width: 36,
+                    height: 34,
                     flexShrink: 0,
                     "&::before": {
                         content: '""',
@@ -32,7 +32,7 @@ function BrandLogo({ compact = false }: { compact?: boolean }) {
                 }}
             />
             {!compact && (
-                <Typography sx={{ fontSize: "0.95rem", fontWeight: 900, letterSpacing: "-0.035em", whiteSpace: "nowrap" }}>
+                <Typography sx={{ fontSize: "1.05rem", fontWeight: 900, letterSpacing: "-0.035em", whiteSpace: "nowrap" }}>
                     AlphaEdge <Box component="span" sx={{ background: "linear-gradient(90deg,#60a5fa,#a855f7)", backgroundClip: "text", color: "transparent" }}>AI</Box>
                 </Typography>
             )}

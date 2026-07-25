@@ -118,3 +118,9 @@ Expanded zone charts now request the same timeframe used for zone detection. Mon
 zones display monthly candles, weekly zones display weekly candles, and the same rule
 applies through yearly charts. The zone is rendered as one colored band beginning at its
 formation candle; duplicate full-chart proximal and distal price lines were removed.
+
+Shared workspace parity work now uses a 224-pixel desktop sidebar, 70-pixel header,
+aligned page gutters, a correctly offset delayed ticker, larger AlphaEdge branding and
+consistent blue/violet interaction accents. The Dashboard uses aligned index cards with
+sparklines, a large interactive chart, a signal column, and a combined AI insight,
+market-breadth and sentiment column.

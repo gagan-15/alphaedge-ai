@@ -28,6 +28,7 @@ import AIInsightCard from "../components/dashboard/AIInsightCard";
 import AlertCard from "../components/dashboard/AlertCard";
 import BacktestCard from "../components/dashboard/BacktestCard";
 import MarketOverview from "../components/dashboard/MarketOverview";
+import MarketPulseCard from "../components/dashboard/MarketPulseCard";
 import TradingChart from "../components/dashboard/TradingChart";
 import { getResearchLabel } from "../utils/researchLanguage";
 
@@ -158,6 +159,7 @@ function Dashboard() {
                         <AIInsightCard
                             insight={dashboard.ai_explanation}
                         />
+                        <MarketPulseCard />
                     </Stack>
                 </Grid>
 

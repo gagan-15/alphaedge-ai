@@ -29,16 +29,16 @@ function AppLayout({ children }: AppLayoutProps) {
                 sx={{
                     width: {
                         xs: "calc(100% - 64px)",
-                        lg: "calc(100% - 196px)",
+                        lg: "calc(100% - 224px)",
                     },
                     pt: {
-                        xs: "66px",
-                        md: "66px",
+                        xs: "72px",
+                        md: "82px",
                     },
                     px: {
                         xs: 1.5,
                         sm: 2,
-                        xl: 2.5,
+                        xl: 2,
                     },
                     pb: 7,
                     minHeight: "100vh",

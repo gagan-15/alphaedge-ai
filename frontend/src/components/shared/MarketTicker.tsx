@@ -15,7 +15,7 @@ function MarketTicker() {
             aria-label="Delayed demo market ticker"
             sx={{
                 position: "fixed",
-                left: { xs: 64, lg: 196 },
+                left: { xs: 64, lg: 224 },
                 right: 0,
                 bottom: 0,
                 zIndex: 1200,

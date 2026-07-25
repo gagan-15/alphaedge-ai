@@ -76,12 +76,16 @@ function MarketOverview({
                         elevation={2}
                         sx={{
                             height: "100%",
+                            minHeight: 92,
+                            position: "relative",
+                            overflow: "hidden",
                         }}
                     >
-                        <CardContent sx={{ p: "10px !important" }}>
+                        <CardContent sx={{ p: "13px !important", position: "relative", zIndex: 1 }}>
                             <Typography
                                 variant="body2"
                                 color="text.secondary"
+                                sx={{ fontSize: ".67rem", fontWeight: 750, letterSpacing: ".04em" }}
                             >
                                 {item.title}
                             </Typography>
@@ -90,7 +94,8 @@ function MarketOverview({
                                 variant="h6"
                                 sx={{
                                     mt: 0.5,
-                                    fontWeight: 600,
+                                    fontWeight: 800,
+                                    fontSize: "1.05rem",
                                 }}
                             >
                                 {item.value.toLocaleString()}
@@ -101,7 +106,7 @@ function MarketOverview({
                                     display: "flex",
                                     alignItems: "center",
                                     gap: 0.5,
-                                    mt: 0.5,
+                                    mt: 0.25,
                                     color:
                                         item.change >= 0
                                             ? "success.main"
@@ -124,18 +129,30 @@ function MarketOverview({
                                     {item.change}%
                                 </Typography>
                             </Box>
-                            <Box
-                                aria-hidden="true"
-                                sx={{
-                                    height: 10,
-                                    mt: 0.5,
-                                    borderBottom: "2px solid",
-                                    borderColor: item.change >= 0 ? "success.main" : "error.main",
-                                    transform: item.change >= 0 ? "skewY(-5deg)" : "skewY(5deg)",
-                                    opacity: 0.7,
-                                }}
-                            />
                         </CardContent>
+                        <Box
+                            component="svg"
+                            viewBox="0 0 100 36"
+                            preserveAspectRatio="none"
+                            aria-hidden="true"
+                            sx={{
+                                position: "absolute",
+                                right: 8,
+                                bottom: 7,
+                                width: "45%",
+                                height: 30,
+                                opacity: .9,
+                            }}
+                        >
+                            <polyline
+                                fill="none"
+                                stroke={item.change >= 0 ? "#35d07f" : "#ff5c67"}
+                                strokeWidth="2"
+                                points={item.change >= 0
+                                    ? "0,31 10,27 18,29 29,20 38,23 48,14 58,18 70,9 80,13 91,4 100,7"
+                                    : "0,7 12,11 22,9 33,17 43,15 55,24 67,20 79,28 90,25 100,33"}
+                            />
+                        </Box>
                     </Card>
                 </Box>
             ))}

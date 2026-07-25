@@ -32,11 +32,11 @@ function Header() {
             sx={{
                 left: {
                     xs: 64,
-                    lg: 196,
+                    lg: 224,
                 },
                 width: {
                     xs: "calc(100% - 64px)",
-                    lg: "calc(100% - 196px)",
+                    lg: "calc(100% - 224px)",
                 },
                 zIndex: (theme) => theme.zIndex.drawer - 1,
             }}
@@ -44,8 +44,8 @@ function Header() {
             <Toolbar
                 sx={{
                     minHeight: {
-                        xs: "56px !important",
-                        md: "56px !important",
+                        xs: "64px !important",
+                        md: "70px !important",
                     },
                     px: {
                         xs: 1.5,
@@ -94,7 +94,7 @@ function Header() {
                             xs: "none",
                             xl: "block",
                         },
-                        width: 210,
+                        width: 344,
                         "& .MuiOutlinedInput-root": {
                             backgroundColor: "rgba(5, 12, 24, 0.7)",
                             fontSize: "0.78rem",
