@@ -20,6 +20,8 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import MyHoldings from "./pages/MyHoldings";
+import MarketBreadth from "./pages/MarketBreadth";
+import NewsEvents from "./pages/NewsEvents";
 import Reports from "./pages/Reports";
 import Register from "./pages/Register";
 import Scanner from "./pages/Scanner";
@@ -30,9 +32,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import {
     CalculatorsPage,
     EconomicCalendarPage,
-    MarketBreadthPage,
     MarketOverviewPage,
-    NewsInsightsPage,
     OptionChainPage,
     BacktestingPage,
     RiskManagementPage,
@@ -90,8 +90,8 @@ function App() {
                 element={<PrivatePage><Settings /></PrivatePage>}
             />
             <Route path="/market-overview" element={<PrivatePage><MarketOverviewPage /></PrivatePage>} />
-            <Route path="/market-breadth" element={<PrivatePage><MarketBreadthPage /></PrivatePage>} />
-            <Route path="/news" element={<PrivatePage><NewsInsightsPage /></PrivatePage>} />
+            <Route path="/market-breadth" element={<PrivatePage><MarketBreadth /></PrivatePage>} />
+            <Route path="/news" element={<PrivatePage><NewsEvents /></PrivatePage>} />
             <Route path="/alerts" element={<PrivatePage><Alerts /></PrivatePage>} />
             <Route path="/economic-calendar" element={<PrivatePage><EconomicCalendarPage /></PrivatePage>} />
             <Route path="/option-chain" element={<PrivatePage><OptionChainPage /></PrivatePage>} />

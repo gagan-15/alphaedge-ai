@@ -140,3 +140,8 @@ Zone ranking categories are Elite (90–100), Strong (75–89), Moderate (60–7
 from the minimum-quality control. Departure strength now requires follow-through closes
 and applies a penalty when price immediately reverses into the zone; a brief maximum
 excursion alone cannot earn an explosive-departure score.
+
+Market Breadth now has working range controls, an advance–decline visualization, sector
+participation bars and 52-week high/low summaries. News & Events now has working
+Overview, Technical, Sentiment and Scenarios tabs plus an event monitor. Both screens
+show explicit demo/provider limitations instead of implying that static values are live.
