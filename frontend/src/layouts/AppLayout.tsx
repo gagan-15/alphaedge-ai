@@ -24,16 +24,16 @@ function AppLayout({ children }: AppLayoutProps) {
                 component="main"
                 sx={{
                     width: {
-                        xs: "calc(100% - 76px)",
-                        lg: "calc(100% - 240px)",
+                        xs: "calc(100% - 64px)",
+                        lg: "calc(100% - 196px)",
                     },
                     ml: {
-                        xs: "76px",
-                        lg: "240px",
+                        xs: "64px",
+                        lg: "196px",
                     },
                     pt: {
-                        xs: "76px",
-                        md: "88px",
+                        xs: "66px",
+                        md: "66px",
                     },
                     px: {
                         xs: 1.5,
@@ -48,8 +48,7 @@ function AppLayout({ children }: AppLayoutProps) {
                 <Box
                     sx={{
                         width: "100%",
-                        maxWidth: 1600,
-                        mx: "auto",
+                        maxWidth: "none",
                     }}
                 >
                     {children}

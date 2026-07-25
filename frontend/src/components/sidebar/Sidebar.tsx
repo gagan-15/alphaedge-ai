@@ -120,14 +120,14 @@ function Sidebar() {
             variant="permanent"
             sx={{
                 width: {
-                    xs: 76,
-                    lg: 240,
+                    xs: 64,
+                    lg: 196,
                 },
                 flexShrink: 0,
                 "& .MuiDrawer-paper": {
                     width: {
-                        xs: 76,
-                        lg: 240,
+                        xs: 64,
+                        lg: 196,
                     },
                     boxSizing: "border-box",
                     overflowX: "hidden",
@@ -137,8 +137,8 @@ function Sidebar() {
             <Box
                 sx={{
                     minHeight: {
-                        xs: 64,
-                        md: 76,
+                        xs: 56,
+                        md: 56,
                     },
                     display: "flex",
                     alignItems: "center",
@@ -209,8 +209,8 @@ function Sidebar() {
                         onClick={() => navigate(item.path)}
                         aria-label={item.text}
                         sx={{
-                            minHeight: 42,
-                            mb: 0.5,
+                            minHeight: 36,
+                            mb: 0.25,
                             px: {
                                 xs: 1.25,
                                 lg: 1.5,

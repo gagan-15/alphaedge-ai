@@ -307,6 +307,10 @@ Verified current capabilities:
   builds continue to require authentication
 - Dashboard visual-density pass: compact six-card market strip, NSE Reliance
   chart, side signal/insight columns and lower intelligence panels
+- Reliable local candlestick chart replaces the restricted external widget
+- 100% browser zoom shell aligned to a 196px desktop sidebar and 56px header
+- Dashboard now includes sector performance, FII/DII flow, sentiment, news,
+  AI prompt shortcuts and a live research ticker
 
 Important limitations:
 

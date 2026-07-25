@@ -57,9 +57,19 @@ const theme = createTheme({
     components: {
         MuiCssBaseline: {
             styleOverrides: {
-                body: {
+        body: {
                     backgroundImage:
                         "radial-gradient(circle at 50% -20%, #13243c 0%, #07101f 42%)",
+                },
+            },
+        },
+        MuiCardContent: {
+            styleOverrides: {
+                root: {
+                    padding: 14,
+                    "&:last-child": {
+                        paddingBottom: 14,
+                    },
                 },
             },
         },

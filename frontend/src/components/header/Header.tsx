@@ -30,12 +30,12 @@ function Header() {
             position="fixed"
             sx={{
                 left: {
-                    xs: 76,
-                    lg: 240,
+                    xs: 64,
+                    lg: 196,
                 },
                 width: {
-                    xs: "calc(100% - 76px)",
-                    lg: "calc(100% - 240px)",
+                    xs: "calc(100% - 64px)",
+                    lg: "calc(100% - 196px)",
                 },
                 zIndex: (theme) => theme.zIndex.drawer - 1,
             }}
@@ -43,8 +43,8 @@ function Header() {
             <Toolbar
                 sx={{
                     minHeight: {
-                        xs: "64px !important",
-                        md: "76px !important",
+                        xs: "56px !important",
+                        md: "56px !important",
                     },
                     px: {
                         xs: 1.5,
@@ -68,7 +68,7 @@ function Header() {
                         sx={{
                             fontSize: {
                                 xs: "1.15rem",
-                                md: "1.9rem",
+                                md: "1.55rem",
                             },
                             fontWeight: 800,
                             letterSpacing: "-0.04em",

@@ -14,6 +14,9 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
+import Button from "@mui/material/Button";
+import LinearProgress from "@mui/material/LinearProgress";
+import TextField from "@mui/material/TextField";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
@@ -161,6 +164,64 @@ function Dashboard() {
                     <AlertCard alerts={dashboard.alerts.slice(0, 2)} />
                 </Grid>
 
+                <Grid size={{ xs: 12, md: 6, xl: 3 }}>
+                    <Card sx={{ height: "100%" }}><CardContent>
+                        <Typography variant="h6" sx={{ mb: 1.25 }}>Sector Performance</Typography>
+                        {[
+                            ["Nifty IT", 78, "+1.62%"],
+                            ["Nifty Bank", 66, "+1.15%"],
+                            ["Nifty FMCG", 55, "+0.98%"],
+                            ["Nifty Auto", 35, "-0.32%"],
+                        ].map(([name, value, change]) => (
+                            <Box key={name as string} sx={{ mb: 1 }}>
+                                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                                    <Typography variant="caption">{name}</Typography>
+                                    <Typography variant="caption" color={(change as string).startsWith("+") ? "success.main" : "error.main"}>{change}</Typography>
+                                </Box>
+                                <LinearProgress value={value as number} variant="determinate" color={(change as string).startsWith("+") ? "success" : "error"} />
+                            </Box>
+                        ))}
+                    </CardContent></Card>
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 6, xl: 3 }}>
+                    <Card sx={{ height: "100%" }}><CardContent>
+                        <Typography variant="h6">FII / DII Flow</Typography>
+                        {[["FII", "+₹1,254.35 Cr"], ["DII", "+₹875.40 Cr"], ["Net", "+₹2,129.75 Cr"]].map(([name, value]) => (
+                            <Box key={name} sx={{ display: "flex", justifyContent: "space-between", py: 1.25 }}>
+                                <Typography color="text.secondary">{name}</Typography>
+                                <Typography color="success.main">{value}</Typography>
+                            </Box>
+                        ))}
+                    </CardContent></Card>
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 6, xl: 3 }}>
+                    <Card sx={{ height: "100%" }}><CardContent sx={{ textAlign: "center" }}>
+                        <Typography variant="h6">Market Sentiment</Typography>
+                        <Box sx={{ width: 110, height: 55, mx: "auto", mt: 2, border: "12px solid #26364d", borderBottom: 0, borderRadius: "110px 110px 0 0", borderTopColor: "success.main" }} />
+                        <Typography variant="h4" sx={{ mt: 1 }}>72%</Typography>
+                        <Typography color="success.main">Bullish conditions</Typography>
+                    </CardContent></Card>
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 6, xl: 3 }}>
+                    <Card sx={{ height: "100%" }}><CardContent>
+                        <Typography variant="h6" sx={{ mb: 1 }}>News & Events</Typography>
+                        {[
+                            ["09:15", "RBI keeps policy stance unchanged"],
+                            ["08:45", "US market closes higher"],
+                            ["08:30", "Crude oil prices ease"],
+                            ["08:15", "FII buying in banking stocks"],
+                        ].map(([time, news]) => (
+                            <Box key={news} sx={{ display: "flex", gap: 1, py: 0.7 }}>
+                                <Typography variant="caption" color="text.secondary">{time}</Typography>
+                                <Typography variant="caption">{news}</Typography>
+                            </Box>
+                        ))}
+                    </CardContent></Card>
+                </Grid>
+
                 <Grid size={{ xs: 12, lg: 8 }}>
                     <BacktestCard backtest={dashboard.backtest} />
                 </Grid>
@@ -179,7 +240,33 @@ function Dashboard() {
                         ))}
                     </CardContent></Card>
                 </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                    <Card><CardContent sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                        <Typography sx={{ fontWeight: 800, whiteSpace: "nowrap" }}>Ask AlphaEdge AI</Typography>
+                        <TextField size="small" fullWidth placeholder="Ask about markets, stocks, risk or strategies..." />
+                        {["Market Outlook", "Top Stocks", "Risk Check", "Strategy Idea", "News Impact"].map((label) => (
+                            <Button key={label} variant="outlined" size="small" sx={{ whiteSpace: "nowrap", display: { xs: "none", xl: "inline-flex" } }}>{label}</Button>
+                        ))}
+                    </CardContent></Card>
+                </Grid>
             </Grid>
+
+            <Card sx={{ position: "sticky", bottom: 0, zIndex: 4 }}>
+                <CardContent sx={{ display: "flex", gap: 4, py: "8px !important", overflow: "hidden" }}>
+                    <Chip label="LIVE" size="small" color="success" />
+                    {[
+                        ["RELIANCE", "2,978.45 ▲ 0.83%"],
+                        ["TCS", "3,584.75 ▼ 0.41%"],
+                        ["HDFC BANK", "1,654.20 ▲ 1.12%"],
+                        ["INFY", "1,512.10 ▲ 0.35%"],
+                    ].map(([symbol, quote]) => (
+                        <Typography key={symbol} variant="caption" sx={{ whiteSpace: "nowrap" }}>
+                            {symbol}&nbsp;&nbsp;<Box component="span" color={quote.includes("▼") ? "error.main" : "success.main"}>{quote}</Box>
+                        </Typography>
+                    ))}
+                </CardContent>
+            </Card>
         </Stack>
     );
 }
