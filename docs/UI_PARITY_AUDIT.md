@@ -180,3 +180,9 @@ Market Overview now uses a dedicated responsive screen with compact index cards,
 labelled chart axes, normalized multi-index lines, a breadth donut, a movers table
 and sector participation bars. The former oversized placeholder chart is no longer
 routed into the application.
+
+Breached zones are excluded from scanner results. A demand zone is invalid after
+a later candle closes below its distal (lower) boundary; a supply zone is invalid
+after a later candle closes above its distal (upper) boundary. Wicks alone remain
+classified as tests or liquidity probes, while confirmed close breaches remove
+the zone.

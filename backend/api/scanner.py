@@ -130,6 +130,20 @@ def _measure_zone(zone: Zone, data: DataFrame) -> Zone:
     )
 
 
+def _is_zone_invalidated(zone: Zone, data: DataFrame) -> bool:
+    """Return True when a later candle closes beyond the distal boundary."""
+
+    first_review_index = min(zone.created_index + 2, len(data))
+    later_closes = data.iloc[first_review_index:]["Close"]
+    if later_closes.empty:
+        return False
+
+    if zone.zone_type == ZoneType.DEMAND:
+        return bool((later_closes < zone.lower_price).any())
+
+    return bool((later_closes > zone.upper_price).any())
+
+
 def build_scanner_response(
     scanner: MarketScannerResult,
 ) -> ScannerResponse:
@@ -243,6 +257,8 @@ def get_research_zones(
                 reverse=True,
             )[:4]:
                 zone = _measure_zone(detected_zone, data)
+                if _is_zone_invalidated(zone, data):
+                    continue
                 if zone.lower_price <= current_price <= zone.upper_price:
                     distance = 0.0
                     status = "IN ZONE"

@@ -5,6 +5,7 @@ Tests for the Scanner API response mapping.
 from pandas import DataFrame, date_range
 
 from backend.api.scanner import (
+    _is_zone_invalidated,
     _measure_zone,
     _timeframe_data,
     build_scanner_response,
@@ -112,3 +113,41 @@ def test_measure_zone_penalizes_departure_without_follow_through() -> None:
     )
 
     assert measured.strength < 10
+
+
+def test_demand_zone_is_invalid_after_close_below_distal() -> None:
+    data = DataFrame(
+        [
+            {"Open": 101, "High": 103, "Low": 100, "Close": 102},
+            {"Open": 102, "High": 106, "Low": 101, "Close": 105},
+            {"Open": 105, "High": 106, "Low": 99, "Close": 100},
+            {"Open": 100, "High": 101, "Low": 96, "Close": 97},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.DEMAND,
+        upper_price=102,
+        lower_price=98,
+        created_index=0,
+    )
+
+    assert _is_zone_invalidated(zone, data) is True
+
+
+def test_supply_zone_is_invalid_after_close_above_distal() -> None:
+    data = DataFrame(
+        [
+            {"Open": 101, "High": 103, "Low": 100, "Close": 102},
+            {"Open": 102, "High": 103, "Low": 95, "Close": 96},
+            {"Open": 96, "High": 103, "Low": 95, "Close": 102},
+            {"Open": 102, "High": 106, "Low": 101, "Close": 105},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.SUPPLY,
+        upper_price=104,
+        lower_price=100,
+        created_index=0,
+    )
+
+    assert _is_zone_invalidated(zone, data) is True
