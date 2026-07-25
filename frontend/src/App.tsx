@@ -20,6 +20,7 @@ import Login from "./pages/Login";
 import Reports from "./pages/Reports";
 import Register from "./pages/Register";
 import Scanner from "./pages/Scanner";
+import Signals from "./pages/Signals";
 import Settings from "./pages/Settings";
 import Watchlist from "./pages/Watchlist";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -33,7 +34,6 @@ import {
     OptionChainPage,
     BacktestingPage,
     PortfolioPage,
-    ResearchSignalsPage,
     RiskManagementPage,
 } from "./pages/WorkspaceScreens";
 
@@ -62,7 +62,7 @@ function App() {
             />
             <Route
                 path="/signals"
-                element={<PrivatePage><ResearchSignalsPage /></PrivatePage>}
+                element={<PrivatePage><Signals /></PrivatePage>}
             />
             <Route
                 path="/holdings"

@@ -321,6 +321,8 @@ Verified current capabilities:
 - 238 backend tests passing
 - Scanner confidence and risk-status filters now operate on live results
 - Scanner exports the currently filtered research results as a local CSV
+- Signals screen now consumes real scanner results with working status filters,
+  refresh, loading, error, empty and explainable risk-detail states
 
 Important limitations:
 

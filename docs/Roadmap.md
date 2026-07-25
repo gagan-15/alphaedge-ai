@@ -195,6 +195,7 @@ Current authentication state:
 - Signals, portfolio, backtesting and risk-management reference screens added
 - Interactive chart connected to validated delayed historical candle API
 - Scanner filtering and CSV export implemented
+- Signals workspace connected to scanner and risk-engine results
 - Production email delivery pending approval before public launch
 - Login and registration UI implemented
 - Protected-route refresh bootstrap pending
