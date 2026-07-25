@@ -341,6 +341,10 @@ Verified current capabilities:
 - The application shell now uses a gradient brand mark, grouped navigation,
   compact research identity and blue-violet navigation states; green and red
   remain reserved for market direction and risk.
+- The public root route now provides a centered, responsive product landing
+  page with a research preview, feature explanations, workflow, safety
+  disclosure and free local-demo entry. Unsupported pricing and testimonials
+  are intentionally excluded.
 
 Important limitations:
 

@@ -18,6 +18,7 @@ import AIAssistant from "./pages/AIAssistant";
 import Alerts from "./pages/Alerts";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
+import Landing from "./pages/Landing";
 import MyHoldings from "./pages/MyHoldings";
 import Reports from "./pages/Reports";
 import Register from "./pages/Register";
@@ -51,7 +52,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<Landing />} />
             <Route
                 path="/dashboard"
                 element={<PrivatePage><Dashboard /></PrivatePage>}
