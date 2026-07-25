@@ -67,6 +67,21 @@ class ZoneScoringEngine:
             )
 
             total = freshness + strength + touch + merge_bonus
+            departure_ratio = (
+                strength / self._config.strength_weight
+                if self._config.strength_weight > 0
+                else 0.0
+            )
+            if departure_ratio < 0.40:
+                quality_cap = 39.0
+            elif departure_ratio < 0.60:
+                quality_cap = 49.0
+            elif departure_ratio < 0.75:
+                quality_cap = 69.0
+            elif departure_ratio < 0.90:
+                quality_cap = 84.0
+            else:
+                quality_cap = self._config.maximum_score
 
             scored.append(
                 ZoneScore(
@@ -77,6 +92,7 @@ class ZoneScoringEngine:
                     merge_bonus=merge_bonus,
                     total_score=min(
                         total,
+                        quality_cap,
                         self._config.maximum_score,
                     ),
                 )

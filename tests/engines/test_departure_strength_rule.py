@@ -27,3 +27,17 @@ def test_strong_leg_out_with_follow_through_is_allowed() -> None:
     base = BaseRegion(start_index=1, end_index=2)
 
     assert DepartureDetector().detect(data, base) is not None
+
+
+def test_overlapping_non_explosive_leg_out_is_rejected() -> None:
+    data = pd.DataFrame(
+        {
+            "Open": [100.0, 105.0, 106.0, 107.0, 109.0, 108.5],
+            "High": [106.0, 108.0, 108.0, 110.0, 110.0, 110.0],
+            "Low": [99.0, 104.0, 105.0, 106.5, 107.0, 107.5],
+            "Close": [105.0, 106.0, 106.5, 109.0, 108.5, 109.5],
+        }
+    )
+    base = BaseRegion(start_index=1, end_index=2)
+
+    assert DepartureDetector().detect(data, base) is None

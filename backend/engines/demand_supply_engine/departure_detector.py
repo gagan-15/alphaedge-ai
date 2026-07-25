@@ -155,12 +155,31 @@ class DepartureDetector:
         follow_through = market_data.iloc[
             departure_index : min(departure_index + 3, len(market_data))
         ]
+        if len(follow_through) < 2:
+            return False
+
         final_close = float(follow_through.iloc[-1]["Close"])
         directional_move = direction * (
             final_close - float(departure["Open"])
         )
 
-        return directional_move > leg_in_body
+        base_data = market_data.iloc[base.start_index : base.end_index + 1]
+        base_high = float(base_data["High"].max())
+        base_low = float(base_data["Low"].min())
+        zone_width = max(base_high - base_low, 1e-9)
+
+        if direction > 0:
+            closes_outside = int((follow_through["Close"] > base_high).sum())
+            sustained_move = final_close - base_high
+        else:
+            closes_outside = int((follow_through["Close"] < base_low).sum())
+            sustained_move = base_low - final_close
+
+        return (
+            directional_move > leg_in_body
+            and closes_outside >= 2
+            and sustained_move >= zone_width * 1.5
+        )
 
     @staticmethod
     def _calculate_average_base_range(

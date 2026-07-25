@@ -191,3 +191,14 @@ Active scanner results now exclude zones that were tested before the latest
 candle and already produced a reaction. A first touch occurring on the current
 candle remains visible as `IN ZONE`; completed reactions are reserved for a
 future historical-validation view instead of being presented as new opportunities.
+
+Zone quality now uses mandatory departure gates. Freshness, zero touches and merge
+confluence cannot lift a structurally weak departure into a moderate or strong
+rating. Departure below 40 percent of its available points is capped as Rejected;
+below 60 percent is capped as Weak; below 75 percent cannot exceed Moderate; and
+below 90 percent cannot reach Elite.
+
+Departure detection also requires at least two closes beyond the base boundary,
+a sustained final close in the departure direction, and movement of at least
+1.5 times the full zone width. Overlapping or hesitant candles are rejected even
+when the first departure candle is larger than the incoming leg.
