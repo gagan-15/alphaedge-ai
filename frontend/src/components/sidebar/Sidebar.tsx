@@ -22,89 +22,107 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import { useLocation, useNavigate } from "react-router-dom";
+import BrandLogo from "../brand/BrandLogo";
 
 const menuItems = [
     {
+        section: "OVERVIEW",
         text: "Dashboard",
         icon: <DashboardOutlinedIcon />,
         path: "/dashboard",
     },
     {
+        section: "MARKET",
         text: "Scanner",
         icon: <ShowChartOutlinedIcon />,
         path: "/scanner",
     },
     {
+        section: "MARKET",
         text: "Market Overview",
         icon: <QueryStatsOutlinedIcon />,
         path: "/market-overview",
     },
     {
+        section: "MARKET",
         text: "Signals",
         icon: <CandlestickChartOutlinedIcon />,
         path: "/signals",
     },
     {
+        section: "MARKET",
         text: "My Holdings",
         icon: <AccountBalanceWalletOutlinedIcon />,
         path: "/holdings",
     },
     {
+        section: "MARKET",
         text: "Watchlist",
         icon: <VisibilityOutlinedIcon />,
         path: "/watchlist",
     },
     {
+        section: "MARKET",
         text: "Market Breadth",
         icon: <PieChartOutlineOutlinedIcon />,
         path: "/market-breadth",
     },
     {
+        section: "MARKET",
         text: "News & Insights",
         icon: <NewspaperOutlinedIcon />,
         path: "/news",
     },
     {
+        section: "ANALYSIS",
         text: "Backtest",
         icon: <QueryStatsOutlinedIcon />,
         path: "/backtest",
     },
     {
+        section: "ANALYSIS",
         text: "AI Assistant",
         icon: <SmartToyOutlinedIcon />,
         path: "/ai-assistant",
     },
     {
+        section: "ANALYSIS",
         text: "Reports",
         icon: <AssessmentOutlinedIcon />,
         path: "/reports",
     },
     {
+        section: "TOOLS",
         text: "Alerts",
         icon: <AddAlertOutlinedIcon />,
         path: "/alerts",
     },
     {
+        section: "TOOLS",
         text: "Economic Calendar",
         icon: <CalendarMonthOutlinedIcon />,
         path: "/economic-calendar",
     },
     {
+        section: "TOOLS",
         text: "Option Chain",
         icon: <TableChartOutlinedIcon />,
         path: "/option-chain",
     },
     {
+        section: "TOOLS",
         text: "Calculators",
         icon: <CalculateOutlinedIcon />,
         path: "/calculators",
     },
     {
+        section: "TOOLS",
         text: "Risk Management",
         icon: <SecurityOutlinedIcon />,
         path: "/risk-management",
     },
     {
+        section: "ACCOUNT",
         text: "Settings",
         icon: <SettingsOutlinedIcon />,
         path: "/settings",
@@ -131,6 +149,8 @@ function Sidebar() {
                     },
                     boxSizing: "border-box",
                     overflowX: "hidden",
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "#263a56 transparent",
                 },
             }}
         >
@@ -154,41 +174,8 @@ function Sidebar() {
                     borderColor: "divider",
                 }}
             >
-                <Box
-                    sx={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: 1.5,
-                        display: "grid",
-                        placeItems: "center",
-                        color: "primary.main",
-                        border: "1px solid",
-                        borderColor: "primary.main",
-                        fontWeight: 900,
-                    }}
-                >
-                    A
-                </Box>
-
-                <Typography
-                    sx={{
-                        display: {
-                            xs: "none",
-                            lg: "block",
-                        },
-                        ml: 1,
-                        fontWeight: 800,
-                        letterSpacing: "-0.02em",
-                    }}
-                >
-                    AlphaEdge{" "}
-                    <Box
-                        component="span"
-                        sx={{ color: "primary.main" }}
-                    >
-                        AI
-                    </Box>
-                </Typography>
+                <Box sx={{ display: { xs: "none", lg: "block" } }}><BrandLogo /></Box>
+                <Box sx={{ display: { xs: "block", lg: "none" } }}><BrandLogo compact /></Box>
             </Box>
 
             <List
@@ -199,17 +186,35 @@ function Sidebar() {
                         xs: 1,
                         lg: 1.25,
                     },
-                    py: 1.5,
+                    pt: 1,
+                    pb: 2,
                 }}
             >
-                {menuItems.map((item) => (
+                {menuItems.map((item, index) => (
+                    <Box key={item.text}>
+                    {(index === 0 || menuItems[index - 1].section !== item.section) && (
+                        <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                                display: { xs: "none", lg: "block" },
+                                px: 1.5,
+                                pt: index === 0 ? 0 : 1,
+                                pb: 0.5,
+                                fontSize: "0.58rem",
+                                letterSpacing: "0.12em",
+                                fontWeight: 800,
+                            }}
+                        >
+                            {item.section}
+                        </Typography>
+                    )}
                     <ListItemButton
-                        key={item.text}
                         selected={location.pathname === item.path}
                         onClick={() => navigate(item.path)}
                         aria-label={item.text}
                         sx={{
-                            minHeight: 36,
+                            minHeight: 34,
                             mb: 0.25,
                             px: {
                                 xs: 1.25,
@@ -254,6 +259,7 @@ function Sidebar() {
                             }}
                         />
                     </ListItemButton>
+                    </Box>
                 ))}
             </List>
         </Drawer>

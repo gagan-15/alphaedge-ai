@@ -69,7 +69,7 @@ const theme = createTheme({
     components: {
         MuiCssBaseline: {
             styleOverrides: {
-        body: {
+                body: {
                     backgroundImage:
                         "radial-gradient(circle at 50% -20%, #13243c 0%, #07101f 42%)",
                 },
@@ -88,8 +88,8 @@ const theme = createTheme({
         MuiCard: {
             styleOverrides: {
                 root: {
-                    backgroundImage: "none",
-                    backgroundColor: colors.paper,
+                    backgroundImage:
+                        "linear-gradient(145deg, rgba(15,28,47,.97), rgba(8,19,34,.98))",
                     border: `1px solid ${colors.border}`,
                     boxShadow: "0 14px 40px rgba(0, 0, 0, 0.18)",
                 },
@@ -132,15 +132,18 @@ const theme = createTheme({
                     },
                     "&:hover": {
                         color: colors.text,
-                        backgroundColor: alpha(colors.primary, 0.06),
+                        backgroundColor: "rgba(59,130,246,.08)",
                     },
                     "&.Mui-selected": {
-                        color: "#dfffea",
-                        backgroundColor: alpha(colors.primary, 0.13),
-                        boxShadow: `inset 3px 0 0 ${colors.primary}`,
+                        color: "#ffffff",
+                        background:
+                            "linear-gradient(90deg, rgba(37,99,235,.4), rgba(124,58,237,.3))",
+                        boxShadow:
+                            "inset 3px 0 0 #60a5fa, 0 7px 20px rgba(37,99,235,.12)",
                     },
                     "&.Mui-selected:hover": {
-                        backgroundColor: alpha(colors.primary, 0.17),
+                        background:
+                            "linear-gradient(90deg, rgba(37,99,235,.48), rgba(124,58,237,.36))",
                     },
                 },
             },

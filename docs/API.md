@@ -392,3 +392,7 @@ Query parameters:
 
 The response includes `source` and `delayed` fields so the UI can clearly label
 data quality. The endpoint is read-only and does not support order execution.
+
+Scanner results also include detected zone metadata when available: zone type,
+proximal and distal levels, quality score, distance from current price,
+freshness, touch count, base index and analysis timeframe.

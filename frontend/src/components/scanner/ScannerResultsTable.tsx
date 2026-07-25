@@ -103,6 +103,22 @@ function ScannerResultsTable({
                                     </TableCell>
 
                                     <TableCell align="right">
+                                        Zone
+                                    </TableCell>
+
+                                    <TableCell align="right">
+                                        Proximal
+                                    </TableCell>
+
+                                    <TableCell align="right">
+                                        Distal
+                                    </TableCell>
+
+                                    <TableCell align="right">
+                                        Distance
+                                    </TableCell>
+
+                                    <TableCell align="right">
                                         Possible Entry
                                     </TableCell>
 
@@ -142,6 +158,22 @@ function ScannerResultsTable({
                                                 {
                                                     result.symbol
                                                 }
+                                            </TableCell>
+
+                                            <TableCell align="right">
+                                                {result.zone_type ?? "—"}
+                                            </TableCell>
+
+                                            <TableCell align="right">
+                                                {result.proximal_price?.toLocaleString("en-IN", { maximumFractionDigits: 2 }) ?? "—"}
+                                            </TableCell>
+
+                                            <TableCell align="right">
+                                                {result.distal_price?.toLocaleString("en-IN", { maximumFractionDigits: 2 }) ?? "—"}
+                                            </TableCell>
+
+                                            <TableCell align="right">
+                                                {result.distance_percent === null ? "—" : `${result.distance_percent.toFixed(2)}%`}
                                             </TableCell>
 
                                             <TableCell align="right">

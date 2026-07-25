@@ -82,6 +82,8 @@ class MarketOpportunityService:
 
         scored = self._zone_scoring_engine.score(zones)
         ranked = self._zone_ranking_engine.rank(scored.scored_zones)
+        selected_zone_score = ranked.ranked_zones[0].zone_score
+        selected_zone = selected_zone_score.zone
         setup_result = self._trade_setup_engine.generate(
             ranked.ranked_zones[:1],
         )
@@ -114,6 +116,20 @@ class MarketOpportunityService:
         return ScreenedOpportunity(
             symbol=symbol,
             risk_management_result=risk_result,
+            zone_type=selected_zone.zone_type.value,
+            proximal_price=selected_zone.upper_price,
+            distal_price=selected_zone.lower_price,
+            zone_score=selected_zone_score.total_score,
+            distance_percent=max(
+                0.0,
+                (current_price - selected_zone.upper_price)
+                / selected_zone.upper_price
+                * 100,
+            ),
+            zone_fresh=selected_zone.is_fresh,
+            touch_count=selected_zone.touch_count,
+            base_index=selected_zone.created_index,
+            timeframe=self._config.interval,
         )
 
     def _eligible_demand_zones(

@@ -79,6 +79,15 @@ def build_scanner_response(
                 opportunity.risk_management_result
                 .rejection_reason
             ),
+            zone_type=opportunity.zone_type,
+            proximal_price=opportunity.proximal_price,
+            distal_price=opportunity.distal_price,
+            zone_score=opportunity.zone_score,
+            distance_percent=opportunity.distance_percent,
+            zone_fresh=opportunity.zone_fresh,
+            touch_count=opportunity.touch_count,
+            base_index=opportunity.base_index,
+            timeframe=opportunity.timeframe,
         )
         for opportunity in scanner.screener_result.opportunities
     )

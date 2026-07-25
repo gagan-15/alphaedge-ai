@@ -152,6 +152,15 @@ def test_analyze_builds_confirmed_opportunity() -> None:
 
     assert opportunity is not None
     assert opportunity.symbol == "INFY"
+    assert opportunity.zone_type == "DEMAND"
+    assert opportunity.proximal_price == 100.0
+    assert opportunity.distal_price == 95.0
+    assert opportunity.zone_score == 90.0
+    assert opportunity.distance_percent == 1.96
+    assert opportunity.zone_fresh is True
+    assert opportunity.touch_count == 0
+    assert opportunity.base_index == 10
+    assert opportunity.timeframe == "1d"
     assert opportunity.risk_management_result.approved is True
     assert opportunity.risk_management_result.entry_confirmation.confirmed is True
 

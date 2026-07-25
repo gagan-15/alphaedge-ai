@@ -336,6 +336,11 @@ Verified current capabilities:
   confluence, sector rotation, command search, onboarding and alert patterns
 - Scanner table now sorts by symbol, score and risk/reward and exposes trend,
   volume, momentum and risk-engine status separately
+- Scanner analysis now preserves zone type, boundaries, quality, distance,
+  freshness, touches, base index and timeframe through the domain and API
+- The application shell now uses a gradient brand mark, grouped navigation,
+  compact research identity and blue-violet navigation states; green and red
+  remain reserved for market direction and risk.
 
 Important limitations:
 

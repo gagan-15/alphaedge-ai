@@ -29,6 +29,16 @@ export interface ScannerResult {
     approved: boolean;
 
     rejection_reason: string | null;
+
+    zone_type: string | null;
+    proximal_price: number | null;
+    distal_price: number | null;
+    zone_score: number | null;
+    distance_percent: number | null;
+    zone_fresh: boolean | null;
+    touch_count: number | null;
+    base_index: number | null;
+    timeframe: string | null;
 }
 
 export interface ScannerResponse {

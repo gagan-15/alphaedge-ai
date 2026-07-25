@@ -2,6 +2,7 @@ import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNone
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -50,26 +51,20 @@ function Header() {
                         xs: 1.5,
                         sm: 2.5,
                     },
-                    gap: 1.5,
+                    gap: 1,
                 }}
             >
                 <Box
                     sx={{
                         flex: 1,
                         minWidth: 0,
-                        textAlign: {
-                            xs: "left",
-                            md: "center",
-                        },
+                        textAlign: "left",
                     }}
                 >
                     <Typography
                         component="div"
                         sx={{
-                            display: {
-                                xs: "block",
-                                md: "none",
-                            },
+                            display: { xs: "block", md: "none" },
                             fontSize: {
                                 xs: "1.15rem",
                                 md: "1.55rem",
@@ -88,26 +83,11 @@ function Header() {
                         </Box>
                     </Typography>
 
-                    <Typography
-                        color="text.secondary"
-                        sx={{
-                            display: {
-                                xs: "none",
-                                md: "none",
-                            },
-                            mt: 0.5,
-                            fontSize: "0.7rem",
-                            letterSpacing: "0.12em",
-                            textTransform: "uppercase",
-                        }}
-                    >
-                        AI-Assisted Trading Intelligence Platform
-                    </Typography>
                 </Box>
 
                 <TextField
                     size="small"
-                    placeholder="Search"
+                    placeholder="Search (Ctrl + K)"
                     aria-label="Search AlphaEdge AI"
                     sx={{
                         display: {
@@ -168,14 +148,40 @@ function Header() {
                         <SettingsOutlinedIcon fontSize="small" />
                     </IconButton>
 
+                    <IconButton
+                        aria-label="Help"
+                        color="inherit"
+                        size="small"
+                        sx={{ display: { xs: "none", md: "inline-flex" } }}
+                    >
+                        <HelpOutlineRoundedIcon fontSize="small" />
+                    </IconButton>
+
+                    <Box
+                        sx={{
+                            display: { xs: "none", xl: "block" },
+                            textAlign: "right",
+                            ml: 0.75,
+                            maxWidth: 130,
+                        }}
+                    >
+                        <Typography sx={{ fontSize: "0.72rem", fontWeight: 750, lineHeight: 1.15 }} noWrap>
+                            {user?.full_name ?? "AlphaEdge User"}
+                        </Typography>
+                        <Typography color="text.secondary" sx={{ fontSize: "0.6rem", lineHeight: 1.2 }} noWrap>
+                            Research workspace
+                        </Typography>
+                    </Box>
                     <Avatar
                         aria-label={user?.full_name ?? "User account"}
                         sx={{
                             ml: 0.5,
                             width: 30,
                             height: 30,
-                            bgcolor: "primary.main",
-                            color: "primary.contrastText",
+                            background: "linear-gradient(145deg,#2563eb,#8b5cf6)",
+                            color: "#fff",
+                            border: "1px solid rgba(255,255,255,.18)",
+                            boxShadow: "0 0 16px rgba(99,102,241,.24)",
                             fontSize: "0.75rem",
                             fontWeight: 800,
                         }}
