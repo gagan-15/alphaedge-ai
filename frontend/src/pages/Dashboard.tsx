@@ -242,17 +242,55 @@ function Dashboard() {
                 </Grid>
 
                 <Grid size={{ xs: 12 }}>
-                    <Card><CardContent sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                        <Typography sx={{ fontWeight: 800, whiteSpace: "nowrap" }}>Ask AlphaEdge AI</Typography>
-                        <TextField size="small" fullWidth placeholder="Ask about markets, stocks, risk or strategies..." />
-                        {["Market Outlook", "Top Stocks", "Risk Check", "Strategy Idea", "News Impact"].map((label) => (
-                            <Button key={label} variant="outlined" size="small" sx={{ whiteSpace: "nowrap", display: { xs: "none", xl: "inline-flex" } }}>{label}</Button>
-                        ))}
+                    <Card><CardContent sx={{ display: "flex", gap: 1.25, alignItems: "center", minWidth: 0 }}>
+                        <Typography sx={{ fontWeight: 800, whiteSpace: "nowrap", flexShrink: 0 }}>Ask AlphaEdge AI</Typography>
+                        <TextField
+                            size="small"
+                            placeholder="Ask about markets, stocks, risk or strategies..."
+                            sx={{ flex: "1 1 260px", minWidth: 180 }}
+                        />
+                        <Stack
+                            direction="row"
+                            spacing={0.75}
+                            sx={{ flex: "0 1 auto", minWidth: 0 }}
+                        >
+                            {["Market Outlook", "Top Stocks", "Risk Check", "Strategy Idea", "News Impact"].map((label, index) => (
+                                <Button
+                                    key={label}
+                                    variant="outlined"
+                                    size="small"
+                                    sx={{
+                                        whiteSpace: "nowrap",
+                                        minWidth: 0,
+                                        px: 1,
+                                        display: {
+                                            xs: "none",
+                                            lg: index > 2 ? "none" : "inline-flex",
+                                            xl: "inline-flex",
+                                        },
+                                    }}
+                                >
+                                    {label}
+                                </Button>
+                            ))}
+                        </Stack>
                     </CardContent></Card>
                 </Grid>
             </Grid>
 
-            <Card sx={{ position: "sticky", bottom: 0, zIndex: 4 }}>
+            <Card
+                square
+                sx={{
+                    position: "fixed",
+                    left: { xs: 64, lg: 196 },
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 1100,
+                    borderLeft: 0,
+                    borderRight: 0,
+                    borderBottom: 0,
+                }}
+            >
                 <CardContent sx={{ display: "flex", gap: 4, py: "8px !important", overflow: "hidden" }}>
                     <Chip label="LIVE" size="small" color="success" />
                     {[

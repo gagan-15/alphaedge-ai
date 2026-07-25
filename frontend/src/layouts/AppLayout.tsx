@@ -36,7 +36,7 @@ function AppLayout({ children }: AppLayoutProps) {
                         sm: 2,
                         xl: 2.5,
                     },
-                    pb: 3,
+                    pb: 7,
                     minHeight: "100vh",
                     overflow: "hidden",
                 }}

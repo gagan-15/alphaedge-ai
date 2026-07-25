@@ -316,6 +316,8 @@ Verified current capabilities:
   market-card height and chart-column proportions for 100% browser zoom
 - Read-only historical candle API connected to the chart through the Yahoo
   development provider, with delayed-source and fallback labels
+- AI shortcut row now shrinks safely at desktop breakpoints and the live market
+  ticker remains fixed to the viewport bottom without covering page content
 - 238 backend tests passing
 
 Important limitations:
