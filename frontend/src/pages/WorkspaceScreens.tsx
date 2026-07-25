@@ -264,7 +264,56 @@ export function CalculatorsPage() {
     const [capital, setCapital] = useState(100000);
     const [risk, setRisk] = useState(1);
     const [stop, setStop] = useState(2);
+    const [activeCalculator, setActiveCalculator] = useState(0);
+    const [calculatorValues, setCalculatorValues] = useState<Record<string, number>>({
+        entry: 100,
+        invalidation: 95,
+        target: 115,
+        monthly: 5000,
+        rate: 12,
+        years: 10,
+        buy: 100,
+        sell: 120,
+        tradeQuantity: 10,
+        firstPrice: 100,
+        firstQuantity: 10,
+        secondPrice: 90,
+        secondQuantity: 10,
+        high: 120,
+        low: 80,
+    });
     const quantity = useMemo(() => Math.floor((capital * risk / 100) / (stop || 1)), [capital, risk, stop]);
+    function calculatorField(key: string, label: string) {
+        return (
+            <TextField
+                key={key}
+                label={label}
+                type="number"
+                value={calculatorValues[key]}
+                onChange={(event) => setCalculatorValues((current) => ({
+                    ...current,
+                    [key]: Number(event.target.value),
+                }))}
+            />
+        );
+    }
+    const riskDistance = Math.abs(calculatorValues.entry - calculatorValues.invalidation);
+    const rewardDistance = Math.abs(calculatorValues.target - calculatorValues.entry);
+    const monthlyRate = calculatorValues.rate / 1200;
+    const months = Math.max(0, calculatorValues.years * 12);
+    const sipValue = monthlyRate === 0
+        ? calculatorValues.monthly * months
+        : calculatorValues.monthly
+            * (((1 + monthlyRate) ** months - 1) / monthlyRate)
+            * (1 + monthlyRate);
+    const totalAverageQuantity = calculatorValues.firstQuantity + calculatorValues.secondQuantity;
+    const weightedAverage = totalAverageQuantity === 0
+        ? 0
+        : (
+            calculatorValues.firstPrice * calculatorValues.firstQuantity
+            + calculatorValues.secondPrice * calculatorValues.secondQuantity
+        ) / totalAverageQuantity;
+    const fibonacciRange = calculatorValues.high - calculatorValues.low;
     return (
         <Stack spacing={2.5}>
             <PageTitle title="Trading Calculators" subtitle="Planning tools for research and risk awareness." />
@@ -286,9 +335,62 @@ export function CalculatorsPage() {
                 <Grid size={{ xs: 12, lg: 6 }}>
                     <Card><CardContent>
                         <Typography variant="h6" sx={{ mb: 2 }}>Available tools</Typography>
-                        {["Risk–reward calculator", "SIP calculator", "Profit calculator", "Average price calculator", "Fibonacci levels"].map((x) => (
-                            <Button key={x} fullWidth variant="outlined" sx={{ mb: 1, justifyContent: "flex-start" }}>{x}</Button>
+                        {["Risk–reward calculator", "SIP calculator", "Profit calculator", "Average price calculator", "Fibonacci levels"].map((x, index) => (
+                            <Button
+                                key={x}
+                                fullWidth
+                                variant={activeCalculator === index ? "contained" : "outlined"}
+                                onClick={() => setActiveCalculator(index)}
+                                sx={{ mb: 1, justifyContent: "flex-start" }}
+                            >
+                                {x}
+                            </Button>
                         ))}
+                        <Stack spacing={1.5} sx={{ mt: 2, pt: 2, borderTop: "1px solid", borderColor: "divider" }}>
+                            {activeCalculator === 0 && <>
+                                {calculatorField("entry", "Entry price")}
+                                {calculatorField("invalidation", "Invalidation price")}
+                                {calculatorField("target", "Target scenario")}
+                                <Typography variant="h5">
+                                    Risk/reward: 1 : {riskDistance === 0 ? "—" : (rewardDistance / riskDistance).toFixed(2)}
+                                </Typography>
+                            </>}
+                            {activeCalculator === 1 && <>
+                                {calculatorField("monthly", "Monthly contribution (₹)")}
+                                {calculatorField("rate", "Illustrative annual rate (%)")}
+                                {calculatorField("years", "Years")}
+                                <Typography variant="h5">
+                                    Illustrative value: ₹{Math.round(sipValue).toLocaleString("en-IN")}
+                                </Typography>
+                            </>}
+                            {activeCalculator === 2 && <>
+                                {calculatorField("buy", "Buy price")}
+                                {calculatorField("sell", "Sell price")}
+                                {calculatorField("tradeQuantity", "Quantity")}
+                                <Typography variant="h5">
+                                    Gross result: ₹{((calculatorValues.sell - calculatorValues.buy) * calculatorValues.tradeQuantity).toLocaleString("en-IN")}
+                                </Typography>
+                            </>}
+                            {activeCalculator === 3 && <>
+                                {calculatorField("firstPrice", "First price")}
+                                {calculatorField("firstQuantity", "First quantity")}
+                                {calculatorField("secondPrice", "Second price")}
+                                {calculatorField("secondQuantity", "Second quantity")}
+                                <Typography variant="h5">Weighted average: ₹{weightedAverage.toFixed(2)}</Typography>
+                            </>}
+                            {activeCalculator === 4 && <>
+                                {calculatorField("high", "Range high")}
+                                {calculatorField("low", "Range low")}
+                                {[23.6, 38.2, 50, 61.8, 78.6].map((level) => (
+                                    <Typography key={level}>
+                                        {level}%: {(calculatorValues.high - fibonacciRange * level / 100).toFixed(2)}
+                                    </Typography>
+                                ))}
+                            </>}
+                            <Typography variant="caption" color="text.secondary">
+                                Mathematical illustration only. Fees, taxes and slippage may change results.
+                            </Typography>
+                        </Stack>
                     </CardContent></Card>
                 </Grid>
             </Grid>

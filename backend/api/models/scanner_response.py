@@ -128,4 +128,5 @@ class ZoneResearchResponse(APIResponseModel):
     total_scanned: int
     total_zones: int
     delayed: bool = True
+    timeframe: str = "1D"
     results: tuple[ZoneResearchResultResponse, ...]

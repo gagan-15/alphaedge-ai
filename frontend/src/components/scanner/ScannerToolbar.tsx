@@ -33,6 +33,10 @@ interface ScannerToolbarProps {
     onApprovalFilterChange: (value: string) => void;
     onExport: () => void;
     canExport: boolean;
+    market: string;
+    timeframe: string;
+    onMarketChange: (value: string) => void;
+    onTimeframeChange: (value: string) => void;
 }
 
 function ScannerToolbar({
@@ -47,6 +51,10 @@ function ScannerToolbar({
     onApprovalFilterChange,
     onExport,
     canExport,
+    market,
+    timeframe,
+    onMarketChange,
+    onTimeframeChange,
 }: ScannerToolbarProps) {
     return (
         <Card>
@@ -150,8 +158,8 @@ function ScannerToolbar({
 
                             <Select
                                 fullWidth
-                                value="NSE"
-                                disabled
+                                value={market}
+                                onChange={(event) => onMarketChange(event.target.value)}
                             >
                                 <MenuItem value="NSE">
                                     NSE
@@ -174,23 +182,31 @@ function ScannerToolbar({
 
                             <Select
                                 fullWidth
-                                value="Daily"
-                                disabled
+                                value={timeframe}
+                                onChange={(event) => onTimeframeChange(event.target.value)}
                             >
-                                <MenuItem value="Daily">
+                                <MenuItem value="DAILY">
                                     Daily
                                 </MenuItem>
 
-                                <MenuItem value="Weekly">
+                                <MenuItem value="WEEKLY">
                                     Weekly
                                 </MenuItem>
 
-                                <MenuItem value="75 Min">
-                                    75 Min
+                                <MenuItem value="MONTHLY">
+                                    Monthly
                                 </MenuItem>
 
-                                <MenuItem value="125 Min">
-                                    125 Min
+                                <MenuItem value="QUARTERLY">
+                                    Quarterly
+                                </MenuItem>
+
+                                <MenuItem value="HALFYEARLY">
+                                    Half-yearly
+                                </MenuItem>
+
+                                <MenuItem value="YEARLY">
+                                    Yearly
                                 </MenuItem>
                             </Select>
                         </Grid>
@@ -201,7 +217,7 @@ function ScannerToolbar({
                                 color="text.secondary"
                                 sx={{ mb: 1 }}
                             >
-                                Minimum confidence
+                                Minimum quality
                             </Typography>
 
                             <Select
@@ -209,10 +225,10 @@ function ScannerToolbar({
                                 value={minimumScore}
                                 onChange={(event) => onMinimumScoreChange(Number(event.target.value))}
                             >
-                                <MenuItem value={0}>Any score</MenuItem>
-                                <MenuItem value={60}>60% and above</MenuItem>
-                                <MenuItem value={75}>75% and above</MenuItem>
-                                <MenuItem value={90}>90% and above</MenuItem>
+                                <MenuItem value={0}>Any quality</MenuItem>
+                                <MenuItem value={60}>60 and above</MenuItem>
+                                <MenuItem value={75}>75 and above</MenuItem>
+                                <MenuItem value={90}>90 and above</MenuItem>
                             </Select>
                         </Grid>
 

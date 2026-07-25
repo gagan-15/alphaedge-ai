@@ -32,7 +32,9 @@ export async function getScanner(): Promise<ScannerResponse> {
     }
 }
 
-export async function getResearchZones(): Promise<ZoneResearchResponse> {
-    const response = await api.get<ZoneResearchResponse>("/scanner/zones");
+export async function getResearchZones(timeframe = "DAILY"): Promise<ZoneResearchResponse> {
+    const response = await api.get<ZoneResearchResponse>("/scanner/zones", {
+        params: { timeframe },
+    });
     return response.data;
 }

@@ -102,3 +102,14 @@ intersections/retests and overlapping-zone confluence. Planned modules include b
 quality, leg-in, leg-out, BOS, CHOCH, trend, higher-timeframe alignment, EMA alignment,
 volume, risk/reward, zone width, liquidity sweep, momentum and validated institutional
 activity evidence.
+
+The scanner now supports delayed Daily, Weekly, Monthly, Quarterly, Half-yearly and
+Yearly zone requests by aggregating daily OHLCV candles. Timeframe tabs and the toolbar
+reload the selected aggregation and retain a count after each timeframe has been opened.
+NSE is connected; BSE remains visibly unavailable rather than displaying NSE results
+under an incorrect market label.
+
+Dashboard quick research prompts now return explicit local research guidance. They do
+not call a generative AI service yet. All five secondary calculator buttons now open
+working mathematical tools: risk/reward, SIP illustration, gross result, weighted
+average price and Fibonacci retracement levels.

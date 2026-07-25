@@ -34,6 +34,8 @@ import { getResearchLabel } from "../utils/researchLanguage";
 function Dashboard() {
     const [dashboard, setDashboard] =
         useState<DashboardResult | null>(null);
+    const [aiQuestion, setAiQuestion] = useState("");
+    const [aiAnswer, setAiAnswer] = useState("");
 
     useEffect(() => {
         async function loadDashboard() {
@@ -50,6 +52,42 @@ function Dashboard() {
 
         loadDashboard();
     }, []);
+
+    function askAlphaEdge(prompt = aiQuestion) {
+        const question = prompt.trim();
+        if (!question) {
+            setAiAnswer("Enter a market research question first.");
+            return;
+        }
+        setAiQuestion(question);
+        const normalized = question.toLowerCase();
+        if (normalized.includes("risk")) {
+            setAiAnswer(
+                "Risk check: define invalidation before entry, limit account exposure, "
+                + "and do not treat a quality score as a success probability.",
+            );
+        } else if (normalized.includes("news")) {
+            setAiAnswer(
+                "News impact is not connected to a verified provider yet. "
+                + "Use the News & Events screen only as demo context until sources and timestamps are shown.",
+            );
+        } else if (normalized.includes("top stock")) {
+            setAiAnswer(
+                "AlphaEdge AI does not recommend a stock. Open Scanner to compare delayed "
+                + "research zones by quality, freshness and distance.",
+            );
+        } else if (normalized.includes("strategy")) {
+            setAiAnswer(
+                "Strategy idea: combine a fresh zone with trend and market-structure confirmation, "
+                + "then test the same rules historically before relying on them.",
+            );
+        } else {
+            setAiAnswer(
+                "Market outlook is research-only. Review breadth, trend, volatility and "
+                + "fresh zones together; current demo panels are not a live market forecast.",
+            );
+        }
+    }
 
     if (!dashboard) {
         return (
@@ -242,38 +280,48 @@ function Dashboard() {
                 </Grid>
 
                 <Grid size={{ xs: 12 }}>
-                    <Card><CardContent sx={{ display: "flex", gap: 1.25, alignItems: "center", minWidth: 0 }}>
-                        <Typography sx={{ fontWeight: 800, whiteSpace: "nowrap", flexShrink: 0 }}>Ask AlphaEdge AI</Typography>
-                        <TextField
-                            size="small"
-                            placeholder="Ask about markets, stocks, risk or strategies..."
-                            sx={{ flex: "1 1 260px", minWidth: 180 }}
-                        />
-                        <Stack
-                            direction="row"
-                            spacing={0.75}
-                            sx={{ flex: "0 1 auto", minWidth: 0 }}
-                        >
-                            {["Market Outlook", "Top Stocks", "Risk Check", "Strategy Idea", "News Impact"].map((label, index) => (
-                                <Button
-                                    key={label}
-                                    variant="outlined"
-                                    size="small"
-                                    sx={{
-                                        whiteSpace: "nowrap",
-                                        minWidth: 0,
-                                        px: 1,
-                                        display: {
-                                            xs: "none",
-                                            lg: index > 2 ? "none" : "inline-flex",
-                                            xl: "inline-flex",
-                                        },
-                                    }}
-                                >
-                                    {label}
-                                </Button>
-                            ))}
+                    <Card><CardContent>
+                        <Stack direction={{ xs: "column", lg: "row" }} spacing={1.25} sx={{ alignItems: { lg: "center" }, minWidth: 0 }}>
+                            <Typography sx={{ fontWeight: 800, whiteSpace: "nowrap", flexShrink: 0 }}>Ask AlphaEdge AI</Typography>
+                            <TextField
+                                size="small"
+                                value={aiQuestion}
+                                onChange={(event) => setAiQuestion(event.target.value)}
+                                onKeyDown={(event) => {
+                                    if (event.key === "Enter") askAlphaEdge();
+                                }}
+                                placeholder="Ask about markets, stocks, risk or strategies..."
+                                sx={{ flex: "1 1 260px", minWidth: 180 }}
+                            />
+                            <Button variant="contained" size="small" onClick={() => askAlphaEdge()}>Ask</Button>
+                            <Stack direction="row" spacing={0.75} sx={{ flex: "0 1 auto", minWidth: 0, flexWrap: "wrap" }}>
+                                {["Market Outlook", "Top Stocks", "Risk Check", "Strategy Idea", "News Impact"].map((label, index) => (
+                                    <Button
+                                        key={label}
+                                        variant="outlined"
+                                        size="small"
+                                        onClick={() => askAlphaEdge(label)}
+                                        sx={{
+                                            whiteSpace: "nowrap",
+                                            minWidth: 0,
+                                            px: 1,
+                                            display: {
+                                                xs: "none",
+                                                lg: index > 2 ? "none" : "inline-flex",
+                                                xl: "inline-flex",
+                                            },
+                                        }}
+                                    >
+                                        {label}
+                                    </Button>
+                                ))}
+                            </Stack>
                         </Stack>
+                        {aiAnswer && (
+                            <Box sx={{ mt: 1.5, p: 1.25, borderRadius: 1.5, bgcolor: "rgba(99,102,241,.08)" }}>
+                                <Typography variant="body2">{aiAnswer}</Typography>
+                            </Box>
+                        )}
                     </CardContent></Card>
                 </Grid>
             </Grid>

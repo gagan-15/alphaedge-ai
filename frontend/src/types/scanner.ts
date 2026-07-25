@@ -99,5 +99,6 @@ export interface ZoneResearchResponse {
     total_scanned: number;
     total_zones: number;
     delayed: boolean;
+    timeframe: string;
     results: ZoneResearchResult[];
 }

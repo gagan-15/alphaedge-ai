@@ -6,8 +6,9 @@ Sprint:
 """
 
 from dataclasses import replace
+from typing import Literal
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from pandas import DataFrame
 
 from backend.api.models.scanner_response import (
@@ -45,6 +46,50 @@ _zone_market_data = MarketDataService()
 _zone_engine = ZoneDetectionEngine()
 _zone_scoring_engine = ZoneScoringEngine()
 _zone_config = ScannerConfig()
+
+ZoneTimeframe = Literal[
+    "DAILY",
+    "WEEKLY",
+    "MONTHLY",
+    "QUARTERLY",
+    "HALFYEARLY",
+    "YEARLY",
+]
+
+_TIMEFRAME_RULES: dict[str, str | None] = {
+    "DAILY": None,
+    "WEEKLY": "W-FRI",
+    "MONTHLY": "ME",
+    "QUARTERLY": "QE",
+    "HALFYEARLY": "2QE",
+    "YEARLY": "YE",
+}
+
+_TIMEFRAME_LABELS = {
+    "DAILY": "1D",
+    "WEEKLY": "1W",
+    "MONTHLY": "1M",
+    "QUARTERLY": "3M",
+    "HALFYEARLY": "6M",
+    "YEARLY": "1Y",
+}
+
+
+def _timeframe_data(data: DataFrame, timeframe: str) -> DataFrame:
+    """Aggregate daily OHLCV candles into the selected research timeframe."""
+
+    rule = _TIMEFRAME_RULES[timeframe]
+    if rule is None:
+        return data
+    aggregations = {
+        "Open": "first",
+        "High": "max",
+        "Low": "min",
+        "Close": "last",
+    }
+    if "Volume" in data.columns:
+        aggregations["Volume"] = "sum"
+    return data.resample(rule).agg(aggregations).dropna(subset=["Close"])
 
 
 def _measure_zone(zone: Zone, data: DataFrame) -> Zone:
@@ -174,7 +219,9 @@ def get_scanner() -> ScannerResponse:
 
 
 @scanner_router.get("/zones", response_model=ZoneResearchResponse)
-def get_research_zones() -> ZoneResearchResponse:
+def get_research_zones(
+    timeframe: ZoneTimeframe = Query(default="DAILY"),
+) -> ZoneResearchResponse:
     """Return recent demand and supply zones for research exploration."""
 
     results: list[ZoneResearchResultResponse] = []
@@ -183,9 +230,10 @@ def get_research_zones() -> ZoneResearchResponse:
         try:
             data = _zone_market_data.get_stock_data(
                 symbol=symbol,
-                period=_zone_config.period,
+                period="10y" if timeframe != "DAILY" else _zone_config.period,
                 interval=_zone_config.interval,
             )
+            data = _timeframe_data(data, timeframe)
             scanned += 1
             current_price = float(data["Close"].iloc[-1])
             zones = _zone_engine.detect_zones(data)
@@ -282,7 +330,7 @@ def get_research_zones() -> ZoneResearchResponse:
                             ),
                         ),
                         current_price=current_price,
-                        timeframe=_zone_config.interval,
+                        timeframe=_TIMEFRAME_LABELS[timeframe],
                         base_index=zone.created_index,
                         base_date=data.index[zone.created_index].date().isoformat(),
                         status=status,
@@ -295,5 +343,6 @@ def get_research_zones() -> ZoneResearchResponse:
     return ZoneResearchResponse(
         total_scanned=scanned,
         total_zones=len(results),
+        timeframe=_TIMEFRAME_LABELS[timeframe],
         results=tuple(results),
     )
