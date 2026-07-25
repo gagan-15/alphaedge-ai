@@ -18,6 +18,9 @@ export interface AuthContextValue {
     logoutAll: () => Promise<void>;
 }
 
+export const LOCAL_DEMO_MODE =
+    import.meta.env.DEV && import.meta.env.VITE_DEMO_MODE !== "false";
+
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function useAuth() {

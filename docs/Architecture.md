@@ -992,6 +992,16 @@ Development CORS allows both `localhost:5173` and `127.0.0.1:5173`.
 
 ---
 
+## AD-039 - Local Demo Access
+
+The Vite development server uses a local demo identity by default so UI work
+does not depend on registration or database setup. The bypass is compiled only
+when Vite development mode is active and is visibly marked in the header.
+Production builds never enable it. Developers can set
+`VITE_DEMO_MODE=false` when they need to test the real authentication flow.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

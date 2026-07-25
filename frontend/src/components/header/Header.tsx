@@ -10,10 +10,11 @@ import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
 import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router-dom";
 
-import { useAuth } from "../../auth/AuthState";
+import { LOCAL_DEMO_MODE, useAuth } from "../../auth/AuthState";
 
 function Header() {
     const navigate = useNavigate();
@@ -133,6 +134,14 @@ function Header() {
                         gap: 0.25,
                     }}
                 >
+                    {LOCAL_DEMO_MODE && (
+                        <Chip
+                            label="LOCAL DEMO"
+                            color="warning"
+                            size="small"
+                            sx={{ display: { xs: "none", sm: "flex" } }}
+                        />
+                    )}
                     <IconButton
                         aria-label="Notifications"
                         color="inherit"

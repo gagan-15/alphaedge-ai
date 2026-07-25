@@ -11,16 +11,31 @@ import {
 } from "../api/authApi";
 import {
     AuthContext,
+    LOCAL_DEMO_MODE,
     type AuthContextValue,
     type AuthUser,
 } from "./AuthState";
 
+const DEMO_USER: AuthUser = {
+    id: "local-demo",
+    full_name: "Local Demo",
+    email: "demo@localhost",
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<AuthUser | null>(null);
-    const [accessToken, setAccessToken] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [user, setUser] = useState<AuthUser | null>(
+        LOCAL_DEMO_MODE ? DEMO_USER : null,
+    );
+    const [accessToken, setAccessToken] = useState<string | null>(
+        LOCAL_DEMO_MODE ? "local-demo-token" : null,
+    );
+    const [isLoading, setIsLoading] = useState(!LOCAL_DEMO_MODE);
 
     useEffect(() => {
+        if (LOCAL_DEMO_MODE) {
+            return;
+        }
+
         void refreshSession()
             .then((result) => {
                 setUser(result.user);

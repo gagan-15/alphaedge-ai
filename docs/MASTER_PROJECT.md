@@ -303,6 +303,8 @@ Verified current capabilities:
 - Responsive research workspaces with tables, filters and a position-size tool
 - Functional research signal cards, portfolio view, backtest controls and risk
   management workspace
+- Local Vite development opens with a clearly marked demo session; production
+  builds continue to require authentication
 
 Important limitations:
 

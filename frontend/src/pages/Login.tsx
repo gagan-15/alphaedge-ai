@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 import Alert from "@mui/material/Alert";
@@ -12,7 +12,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
 import { loginAccount } from "../api/authApi";
-import { useAuth } from "../auth/AuthState";
+import { LOCAL_DEMO_MODE, useAuth } from "../auth/AuthState";
 
 function Login() {
     const navigate = useNavigate();
@@ -21,6 +21,12 @@ function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (LOCAL_DEMO_MODE) {
+            navigate("/dashboard", { replace: true });
+        }
+    }, [navigate]);
 
     async function submit(event: React.FormEvent) {
         event.preventDefault();
