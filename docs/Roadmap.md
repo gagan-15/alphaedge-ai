@@ -196,6 +196,7 @@ Current authentication state:
 - Interactive chart connected to validated delayed historical candle API
 - Scanner filtering and CSV export implemented
 - Signals workspace connected to scanner and risk-engine results
+- Local-development watchlist connected to delayed market prices
 - Production email delivery pending approval before public launch
 - Login and registration UI implemented
 - Protected-route refresh bootstrap pending

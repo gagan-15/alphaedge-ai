@@ -323,6 +323,8 @@ Verified current capabilities:
 - Scanner exports the currently filtered research results as a local CSV
 - Signals screen now consumes real scanner results with working status filters,
   refresh, loading, error, empty and explainable risk-detail states
+- Watchlist supports validated add/remove, browser persistence, refresh and
+  delayed backend candle prices with daily change and failure states
 
 Important limitations:
 
