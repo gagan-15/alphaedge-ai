@@ -60,7 +60,8 @@ function ZoneDetailChart({ result }: { result: ZoneResearchResult }) {
         });
         observer.observe(container);
 
-        void getMarketCandles(result.symbol)
+        const chartPeriod = result.timeframe === "1D" ? "1y" : "10y";
+        void getMarketCandles(result.symbol, chartPeriod, "1d", result.timeframe)
             .then((response) => {
                 if (cancelled) return;
                 const data = response.candles.map((candle) => ({
@@ -89,9 +90,9 @@ function ZoneDetailChart({ result }: { result: ZoneResearchResult }) {
                         topLineColor: zoneColor,
                         topFillColor1: demand ? "rgba(29,140,255,.52)" : "rgba(255,47,104,.52)",
                         topFillColor2: demand ? "rgba(29,140,255,.34)" : "rgba(255,47,104,.34)",
-                        bottomLineColor: "transparent",
-                        bottomFillColor1: "transparent",
-                        bottomFillColor2: "transparent",
+                        bottomLineColor: zoneColor,
+                        bottomFillColor1: demand ? "rgba(29,140,255,.52)" : "rgba(255,47,104,.52)",
+                        bottomFillColor2: demand ? "rgba(29,140,255,.34)" : "rgba(255,47,104,.34)",
                         lineWidth: 2,
                         priceLineVisible: false,
                         lastValueVisible: false,
@@ -101,22 +102,6 @@ function ZoneDetailChart({ result }: { result: ZoneResearchResult }) {
                         time: candle.time,
                         value: result.proximal_price as number,
                     })));
-                    candles.createPriceLine({
-                        price: result.proximal_price,
-                        color: zoneColor,
-                        lineWidth: 2,
-                        lineStyle: 0,
-                        axisLabelVisible: true,
-                        title: `${result.zone_type} PROXIMAL`,
-                    });
-                    candles.createPriceLine({
-                        price: result.distal_price,
-                        color: zoneColor,
-                        lineWidth: 2,
-                        lineStyle: 0,
-                        axisLabelVisible: true,
-                        title: `${result.zone_type} DISTAL`,
-                    });
                 }
 
                 chart.timeScale().fitContent();

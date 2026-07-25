@@ -113,3 +113,8 @@ Dashboard quick research prompts now return explicit local research guidance. Th
 not call a generative AI service yet. All five secondary calculator buttons now open
 working mathematical tools: risk/reward, SIP illustration, gross result, weighted
 average price and Fibonacci retracement levels.
+
+Expanded zone charts now request the same timeframe used for zone detection. Monthly
+zones display monthly candles, weekly zones display weekly candles, and the same rule
+applies through yearly charts. The zone is rendered as one colored band beginning at its
+formation candle; duplicate full-chart proximal and distal price lines were removed.

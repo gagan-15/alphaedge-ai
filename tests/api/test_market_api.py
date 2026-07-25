@@ -49,3 +49,38 @@ def test_rejects_invalid_market_symbol() -> None:
     )
 
     assert response.status_code == 400
+
+
+def test_get_candles_uses_requested_chart_timeframe(monkeypatch) -> None:
+    """A monthly zone chart must receive monthly candles, not daily candles."""
+
+    class MonthlyMarketDataService:
+        def get_stock_data(self, symbol: str, period: str, interval: str):
+            assert period == "10y"
+            assert interval == "1d"
+            index = pd.date_range("2026-01-01", periods=60, freq="D")
+            return pd.DataFrame(
+                {
+                    "Open": range(100, 160),
+                    "High": range(101, 161),
+                    "Low": range(99, 159),
+                    "Close": range(100, 160),
+                    "Volume": [1000] * 60,
+                },
+                index=index,
+            )
+
+    monkeypatch.setattr(
+        market,
+        "_market_data_service",
+        MonthlyMarketDataService(),
+    )
+    response = TestClient(app).get(
+        "/market/candles?symbol=RELIANCE&period=10y"
+        "&interval=1d&timeframe=1M",
+    )
+
+    assert response.status_code == 200
+    result = response.json()
+    assert result["interval"] == "1M"
+    assert len(result["candles"]) == 3

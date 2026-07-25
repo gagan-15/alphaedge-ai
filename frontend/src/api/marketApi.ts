@@ -28,9 +28,10 @@ export async function getMarketCandles(
     symbol: string,
     period = "1y",
     interval = "1d",
+    timeframe = "1D",
 ): Promise<CandleSeriesResult> {
     const response = await marketApi.get<CandleSeriesResult>("/candles", {
-        params: { symbol, period, interval },
+        params: { symbol, period, interval, timeframe },
     });
     return response.data;
 }

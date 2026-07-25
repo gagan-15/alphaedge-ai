@@ -35,6 +35,7 @@ from backend.services.scanner.scanner_service import (
 )
 from backend.services.zone_explanation_service import ZoneExplanationService
 from backend.services.market_data.market_data_service import MarketDataService
+from backend.services.market_data.timeframe_service import aggregate_timeframe
 
 scanner_router = APIRouter(
     prefix="/scanner",
@@ -56,15 +57,6 @@ ZoneTimeframe = Literal[
     "YEARLY",
 ]
 
-_TIMEFRAME_RULES: dict[str, str | None] = {
-    "DAILY": None,
-    "WEEKLY": "W-FRI",
-    "MONTHLY": "ME",
-    "QUARTERLY": "QE",
-    "HALFYEARLY": "2QE",
-    "YEARLY": "YE",
-}
-
 _TIMEFRAME_LABELS = {
     "DAILY": "1D",
     "WEEKLY": "1W",
@@ -78,18 +70,7 @@ _TIMEFRAME_LABELS = {
 def _timeframe_data(data: DataFrame, timeframe: str) -> DataFrame:
     """Aggregate daily OHLCV candles into the selected research timeframe."""
 
-    rule = _TIMEFRAME_RULES[timeframe]
-    if rule is None:
-        return data
-    aggregations = {
-        "Open": "first",
-        "High": "max",
-        "Low": "min",
-        "Close": "last",
-    }
-    if "Volume" in data.columns:
-        aggregations["Volume"] = "sum"
-    return data.resample(rule).agg(aggregations).dropna(subset=["Close"])
+    return aggregate_timeframe(data, _TIMEFRAME_LABELS[timeframe])
 
 
 def _measure_zone(zone: Zone, data: DataFrame) -> Zone:
