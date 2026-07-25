@@ -237,7 +237,8 @@ function ScannerToolbar({
                                 value={minimumScore}
                                 onChange={(event) => onMinimumScoreChange(Number(event.target.value))}
                             >
-                                <MenuItem value={0}>Any quality</MenuItem>
+                                <MenuItem value={0}>Show rejected zones</MenuItem>
+                                <MenuItem value={40}>Weak and above</MenuItem>
                                 <MenuItem value={60}>60 and above</MenuItem>
                                 <MenuItem value={75}>75 and above</MenuItem>
                                 <MenuItem value={90}>90 and above</MenuItem>

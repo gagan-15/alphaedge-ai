@@ -51,7 +51,7 @@ function Signals() {
                 <Box>
                     <Typography variant="h4">AI Research Signals</Typography>
                     <Typography color="text.secondary">
-                        Explainable scanner setups. Not investment advice or guaranteed outcomes.
+                        Explainable delayed scanner setups. No orders or guaranteed outcomes.
                     </Typography>
                 </Box>
                 <Button variant="outlined" onClick={loadSignals} disabled={loading}>Refresh</Button>
@@ -59,7 +59,7 @@ function Signals() {
 
             <Stack direction="row" spacing={1}>
                 {([
-                    ["all", "All"],
+                    ["all", "All signals"],
                     ["approved", "Risk checks passed"],
                     ["review", "Needs review"],
                 ] as const).map(([value, label]) => (
@@ -80,48 +80,97 @@ function Signals() {
                 <Alert severity="info">No research setups match this filter.</Alert>
             )}
 
-            <Grid container spacing={1.5}>
+            <Grid container spacing={1}>
                 {visible.map((signal) => (
-                    <Grid key={signal.symbol} size={{ xs: 12, md: 6, xl: 4 }}>
-                        <Card sx={{ height: "100%" }}>
+                    <Grid key={signal.symbol} size={12}>
+                        <Card>
                             <CardContent>
-                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <Typography variant="h6">{signal.symbol}</Typography>
-                                    <Chip
-                                        size="small"
-                                        color={signal.approved ? "success" : "warning"}
-                                        label={signal.approved ? "Bullish setup" : "Needs review"}
-                                    />
-                                </Box>
-                                <Grid container spacing={1.5} sx={{ my: 2 }}>
-                                    <Grid size={4}>
-                                        <Typography color="text.secondary" variant="caption">Possible entry</Typography>
-                                        <Typography>₹{signal.entry_price.toLocaleString("en-IN")}</Typography>
+                                <Grid container spacing={2} sx={{ alignItems: "center" }}>
+                                    <Grid size={{ xs: 12, md: 2 }}>
+                                        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                                            <Typography variant="h6">{signal.symbol}</Typography>
+                                            <Chip
+                                                size="small"
+                                                color={signal.approved ? "success" : "warning"}
+                                                label={signal.approved ? "Qualified" : "Review"}
+                                            />
+                                        </Stack>
+                                        <Typography
+                                            variant="body2"
+                                            color={signal.approved ? "success.main" : "warning.main"}
+                                            sx={{ mt: .75, fontWeight: 750 }}
+                                        >
+                                            {signal.approved ? "Bullish research setup" : "Conditions incomplete"}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            {signal.timeframe?.toUpperCase() ?? "1D"} · delayed research
+                                        </Typography>
                                     </Grid>
-                                    <Grid size={4}>
-                                        <Typography color="text.secondary" variant="caption">Invalidation</Typography>
-                                        <Typography color="error.main">₹{signal.stop_loss.toLocaleString("en-IN")}</Typography>
+
+                                    <Grid size={{ xs: 12, md: 3 }}>
+                                        <Typography variant="caption" color="text.secondary">Why it was detected</Typography>
+                                        {[
+                                            ["Trend alignment", signal.trend_confirmed],
+                                            ["Volume confirmation", signal.volume_confirmed],
+                                            ["Momentum confirmation", signal.momentum_confirmed],
+                                        ].map(([label, matched]) => (
+                                            <Typography
+                                                key={label as string}
+                                                variant="body2"
+                                                color={matched ? "success.main" : "text.secondary"}
+                                                sx={{ py: .25 }}
+                                            >
+                                                {matched ? "✓" : "—"} {label}
+                                            </Typography>
+                                        ))}
                                     </Grid>
-                                    <Grid size={4}>
-                                        <Typography color="text.secondary" variant="caption">Scenario target</Typography>
-                                        <Typography color="success.main">₹{signal.target_price.toLocaleString("en-IN")}</Typography>
+
+                                    <Grid size={{ xs: 12, md: 3 }}>
+                                        <Stack direction="row" spacing={2}>
+                                            <Box>
+                                                <Typography color="text.secondary" variant="caption">Possible entry</Typography>
+                                                <Typography>₹{signal.entry_price.toLocaleString("en-IN")}</Typography>
+                                            </Box>
+                                            <Box>
+                                                <Typography color="text.secondary" variant="caption">Invalidation</Typography>
+                                                <Typography color="error.main">₹{signal.stop_loss.toLocaleString("en-IN")}</Typography>
+                                            </Box>
+                                            <Box>
+                                                <Typography color="text.secondary" variant="caption">Scenario</Typography>
+                                                <Typography color="success.main">₹{signal.target_price.toLocaleString("en-IN")}</Typography>
+                                            </Box>
+                                        </Stack>
+                                        <Chip
+                                            size="small"
+                                            variant="outlined"
+                                            label={`Risk/reward 1:${signal.risk_reward_ratio.toFixed(2)}`}
+                                            sx={{ mt: 1 }}
+                                        />
+                                    </Grid>
+
+                                    <Grid size={{ xs: 12, md: 2 }}>
+                                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: .75 }}>
+                                            <Typography variant="caption">Rule quality</Typography>
+                                            <Typography variant="caption">{signal.confirmation_score.toFixed(0)}/100</Typography>
+                                        </Box>
+                                        <LinearProgress variant="determinate" value={signal.confirmation_score} />
+                                        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: .75 }}>
+                                            Ranking score, not success probability.
+                                        </Typography>
+                                    </Grid>
+
+                                    <Grid size={{ xs: 12, md: 2 }}>
+                                        {signal.rejection_reason ? (
+                                            <Typography color="warning.main" variant="caption">
+                                                Review: {signal.rejection_reason}
+                                            </Typography>
+                                        ) : (
+                                            <Alert severity="success" icon={false} sx={{ py: .25 }}>
+                                                Risk checks passed
+                                            </Alert>
+                                        )}
                                     </Grid>
                                 </Grid>
-                                <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.75 }}>
-                                    <Typography variant="caption">Conditions matched</Typography>
-                                    <Typography variant="caption">{signal.confirmation_score.toFixed(0)}%</Typography>
-                                </Box>
-                                <LinearProgress variant="determinate" value={signal.confirmation_score} />
-                                <Stack direction="row" spacing={0.75} sx={{ mt: 1.5, flexWrap: "wrap" }}>
-                                    <Chip size="small" variant="outlined" label={`Risk/reward 1:${signal.risk_reward_ratio.toFixed(2)}`} />
-                                    <Chip size="small" variant="outlined" label={`Trend ${signal.trend_confirmed ? "✓" : "—"}`} />
-                                    <Chip size="small" variant="outlined" label={`Volume ${signal.volume_confirmed ? "✓" : "—"}`} />
-                                </Stack>
-                                {signal.rejection_reason && (
-                                    <Typography color="warning.main" variant="caption" sx={{ display: "block", mt: 1.25 }}>
-                                        Review: {signal.rejection_reason}
-                                    </Typography>
-                                )}
                             </CardContent>
                         </Card>
                     </Grid>

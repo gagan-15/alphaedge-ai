@@ -59,7 +59,7 @@ def test_retested_zone_explains_quality_reduction() -> None:
 
     explanation = ZoneExplanationService.build(zone, score)
 
-    assert explanation.label == "Weak Supply Zone"
+    assert explanation.label == "Rejected Supply Zone"
     assert {factor.key for factor in explanation.negative_factors} == {
         "freshness",
         "departure",

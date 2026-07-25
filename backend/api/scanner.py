@@ -83,15 +83,31 @@ def _measure_zone(zone: Zone, data: DataFrame) -> Zone:
 
     if departure.empty:
         departure_multiple = 0.0
+        follow_through_ratio = 0.0
+        reversal_penalty = 1.0
     elif zone.zone_type == ZoneType.DEMAND:
         departure_multiple = max(
             0.0,
             (float(departure["High"].max()) - zone.upper_price) / zone_width,
         )
+        follow_through_ratio = float(
+            (departure["Close"] > zone.upper_price).sum()
+        ) / len(departure)
+        reversal_penalty = (
+            0.45 if float(departure["Close"].iloc[-1]) <= zone.upper_price
+            else 1.0
+        )
     else:
         departure_multiple = max(
             0.0,
             (zone.lower_price - float(departure["Low"].min())) / zone_width,
+        )
+        follow_through_ratio = float(
+            (departure["Close"] < zone.lower_price).sum()
+        ) / len(departure)
+        reversal_penalty = (
+            0.45 if float(departure["Close"].iloc[-1]) >= zone.lower_price
+            else 1.0
         )
 
     later = data.iloc[departure_end:]
@@ -101,7 +117,10 @@ def _measure_zone(zone: Zone, data: DataFrame) -> Zone:
             & (later["High"] >= zone.lower_price)
         ).sum()
     )
-    departure_strength = min(35.0, departure_multiple / 3.0 * 35.0)
+    departure_strength = min(
+        35.0,
+        departure_multiple / 3.0 * 35.0,
+    ) * follow_through_ratio * reversal_penalty
 
     return replace(
         zone,

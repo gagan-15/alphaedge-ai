@@ -159,10 +159,12 @@ class ZoneExplanationService:
 
     @staticmethod
     def _label(score: float) -> str:
-        if score >= 85:
-            return "Excellent"
-        if score >= 70:
+        if score >= 90:
+            return "Elite"
+        if score >= 75:
             return "Strong"
-        if score >= 55:
+        if score >= 60:
             return "Moderate"
-        return "Weak"
+        if score >= 40:
+            return "Weak"
+        return "Rejected"

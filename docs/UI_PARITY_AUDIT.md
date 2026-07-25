@@ -134,3 +134,9 @@ Scanner filters now work for market selection, timeframe, minimum rule quality, 
 or supply type, DBR/RBR/RBD/DBD pattern, zone status and maximum proximity. The visual
 workspace was checked with delayed results loaded and the table remains aligned at
 100-percent browser zoom.
+
+Zone ranking categories are Elite (90–100), Strong (75–89), Moderate (60–74), Weak
+(40–59) and Rejected (below 40). Rejected zones are hidden by default and can be enabled
+from the minimum-quality control. Departure strength now requires follow-through closes
+and applies a penalty when price immediately reverses into the zone; a brief maximum
+excursion alone cannot earn an explosive-departure score.

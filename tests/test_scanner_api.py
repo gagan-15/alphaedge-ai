@@ -87,3 +87,28 @@ def test_timeframe_data_aggregates_daily_candles() -> None:
     assert weekly.iloc[0]["Low"] == 99
     assert weekly.iloc[0]["Close"] == 105
     assert weekly.iloc[0]["Volume"] == 150
+
+
+def test_measure_zone_penalizes_departure_without_follow_through() -> None:
+    """A short move followed by immediate reversal must not score as explosive."""
+
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 103, "Low": 99, "Close": 102},
+            {"Open": 102, "High": 103, "Low": 100, "Close": 101},
+            {"Open": 101, "High": 110, "Low": 101, "Close": 108},
+            {"Open": 108, "High": 109, "Low": 99, "Close": 100},
+            {"Open": 100, "High": 102, "Low": 96, "Close": 98},
+        ]
+    )
+    measured = _measure_zone(
+        Zone(
+            zone_type=ZoneType.DEMAND,
+            upper_price=103,
+            lower_price=100,
+            created_index=1,
+        ),
+        data,
+    )
+
+    assert measured.strength < 10

@@ -35,6 +35,14 @@ function valueOrDash(value: number | null, digits = 2) {
     return value === null ? "—" : value.toLocaleString("en-IN", { maximumFractionDigits: digits });
 }
 
+function qualityLabel(score: number) {
+    if (score >= 90) return "Elite";
+    if (score >= 75) return "Strong";
+    if (score >= 60) return "Moderate";
+    if (score >= 40) return "Weak";
+    return "Rejected";
+}
+
 function ScannerResultsTable({ results }: ScannerResultsTableProps) {
     const [sortField, setSortField] = useState<"symbol" | "zone_score" | "distance_percent">("zone_score");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -143,7 +151,12 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                                 </TableCell>
                                                 <TableCell align="right">
                                                     <Box sx={{ display: "inline-flex", gap: .7, alignItems: "center" }}>
-                                                        <Typography sx={{ fontWeight: 850 }}>{result.zone_score.toFixed(0)}</Typography>
+                                                        <Box>
+                                                            <Typography sx={{ fontWeight: 850 }}>{result.zone_score.toFixed(0)}</Typography>
+                                                            <Typography variant="caption" color="text.secondary">
+                                                                {qualityLabel(result.zone_score)}
+                                                            </Typography>
+                                                        </Box>
                                                         <Box sx={{ width: 36, height: 5, bgcolor: "rgba(143,161,184,.14)", borderRadius: 9, overflow: "hidden" }}>
                                                             <Box sx={{ width: `${Math.min(100, result.zone_score)}%`, height: "100%", bgcolor: result.zone_score >= 75 ? "success.main" : "warning.main" }} />
                                                         </Box>

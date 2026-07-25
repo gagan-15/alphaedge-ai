@@ -39,7 +39,7 @@ function Scanner() {
         useState<string | null>(null);
     const [searchQuery, setSearchQuery] =
         useState("");
-    const [minimumScore, setMinimumScore] = useState(0);
+    const [minimumScore, setMinimumScore] = useState(40);
     const [approvalFilter, setApprovalFilter] = useState("all");
     const [timeframe, setTimeframe] = useState("DAILY");
     const [market, setMarket] = useState("NSE");
