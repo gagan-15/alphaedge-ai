@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 
 import Header from "../components/header/Header";
+import MarketTicker from "../components/shared/MarketTicker";
 import ResearchDisclaimer from "../components/shared/ResearchDisclaimer";
 import RiskConsentDialog from "../components/shared/RiskConsentDialog";
 import Sidebar from "../components/sidebar/Sidebar";
@@ -21,6 +22,7 @@ function AppLayout({ children }: AppLayoutProps) {
             <Header />
             <Sidebar />
             <RiskConsentDialog />
+            <MarketTicker />
 
             <Box
                 component="main"

@@ -281,6 +281,7 @@ function Dashboard() {
             <Card
                 square
                 sx={{
+                    display: "none",
                     position: "fixed",
                     left: { xs: 64, lg: 196 },
                     right: 0,

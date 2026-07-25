@@ -81,6 +81,15 @@ class ZoneResearchResultResponse(APIResponseModel):
     distal_price: float
     distance_percent: float
     zone_score: float
+    score_kind: str = "RULE_BASED_QUALITY"
+    freshness_score: float
+    strength_score: float
+    touch_score: float
+    merge_score: float
+    is_fresh: bool
+    touch_count: int
+    merged_count: int
+    evidence: tuple[str, ...]
     current_price: float
     timeframe: str
     base_index: int

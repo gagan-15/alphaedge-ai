@@ -6,6 +6,7 @@ import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -94,7 +95,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                     <TableCell align="right">Proximal</TableCell>
                                     <TableCell align="right">Distal</TableCell>
                                     <TableCell align="right">Distance</TableCell>
-                                    <TableCell align="right">{sortableLabel("zone_score", "Score")}</TableCell>
+                                    <TableCell align="right">{sortableLabel("zone_score", "Quality")}</TableCell>
                                     <TableCell align="right">LTP / Entry</TableCell>
                                     <TableCell>Base date</TableCell>
                                     <TableCell>Timeframe</TableCell>
@@ -156,6 +157,37 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                                 <TableCell colSpan={12} sx={{ py: 0, borderBottom: expanded ? undefined : 0 }}>
                                                     <Collapse in={expanded} timeout="auto" unmountOnExit>
                                                         <Box sx={{ py: 1.5 }}>
+                                                            <Card variant="outlined" sx={{ mb: 1.5 }}>
+                                                                <CardContent>
+                                                                    <Stack
+                                                                        direction={{ xs: "column", lg: "row" }}
+                                                                        spacing={2}
+                                                                        sx={{ justifyContent: "space-between" }}
+                                                                    >
+                                                                        <Box>
+                                                                            <Typography variant="h6">
+                                                                                Why this zone has quality {result.zone_score.toFixed(0)}/100
+                                                                            </Typography>
+                                                                            <Typography color="warning.main" variant="caption">
+                                                                                Rule-based research quality — not a success probability or return promise.
+                                                                            </Typography>
+                                                                        </Box>
+                                                                        <Stack direction="row" spacing={2} sx={{ flexWrap: "wrap" }}>
+                                                                            <Typography variant="body2">Freshness <b>{result.freshness_score}/30</b></Typography>
+                                                                            <Typography variant="body2">Strength <b>{result.strength_score}/35</b></Typography>
+                                                                            <Typography variant="body2">Touches <b>{result.touch_score}/20</b></Typography>
+                                                                            <Typography variant="body2">Confluence <b>{result.merge_score}/15</b></Typography>
+                                                                        </Stack>
+                                                                    </Stack>
+                                                                    <Stack spacing={0.5} sx={{ mt: 1.5 }}>
+                                                                        {result.evidence.map((point) => (
+                                                                            <Typography key={point} variant="body2" color="text.secondary">
+                                                                                • {point}
+                                                                            </Typography>
+                                                                        ))}
+                                                                    </Stack>
+                                                                </CardContent>
+                                                            </Card>
                                                             <ZoneDetailChart result={result} />
                                                         </Box>
                                                     </Collapse>

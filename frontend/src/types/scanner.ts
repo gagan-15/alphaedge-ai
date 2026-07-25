@@ -58,6 +58,15 @@ export interface ZoneResearchResult {
     distal_price: number;
     distance_percent: number;
     zone_score: number;
+    score_kind: "RULE_BASED_QUALITY";
+    freshness_score: number;
+    strength_score: number;
+    touch_score: number;
+    merge_score: number;
+    is_fresh: boolean;
+    touch_count: number;
+    merged_count: number;
+    evidence: string[];
     current_price: number;
     timeframe: string;
     base_index: number;

@@ -5,7 +5,10 @@ Sprint:
     2.64 - Scanner Results Foundation
 """
 
+from dataclasses import replace
+
 from fastapi import APIRouter
+from pandas import DataFrame
 
 from backend.api.models.scanner_response import (
     ScannerResponse,
@@ -17,9 +20,13 @@ from backend.config.scanner_config import ScannerConfig
 from backend.engines.demand_supply_engine.zone_detection_engine import (
     ZoneDetectionEngine,
 )
+from backend.engines.zone_scoring_engine.zone_scoring_engine import (
+    ZoneScoringEngine,
+)
 from backend.models.market_scanner.market_scanner_result import (
     MarketScannerResult,
 )
+from backend.models.zone import Zone, ZoneType
 from backend.services.scanner.scanner_service import (
     ScannerService,
 )
@@ -33,7 +40,46 @@ scanner_router = APIRouter(
 _scanner_service = ScannerService()
 _zone_market_data = MarketDataService()
 _zone_engine = ZoneDetectionEngine()
+_zone_scoring_engine = ZoneScoringEngine()
 _zone_config = ScannerConfig()
+
+
+def _measure_zone(zone: Zone, data: DataFrame) -> Zone:
+    """Add observable freshness, retest and departure measurements."""
+
+    zone_width = max(zone.upper_price - zone.lower_price, 1e-9)
+    departure_start = min(zone.created_index + 1, len(data))
+    departure_end = min(departure_start + 3, len(data))
+    departure = data.iloc[departure_start:departure_end]
+
+    if departure.empty:
+        departure_multiple = 0.0
+    elif zone.zone_type == ZoneType.DEMAND:
+        departure_multiple = max(
+            0.0,
+            (float(departure["High"].max()) - zone.upper_price) / zone_width,
+        )
+    else:
+        departure_multiple = max(
+            0.0,
+            (zone.lower_price - float(departure["Low"].min())) / zone_width,
+        )
+
+    later = data.iloc[departure_end:]
+    touches = int(
+        (
+            (later["Low"] <= zone.upper_price)
+            & (later["High"] >= zone.lower_price)
+        ).sum()
+    )
+    departure_strength = min(35.0, departure_multiple / 3.0 * 35.0)
+
+    return replace(
+        zone,
+        strength=round(departure_strength, 2),
+        is_fresh=touches == 0,
+        touch_count=touches,
+    )
 
 
 def build_scanner_response(
@@ -140,11 +186,12 @@ def get_research_zones() -> ZoneResearchResponse:
             scanned += 1
             current_price = float(data["Close"].iloc[-1])
             zones = _zone_engine.detect_zones(data)
-            for zone in sorted(
+            for detected_zone in sorted(
                 zones,
                 key=lambda item: item.created_index,
                 reverse=True,
             )[:4]:
+                zone = _measure_zone(detected_zone, data)
                 if zone.lower_price <= current_price <= zone.upper_price:
                     distance = 0.0
                     status = "IN ZONE"
@@ -155,9 +202,31 @@ def get_research_zones() -> ZoneResearchResponse:
                     distance = (zone.lower_price - current_price) / current_price * 100
                     status = "APPROACHING" if distance <= 5 else "WATCH"
 
-                recency = zone.created_index / max(len(data) - 1, 1)
-                score = min(95.0, 55.0 + recency * 35.0)
+                zone_score = _zone_scoring_engine.score([zone]).scored_zones[0]
                 demand = zone.zone_type.value == "DEMAND"
+                evidence = (
+                    (
+                        "Fresh: price has not retested the zone after formation."
+                        if zone.is_fresh
+                        else (
+                            f"Retested: {zone.touch_count} later touch(es) "
+                            "reduce quality."
+                        )
+                    ),
+                    (
+                        "Departure strength contribution: "
+                        f"{zone_score.strength_score:.1f}/35."
+                    ),
+                    f"Touch contribution: {zone_score.touch_score:.1f}/20.",
+                    (
+                        "Confluence/merge contribution: "
+                        f"{zone_score.merge_bonus:.1f}/15."
+                    ),
+                    (
+                        "This quality score is rule-based and is not a "
+                        "probability that the zone will hold."
+                    ),
+                )
                 results.append(
                     ZoneResearchResultResponse(
                         symbol=symbol,
@@ -166,7 +235,15 @@ def get_research_zones() -> ZoneResearchResponse:
                         proximal_price=zone.upper_price if demand else zone.lower_price,
                         distal_price=zone.lower_price if demand else zone.upper_price,
                         distance_percent=round(distance, 2),
-                        zone_score=round(score, 1),
+                        zone_score=round(zone_score.total_score, 1),
+                        freshness_score=round(zone_score.freshness_score, 1),
+                        strength_score=round(zone_score.strength_score, 1),
+                        touch_score=round(zone_score.touch_score, 1),
+                        merge_score=round(zone_score.merge_bonus, 1),
+                        is_fresh=zone.is_fresh,
+                        touch_count=zone.touch_count,
+                        merged_count=zone.merged_count,
+                        evidence=evidence,
                         current_price=current_price,
                         timeframe=_zone_config.interval,
                         base_index=zone.created_index,
