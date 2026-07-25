@@ -16,6 +16,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
+import TableSortLabel from "@mui/material/TableSortLabel";
+import { useMemo, useState } from "react";
 
 import type { ScannerResult } from "../../types/scanner";
 
@@ -26,6 +28,39 @@ interface ScannerResultsTableProps {
 function ScannerResultsTable({
     results,
 }: ScannerResultsTableProps) {
+    const [sortField, setSortField] = useState<"symbol" | "confirmation_score" | "risk_reward_ratio">("confirmation_score");
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+
+    const sortedResults = useMemo(() => [...results].sort((left, right) => {
+        const first = left[sortField];
+        const second = right[sortField];
+        const comparison = typeof first === "string"
+            ? first.localeCompare(String(second))
+            : Number(first) - Number(second);
+        return sortDirection === "asc" ? comparison : -comparison;
+    }), [results, sortDirection, sortField]);
+
+    function chooseSort(field: typeof sortField) {
+        if (field === sortField) {
+            setSortDirection((current) => current === "asc" ? "desc" : "asc");
+        } else {
+            setSortField(field);
+            setSortDirection("desc");
+        }
+    }
+
+    function sortableLabel(field: typeof sortField, label: string) {
+        return (
+            <TableSortLabel
+                active={sortField === field}
+                direction={sortField === field ? sortDirection : "asc"}
+                onClick={() => chooseSort(field)}
+            >
+                {label}
+            </TableSortLabel>
+        );
+    }
+
     return (
         <Card>
             <CardContent>
@@ -64,7 +99,7 @@ function ScannerResultsTable({
                             <TableHead>
                                 <TableRow>
                                     <TableCell>
-                                        Symbol
+                                        {sortableLabel("symbol", "Symbol")}
                                     </TableCell>
 
                                     <TableCell align="right">
@@ -80,25 +115,22 @@ function ScannerResultsTable({
                                     </TableCell>
 
                                     <TableCell align="right">
-                                        RR
+                                        {sortableLabel("risk_reward_ratio", "RR")}
                                     </TableCell>
 
                                     <TableCell align="right">
-                                        Conditions
+                                        {sortableLabel("confirmation_score", "Score")}
                                     </TableCell>
 
-                                    <TableCell align="center">
-                                        Risk Check
-                                    </TableCell>
-
-                                    <TableCell align="center">
-                                        Setup Valid
-                                    </TableCell>
+                                    <TableCell align="center">Trend</TableCell>
+                                    <TableCell align="center">Volume</TableCell>
+                                    <TableCell align="center">Momentum</TableCell>
+                                    <TableCell align="center">Risk Status</TableCell>
                                 </TableRow>
                             </TableHead>
 
                             <TableBody>
-                                {results.map(
+                                {sortedResults.map(
                                     (result) => (
                                         <TableRow
                                             hover
@@ -114,31 +146,31 @@ function ScannerResultsTable({
 
                                             <TableCell align="right">
                                                 {
-                                                    result.entry_price
+                                                    result.entry_price.toLocaleString("en-IN", { maximumFractionDigits: 2 })
                                                 }
                                             </TableCell>
 
                                             <TableCell align="right">
                                                 {
-                                                    result.stop_loss
+                                                    result.stop_loss.toLocaleString("en-IN", { maximumFractionDigits: 2 })
                                                 }
                                             </TableCell>
 
                                             <TableCell align="right">
                                                 {
-                                                    result.target_price
+                                                    result.target_price.toLocaleString("en-IN", { maximumFractionDigits: 2 })
                                                 }
                                             </TableCell>
 
                                             <TableCell align="right">
                                                 {
-                                                    result.risk_reward_ratio
+                                                    result.risk_reward_ratio.toFixed(2)
                                                 }
                                             </TableCell>
 
                                             <TableCell align="right">
                                                 {
-                                                    result.confirmation_score
+                                                    result.confirmation_score.toFixed(0)
                                                 }
                                                 %
                                             </TableCell>
@@ -146,14 +178,12 @@ function ScannerResultsTable({
                                             <TableCell align="center">
                                                 <Chip
                                                     color={
-                                                        result.approved
+                                                        result.trend_confirmed
                                                             ? "success"
                                                             : "error"
                                                     }
                                                     label={
-                                                        result.approved
-                                                            ? "Yes"
-                                                            : "No"
+                                                        result.trend_confirmed ? "✓" : "—"
                                                     }
                                                     size="small"
                                                 />
@@ -162,15 +192,29 @@ function ScannerResultsTable({
                                             <TableCell align="center">
                                                 <Chip
                                                     color={
-                                                        result.confirmed
+                                                        result.volume_confirmed
                                                             ? "success"
                                                             : "default"
                                                     }
                                                     label={
-                                                        result.confirmed
-                                                            ? "Yes"
-                                                            : "No"
+                                                        result.volume_confirmed ? "✓" : "—"
                                                     }
+                                                    size="small"
+                                                />
+                                            </TableCell>
+
+                                            <TableCell align="center">
+                                                <Chip
+                                                    color={result.momentum_confirmed ? "success" : "default"}
+                                                    label={result.momentum_confirmed ? "✓" : "—"}
+                                                    size="small"
+                                                />
+                                            </TableCell>
+
+                                            <TableCell align="center">
+                                                <Chip
+                                                    color={result.approved ? "success" : "warning"}
+                                                    label={result.approved ? "Passed" : "Review"}
                                                     size="small"
                                                 />
                                             </TableCell>

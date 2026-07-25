@@ -334,6 +334,8 @@ Verified current capabilities:
   evaluation, condition status and removal
 - Comparable-product audit documented scanner density, timeframe tabs, MTF
   confluence, sector rotation, command search, onboarding and alert patterns
+- Scanner table now sorts by symbol, score and risk/reward and exposes trend,
+  volume, momentum and risk-engine status separately
 
 Important limitations:
 
