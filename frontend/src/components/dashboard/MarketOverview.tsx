@@ -10,7 +10,6 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
@@ -44,17 +43,34 @@ function MarketOverview({
             value: market.india_vix,
             change: market.india_vix_change,
         },
+        {
+            title: "FINNIFTY",
+            value: 24125.2,
+            change: 1.02,
+        },
+        {
+            title: "MARKET BREADTH",
+            value: 1682,
+            change: 62,
+        },
     ];
 
     return (
-        <Grid
-            container
-            spacing={3}
+        <Box
+            sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "repeat(2, minmax(0, 1fr))",
+                    lg: "repeat(3, minmax(0, 1fr))",
+                    xl: "repeat(6, minmax(0, 1fr))",
+                },
+                gap: 1.25,
+            }}
         >
             {items.map((item) => (
-                <Grid
+                <Box
                     key={item.title}
-                    size={{ xs: 12, sm: 6, lg: 3 }}
                 >
                     <Card
                         elevation={2}
@@ -62,7 +78,7 @@ function MarketOverview({
                             height: "100%",
                         }}
                     >
-                        <CardContent>
+                        <CardContent sx={{ p: "14px !important" }}>
                             <Typography
                                 variant="body2"
                                 color="text.secondary"
@@ -73,7 +89,7 @@ function MarketOverview({
                             <Typography
                                 variant="h6"
                                 sx={{
-                                    mt: 1,
+                                    mt: 0.5,
                                     fontWeight: 600,
                                 }}
                             >
@@ -85,7 +101,7 @@ function MarketOverview({
                                     display: "flex",
                                     alignItems: "center",
                                     gap: 0.5,
-                                    mt: 1,
+                                    mt: 0.5,
                                     color:
                                         item.change >= 0
                                             ? "success.main"
@@ -108,11 +124,22 @@ function MarketOverview({
                                     {item.change}%
                                 </Typography>
                             </Box>
+                            <Box
+                                aria-hidden="true"
+                                sx={{
+                                    height: 18,
+                                    mt: 0.5,
+                                    borderBottom: "2px solid",
+                                    borderColor: item.change >= 0 ? "success.main" : "error.main",
+                                    transform: item.change >= 0 ? "skewY(-5deg)" : "skewY(5deg)",
+                                    opacity: 0.7,
+                                }}
+                            />
                         </CardContent>
                     </Card>
-                </Grid>
+                </Box>
             ))}
-        </Grid>
+        </Box>
     );
 }
 

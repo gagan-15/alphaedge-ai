@@ -51,7 +51,7 @@ function TradingChart() {
 
                 new window.TradingView.widget({
                     autosize: true,
-                    symbol: "NASDAQ:AAPL",
+                    symbol: "NSE:RELIANCE",
                     interval: "D",
                     timezone: "Asia/Kolkata",
                     theme: "dark",
@@ -93,7 +93,7 @@ function TradingChart() {
         <Card
             elevation={2}
             sx={{
-                height: 720,
+                height: 430,
             }}
         >
             <CardContent

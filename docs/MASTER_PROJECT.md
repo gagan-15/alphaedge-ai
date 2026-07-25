@@ -305,6 +305,8 @@ Verified current capabilities:
   management workspace
 - Local Vite development opens with a clearly marked demo session; production
   builds continue to require authentication
+- Dashboard visual-density pass: compact six-card market strip, NSE Reliance
+  chart, side signal/insight columns and lower intelligence panels
 
 Important limitations:
 
