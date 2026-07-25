@@ -17,12 +17,15 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import AIAssistant from "./pages/AIAssistant";
 import Alerts from "./pages/Alerts";
 import Backtesting from "./pages/Backtesting";
+import Calculators from "./pages/Calculators";
 import Dashboard from "./pages/Dashboard";
+import EconomicCalendar from "./pages/EconomicCalendar";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import MyHoldings from "./pages/MyHoldings";
 import MarketBreadth from "./pages/MarketBreadth";
 import NewsEvents from "./pages/NewsEvents";
+import OptionChain from "./pages/OptionChain";
 import Reports from "./pages/Reports";
 import RiskManagement from "./pages/RiskManagement";
 import Register from "./pages/Register";
@@ -32,10 +35,7 @@ import Settings from "./pages/Settings";
 import Watchlist from "./pages/Watchlist";
 import VerifyEmail from "./pages/VerifyEmail";
 import {
-    CalculatorsPage,
-    EconomicCalendarPage,
     MarketOverviewPage,
-    OptionChainPage,
 } from "./pages/WorkspaceScreens";
 
 function PrivatePage({ children }: { children: React.ReactNode }) {
@@ -93,9 +93,9 @@ function App() {
             <Route path="/market-breadth" element={<PrivatePage><MarketBreadth /></PrivatePage>} />
             <Route path="/news" element={<PrivatePage><NewsEvents /></PrivatePage>} />
             <Route path="/alerts" element={<PrivatePage><Alerts /></PrivatePage>} />
-            <Route path="/economic-calendar" element={<PrivatePage><EconomicCalendarPage /></PrivatePage>} />
-            <Route path="/option-chain" element={<PrivatePage><OptionChainPage /></PrivatePage>} />
-            <Route path="/calculators" element={<PrivatePage><CalculatorsPage /></PrivatePage>} />
+            <Route path="/economic-calendar" element={<PrivatePage><EconomicCalendar /></PrivatePage>} />
+            <Route path="/option-chain" element={<PrivatePage><OptionChain /></PrivatePage>} />
+            <Route path="/calculators" element={<PrivatePage><Calculators /></PrivatePage>} />
             <Route path="/risk-management" element={<PrivatePage><RiskManagement /></PrivatePage>} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

@@ -152,3 +152,9 @@ live performance. Risk Management now calculates capital at risk, position size,
 exposure and risk/reward from user inputs. Alerts can be created, checked against
 delayed prices, paused, resumed and deleted, with local persistence and no implied
 broker execution.
+
+Economic Calendar now has working country, impact and date-window controls with a
+clear demo-feed label. Option Chain now recalculates visible strikes when the
+underlying or strike count changes and marks the illustrative ATM row. Calculators
+now use one consistent workspace with working position-size, risk/reward, profit,
+average-price, SIP and Fibonacci tools.
