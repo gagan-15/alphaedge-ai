@@ -37,6 +37,12 @@ interface ScannerToolbarProps {
     timeframe: string;
     onMarketChange: (value: string) => void;
     onTimeframeChange: (value: string) => void;
+    patternFilter: string;
+    statusFilter: string;
+    proximityFilter: number;
+    onPatternFilterChange: (value: string) => void;
+    onStatusFilterChange: (value: string) => void;
+    onProximityFilterChange: (value: number) => void;
 }
 
 function ScannerToolbar({
@@ -55,11 +61,17 @@ function ScannerToolbar({
     timeframe,
     onMarketChange,
     onTimeframeChange,
+    patternFilter,
+    statusFilter,
+    proximityFilter,
+    onPatternFilterChange,
+    onStatusFilterChange,
+    onProximityFilterChange,
 }: ScannerToolbarProps) {
     return (
         <Card>
             <CardContent>
-                <Stack spacing={4}>
+                <Stack spacing={2}>
                     <Stack
                         sx={{
                             flexDirection: "row",
@@ -147,7 +159,7 @@ function ScannerToolbar({
                         container
                         spacing={2}
                     >
-                        <Grid size={{ xs: 12, md: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
                             <Typography
                                 variant="body2"
                                 color="text.secondary"
@@ -171,7 +183,7 @@ function ScannerToolbar({
                             </Select>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
                             <Typography
                                 variant="body2"
                                 color="text.secondary"
@@ -211,7 +223,7 @@ function ScannerToolbar({
                             </Select>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
                             <Typography
                                 variant="body2"
                                 color="text.secondary"
@@ -232,7 +244,7 @@ function ScannerToolbar({
                             </Select>
                         </Grid>
 
-                        <Grid size={{ xs: 12, md: 3 }}>
+                        <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
                             <Typography
                                 variant="body2"
                                 color="text.secondary"
@@ -250,6 +262,49 @@ function ScannerToolbar({
                                 <MenuItem value="approved">Demand zones</MenuItem>
                                 <MenuItem value="rejected">Supply zones</MenuItem>
                             </Select>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                Pattern
+                            </Typography>
+                            <Select
+                                fullWidth
+                                value={patternFilter}
+                                onChange={(event) => onPatternFilterChange(event.target.value)}
+                            >
+                                <MenuItem value="all">All patterns</MenuItem>
+                                <MenuItem value="DROP_BASE_RALLY">DBR</MenuItem>
+                                <MenuItem value="RALLY_BASE_RALLY">RBR</MenuItem>
+                                <MenuItem value="RALLY_BASE_DROP">RBD</MenuItem>
+                                <MenuItem value="DROP_BASE_DROP">DBD</MenuItem>
+                            </Select>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                Status / proximity
+                            </Typography>
+                            <Stack direction="row" spacing={1}>
+                                <Select
+                                    fullWidth
+                                    value={statusFilter}
+                                    onChange={(event) => onStatusFilterChange(event.target.value)}
+                                >
+                                    <MenuItem value="all">All</MenuItem>
+                                    <MenuItem value="IN ZONE">In zone</MenuItem>
+                                    <MenuItem value="APPROACHING">Approaching</MenuItem>
+                                    <MenuItem value="WATCH">Watch</MenuItem>
+                                </Select>
+                                <Select
+                                    fullWidth
+                                    value={proximityFilter}
+                                    onChange={(event) => onProximityFilterChange(Number(event.target.value))}
+                                >
+                                    <MenuItem value={100}>Any distance</MenuItem>
+                                    <MenuItem value={1}>Within 1%</MenuItem>
+                                    <MenuItem value={3}>Within 3%</MenuItem>
+                                    <MenuItem value={5}>Within 5%</MenuItem>
+                                </Select>
+                            </Stack>
                         </Grid>
                     </Grid>
                 </Stack>

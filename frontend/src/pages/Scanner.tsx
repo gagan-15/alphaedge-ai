@@ -43,6 +43,9 @@ function Scanner() {
     const [approvalFilter, setApprovalFilter] = useState("all");
     const [timeframe, setTimeframe] = useState("DAILY");
     const [market, setMarket] = useState("NSE");
+    const [patternFilter, setPatternFilter] = useState("all");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [proximityFilter, setProximityFilter] = useState(100);
     const [timeframeCounts, setTimeframeCounts] = useState<Record<string, number>>({});
 
     function loadScanner(selectedTimeframe = timeframe) {
@@ -112,7 +115,17 @@ function Scanner() {
             approvalFilter === "all"
             || (approvalFilter === "approved" && result.zone_type === "DEMAND")
             || (approvalFilter === "rejected" && result.zone_type === "SUPPLY");
-        return matchesSymbol && matchesScore && matchesApproval;
+        const matchesPattern = patternFilter === "all"
+            || result.pattern_type === patternFilter;
+        const matchesStatus = statusFilter === "all"
+            || result.status === statusFilter;
+        const matchesProximity = result.distance_percent <= proximityFilter;
+        return matchesSymbol
+            && matchesScore
+            && matchesApproval
+            && matchesPattern
+            && matchesStatus
+            && matchesProximity;
     });
 
     function exportResults() {
@@ -169,6 +182,12 @@ function Scanner() {
                 timeframe={timeframe}
                 onMarketChange={changeMarket}
                 onTimeframeChange={changeTimeframe}
+                patternFilter={patternFilter}
+                statusFilter={statusFilter}
+                proximityFilter={proximityFilter}
+                onPatternFilterChange={setPatternFilter}
+                onStatusFilterChange={setStatusFilter}
+                onProximityFilterChange={setProximityFilter}
             />
 
             {market === "BSE" && (

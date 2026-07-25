@@ -129,3 +129,8 @@ Market Overview now includes an aligned five-index strip, working comparison-ran
 controls, a four-index performance visualization, breadth donut with participation
 counts, a movers table and positive/negative sector bars. Unlicensed breadth and index
 summary values remain explicitly labelled as delayed development data.
+
+Scanner filters now work for market selection, timeframe, minimum rule quality, demand
+or supply type, DBR/RBR/RBD/DBD pattern, zone status and maximum proximity. The visual
+workspace was checked with delayed results loaded and the table remains aligned at
+100-percent browser zoom.
