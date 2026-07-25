@@ -377,3 +377,18 @@ The current REST APIs are designed as the single integration layer for:
 - Future Public APIs
 
 All future clients must consume the backend through the public REST API rather than accessing business logic directly.
+# Historical Candles
+
+`GET /market/candles`
+
+Returns normalized OHLCV candles for a validated symbol. Development data uses
+the delayed Yahoo Finance feed through the replaceable market-data provider.
+
+Query parameters:
+
+- `symbol`: NSE equity symbol, default `RELIANCE`
+- `period`: `1mo`, `3mo`, `6mo`, `1y`, `2y` or `5y`
+- `interval`: `1d`, `1h`, `30m` or `15m`
+
+The response includes `source` and `delayed` fields so the UI can clearly label
+data quality. The endpoint is read-only and does not support order execution.

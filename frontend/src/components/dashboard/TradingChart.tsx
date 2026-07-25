@@ -20,6 +20,8 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
+import { getMarketCandles } from "../../api/marketApi";
+
 const ranges: Record<string, number> = {
     "1M": 22,
     "3M": 66,
@@ -28,7 +30,7 @@ const ranges: Record<string, number> = {
     ALL: 260,
 };
 
-const candleData = Array.from({ length: 260 }, (_, index) => {
+const fallbackCandleData = Array.from({ length: 260 }, (_, index) => {
     const trend = 2480 + index * 1.9;
     const wave = Math.sin(index * 0.21) * 55 + Math.sin(index * 0.053) * 70;
     const open = trend + wave;
@@ -43,20 +45,46 @@ const candleData = Array.from({ length: 260 }, (_, index) => {
     };
 });
 
-const movingAverage = candleData.map((candle, index) => {
+function calculateMovingAverage(data: typeof fallbackCandleData) {
+    return data.map((candle, index) => {
     const start = Math.max(0, index - 19);
-    const window = candleData.slice(start, index + 1);
+    const window = data.slice(start, index + 1);
     return {
         time: candle.time,
         value: window.reduce((total, item) => total + item.close, 0) / window.length,
     };
-});
+    });
+}
 
 function TradingChart() {
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
     const [activeRange, setActiveRange] = useState("6M");
     const [showIndicator, setShowIndicator] = useState(true);
+    const [chartData, setChartData] = useState(fallbackCandleData);
+    const [dataLabel, setDataLabel] = useState("Loading delayed market data...");
+
+    useEffect(() => {
+        void getMarketCandles("RELIANCE")
+            .then((result) => {
+                if (result.candles.length === 0) {
+                    throw new Error("No candles returned.");
+                }
+                setChartData(
+                    result.candles.map((candle) => ({
+                        time: Math.floor(new Date(candle.time).getTime() / 1000) as UTCTimestamp,
+                        open: candle.open,
+                        high: candle.high,
+                        low: candle.low,
+                        close: candle.close,
+                    })),
+                );
+                setDataLabel(`${result.source}${result.delayed ? " · delayed" : ""}`);
+            })
+            .catch(() => {
+                setDataLabel("Demo candles · backend feed unavailable");
+            });
+    }, []);
 
     useEffect(() => {
         const container = containerRef.current;
@@ -93,7 +121,7 @@ function TradingChart() {
             borderVisible: false,
             priceLineColor: "#35d07f",
         });
-        candles.setData(candleData);
+        candles.setData(chartData);
 
         if (showIndicator) {
             const average = chart.addSeries(LineSeries, {
@@ -102,14 +130,14 @@ function TradingChart() {
                 priceLineVisible: false,
                 lastValueVisible: false,
             });
-            average.setData(movingAverage);
+            average.setData(calculateMovingAverage(chartData));
         }
 
         chartRef.current = chart;
-        const visible = ranges[activeRange];
+        const visible = Math.min(ranges[activeRange], chartData.length);
         chart.timeScale().setVisibleLogicalRange({
-            from: candleData.length - visible,
-            to: candleData.length + 3,
+            from: chartData.length - visible,
+            to: chartData.length + 3,
         });
 
         const observer = new ResizeObserver(() => {
@@ -125,7 +153,7 @@ function TradingChart() {
             chart.remove();
             chartRef.current = null;
         };
-    }, [activeRange, showIndicator]);
+    }, [activeRange, chartData, showIndicator]);
 
     function chooseRange(range: string) {
         setActiveRange(range);
@@ -169,7 +197,7 @@ function TradingChart() {
             </Box>
             <Stack direction="row" sx={{ height: 40, px: 1.5, alignItems: "center", bgcolor: "#091423" }}>
                 <Typography color="text.secondary" variant="caption">
-                    Drag to pan · wheel to zoom · hover for crosshair
+                    Drag to pan · wheel to zoom · {dataLabel}
                 </Typography>
                 <Link
                     href="https://www.tradingview.com/"

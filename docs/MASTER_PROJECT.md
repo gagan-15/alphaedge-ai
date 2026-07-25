@@ -314,6 +314,9 @@ Verified current capabilities:
   AI prompt shortcuts and a live research ticker
 - Fixed double-counted desktop sidebar spacing and tuned dashboard typography,
   market-card height and chart-column proportions for 100% browser zoom
+- Read-only historical candle API connected to the chart through the Yahoo
+  development provider, with delayed-source and fallback labels
+- 238 backend tests passing
 
 Important limitations:
 

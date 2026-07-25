@@ -19,6 +19,7 @@ from backend.api.health import (
 from backend.api.scanner import (
     scanner_router,
 )
+from backend.api.market import market_router
 
 api_router = APIRouter()
 
@@ -36,4 +37,8 @@ api_router.include_router(
 
 api_router.include_router(
     scanner_router,
+)
+
+api_router.include_router(
+    market_router,
 )
