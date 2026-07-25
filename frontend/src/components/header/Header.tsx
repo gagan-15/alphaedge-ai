@@ -66,6 +66,10 @@ function Header() {
                     <Typography
                         component="div"
                         sx={{
+                            display: {
+                                xs: "block",
+                                md: "none",
+                            },
                             fontSize: {
                                 xs: "1.15rem",
                                 md: "1.55rem",
@@ -89,7 +93,7 @@ function Header() {
                         sx={{
                             display: {
                                 xs: "none",
-                                md: "block",
+                                md: "none",
                             },
                             mt: 0.5,
                             fontSize: "0.7rem",

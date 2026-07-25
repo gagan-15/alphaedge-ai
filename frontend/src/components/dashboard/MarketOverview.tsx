@@ -78,7 +78,7 @@ function MarketOverview({
                             height: "100%",
                         }}
                     >
-                        <CardContent sx={{ p: "14px !important" }}>
+                        <CardContent sx={{ p: "10px !important" }}>
                             <Typography
                                 variant="body2"
                                 color="text.secondary"
@@ -127,7 +127,7 @@ function MarketOverview({
                             <Box
                                 aria-hidden="true"
                                 sx={{
-                                    height: 18,
+                                    height: 10,
                                     mt: 0.5,
                                     borderBottom: "2px solid",
                                     borderColor: item.change >= 0 ? "success.main" : "error.main",

@@ -27,10 +27,6 @@ function AppLayout({ children }: AppLayoutProps) {
                         xs: "calc(100% - 64px)",
                         lg: "calc(100% - 196px)",
                     },
-                    ml: {
-                        xs: "64px",
-                        lg: "196px",
-                    },
                     pt: {
                         xs: "66px",
                         md: "66px",

@@ -42,12 +42,24 @@ const theme = createTheme({
     typography: {
         fontFamily:
             '"Inter", "Segoe UI", Roboto, Arial, sans-serif',
+        fontSize: 12,
         h4: {
             fontWeight: 750,
             letterSpacing: "-0.03em",
+            fontSize: "1.35rem",
         },
         h6: {
             fontWeight: 700,
+            fontSize: "0.9rem",
+        },
+        h5: {
+            fontSize: "1.12rem",
+        },
+        body1: {
+            fontSize: "0.78rem",
+        },
+        body2: {
+            fontSize: "0.72rem",
         },
         button: {
             fontWeight: 650,

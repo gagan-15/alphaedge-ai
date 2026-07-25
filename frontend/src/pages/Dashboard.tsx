@@ -80,11 +80,11 @@ function Dashboard() {
                 container
                 spacing={1.5}
             >
-                <Grid size={{ xs: 12, xl: 8 }}>
+                <Grid size={{ xs: 12, xl: 7 }}>
                     <TradingChart />
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 6, xl: 2.25 }}>
+                <Grid size={{ xs: 12, md: 6, xl: 2.5 }}>
                     <Card sx={{ height: "100%" }}>
                         <CardContent sx={{ p: 1.75 }}>
                             <Typography variant="h6" sx={{ mb: 1.25 }}>
@@ -115,7 +115,7 @@ function Dashboard() {
                     </Card>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 6, xl: 1.75 }}>
+                <Grid size={{ xs: 12, md: 6, xl: 2.5 }}>
                     <Stack spacing={1.5}>
                         <AIInsightCard
                             insight={dashboard.ai_explanation}

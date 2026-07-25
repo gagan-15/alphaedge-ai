@@ -312,6 +312,8 @@ Verified current capabilities:
 - 100% browser zoom shell aligned to a 196px desktop sidebar and 56px header
 - Dashboard now includes sector performance, FII/DII flow, sentiment, news,
   AI prompt shortcuts and a live research ticker
+- Fixed double-counted desktop sidebar spacing and tuned dashboard typography,
+  market-card height and chart-column proportions for 100% browser zoom
 
 Important limitations:
 
