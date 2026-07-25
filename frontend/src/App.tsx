@@ -16,6 +16,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 
 import AIAssistant from "./pages/AIAssistant";
 import Alerts from "./pages/Alerts";
+import Backtesting from "./pages/Backtesting";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
@@ -23,6 +24,7 @@ import MyHoldings from "./pages/MyHoldings";
 import MarketBreadth from "./pages/MarketBreadth";
 import NewsEvents from "./pages/NewsEvents";
 import Reports from "./pages/Reports";
+import RiskManagement from "./pages/RiskManagement";
 import Register from "./pages/Register";
 import Scanner from "./pages/Scanner";
 import Signals from "./pages/Signals";
@@ -34,8 +36,6 @@ import {
     EconomicCalendarPage,
     MarketOverviewPage,
     OptionChainPage,
-    BacktestingPage,
-    RiskManagementPage,
 } from "./pages/WorkspaceScreens";
 
 function PrivatePage({ children }: { children: React.ReactNode }) {
@@ -75,7 +75,7 @@ function App() {
             />
             <Route
                 path="/backtest"
-                element={<PrivatePage><BacktestingPage /></PrivatePage>}
+                element={<PrivatePage><Backtesting /></PrivatePage>}
             />
             <Route
                 path="/ai-assistant"
@@ -96,7 +96,7 @@ function App() {
             <Route path="/economic-calendar" element={<PrivatePage><EconomicCalendarPage /></PrivatePage>} />
             <Route path="/option-chain" element={<PrivatePage><OptionChainPage /></PrivatePage>} />
             <Route path="/calculators" element={<PrivatePage><CalculatorsPage /></PrivatePage>} />
-            <Route path="/risk-management" element={<PrivatePage><RiskManagementPage /></PrivatePage>} />
+            <Route path="/risk-management" element={<PrivatePage><RiskManagement /></PrivatePage>} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
     );

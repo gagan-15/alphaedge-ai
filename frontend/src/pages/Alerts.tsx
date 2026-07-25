@@ -26,6 +26,7 @@ interface PriceAlert {
     condition: "above" | "below";
     target: number;
     current: number | null;
+    enabled: boolean;
 }
 
 const storageKey = "alphaedge.local.alerts";
@@ -33,7 +34,9 @@ const storageKey = "alphaedge.local.alerts";
 function loadAlerts(): PriceAlert[] {
     try {
         const parsed = JSON.parse(localStorage.getItem(storageKey) ?? "[]");
-        return Array.isArray(parsed) ? parsed : [];
+        return Array.isArray(parsed)
+            ? parsed.map((item) => ({ ...item, enabled: item.enabled ?? true }))
+            : [];
     } catch {
         return [];
     }
@@ -45,6 +48,7 @@ function Alerts() {
     const [condition, setCondition] = useState<"above" | "below">("above");
     const [target, setTarget] = useState("");
     const [message, setMessage] = useState("");
+    const [view, setView] = useState<"active" | "paused">("active");
 
     useEffect(() => {
         localStorage.setItem(storageKey, JSON.stringify(alerts.map((item) => ({ ...item, current: null }))));
@@ -63,6 +67,7 @@ function Alerts() {
             condition,
             target: parsedTarget,
             current: null,
+            enabled: true,
         }]);
         setSymbol("");
         setTarget("");
@@ -72,6 +77,7 @@ function Alerts() {
     async function checkAlerts() {
         setMessage("Checking delayed prices...");
         const checked = await Promise.all(alerts.map(async (item) => {
+            if (!item.enabled) return item;
             try {
                 const data = await getMarketCandles(item.symbol, "1mo", "1d");
                 return { ...item, current: data.candles.at(-1)?.close ?? null };
@@ -107,12 +113,16 @@ function Alerts() {
                 {message && <Alert severity="info" sx={{ mt: 1.5 }}>{message}</Alert>}
             </CardContent></Card>
             <Card><CardContent>
-                {alerts.length === 0 ? <Alert severity="info">No alerts created yet.</Alert> : (
+                <Stack direction="row" spacing={1} sx={{ mb: 1.5 }}>
+                    <Button size="small" variant={view === "active" ? "contained" : "outlined"} onClick={() => setView("active")}>Active alerts</Button>
+                    <Button size="small" variant={view === "paused" ? "contained" : "outlined"} onClick={() => setView("paused")}>Paused alerts</Button>
+                </Stack>
+                {alerts.filter((item) => view === "active" ? item.enabled : !item.enabled).length === 0 ? <Alert severity="info">No {view} alerts.</Alert> : (
                     <Table size="small">
                         <TableHead><TableRow>
                             {["Symbol", "Condition", "Target", "Delayed price", "Status", ""].map((label) => <TableCell key={label}>{label}</TableCell>)}
                         </TableRow></TableHead>
-                        <TableBody>{alerts.map((item) => {
+                        <TableBody>{alerts.filter((item) => view === "active" ? item.enabled : !item.enabled).map((item) => {
                             const triggered = item.current !== null
                                 && (item.condition === "above" ? item.current >= item.target : item.current <= item.target);
                             return <TableRow key={item.id}>
@@ -121,7 +131,15 @@ function Alerts() {
                                 <TableCell>₹{item.target.toLocaleString("en-IN")}</TableCell>
                                 <TableCell>{item.current === null ? "Not checked" : `₹${item.current.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`}</TableCell>
                                 <TableCell><Chip size="small" color={triggered ? "warning" : "default"} label={triggered ? "Condition met" : "Watching"} /></TableCell>
-                                <TableCell><IconButton onClick={() => setAlerts((current) => current.filter((alertItem) => alertItem.id !== item.id))}><DeleteOutlinedIcon fontSize="small" /></IconButton></TableCell>
+                                <TableCell>
+                                    <Button
+                                        size="small"
+                                        onClick={() => setAlerts((current) => current.map((alertItem) => alertItem.id === item.id ? { ...alertItem, enabled: !alertItem.enabled } : alertItem))}
+                                    >
+                                        {item.enabled ? "Pause" : "Resume"}
+                                    </Button>
+                                    <IconButton onClick={() => setAlerts((current) => current.filter((alertItem) => alertItem.id !== item.id))}><DeleteOutlinedIcon fontSize="small" /></IconButton>
+                                </TableCell>
                             </TableRow>;
                         })}</TableBody>
                     </Table>

@@ -145,3 +145,10 @@ Market Breadth now has working range controls, an advance–decline visualizatio
 participation bars and 52-week high/low summaries. News & Events now has working
 Overview, Technical, Sentiment and Scenarios tabs plus an event monitor. Both screens
 show explicit demo/provider limitations instead of implying that static values are live.
+
+Backtesting now has working strategy, period and cost controls, recalculates an
+illustrative historical result, and clearly separates research output from verified
+live performance. Risk Management now calculates capital at risk, position size,
+exposure and risk/reward from user inputs. Alerts can be created, checked against
+delayed prices, paused, resumed and deleted, with local persistence and no implied
+broker execution.
