@@ -332,6 +332,8 @@ Verified current capabilities:
   user accepts research-only, no-guarantee and no-execution terms
 - Alerts support local validated conditions, persistence, manual delayed-price
   evaluation, condition status and removal
+- Comparable-product audit documented scanner density, timeframe tabs, MTF
+  confluence, sector rotation, command search, onboarding and alert patterns
 
 Important limitations:
 

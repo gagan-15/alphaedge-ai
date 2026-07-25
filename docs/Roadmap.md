@@ -199,6 +199,14 @@ Current authentication state:
 - Local-development watchlist connected to delayed market prices
 - Manual research portfolio with delayed valuation implemented
 - Local price-condition alerts with manual delayed-price evaluation implemented
+
+Reference-driven priorities:
+
+- Zone metadata and sortable scanner columns
+- Multi-timeframe confluence
+- Benchmark-relative sector rotation
+- Command search and guided onboarding
+- Honest in-app polling limitations and optional Telegram delivery
 - Production email delivery pending approval before public launch
 - Login and registration UI implemented
 - Protected-route refresh bootstrap pending
