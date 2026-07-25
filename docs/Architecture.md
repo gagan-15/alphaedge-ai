@@ -1012,6 +1012,16 @@ TradingView attribution.
 
 ---
 
+## AD-041 - Layered Risk Acknowledgement
+
+Registration consent remains authoritative for account creation. A separate
+versioned browser acknowledgement is shown before entering the application so
+the research-only, no-guarantee and no-order-execution boundaries remain
+visible. It does not claim regulatory registration and does not replace legal
+terms or professional advice.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:

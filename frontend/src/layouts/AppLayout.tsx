@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 
 import Header from "../components/header/Header";
 import ResearchDisclaimer from "../components/shared/ResearchDisclaimer";
+import RiskConsentDialog from "../components/shared/RiskConsentDialog";
 import Sidebar from "../components/sidebar/Sidebar";
 
 interface AppLayoutProps {
@@ -19,6 +20,7 @@ function AppLayout({ children }: AppLayoutProps) {
         >
             <Header />
             <Sidebar />
+            <RiskConsentDialog />
 
             <Box
                 component="main"

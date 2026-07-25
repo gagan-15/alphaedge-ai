@@ -327,6 +327,9 @@ Verified current capabilities:
   delayed backend candle prices with daily change and failure states
 - Portfolio supports manual holdings, browser persistence, delayed prices,
   calculated value and P&L, validation and removal without broker connectivity
+- Split-screen login explains the product without performance promises
+- Versioned first-entry risk acknowledgement blocks the workspace until the
+  user accepts research-only, no-guarantee and no-execution terms
 
 Important limitations:
 
