@@ -130,6 +130,7 @@ class MarketOpportunityService:
             touch_count=selected_zone.touch_count,
             base_index=selected_zone.created_index,
             timeframe=self._config.interval,
+            pattern_type=selected_zone.pattern_type,
         )
 
     def _eligible_demand_zones(

@@ -164,6 +164,13 @@ function Login() {
                             New to AlphaEdge AI?{" "}
                             <Link component={RouterLink} to="/register">Create an account</Link>
                         </Typography>
+                        <Link
+                            component={RouterLink}
+                            to="/"
+                            sx={{ display: "inline-block", mt: 2, fontSize: ".74rem" }}
+                        >
+                            ← Back to complete product overview
+                        </Link>
                         <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 4, lineHeight: 1.55 }}>
                             Educational and analytical use only. Market outcomes are uncertain,
                             and historical results do not guarantee future performance.

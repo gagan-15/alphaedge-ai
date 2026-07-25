@@ -41,3 +41,5 @@ class Zone:
     touch_count: int = 0
 
     merged_count: int = 1
+
+    pattern_type: str | None = None

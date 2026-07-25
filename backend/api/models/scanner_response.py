@@ -56,6 +56,7 @@ class ScannerResultResponse(APIResponseModel):
     base_index: int | None = None
 
     timeframe: str | None = None
+    pattern_type: str | None = None
 
 
 class ScannerResponse(APIResponseModel):
@@ -68,3 +69,29 @@ class ScannerResponse(APIResponseModel):
     total_matches: int
 
     results: tuple[ScannerResultResponse, ...]
+
+
+class ZoneResearchResultResponse(APIResponseModel):
+    """Detected zone context without execution claims."""
+
+    symbol: str
+    zone_type: str
+    pattern_type: str | None = None
+    proximal_price: float
+    distal_price: float
+    distance_percent: float
+    zone_score: float
+    current_price: float
+    timeframe: str
+    base_index: int
+    base_date: str
+    status: str
+
+
+class ZoneResearchResponse(APIResponseModel):
+    """Research zones across the configured scanner universe."""
+
+    total_scanned: int
+    total_zones: int
+    delayed: bool = True
+    results: tuple[ZoneResearchResultResponse, ...]

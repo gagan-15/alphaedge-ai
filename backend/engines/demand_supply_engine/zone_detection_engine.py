@@ -141,6 +141,7 @@ class ZoneDetectionEngine:
             upper_price=upper_price,
             lower_price=lower_price,
             created_index=base.end_index,
+            pattern_type=pattern.pattern_type.value,
         )
 
     @staticmethod

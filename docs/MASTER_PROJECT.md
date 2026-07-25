@@ -345,6 +345,12 @@ Verified current capabilities:
   page with a research preview, feature explanations, workflow, safety
   disclosure and free local-demo entry. Unsupported pricing and testimonials
   are intentionally excluded.
+- Zone Intelligence now exposes recent demand and supply zones independently
+  from the stricter trade-risk filter. The scanner shows DBR/RBR/RBD/DBD,
+  proximity, boundaries, delayed LTP, score and base date, and expands each row
+  into an interactive candlestick chart with the selected zone highlighted.
+- Frontend APIs use `VITE_API_BASE_URL`, allowing local and deployed backends
+  to be selected without editing application code.
 
 Important limitations:
 

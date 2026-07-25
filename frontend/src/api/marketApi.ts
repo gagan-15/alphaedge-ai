@@ -1,4 +1,5 @@
 import axios from "axios";
+import { API_BASE_URL } from "./config";
 
 export interface MarketCandle {
     time: string;
@@ -19,7 +20,7 @@ export interface CandleSeriesResult {
 }
 
 const marketApi = axios.create({
-    baseURL: "http://127.0.0.1:8000/market",
+    baseURL: `${API_BASE_URL}/market`,
     timeout: 15000,
 });
 

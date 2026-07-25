@@ -6,11 +6,12 @@
  */
 
 import axios from "axios";
+import { API_BASE_URL } from "./config";
 
-import type { ScannerResponse } from "../types/scanner";
+import type { ScannerResponse, ZoneResearchResponse } from "../types/scanner";
 
 const api = axios.create({
-    baseURL: "http://127.0.0.1:8000",
+    baseURL: API_BASE_URL,
     timeout: 10000,
 });
 
@@ -29,4 +30,9 @@ export async function getScanner(): Promise<ScannerResponse> {
 
         throw error;
     }
+}
+
+export async function getResearchZones(): Promise<ZoneResearchResponse> {
+    const response = await api.get<ZoneResearchResponse>("/scanner/zones");
+    return response.data;
 }

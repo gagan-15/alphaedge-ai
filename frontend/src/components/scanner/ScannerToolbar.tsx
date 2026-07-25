@@ -222,7 +222,7 @@ function ScannerToolbar({
                                 color="text.secondary"
                                 sx={{ mb: 1 }}
                             >
-                                Risk-engine status
+                                Zone type
                             </Typography>
 
                             <Select
@@ -230,9 +230,9 @@ function ScannerToolbar({
                                 value={approvalFilter}
                                 onChange={(event) => onApprovalFilterChange(event.target.value)}
                             >
-                                <MenuItem value="all">All research setups</MenuItem>
-                                <MenuItem value="approved">Risk checks passed</MenuItem>
-                                <MenuItem value="rejected">Needs review</MenuItem>
+                                <MenuItem value="all">Demand and supply</MenuItem>
+                                <MenuItem value="approved">Demand zones</MenuItem>
+                                <MenuItem value="rejected">Supply zones</MenuItem>
                             </Select>
                         </Grid>
                     </Grid>

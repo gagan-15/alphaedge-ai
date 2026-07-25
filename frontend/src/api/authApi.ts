@@ -1,7 +1,8 @@
 import axios from "axios";
+import { API_BASE_URL } from "./config";
 
 const authApi = axios.create({
-    baseURL: "http://127.0.0.1:8000/auth",
+    baseURL: `${API_BASE_URL}/auth`,
     timeout: 10000,
     withCredentials: true,
 });

@@ -39,6 +39,7 @@ export interface ScannerResult {
     touch_count: number | null;
     base_index: number | null;
     timeframe: string | null;
+    pattern_type: string | null;
 }
 
 export interface ScannerResponse {
@@ -47,4 +48,26 @@ export interface ScannerResponse {
     total_matches: number;
 
     results: ScannerResult[];
+}
+
+export interface ZoneResearchResult {
+    symbol: string;
+    zone_type: string;
+    pattern_type: string | null;
+    proximal_price: number;
+    distal_price: number;
+    distance_percent: number;
+    zone_score: number;
+    current_price: number;
+    timeframe: string;
+    base_index: number;
+    base_date: string;
+    status: string;
+}
+
+export interface ZoneResearchResponse {
+    total_scanned: number;
+    total_zones: number;
+    delayed: boolean;
+    results: ZoneResearchResult[];
 }

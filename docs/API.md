@@ -396,3 +396,8 @@ data quality. The endpoint is read-only and does not support order execution.
 Scanner results also include detected zone metadata when available: zone type,
 proximal and distal levels, quality score, distance from current price,
 freshness, touch count, base index and analysis timeframe.
+
+`GET /scanner/zones` returns recent demand and supply research zones across the
+configured universe, including DBR/RBR/RBD/DBD pattern, proximity status,
+current delayed price, zone score and base date. It is separate from the
+stricter risk-approved opportunity endpoint.

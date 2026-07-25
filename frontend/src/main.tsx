@@ -17,6 +17,7 @@ import {
 import App from "./App";
 import { AuthProvider } from "./auth/AuthContext";
 import theme from "./theme/theme";
+import "./index.css";
 
 createRoot(
     document.getElementById("root")!,

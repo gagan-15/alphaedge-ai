@@ -40,3 +40,4 @@ class ScreenedOpportunity:
     base_index: int | None = None
 
     timeframe: str | None = None
+    pattern_type: str | None = None
