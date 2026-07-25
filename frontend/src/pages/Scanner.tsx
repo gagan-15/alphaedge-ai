@@ -27,6 +27,8 @@ function Scanner() {
         useState<string | null>(null);
     const [searchQuery, setSearchQuery] =
         useState("");
+    const [minimumScore, setMinimumScore] = useState(0);
+    const [approvalFilter, setApprovalFilter] = useState("all");
 
     function loadScanner() {
         void getScanner()
@@ -61,11 +63,47 @@ function Scanner() {
 
     const visibleResults = (
         scanner?.results ?? []
-    ).filter((result) =>
-        result.symbol
+    ).filter((result) => {
+        const matchesSymbol = result.symbol
             .toLowerCase()
-            .includes(searchQuery.toLowerCase()),
-    );
+            .includes(searchQuery.toLowerCase());
+        const matchesScore = result.confirmation_score >= minimumScore;
+        const matchesApproval =
+            approvalFilter === "all"
+            || (approvalFilter === "approved" && result.approved)
+            || (approvalFilter === "rejected" && !result.approved);
+        return matchesSymbol && matchesScore && matchesApproval;
+    });
+
+    function exportResults() {
+        const header = [
+            "Symbol",
+            "Possible Entry",
+            "Invalidation",
+            "Scenario Target",
+            "Risk Reward",
+            "Confidence",
+            "Risk Checks Passed",
+        ];
+        const rows = visibleResults.map((result) => [
+            result.symbol,
+            result.entry_price,
+            result.stop_loss,
+            result.target_price,
+            result.risk_reward_ratio,
+            result.confirmation_score,
+            result.approved ? "Yes" : "No",
+        ]);
+        const csv = [header, ...rows]
+            .map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+            .join("\n");
+        const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `alphaedge-scanner-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+    }
 
     return (
         <Stack spacing={3}>
@@ -75,6 +113,12 @@ function Scanner() {
                 onRefresh={reloadScanner}
                 onRunScan={reloadScanner}
                 onSearchChange={setSearchQuery}
+                minimumScore={minimumScore}
+                approvalFilter={approvalFilter}
+                onMinimumScoreChange={setMinimumScore}
+                onApprovalFilterChange={setApprovalFilter}
+                onExport={exportResults}
+                canExport={visibleResults.length > 0}
             />
 
             {errorMessage && (

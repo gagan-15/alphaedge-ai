@@ -194,6 +194,7 @@ Current authentication state:
   alerts, economic calendar, option chain and calculators
 - Signals, portfolio, backtesting and risk-management reference screens added
 - Interactive chart connected to validated delayed historical candle API
+- Scanner filtering and CSV export implemented
 - Production email delivery pending approval before public launch
 - Login and registration UI implemented
 - Protected-route refresh bootstrap pending

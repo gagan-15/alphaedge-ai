@@ -27,6 +27,12 @@ interface ScannerToolbarProps {
     onRefresh: () => void;
     onRunScan: () => void;
     onSearchChange: (value: string) => void;
+    minimumScore: number;
+    approvalFilter: string;
+    onMinimumScoreChange: (value: number) => void;
+    onApprovalFilterChange: (value: string) => void;
+    onExport: () => void;
+    canExport: boolean;
 }
 
 function ScannerToolbar({
@@ -35,6 +41,12 @@ function ScannerToolbar({
     onRefresh,
     onRunScan,
     onSearchChange,
+    minimumScore,
+    approvalFilter,
+    onMinimumScoreChange,
+    onApprovalFilterChange,
+    onExport,
+    canExport,
 }: ScannerToolbarProps) {
     return (
         <Card>
@@ -79,7 +91,8 @@ function ScannerToolbar({
 
                             <Button
                                 variant="outlined"
-                                disabled
+                                disabled={!canExport}
+                                onClick={onExport}
                                 startIcon={
                                     <DownloadOutlinedIcon />
                                 }
@@ -137,7 +150,8 @@ function ScannerToolbar({
 
                             <Select
                                 fullWidth
-                                defaultValue="NSE"
+                                value="NSE"
+                                disabled
                             >
                                 <MenuItem value="NSE">
                                     NSE
@@ -160,7 +174,8 @@ function ScannerToolbar({
 
                             <Select
                                 fullWidth
-                                defaultValue="Daily"
+                                value="Daily"
+                                disabled
                             >
                                 <MenuItem value="Daily">
                                     Daily
@@ -186,16 +201,18 @@ function ScannerToolbar({
                                 color="text.secondary"
                                 sx={{ mb: 1 }}
                             >
-                                Strategy
+                                Minimum confidence
                             </Typography>
 
                             <Select
                                 fullWidth
-                                defaultValue="Demand Zone"
+                                value={minimumScore}
+                                onChange={(event) => onMinimumScoreChange(Number(event.target.value))}
                             >
-                                <MenuItem value="Demand Zone">
-                                    Demand Zone
-                                </MenuItem>
+                                <MenuItem value={0}>Any score</MenuItem>
+                                <MenuItem value={60}>60% and above</MenuItem>
+                                <MenuItem value={75}>75% and above</MenuItem>
+                                <MenuItem value={90}>90% and above</MenuItem>
                             </Select>
                         </Grid>
 
@@ -205,24 +222,17 @@ function ScannerToolbar({
                                 color="text.secondary"
                                 sx={{ mb: 1 }}
                             >
-                                Universe
+                                Risk-engine status
                             </Typography>
 
                             <Select
                                 fullWidth
-                                defaultValue="FnO"
+                                value={approvalFilter}
+                                onChange={(event) => onApprovalFilterChange(event.target.value)}
                             >
-                                <MenuItem value="FnO">
-                                    FnO
-                                </MenuItem>
-
-                                <MenuItem value="NIFTY 200">
-                                    NIFTY 200
-                                </MenuItem>
-
-                                <MenuItem value="All Stocks">
-                                    All Stocks
-                                </MenuItem>
+                                <MenuItem value="all">All research setups</MenuItem>
+                                <MenuItem value="approved">Risk checks passed</MenuItem>
+                                <MenuItem value="rejected">Needs review</MenuItem>
                             </Select>
                         </Grid>
                     </Grid>

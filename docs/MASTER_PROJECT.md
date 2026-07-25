@@ -319,6 +319,8 @@ Verified current capabilities:
 - AI shortcut row now shrinks safely at desktop breakpoints and the live market
   ticker remains fixed to the viewport bottom without covering page content
 - 238 backend tests passing
+- Scanner confidence and risk-status filters now operate on live results
+- Scanner exports the currently filtered research results as a local CSV
 
 Important limitations:
 
