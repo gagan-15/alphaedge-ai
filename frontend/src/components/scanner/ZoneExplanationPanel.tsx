@@ -19,6 +19,8 @@ import { getMarketCandles } from "../../api/marketApi";
 import { getStockDetailsAnalysis, type StockDetailsBackendAnalysis } from "../../api/scannerApi";
 import type { ZoneExplanationFactor, ZoneResearchResult } from "../../types/scanner";
 import { analyzeStockZone, type StockZoneAnalysis } from "./stockZoneAnalysis";
+import TimeframeConfluenceExplorer from "./TimeframeConfluenceExplorer";
+import type { ConfluenceChartOverlay } from "../../types/scanner";
 
 const watchlistKey = "alphaedge.local.watchlist";
 const watchlistZonesKey = "alphaedge.local.watchlist.zones";
@@ -96,7 +98,23 @@ function FactorList({ title, factors, positive }: { title: string; factors: Zone
     );
 }
 
-function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
+interface ZoneExplanationPanelProps {
+    result: ZoneResearchResult;
+    confluenceOverlays?: ConfluenceChartOverlay[];
+    confluenceOverlaysHidden?: boolean;
+    onToggleConfluenceOverlay?: (overlay: ConfluenceChartOverlay) => void;
+    onToggleConfluenceVisibility?: () => void;
+    onClearConfluenceOverlays?: () => void;
+}
+
+function ZoneExplanationPanel({
+    result,
+    confluenceOverlays = [],
+    confluenceOverlaysHidden = false,
+    onToggleConfluenceOverlay,
+    onToggleConfluenceVisibility,
+    onClearConfluenceOverlays,
+}: ZoneExplanationPanelProps) {
     const [message, setMessage] = useState("");
     const selectedAnalysisKey = `${result.symbol}:${result.timeframe}:${result.zone_type}:${result.proximal_price}:${result.distal_price}:${result.base_index}`;
     const [calculatedAnalysis, setAnalysis] = useState<{ key: string; data: StockZoneAnalysis } | null>(null);
@@ -421,6 +439,19 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
                             {backendAnalysis && <Typography variant="caption" color="text.secondary">Combined result: {backendAnalysis.multi_timeframe.status === "CONFIRMED" ? "Aligned" : backendAnalysis.multi_timeframe.status === "MIXED" ? "Partially Aligned" : "Not Aligned"}</Typography>}
                         </Stack>
                     </Section>
+
+                    {onToggleConfluenceOverlay && onToggleConfluenceVisibility && onClearConfluenceOverlays && (
+                        <Section title="Higher Timeframe Confluence">
+                            <TimeframeConfluenceExplorer
+                                result={result}
+                                activeTimeframes={confluenceOverlays.map((overlay) => overlay.timeframe)}
+                                overlaysHidden={confluenceOverlaysHidden}
+                                onToggleOverlay={onToggleConfluenceOverlay}
+                                onToggleVisibility={onToggleConfluenceVisibility}
+                                onClearOverlays={onClearConfluenceOverlays}
+                            />
+                        </Section>
+                    )}
 
                     <Section title="History and Risk">
                         <Grid container spacing={1}>

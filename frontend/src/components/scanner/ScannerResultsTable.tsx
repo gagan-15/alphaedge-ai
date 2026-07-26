@@ -21,7 +21,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Typography from "@mui/material/Typography";
 import { useEffect, useMemo, useState } from "react";
 
-import type { ZoneResearchResult } from "../../types/scanner";
+import type { ConfluenceChartOverlay, ZoneResearchResult } from "../../types/scanner";
 import ZoneDetailChart from "./ZoneDetailChart";
 import ZoneExplanationPanel from "./ZoneExplanationPanel";
 import { zoneSequenceLabel } from "./zoneLabels";
@@ -53,6 +53,8 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
     const [sortField, setSortField] = useState<"symbol" | "zone_score" | "distance_percent">("zone_score");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
     const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>([]);
+    const [confluenceOverlays, setConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
+    const [confluenceOverlaysHidden, setConfluenceOverlaysHidden] = useState(false);
     const [fullChartHeight, setFullChartHeight] = useState(() =>
         Math.max(420, Math.min(680, window.innerHeight - 300))
     );
@@ -95,6 +97,25 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
             setSortField(field);
             setSortDirection("desc");
         }
+    }
+
+    function openStock(zones: ZoneResearchResult[]) {
+        setConfluenceOverlays([]);
+        setConfluenceOverlaysHidden(false);
+        setSelectedZones(zones);
+    }
+
+    function closeStock() {
+        setSelectedZones([]);
+        setConfluenceOverlays([]);
+        setConfluenceOverlaysHidden(false);
+    }
+
+    function toggleConfluenceOverlay(overlay: ConfluenceChartOverlay) {
+        setConfluenceOverlaysHidden(false);
+        setConfluenceOverlays((current) => current.some((item) => item.timeframe === overlay.timeframe)
+            ? current.filter((item) => item.timeframe !== overlay.timeframe)
+            : [...current, overlay]);
     }
 
     function sortableLabel(field: typeof sortField, label: string) {
@@ -145,7 +166,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                     const zoneKey = `${result.symbol}-${result.zone_type}-${result.base_date}-${result.proximal_price}`;
                                     const status = result.status;
                                     return (
-                                            <TableRow key={zoneKey} hover onClick={() => setSelectedZones(zones)} sx={{ cursor: "pointer" }}>
+                                            <TableRow key={zoneKey} hover onClick={() => openStock(zones)} sx={{ cursor: "pointer" }}>
                                                 <TableCell>
                                                     <IconButton size="small" aria-label={`Open ${result.symbol} full-screen chart`}>
                                                         <KeyboardArrowRightRoundedIcon />
@@ -199,7 +220,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                     </TableContainer>
                 )}
             </CardContent>
-            <Dialog fullScreen open={selectedZones.length > 0} onClose={() => setSelectedZones([])}>
+            <Dialog fullScreen open={selectedZones.length > 0} onClose={closeStock}>
                 {selectedZones.length > 0 && (() => {
                     const selectedZone = selectedZones[0];
                     return <>
@@ -211,13 +232,19 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                 <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · delayed data · no order execution</Typography>
                             </Box>
                             <Chip sx={{ ml: "auto" }} color={selectedZone.zone_type === "DEMAND" ? "primary" : "error"} label={`${selectedZone.zone_score.toFixed(0)} · scanner rank`} />
-                            <IconButton aria-label="Close full-screen chart" onClick={() => setSelectedZones([])}><CloseRoundedIcon /></IconButton>
+                            <IconButton aria-label="Close full-screen chart" onClick={closeStock}><CloseRoundedIcon /></IconButton>
                         </Box>
                     </DialogTitle>
                     <DialogContent sx={{ p: 1.5, bgcolor: "#050d18", overflowY: { xs: "auto", lg: "hidden" } }}>
                         <Grid container spacing={1.5}>
                             <Grid size={{ xs: 12, lg: 8.5 }}>
-                                <ZoneDetailChart result={selectedZone} zones={selectedZones} height={fullChartHeight} showTools />
+                                <ZoneDetailChart
+                                    result={selectedZone}
+                                    zones={selectedZones}
+                                    confluenceOverlays={confluenceOverlaysHidden ? [] : confluenceOverlays}
+                                    height={fullChartHeight}
+                                    showTools
+                                />
                             </Grid>
                             <Grid size={{ xs: 12, lg: 3.5 }}>
                                 <Box sx={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}>
@@ -230,7 +257,17 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                             </Box>)}
                                         </Stack>
                                     </CardContent></Card>
-                                    <ZoneExplanationPanel result={selectedZone} />
+                                    <ZoneExplanationPanel
+                                        result={selectedZone}
+                                        confluenceOverlays={confluenceOverlays}
+                                        confluenceOverlaysHidden={confluenceOverlaysHidden}
+                                        onToggleConfluenceOverlay={toggleConfluenceOverlay}
+                                        onToggleConfluenceVisibility={() => setConfluenceOverlaysHidden((hidden) => !hidden)}
+                                        onClearConfluenceOverlays={() => {
+                                            setConfluenceOverlays([]);
+                                            setConfluenceOverlaysHidden(false);
+                                        }}
+                                    />
                                 </Box>
                             </Grid>
                         </Grid>

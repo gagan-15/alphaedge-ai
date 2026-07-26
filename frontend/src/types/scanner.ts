@@ -106,3 +106,45 @@ export interface ZoneResearchResponse {
     timeframe: string;
     results: ZoneResearchResult[];
 }
+
+export interface ConfluenceZone {
+    zone_type: string;
+    lower_price: number;
+    upper_price: number;
+    proximal_price: number;
+    distal_price: number;
+    quality: number;
+    overlap_percent: number;
+    distance_percent: number;
+}
+
+export interface ConfluenceTimeframe {
+    timeframe: string;
+    timeframe_name: string;
+    status: "CONFIRMED" | "PARTIAL" | "NOT_CONFIRMED";
+    zone: ConfluenceZone | null;
+    explanation: string;
+}
+
+export interface TimeframeConfluenceResponse {
+    symbol: string;
+    execution_timeframe: string;
+    execution_zone: {
+        zone_type: string;
+        proximal_price: number;
+        distal_price: number;
+    };
+    higher_timeframes: ConfluenceTimeframe[];
+    confluence_score: number;
+    strength: "Weak" | "Moderate" | "Strong";
+    summary: string;
+    source: string;
+}
+
+export interface ConfluenceChartOverlay {
+    timeframe: string;
+    timeframeName: string;
+    zoneType: string;
+    proximalPrice: number;
+    distalPrice: number;
+}

@@ -384,3 +384,19 @@ height. It now fits between 420 and 680 pixels based on the live viewport and up
 when the window is resized. The chart and analysis panel switch to the desktop
 two-column layout at the normal large-screen breakpoint, preventing the chart from
 being cropped or pushing all intelligence below it at 100% browser zoom.
+
+Stock Details now includes the optional Higher Timeframe Confluence Explorer below
+the existing timeframe analysis. It compares the exact selected execution zone only
+with higher timeframes, reports overlap, distance, direction, zone quality and a
+clearly labelled confluence score, and caches calculations by stock, execution
+timeframe, zone coordinates and scanner refresh date. A user can filter the cards,
+select any available higher-timeframe zone and add or remove it without changing the
+chart timeframe or downloading candle data again.
+
+Zone visuals no longer use full-width price lines that run behind the zone into older
+candles. The coloured area and both boundaries begin at the zone formation and extend
+slightly into the future. The chart toolbar also includes Hide all zones, which removes
+both scanner and higher-timeframe overlays while keeping the market candles, pan,
+zoom, crosshair and measuring tools available. Measure Range now uses two chart clicks
+to draw the selected price-and-time range directly over the candles; Clear Measurement
+removes that drawing without changing the market view.

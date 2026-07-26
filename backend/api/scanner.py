@@ -36,6 +36,9 @@ from backend.services.scanner.scanner_service import (
 from backend.services.scanner.stock_details_analysis_service import (
     StockDetailsAnalysisService,
 )
+from backend.services.scanner.timeframe_confluence_service import (
+    TimeframeConfluenceService,
+)
 from backend.services.zone_explanation_service import ZoneExplanationService
 from backend.services.market_data.market_data_service import MarketDataService
 from backend.services.market_data.timeframe_service import (
@@ -54,6 +57,7 @@ _zone_engine = ZoneDetectionEngine()
 _zone_scoring_engine = ZoneScoringEngine()
 _zone_config = ScannerConfig()
 _stock_details_analysis = StockDetailsAnalysisService()
+_timeframe_confluence = TimeframeConfluenceService()
 
 ZoneTimeframe = Literal[
     "MINUTE_5",
@@ -459,8 +463,36 @@ def get_stock_details_analysis(
         raise HTTPException(
             status_code=404, detail="The selected zone could not be rebuilt."
         ) from error
+
+
+@scanner_router.get("/zones/{symbol}/confluence")
+def get_timeframe_confluence(
+    symbol: str,
+    execution_timeframe: str = Query(...),
+    zone_type: Literal["DEMAND", "SUPPLY"] = Query(...),
+    proximal_price: float = Query(..., gt=0),
+    distal_price: float = Query(..., gt=0),
+    refresh_key: str = Query(""),
+) -> dict[str, object]:
+    """Return cached zones only from timeframes above the execution chart."""
+
+    normalized = symbol.strip().upper()
+    if normalized not in _zone_config.symbols:
+        raise HTTPException(
+            status_code=404,
+            detail="Symbol is not in the scanner universe.",
+        )
+    try:
+        return _timeframe_confluence.build(
+            normalized,
+            execution_timeframe,
+            zone_type,
+            proximal_price,
+            distal_price,
+            refresh_key,
+        )
     except Exception as error:
         raise HTTPException(
             status_code=503,
-            detail="Detailed stock analysis is temporarily unavailable.",
+            detail="Higher-timeframe confluence is temporarily unavailable.",
         ) from error

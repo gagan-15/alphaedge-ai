@@ -8,7 +8,12 @@
 import axios from "axios";
 import { API_BASE_URL } from "./config";
 
-import type { ScannerResponse, ZoneResearchResponse } from "../types/scanner";
+import type {
+    ScannerResponse,
+    TimeframeConfluenceResponse,
+    ZoneResearchResponse,
+    ZoneResearchResult,
+} from "../types/scanner";
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -105,5 +110,23 @@ export async function getStockDetailsAnalysis(result: {
             timeframe: result.timeframe,
         },
     });
+    return response.data;
+}
+
+export async function getTimeframeConfluence(
+    result: ZoneResearchResult,
+): Promise<TimeframeConfluenceResponse> {
+    const response = await api.get<TimeframeConfluenceResponse>(
+        `/scanner/zones/${encodeURIComponent(result.symbol)}/confluence`,
+        {
+            params: {
+                execution_timeframe: result.timeframe,
+                zone_type: result.zone_type,
+                proximal_price: result.proximal_price,
+                distal_price: result.distal_price,
+                refresh_key: result.base_date,
+            },
+        },
+    );
     return response.data;
 }
