@@ -4,7 +4,6 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
-import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 
 interface OverviewPanelProps {
@@ -15,7 +14,6 @@ interface OverviewPanelProps {
     children: ReactNode;
     minHeight?: number | string;
     accent?: string;
-    onExplore?: () => void;
 }
 
 export default function OverviewPanel({
@@ -26,24 +24,9 @@ export default function OverviewPanel({
     children,
     minHeight,
     accent,
-    onExplore,
 }: OverviewPanelProps) {
-    const card = (
+    return (
         <Card
-            role={onExplore ? "button" : undefined}
-            tabIndex={onExplore ? 0 : undefined}
-            aria-label={onExplore ? `Explore ${title}` : undefined}
-            onClick={(event) => {
-                if (!onExplore || (event.target as HTMLElement).closest("button,a,input,[role='button']")) return;
-                onExplore();
-            }}
-            onKeyDown={(event) => {
-                if (!onExplore || (event.target as HTMLElement).closest("button,a,input,[role='button']")) return;
-                if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onExplore();
-                }
-            }}
             sx={{
                 height: "100%",
                 minHeight,
@@ -53,19 +36,6 @@ export default function OverviewPanel({
                 boxShadow: "0 14px 40px rgba(1, 7, 18, .16)",
                 position: "relative",
                 overflow: "hidden",
-                cursor: onExplore ? "pointer" : "default",
-                transition: "transform .18s ease, border-color .18s ease, box-shadow .18s ease",
-                ...(onExplore ? {
-                    "&:hover": {
-                        transform: "translateY(-2px)",
-                        borderColor: "rgba(97,114,243,.42)",
-                        boxShadow: "0 18px 44px rgba(1,7,18,.24)",
-                    },
-                    "&:focus-visible": {
-                        outline: "2px solid #6172f3",
-                        outlineOffset: 2,
-                    },
-                } : {}),
                 ...(accent ? {
                     "&::before": {
                         content: '""',
@@ -116,5 +86,4 @@ export default function OverviewPanel({
             </CardContent>
         </Card>
     );
-    return onExplore ? <Tooltip title="Click to explore more" arrow>{card}</Tooltip> : card;
 }
