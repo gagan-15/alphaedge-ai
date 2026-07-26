@@ -31,9 +31,9 @@ export default function OverviewPanel({
                 height: "100%",
                 minHeight,
                 borderRadius: "18px",
-                borderColor: "rgba(118, 145, 184, .18)",
-                bgcolor: "#0b1728",
-                boxShadow: "0 14px 40px rgba(1, 7, 18, .16)",
+                borderColor: "divider",
+                bgcolor: "background.paper",
+                boxShadow: (theme) => theme.palette.mode === "dark" ? "0 14px 40px rgba(1, 7, 18, .16)" : "0 12px 32px rgba(28,45,72,.08)",
                 position: "relative",
                 overflow: "hidden",
                 ...(accent ? {

@@ -5,6 +5,14 @@
     text-rendering: optimizeLegibility;
 }
 
+:root[data-theme="light"] {
+    color-scheme: light;
+}
+
+:root[data-theme="light"] {
+    background: #f4f7fb;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -48,6 +56,14 @@ input {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #344861;
+}
+
+:root[data-theme="light"] ::-webkit-scrollbar-track {
+    background: #edf2f7;
+}
+
+:root[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: #b7c3d2;
 }
 
 .auth-page {

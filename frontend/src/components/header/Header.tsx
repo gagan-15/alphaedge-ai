@@ -3,6 +3,8 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -16,10 +18,12 @@ import Tooltip from "@mui/material/Tooltip";
 import { useNavigate } from "react-router-dom";
 
 import { LOCAL_DEMO_MODE, useAuth } from "../../auth/AuthState";
+import { useThemeMode } from "../../theme/ThemeModeState";
 
 function Header() {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
+    const { mode, toggleMode } = useThemeMode();
 
     async function handleLogout() {
         await logout();
@@ -96,7 +100,7 @@ function Header() {
                         },
                         width: 344,
                         "& .MuiOutlinedInput-root": {
-                            backgroundColor: "rgba(5, 12, 24, 0.7)",
+                            backgroundColor: (theme) => theme.palette.mode === "dark" ? "rgba(5, 12, 24, 0.7)" : "rgba(255,255,255,.84)",
                             fontSize: "0.78rem",
                         },
                     }}
@@ -193,6 +197,16 @@ function Header() {
                             .slice(0, 2)
                             .toUpperCase() ?? "AE"}
                     </Avatar>
+                    <Tooltip title={`Switch to ${mode === "dark" ? "light" : "dark"} theme`}>
+                        <IconButton
+                            aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} theme`}
+                            color="inherit"
+                            size="small"
+                            onClick={toggleMode}
+                        >
+                            {mode === "dark" ? <LightModeOutlinedIcon fontSize="small" /> : <DarkModeOutlinedIcon fontSize="small" />}
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title="Log out">
                         <IconButton
                             aria-label="Log out"

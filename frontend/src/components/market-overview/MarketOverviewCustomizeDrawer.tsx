@@ -104,7 +104,7 @@ export default function MarketOverviewCustomizeDrawer({ open, value, onClose, on
         onPreview(value);
         onClose();
     };
-    return <Drawer anchor="right" open={open} onClose={cancel} slotProps={{ paper: { sx: { width: { xs: "94vw", sm: 440 }, bgcolor: "#0b1728", backgroundImage: "none" } } }}>
+    return <Drawer anchor="right" open={open} onClose={cancel} slotProps={{ paper: { sx: { width: { xs: "94vw", sm: 440 }, bgcolor: "background.paper", backgroundImage: "none" } } }}>
         <Stack sx={{ height: "100%" }}>
             <Stack direction="row" sx={{ p: 2.5, alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid", borderColor: "divider" }}>
                 <Box><Typography variant="h5">Customize Market Overview</Typography><Typography color="text.secondary" sx={{ mt: .35, fontSize: ".68rem" }}>Choose what you want to see. Market data and calculations will not change.</Typography></Box>

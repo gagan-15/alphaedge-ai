@@ -9,15 +9,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
-import {
-    CssBaseline,
-    ThemeProvider,
-} from "@mui/material";
-
 import App from "./App";
 import { AuthProvider } from "./auth/AuthContext";
 import { MarketIntelligenceProvider } from "./market-intelligence/MarketIntelligenceContext";
-import theme from "./theme/theme";
+import { AppThemeProvider } from "./theme/AppThemeProvider";
 import "./index.css";
 
 createRoot(
@@ -25,15 +20,13 @@ createRoot(
 ).render(
     <StrictMode>
         <BrowserRouter>
-            <ThemeProvider theme={theme}>
-                <CssBaseline />
-
+            <AppThemeProvider>
                 <AuthProvider>
                     <MarketIntelligenceProvider>
                         <App />
                     </MarketIntelligenceProvider>
                 </AuthProvider>
-            </ThemeProvider>
+            </AppThemeProvider>
         </BrowserRouter>
     </StrictMode>,
 );

@@ -78,7 +78,7 @@ function Stars({ value }: { value: number }) {
 function CircularGauge({ value, label, color = colors.green }: { value: number; label: string; color?: string }) {
     const animated = useCountUp(value);
     return <Box sx={{ width: 132, height: 132, mx: "auto", borderRadius: "50%", p: "10px", background: `conic-gradient(${color} ${animated * 3.6}deg,#17263a 0)`, transition: "background .25s ease" }}>
-        <Box sx={{ width: "100%", height: "100%", borderRadius: "50%", bgcolor: "#0b1728", display: "grid", placeItems: "center", textAlign: "center" }}>
+        <Box sx={{ width: "100%", height: "100%", borderRadius: "50%", bgcolor: "background.paper", display: "grid", placeItems: "center", textAlign: "center" }}>
             <Box><Typography sx={{ fontSize: "2rem", lineHeight: 1, fontWeight: 900 }}>{animated}</Typography><Typography color="text.secondary" sx={{ mt: .5, fontSize: ".66rem" }}>{label}</Typography></Box>
         </Box>
     </Box>;
@@ -232,7 +232,7 @@ export function AIMarketSummaryWidget({
             <Grid size={{ xs: 12, lg: 3 }}>
                 <Stack sx={{ height: "100%", justifyContent: "center", alignItems: "center", borderLeft: { lg: "1px solid rgba(143,161,184,.14)" } }}>
                     <Box sx={{ width: 142, height: 142, borderRadius: "50%", p: "10px", background: `conic-gradient(${colors.violet} ${animatedScore * 3.6}deg,#17263a 0)` }}>
-                        <Box sx={{ width: "100%", height: "100%", borderRadius: "50%", bgcolor: "#0b1728", display: "grid", placeItems: "center", textAlign: "center" }}>
+                        <Box sx={{ width: "100%", height: "100%", borderRadius: "50%", bgcolor: "background.paper", display: "grid", placeItems: "center", textAlign: "center" }}>
                             <Box><Typography sx={{ fontSize: "1.75rem", lineHeight: 1, fontWeight: 900 }}>{animatedScore} <Box component="span" sx={{ fontSize: ".7rem", color: "text.secondary" }}>/ 100</Box></Typography><Typography sx={{ mt: .7, color: colors.green, fontSize: ".66rem", fontWeight: 800 }}>Market looks Healthy</Typography></Box>
                         </Box>
                     </Box>
@@ -262,7 +262,7 @@ export function AIMarketSummaryWidget({
             anchor="right"
             open={whyOpen}
             onClose={() => setWhyOpen(false)}
-            slotProps={{ paper: { sx: { width: { xs: "92vw", sm: 420 }, p: 3, bgcolor: "#0b1728", backgroundImage: "none" } } }}
+            slotProps={{ paper: { sx: { width: { xs: "92vw", sm: 420 }, p: 3, bgcolor: "background.paper", backgroundImage: "none" } } }}
         >
             <Typography variant="h5">Why is AlphaEdge saying this?</Typography>
             <Typography color="text.secondary" sx={{ mt: .8, fontSize: ".72rem", lineHeight: 1.6 }}>These simple points support today's market view.</Typography>
@@ -322,7 +322,7 @@ export function RiskMeterWidget({ riskLevel = "Moderate Risk", volatility = "Mod
     return <Stack>
         <Box sx={{ width: 170, height: 86, mx: "auto", overflow: "hidden", position: "relative" }}>
             <Box sx={{ width: 170, height: 170, borderRadius: "50%", background: `conic-gradient(from 270deg,${colors.green} 0 25%,${colors.amber} 25% 38%,${colors.red} 38% 50%,transparent 50%)`, p: "15px" }}>
-                <Box sx={{ width: "100%", height: "100%", borderRadius: "50%", bgcolor: "#0b1728" }} />
+                <Box sx={{ width: "100%", height: "100%", borderRadius: "50%", bgcolor: "background.paper" }} />
             </Box>
             <Typography sx={{ position: "absolute", bottom: 0, width: "100%", textAlign: "center", fontWeight: 900, color: riskLevel === "High Risk" ? colors.red : riskLevel === "Low Risk" ? colors.green : colors.amber }}>{riskLevel.toUpperCase()}</Typography>
         </Box>
@@ -468,7 +468,7 @@ export function ParticipationChartWidget({
                 ["20-Day Average", Math.round(values.slice(-20).reduce((sum, value) => sum + value, 0) / Math.min(20, values.length))],
             ].map(([label, value]) => <Grid key={label} size={{ xs: 6, sm: 4, lg: 2.4 }}><Box sx={{ p: .9, borderRadius: 2, bgcolor: "rgba(4,12,25,.22)", border: "1px solid rgba(143,161,184,.12)" }}><Typography color="text.secondary" sx={{ fontSize: ".55rem" }}>{label}</Typography><Typography sx={{ mt: .2, fontWeight: 900, color: Number(value) >= 0 ? colors.green : colors.red }}>{Number(value) > 0 ? "+" : ""}{value}</Typography></Box></Grid>)}
         </Grid>
-        <Box ref={chartAreaRef} sx={{ position: "relative", height: 400, mt: 1.25, bgcolor: "#081322", borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", overflow: "hidden" }}>
+        <Box ref={chartAreaRef} sx={{ position: "relative", height: 400, mt: 1.25, bgcolor: "#081322", color: "#f3f7fb", borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", overflow: "hidden" }}>
             <Typography color="text.secondary" sx={{ position: "absolute", left: 8, top: "44%", fontSize: ".55rem", transform: "rotate(-90deg)", transformOrigin: "left top" }}>Net Market Participation — stocks up minus stocks down</Typography>
             <Box sx={{ position: "absolute", left: 50, top: 16, bottom: 28, width: 54, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>{[["Positive", "+50"], ["Zero", "0"], ["Negative", "-25"]].map(([label, value]) => <Box key={label}><Typography sx={{ fontSize: ".53rem", color: label === "Positive" ? colors.green : label === "Negative" ? colors.red : "text.secondary" }}>{label}</Typography><Typography color="text.secondary" sx={{ fontSize: ".5rem" }}>{value}</Typography></Box>)}</Box>
             <Box

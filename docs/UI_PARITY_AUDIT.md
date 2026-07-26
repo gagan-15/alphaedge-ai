@@ -481,3 +481,8 @@ the existing research widgets that explicitly identify demo data remain illustra
 The Market Participation Trend widget and its Customize option were removed from
 Market Overview by product decision. Market breadth remains available through the
 more direct Stocks Going Up and Down section.
+
+The application header now includes a Dark/Light theme control beside Logout. Dark
+remains the default. The selected mode is stored locally and restored on the next
+visit. The shared theme provider updates page backgrounds, cards, drawers, navigation,
+search, typography contrast and scrollbar colors without changing routing or data.
