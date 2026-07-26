@@ -281,35 +281,33 @@ export function AIMarketSummaryWidget({
     </Stack>;
 }
 
-export function MarketHealthWidget({ timeframe = "1M", universe = "nifty500", showTooltips = true }: { timeframe?: string; universe?: string; showTooltips?: boolean }) {
-    const adjustment = (timeframe === "1D" ? -4 : timeframe === "1Y" ? 3 : 0) + (universe === "holdings" || universe === "watchlist" ? -3 : 0);
-    const score = 87 + adjustment;
+export function MarketHealthWidget({ score = 87, health = "Looking Healthy", showTooltips = true }: { timeframe?: string; universe?: string; score?: number; health?: string; showTooltips?: boolean }) {
     const factors = [["Market direction", 5], ["Stocks joining", 4], ["Recent strength", 4], ["Expected swings", 4], ["Safety level", 3]] as const;
     const content = <Box>
-            <CircularGauge value={score} label={score >= 85 ? "Strong and healthy" : "Healthy"} />
+            <CircularGauge value={score} label={health} />
             <Stack spacing={.55} sx={{ mt: 1.5 }}>{factors.map(([label, value]) => <Stack key={label} direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".67rem" }}>{label}</Typography><Stars value={value} /></Stack>)}</Stack>
             <Typography color="text.secondary" sx={{ mt: 1.3, fontSize: ".58rem" }}>Updated 10:42 IST</Typography>
         </Box>;
     return showTooltips ? <Tooltip title="This example score looks at market direction, how many stocks are rising, recent price strength, expected price swings and risk. It does not predict returns.">{content}</Tooltip> : content;
 }
 
-export function MarketRegimeWidget({ timeframe = "1M", language = "simple" }: { timeframe?: string; language?: "simple" | "professional" }) {
+export function MarketRegimeWidget({ timeframe = "1M", language = "simple", regime = "Strong Rise", confidence = 88 }: { timeframe?: string; language?: "simple" | "professional"; regime?: string; confidence?: number }) {
     const longTerm = timeframe === "6M" || timeframe === "1Y";
     return <Stack sx={{ height: "100%", justifyContent: "space-between" }}>
         <Box>
             <Box sx={{ width: 54, height: 54, display: "grid", placeItems: "center", borderRadius: 3, bgcolor: `${colors.blue}12`, color: colors.blue }}><ShowChartRoundedIcon fontSize="large" /></Box>
-            <Typography sx={{ mt: 1.5, fontSize: "1.35rem", fontWeight: 900 }}>{language === "professional" ? "Bullish Trend" : longTerm ? "Healthy Long-Term Rise" : "Strong Uptrend"}</Typography>
+            <Typography sx={{ mt: 1.5, fontSize: "1.35rem", fontWeight: 900 }}>{language === "professional" ? regime : longTerm && regime === "Strong Rise" ? "Healthy Long-Term Rise" : regime}</Typography>
             <Typography color="text.secondary" sx={{ mt: .7, fontSize: ".72rem", lineHeight: 1.55 }}>{language === "professional" ? "Price structure and market breadth remain positive." : longTerm ? "The wider market has continued to rise over a longer period." : "The market is rising and more stocks are joining the rally."}</Typography>
         </Box>
-        <Box><Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".68rem" }}>Confidence in this view</Typography><Typography sx={{ fontWeight: 850 }}>88%</Typography></Stack><LinearProgress value={88} variant="determinate" sx={{ mt: .7, height: 7 }} /></Box>
+        <Box><Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".68rem" }}>Confidence in this view</Typography><Typography sx={{ fontWeight: 850 }}>{confidence}%</Typography></Stack><LinearProgress value={confidence} variant="determinate" sx={{ mt: .7, height: 7 }} /></Box>
     </Stack>;
 }
 
-export function TradingBiasWidget() {
+export function TradingBiasWidget({ strategy = "Look for buying opportunities after a small price fall.", direction = "Bullish" }: { strategy?: string; direction?: string }) {
     return <Stack sx={{ height: "100%", justifyContent: "space-between" }}>
         <Box>
-            <ArrowUpwardRoundedIcon sx={{ color: colors.green, fontSize: 56, transform: "rotate(35deg)" }} />
-            <Typography sx={{ fontSize: "1.4rem", fontWeight: 900 }}>Look for Buying Opportunities</Typography>
+            <ArrowUpwardRoundedIcon sx={{ color: direction === "Bearish" ? colors.red : colors.green, fontSize: 56, transform: direction === "Bearish" ? "rotate(145deg)" : "rotate(35deg)" }} />
+            <Typography sx={{ fontSize: "1.4rem", fontWeight: 900 }}>{strategy}</Typography>
         </Box>
         <Box>
             <Typography color="text.secondary" sx={{ fontSize: ".62rem", textTransform: "uppercase" }}>Ideas to research</Typography>
@@ -319,14 +317,14 @@ export function TradingBiasWidget() {
     </Stack>;
 }
 
-export function RiskMeterWidget() {
-    const factors = [["Sudden opening move", "Low", colors.green], ["Ease of buying and selling", "Healthy", colors.green], ["Expected price swings", "Medium", colors.amber], ["Market direction stability", "High", colors.blue]];
+export function RiskMeterWidget({ riskLevel = "Moderate Risk", volatility = "Moderate" }: { riskLevel?: string; volatility?: string }) {
+    const factors = [["Sudden opening move", riskLevel === "High Risk" ? "High" : "Low", riskLevel === "High Risk" ? colors.red : colors.green], ["Ease of buying and selling", "Healthy", colors.green], ["Expected price swings", volatility, volatility === "High" ? colors.red : colors.amber], ["Market direction stability", riskLevel === "Low Risk" ? "High" : "Medium", colors.blue]];
     return <Stack>
         <Box sx={{ width: 170, height: 86, mx: "auto", overflow: "hidden", position: "relative" }}>
             <Box sx={{ width: 170, height: 170, borderRadius: "50%", background: `conic-gradient(from 270deg,${colors.green} 0 25%,${colors.amber} 25% 38%,${colors.red} 38% 50%,transparent 50%)`, p: "15px" }}>
                 <Box sx={{ width: "100%", height: "100%", borderRadius: "50%", bgcolor: "#0b1728" }} />
             </Box>
-            <Typography sx={{ position: "absolute", bottom: 0, width: "100%", textAlign: "center", fontWeight: 900, color: colors.amber }}>MEDIUM</Typography>
+            <Typography sx={{ position: "absolute", bottom: 0, width: "100%", textAlign: "center", fontWeight: 900, color: riskLevel === "High Risk" ? colors.red : riskLevel === "Low Risk" ? colors.green : colors.amber }}>{riskLevel.toUpperCase()}</Typography>
         </Box>
         <Stack spacing={.8} sx={{ mt: 1.5 }}>{factors.map(([label, value, color]) => <Stack key={label} direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".67rem" }}>{label}</Typography><Typography sx={{ color, fontSize: ".67rem", fontWeight: 800 }}>{value}</Typography></Stack>)}</Stack>
     </Stack>;
@@ -525,9 +523,10 @@ const sectorRows = [
     ["Metal", "2/10", "↓↓", "Negative", "Doing poorly", colors.red],
 ] as const;
 
-export function SectorRotationWidget() {
+export function SectorRotationWidget({ leaders = [] }: { leaders?: string[] }) {
     const [heatmap, setHeatmap] = useState(false);
     return <Stack sx={{ height: "100%" }}>
+        {leaders.length > 0 && <Typography variant="caption" color="text.secondary" sx={{ mb: 1 }}>Shared leaders: {leaders.join(" and ")}</Typography>}
         {heatmap ? <Grid container spacing={1} sx={{ flex: 1 }}>{sectorRows.map(([sector, strength, , , status, color]) => <Grid key={sector} size={{ xs: 6, sm: 4 }}><Box sx={{ height: "100%", minHeight: 72, p: 1.2, borderRadius: 2, bgcolor: `${color}18`, border: `1px solid ${color}45` }}><Typography sx={{ fontWeight: 900 }}>{sector}</Typography><Typography sx={{ color, fontSize: "1.1rem", fontWeight: 900 }}>{strength}</Typography><Typography color="text.secondary" sx={{ fontSize: ".58rem" }}>{status}</Typography></Box></Grid>)}</Grid> :
             <Box sx={{ overflowX: "auto", flex: 1 }}><Table size="small"><TableHead><TableRow>{["Sector", "Strength", "Money Moving", "Direction", "Simple View"].map((heading) => <TableCell key={heading}>{heading}</TableCell>)}</TableRow></TableHead><TableBody>{sectorRows.map(([sector, strength, flow, trend, status, color]) => <TableRow key={sector} hover><TableCell sx={{ fontWeight: 850 }}>{sector}</TableCell><TableCell>{strength}</TableCell><TableCell sx={{ color, fontWeight: 900 }}>{flow}</TableCell><TableCell>{trend}</TableCell><TableCell><Chip size="small" label={status} sx={{ color, bgcolor: `${color}12`, border: `1px solid ${color}30` }} /></TableCell></TableRow>)}</TableBody></Table></Box>}
         <Button size="small" endIcon={<OpenInNewRoundedIcon />} onClick={() => setHeatmap((value) => !value)} sx={{ mt: 1.5, alignSelf: "flex-start" }}>{heatmap ? "View Table" : "View Heatmap"}</Button>
@@ -542,9 +541,15 @@ const breadthMetrics = [
     ["High-Volume Stocks Up", 218, "+28", "Rising stocks with more trading activity than usual"], ["High-Volume Stocks Down", 94, "-9", "Falling stocks with more trading activity than usual"], ["Mid-Size Stocks Joining", 68, "+4%", "The percentage of mid-size companies joining the market move"], ["Small Stocks Joining", 61, "+2%", "The percentage of small companies joining the market move"],
 ] as const;
 
-export function MarketBreadthWidget({ shortNumbers = false, showTooltips = true }: { shortNumbers?: boolean; showTooltips?: boolean }) {
+export function MarketBreadthWidget({ participation = 62, shortNumbers = false, showTooltips = true }: { participation?: number; shortNumbers?: boolean; showTooltips?: boolean }) {
     const format = (value: number) => shortNumbers && value >= 1000 ? `${(value / 1000).toFixed(2)}K` : value.toLocaleString("en-IN");
-    return <Grid container spacing={1}>{breadthMetrics.map(([label, value, trend, help]) => {
+    const total = 2610;
+    const sharedMetrics = breadthMetrics.map((metric) => metric[0] === "Stocks Up"
+        ? [metric[0], Math.round(total * participation / 100), metric[2], metric[3]] as const
+        : metric[0] === "Stocks Down"
+            ? [metric[0], Math.round(total * (100 - participation) / 100), metric[2], metric[3]] as const
+            : metric);
+    return <Grid container spacing={1}>{sharedMetrics.map(([label, value, trend, help]) => {
         const metric = <Box sx={{ p: 1.05, borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", bgcolor: "rgba(4,12,25,.24)", transition: "transform .18s ease,border-color .18s ease", "&:hover": { transform: "translateY(-2px)", borderColor: "rgba(97,114,243,.45)" } }}><Typography color="text.secondary" noWrap sx={{ fontSize: ".55rem" }}>{label}</Typography><Stack direction="row" spacing={.55} sx={{ mt: .35, alignItems: "baseline" }}><Typography sx={{ fontWeight: 900 }}>{format(value)}</Typography><Typography sx={{ color: String(trend).startsWith("-") ? colors.red : colors.green, fontSize: ".56rem" }}>{trend}</Typography></Stack></Box>;
         return <Grid key={label} size={{ xs: 6, sm: 4, lg: 3 }}>{showTooltips ? <Tooltip title={help}>{metric}</Tooltip> : metric}</Grid>;
     })}</Grid>;

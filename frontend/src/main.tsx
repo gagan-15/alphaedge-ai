@@ -16,6 +16,7 @@ import {
 
 import App from "./App";
 import { AuthProvider } from "./auth/AuthContext";
+import { MarketIntelligenceProvider } from "./market-intelligence/MarketIntelligenceContext";
 import theme from "./theme/theme";
 import "./index.css";
 
@@ -28,7 +29,9 @@ createRoot(
                 <CssBaseline />
 
                 <AuthProvider>
-                    <App />
+                    <MarketIntelligenceProvider>
+                        <App />
+                    </MarketIntelligenceProvider>
                 </AuthProvider>
             </ThemeProvider>
         </BrowserRouter>

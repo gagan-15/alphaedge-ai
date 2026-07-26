@@ -448,3 +448,32 @@ unavailable inputs and receive no points; the product does not invent those valu
 Scanner rows load this same shared model, show both scores and rank stocks by Trade
 Confidence. Stock Details places Trade Confidence first and explains in simple English
 why it may differ from Zone Quality.
+
+## Dashboard and Market Overview ownership
+
+Dashboard is now the user's short personal workspace. It contains the quick shared
+market snapshot, today's signals, watchlist, alerts, recent zone research, holdings,
+scanner shortcut and personal notifications. The large individual-stock chart,
+sector performance, market breadth, institutional-flow demo, market sentiment,
+market news, backtest summary, research explanation and educational assistant were
+removed from Dashboard. Those market-research responsibilities remain on Market
+Overview or their dedicated pages.
+
+Market Overview remains the longer market-research workspace. It keeps market health,
+market direction/regime, participation, breadth, sector leadership, risk, volatility,
+sentiment, institutional activity, strategy and verdict widgets. It does not display
+the user's watchlist, holdings, alerts, scanner results or individual-stock analysis.
+
+`MarketIntelligenceProvider` is the shared synchronization boundary. It fetches the
+dashboard market payload once, deduplicates an in-flight request, caches the result
+while routes change, and exposes one snapshot plus the selected timeframe, universe,
+last-updated time and refresh action. `marketIntelligenceService` owns the standard
+terms and derivation for Market Health, Market Regime, Market Breadth, Sector
+Leadership, Risk Level, AI Confidence, Volatility, Participation, Market Direction
+and Today's Strategy. Dashboard and Market Overview consume this same state rather
+than fetching or deriving those fields independently.
+
+Remaining backend dependencies are a real breadth universe, maintained sector
+leadership, verified institutional flows, validated sentiment, exchange market-status
+hours and timeframe-specific market calculations. Until those sources are connected,
+the existing research widgets that explicitly identify demo data remain illustrative.

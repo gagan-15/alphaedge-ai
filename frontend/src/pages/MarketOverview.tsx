@@ -36,6 +36,7 @@ import {
     saveMarketOverviewPreferences,
 } from "../components/market-overview/marketOverviewPreferences";
 import { useAuth } from "../auth/AuthState";
+import { useMarketIntelligence } from "../market-intelligence/MarketIntelligenceState";
 
 export default function MarketOverview() {
     const { user } = useAuth();
@@ -45,8 +46,15 @@ export default function MarketOverview() {
     const [customizeOpen, setCustomizeOpen] = useState(false);
     const [customizeSession, setCustomizeSession] = useState(0);
     const [market, setMarket] = useState("NSE");
-    const [timeframe, setTimeframe] = useState(savedPreferences.defaultTimeframe);
-    const [lastUpdated, setLastUpdated] = useState("Not refreshed");
+    const {
+        snapshot,
+        timeframe,
+        universe,
+        lastUpdated,
+        setTimeframe,
+        setUniverse,
+        refresh,
+    } = useMarketIntelligence();
     const visible = previewPreferences.visibleWidgets;
     const professional = previewPreferences.language === "professional";
 
@@ -54,6 +62,8 @@ export default function MarketOverview() {
         saveMarketOverviewPreferences(userKey, next);
         setSavedPreferences(next);
         setPreviewPreferences(next);
+        setTimeframe(next.defaultTimeframe);
+        setUniverse(next.marketUniverse);
         setCustomizeOpen(false);
     }
 
@@ -74,7 +84,7 @@ export default function MarketOverview() {
                             {professional ? "Market trend, breadth, risk and sector context for active research." : "A simple view of what the market is doing and what you may want to check next."}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                            Last updated: {lastUpdated}
+                            Last updated: {lastUpdated?.toLocaleTimeString("en-IN") ?? "Not refreshed"}
                         </Typography>
                     </Box>
 
@@ -101,7 +111,7 @@ export default function MarketOverview() {
                         <Button
                             variant="outlined"
                             startIcon={<CachedOutlinedIcon />}
-                            onClick={() => setLastUpdated(new Date().toLocaleTimeString("en-IN"))}
+                            onClick={() => void refresh()}
                         >
                             Refresh
                         </Button>
@@ -119,14 +129,14 @@ export default function MarketOverview() {
                     minHeight={190}
                     action={<Chip size="small" label="TRANSPARENT DEMO LOGIC" variant="outlined" />}
                 >
-                    <AIMarketSummaryWidget timeframe={timeframe} universe={previewPreferences.marketUniverse} language={previewPreferences.language} showTooltips={previewPreferences.chart.showTooltips} />
+                    <AIMarketSummaryWidget timeframe={timeframe} universe={universe} language={previewPreferences.language} showTooltips={previewPreferences.chart.showTooltips} />
                 </OverviewPanel>}
 
                 {(visible.marketHealth || visible.marketTrend || visible.researchFocus || visible.marketRisk) && <Grid container spacing={2.5}>
-                    {visible.marketHealth && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle={professional ? "Composite trend, breadth, momentum, volatility and risk reading." : "Are most stocks supporting today's market move?"} accent="#32d583" minHeight={310}><MarketHealthWidget timeframe={timeframe} universe={previewPreferences.marketUniverse} showTooltips={previewPreferences.chart.showTooltips} /></OverviewPanel></Grid>}
-                    {visible.marketTrend && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title={professional ? "Market Regime" : "Market Direction"} subtitle={professional ? "Identifies whether conditions are trending, ranging or changing." : "Is the market rising, falling or moving sideways?"} accent="#6172f3" minHeight={310}><MarketRegimeWidget timeframe={timeframe} language={previewPreferences.language} /></OverviewPanel></Grid>}
-                    {visible.researchFocus && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Today's Research Focus" subtitle="Should you mainly look for buying or selling opportunities?" accent="#22d3ee" minHeight={310}><TradingBiasWidget /></OverviewPanel></Grid>}
-                    {visible.marketRisk && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Risk" subtitle="How careful should you be today?" accent="#fdb022" minHeight={310}><RiskMeterWidget /></OverviewPanel></Grid>}
+                    {visible.marketHealth && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle={professional ? "Composite trend, breadth, momentum, volatility and risk reading." : "Are most stocks supporting today's market move?"} accent="#32d583" minHeight={310}><MarketHealthWidget timeframe={timeframe} universe={universe} score={snapshot.aiConfidence} health={snapshot.marketHealth} showTooltips={previewPreferences.chart.showTooltips} /></OverviewPanel></Grid>}
+                    {visible.marketTrend && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title={professional ? "Market Regime" : "Market Direction"} subtitle={professional ? "Identifies whether conditions are trending, ranging or changing." : "Is the market rising, falling or moving sideways?"} accent="#6172f3" minHeight={310}><MarketRegimeWidget timeframe={timeframe} language={previewPreferences.language} regime={snapshot.marketRegime} confidence={snapshot.aiConfidence} /></OverviewPanel></Grid>}
+                    {visible.researchFocus && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Today's Research Focus" subtitle="Should you mainly look for buying or selling opportunities?" accent="#22d3ee" minHeight={310}><TradingBiasWidget strategy={snapshot.todayStrategy} direction={snapshot.marketDirection} /></OverviewPanel></Grid>}
+                    {visible.marketRisk && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Risk" subtitle="How careful should you be today?" accent="#fdb022" minHeight={310}><RiskMeterWidget riskLevel={snapshot.riskLevel} volatility={snapshot.volatility} /></OverviewPanel></Grid>}
                 </Grid>}
 
                 {visible.participationTrend && <OverviewPanel
@@ -139,7 +149,7 @@ export default function MarketOverview() {
                     <ParticipationChartWidget
                         key={`${timeframe}-${previewPreferences.marketUniverse}-${previewPreferences.chart.showNifty}-${previewPreferences.chart.showBankNifty}`}
                         defaultRange={timeframe}
-                        universe={previewPreferences.marketUniverse}
+                        universe={universe}
                         initialNifty={previewPreferences.chart.showNifty}
                         initialBankNifty={previewPreferences.chart.showBankNifty}
                         showEvents={previewPreferences.chart.showEvents}
@@ -151,12 +161,12 @@ export default function MarketOverview() {
                 {(visible.sectorRotation || visible.marketBreadth) && <Grid container spacing={2.5}>
                     {visible.sectorRotation && <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="Strong and Weak Sectors" subtitle="See where money is moving and which sectors are losing strength." minHeight={330}>
-                            <SectorRotationWidget />
+                            <SectorRotationWidget leaders={snapshot.sectorLeadership} />
                         </OverviewPanel>
                     </Grid>}
                     {visible.marketBreadth && <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="Stocks Going Up and Down" subtitle="A wider look at how many stocks are supporting the market." minHeight={330}>
-                            <MarketBreadthWidget shortNumbers={previewPreferences.numberFormat === "short"} showTooltips={previewPreferences.chart.showTooltips} />
+                            <MarketBreadthWidget participation={snapshot.participation} shortNumbers={previewPreferences.numberFormat === "short"} showTooltips={previewPreferences.chart.showTooltips} />
                         </OverviewPanel>
                     </Grid>}
                 </Grid>}
@@ -211,6 +221,7 @@ export default function MarketOverview() {
                 onPreview={(next) => {
                     setPreviewPreferences(next);
                     setTimeframe(next.defaultTimeframe);
+                    setUniverse(next.marketUniverse);
                 }}
                 onSave={saveCustomization}
             />
