@@ -2,7 +2,6 @@ import AddAlertRoundedIcon from "@mui/icons-material/AddAlertRounded";
 import BookmarkAddRoundedIcon from "@mui/icons-material/BookmarkAddRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
-import OpenInFullRoundedIcon from "@mui/icons-material/OpenInFullRounded";
 import ShareRoundedIcon from "@mui/icons-material/ShareRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -22,6 +21,7 @@ import type { ZoneExplanationFactor, ZoneResearchResult } from "../../types/scan
 import { analyzeStockZone, type StockZoneAnalysis } from "./stockZoneAnalysis";
 
 const watchlistKey = "alphaedge.local.watchlist";
+const watchlistZonesKey = "alphaedge.local.watchlist.zones";
 const alertsKey = "alphaedge.local.alerts";
 
 function readList(key: string): string[] {
@@ -35,6 +35,17 @@ function readList(key: string): string[] {
 
 function saveUnique(key: string, value: string) {
     localStorage.setItem(key, JSON.stringify([...new Set([...readList(key), value])]));
+}
+
+function readObjects(key: string): Record<string, unknown>[] {
+    try {
+        const value = JSON.parse(localStorage.getItem(key) ?? "[]");
+        return Array.isArray(value)
+            ? value.filter((item): item is Record<string, unknown> => typeof item === "object" && item !== null)
+            : [];
+    } catch {
+        return [];
+    }
 }
 
 function recommendation(analysis: StockZoneAnalysis | null, tradeConfidence: number) {
@@ -93,6 +104,9 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
     const [receivedBackendAnalysis, setBackendAnalysis] = useState<StockDetailsBackendAnalysis | null>(null);
     const [analysisError, setAnalysisError] = useState("");
     const [scoreDetailsOpen, setScoreDetailsOpen] = useState(false);
+    const [watchlistSavedKey, setWatchlistSavedKey] = useState("");
+    const [alertSavedKey, setAlertSavedKey] = useState("");
+    const [actionBusy, setActionBusy] = useState<"" | "watchlist" | "alert" | "share">("");
     const explanation = result.explanation;
     const sameNumber = (left: number, right: number) => Math.abs(left - right) <= Math.max(0.01, Math.abs(right) * 0.000001);
     const backendAnalysis = receivedBackendAnalysis
@@ -176,6 +190,10 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
         && (plan.target === null || (result.zone_type === "DEMAND" ? plan.target > zoneUpper : plan.target < zoneLower))
         && sameNumber(plan.entry_range[0], zoneLower)
         && sameNumber(plan.entry_range[1], zoneUpper));
+    const watchlistAdded = watchlistSavedKey === selectedAnalysisKey
+        || readObjects(watchlistZonesKey).some((item) => item.id === selectedAnalysisKey);
+    const alertAdded = alertSavedKey === selectedAnalysisKey
+        || readObjects(alertsKey).some((item) => item.zoneId === selectedAnalysisKey);
 
     useEffect(() => {
         let active = true;
@@ -192,37 +210,70 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
     }, [result, selectedAnalysisKey]);
 
     function addToWatchlist() {
-        saveUnique(watchlistKey, result.symbol);
-        setMessage(`${result.symbol} was added to your watchlist.`);
+        if (watchlistAdded) return;
+        setActionBusy("watchlist");
+        try {
+            saveUnique(watchlistKey, result.symbol);
+            localStorage.setItem(watchlistZonesKey, JSON.stringify([...readObjects(watchlistZonesKey), {
+                id: selectedAnalysisKey,
+                symbol: result.symbol,
+                zoneType: result.zone_type,
+                proximalPrice: result.proximal_price,
+                distalPrice: result.distal_price,
+                timeframe: result.timeframe,
+                baseDate: result.base_date,
+            }]));
+            setWatchlistSavedKey(selectedAnalysisKey);
+            setMessage(`${result.symbol} and this zone were added to your watchlist.`);
+        } catch {
+            setMessage("The watchlist could not be updated. Please try again.");
+        } finally {
+            setActionBusy("");
+        }
     }
 
     function createAlert() {
-        const existing: unknown[] = (() => {
-            try {
-                const stored = JSON.parse(localStorage.getItem(alertsKey) ?? "[]");
-                return Array.isArray(stored) ? stored.filter((item) => typeof item === "object" && item !== null) : [];
-            } catch {
-                return [];
-            }
-        })();
+        if (alertAdded) return;
+        setActionBusy("alert");
+        const existing = readObjects(alertsKey);
         const condition = result.zone_type === "DEMAND" ? "below" : "above";
-        const target = result.zone_type === "DEMAND" ? result.distal_price : result.proximal_price;
-        localStorage.setItem(alertsKey, JSON.stringify([...existing, {
-            id: crypto.randomUUID(),
-            symbol: result.symbol,
-            condition,
-            target,
-            current: null,
-            enabled: true,
-        }]));
-        setMessage("A local zone alert was created.");
+        const target = result.proximal_price;
+        try {
+            localStorage.setItem(alertsKey, JSON.stringify([...existing, {
+                id: crypto.randomUUID(),
+                zoneId: selectedAnalysisKey,
+                symbol: result.symbol,
+                condition,
+                target,
+                current: null,
+                enabled: true,
+                alertType: "PRICE_TOUCHES_PROXIMAL",
+                zoneType: result.zone_type,
+                timeframe: result.timeframe,
+            }]));
+            setAlertSavedKey(selectedAnalysisKey);
+            setMessage(`Alert created for price touching ₹${target.toLocaleString("en-IN")}.`);
+        } catch {
+            setMessage("The alert could not be created. Please try again.");
+        } finally {
+            setActionBusy("");
+        }
     }
 
     async function share() {
+        setActionBusy("share");
         const text = `${result.symbol} ${result.zone_type} zone ${currentZone}. Quality ${result.zone_score.toFixed(0)}/100. Research only.`;
-        if (navigator.share) await navigator.share({ title: "AlphaEdge AI zone research", text });
-        else await navigator.clipboard.writeText(text);
-        setMessage(navigator.share ? "Share window opened." : "Analysis copied.");
+        try {
+            if (navigator.share) await navigator.share({ title: "AlphaEdge AI zone research", text });
+            else await navigator.clipboard.writeText(text);
+            setMessage(navigator.share ? "Share window opened." : "Analysis copied.");
+        } catch (error) {
+            setMessage(error instanceof DOMException && error.name === "AbortError"
+                ? "Sharing was cancelled."
+                : "The analysis could not be shared. Please try again.");
+        } finally {
+            setActionBusy("");
+        }
     }
 
     return (
@@ -382,10 +433,9 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
 
                     <Section title="Actions">
                         <Grid container spacing={1}>
-                            <Grid size={{ xs: 6 }}><Button fullWidth variant="outlined" startIcon={<BookmarkAddRoundedIcon />} onClick={addToWatchlist}>Add to Watchlist</Button></Grid>
-                            <Grid size={{ xs: 6 }}><Button fullWidth variant="outlined" startIcon={<AddAlertRoundedIcon />} onClick={createAlert}>Create Alert</Button></Grid>
-                            <Grid size={{ xs: 6 }}><Button fullWidth variant="outlined" startIcon={<OpenInFullRoundedIcon />} onClick={() => setMessage("You are already viewing the full chart.")}>Open Full Chart</Button></Grid>
-                            <Grid size={{ xs: 6 }}><Button fullWidth variant="outlined" startIcon={<ShareRoundedIcon />} onClick={() => void share()}>Share Analysis</Button></Grid>
+                            <Grid size={{ xs: 6 }}><Button fullWidth variant="outlined" disabled={watchlistAdded || actionBusy === "watchlist"} startIcon={<BookmarkAddRoundedIcon />} onClick={addToWatchlist}>{watchlistAdded ? "Added" : "Add to Watchlist"}</Button></Grid>
+                            <Grid size={{ xs: 6 }}><Button fullWidth variant="outlined" disabled={alertAdded || actionBusy === "alert"} startIcon={<AddAlertRoundedIcon />} onClick={createAlert}>{alertAdded ? "Alert Created" : "Create Alert"}</Button></Grid>
+                            <Grid size={{ xs: 12 }}><Button fullWidth variant="outlined" disabled={actionBusy === "share"} startIcon={<ShareRoundedIcon />} onClick={() => void share()}>{actionBusy === "share" ? "Sharing…" : "Share Analysis"}</Button></Grid>
                         </Grid>
                     </Section>
                 </Stack>

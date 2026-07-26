@@ -363,3 +363,11 @@ with Nifty history and interpreted by zone direction: sector outperformance supp
 demand research, while sector underperformance supports supply research. A difference
 within two percentage points is shown as mixed. The result contributes only to Trade
 Confidence and never changes the zone-formation score.
+
+Stock Details actions now keep only useful controls. Add to Watchlist saves both the
+symbol and exact selected-zone identity, prevents duplicates and changes to Added.
+Create Alert saves one compatible local alert for price touching the selected proximal
+line, prevents duplicate zone alerts and changes to Alert Created. Share Analysis uses
+the device share sheet when supported, otherwise copies the research summary, and
+reports cancellation or failure. Open Full Chart was removed because Stock Details is
+already displayed inside the full-screen chart workspace.
