@@ -54,6 +54,14 @@ export interface ComparisonPeriod {
 }
 
 export interface StockDetailsBackendAnalysis {
+    symbol: string;
+    selected_zone: {
+        symbol: string;
+        zone_type: string;
+        proximal_price: number;
+        distal_price: number;
+        timeframe: string;
+    };
     source: string;
     nifty_comparison: Record<string, ComparisonPeriod>;
     sector: {
@@ -82,9 +90,20 @@ export interface StockDetailsBackendAnalysis {
     };
 }
 
-export async function getStockDetailsAnalysis(symbol: string, zoneType: string, baseIndex: number): Promise<StockDetailsBackendAnalysis> {
-    const response = await api.get<StockDetailsBackendAnalysis>(`/scanner/zones/${encodeURIComponent(symbol)}/analysis`, {
-        params: { zone_type: zoneType, base_index: baseIndex },
+export async function getStockDetailsAnalysis(result: {
+    symbol: string;
+    zone_type: string;
+    proximal_price: number;
+    distal_price: number;
+    timeframe: string;
+}): Promise<StockDetailsBackendAnalysis> {
+    const response = await api.get<StockDetailsBackendAnalysis>(`/scanner/zones/${encodeURIComponent(result.symbol)}/analysis`, {
+        params: {
+            zone_type: result.zone_type,
+            proximal_price: result.proximal_price,
+            distal_price: result.distal_price,
+            timeframe: result.timeframe,
+        },
     });
     return response.data;
 }

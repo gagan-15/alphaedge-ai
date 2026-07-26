@@ -87,11 +87,23 @@ function FactorList({ title, factors, positive }: { title: string; factors: Zone
 
 function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
     const [message, setMessage] = useState("");
-    const [analysis, setAnalysis] = useState<StockZoneAnalysis | null>(null);
-    const [backendAnalysis, setBackendAnalysis] = useState<StockDetailsBackendAnalysis | null>(null);
+    const selectedAnalysisKey = `${result.symbol}:${result.timeframe}:${result.zone_type}:${result.proximal_price}:${result.distal_price}:${result.base_index}`;
+    const [calculatedAnalysis, setAnalysis] = useState<{ key: string; data: StockZoneAnalysis } | null>(null);
+    const analysis = calculatedAnalysis?.key === selectedAnalysisKey ? calculatedAnalysis.data : null;
+    const [receivedBackendAnalysis, setBackendAnalysis] = useState<StockDetailsBackendAnalysis | null>(null);
     const [analysisError, setAnalysisError] = useState("");
     const [scoreDetailsOpen, setScoreDetailsOpen] = useState(false);
     const explanation = result.explanation;
+    const sameNumber = (left: number, right: number) => Math.abs(left - right) <= Math.max(0.01, Math.abs(right) * 0.000001);
+    const backendAnalysis = receivedBackendAnalysis
+        && receivedBackendAnalysis.symbol === result.symbol
+        && receivedBackendAnalysis.selected_zone.symbol === result.symbol
+        && receivedBackendAnalysis.selected_zone.zone_type === result.zone_type
+        && receivedBackendAnalysis.selected_zone.timeframe === result.timeframe
+        && sameNumber(receivedBackendAnalysis.selected_zone.proximal_price, result.proximal_price)
+        && sameNumber(receivedBackendAnalysis.selected_zone.distal_price, result.distal_price)
+        ? receivedBackendAnalysis
+        : null;
     const rawZoneScore = result.raw_zone_score ?? (
         result.freshness_score
         + result.strength_score
@@ -134,6 +146,16 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
     ] as const;
     const awarded = (weight: number, status?: string) => status === "PASS" ? weight : status === "MIXED" ? weight * .5 : 0;
     const tradeConfidence = Math.round(tradeFactors.reduce((sum, [, weight, factor]) => sum + awarded(weight, factor?.status), 0));
+    const zoneLower = Math.min(result.proximal_price, result.distal_price);
+    const zoneUpper = Math.max(result.proximal_price, result.distal_price);
+    const plan = backendAnalysis?.trade_plan;
+    const planIsSynchronized = Boolean(plan
+        && plan.illustrative_entry >= zoneLower
+        && plan.illustrative_entry <= zoneUpper
+        && (result.zone_type === "DEMAND" ? plan.invalidation_stop < zoneLower : plan.invalidation_stop > zoneUpper)
+        && (plan.target === null || (result.zone_type === "DEMAND" ? plan.target > zoneUpper : plan.target < zoneLower))
+        && sameNumber(plan.entry_range[0], zoneLower)
+        && sameNumber(plan.entry_range[1], zoneUpper));
 
     useEffect(() => {
         let active = true;
@@ -141,13 +163,13 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
         const period = intraday ? "1mo" : result.timeframe === "1D" ? "1y" : "10y";
         const interval = intraday ? (result.timeframe.includes("H") ? "1h" : result.timeframe === "5m" || result.timeframe === "125m" ? "5m" : "15m") : "1d";
         void getMarketCandles(result.symbol, period, interval, result.timeframe)
-            .then((response) => { if (active) setAnalysis(analyzeStockZone(result, response.candles)); })
+            .then((response) => { if (active) setAnalysis({ key: selectedAnalysisKey, data: analyzeStockZone(result, response.candles) }); })
             .catch(() => { if (active) setAnalysisError("Calculation failed because candle history could not be loaded."); });
-        void getStockDetailsAnalysis(result.symbol, result.zone_type, result.base_index)
+        void getStockDetailsAnalysis(result)
             .then((response) => { if (active) setBackendAnalysis(response); })
             .catch(() => { if (active) setBackendAnalysis(null); });
         return () => { active = false; };
-    }, [result]);
+    }, [result, selectedAnalysisKey]);
 
     function addToWatchlist() {
         saveUnique(watchlistKey, result.symbol);
@@ -229,7 +251,9 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
                     </Section>
 
                     <Section title="Trading Plan">
-                        <Grid container spacing={1}>
+                        {receivedBackendAnalysis && !planIsSynchronized
+                            ? <Typography color="warning.main">Trading plan unavailable because the selected analysis is out of sync.</Typography>
+                            : <Grid container spacing={1}>
                             <Grid size={{ xs: 6 }}><Field label="Entry range" value={backendAnalysis ? `₹${backendAnalysis.trade_plan.entry_range[0].toLocaleString("en-IN")} – ₹${backendAnalysis.trade_plan.entry_range[1].toLocaleString("en-IN")}` : "Calculating from active zones…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Expected holding period" value="Requires a validated outcome backtest" /></Grid>
                             <Grid size={{ xs: 12 }}><Field label="Suggested trigger" value={result.zone_type === "DEMAND" ? "Wait for a bullish confirmation candle inside the demand zone before considering the setup." : "Wait for a bearish rejection candle inside the supply zone before considering the setup."} note="Do not use the zone as an immediate entry." /></Grid>
@@ -239,8 +263,8 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
                             <Grid size={{ xs: 6 }}><Field label="Risk : Reward" value={backendAnalysis?.trade_plan.risk_reward_ratio ? `1 : ${backendAnalysis.trade_plan.risk_reward_ratio}` : "No validated opposing target"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Risk per share" value={backendAnalysis ? `₹${backendAnalysis.trade_plan.risk_per_share.toLocaleString("en-IN")}` : "Calculating…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Reward per share" value={backendAnalysis?.trade_plan.reward_per_share ? `₹${backendAnalysis.trade_plan.reward_per_share.toLocaleString("en-IN")}` : "No validated opposing target"} /></Grid>
-                        </Grid>
-                        <Typography variant="caption" color="text.secondary">Research illustration only. The target uses the nearest detected opposing zone; no order is placed.</Typography>
+                        </Grid>}
+                        {planIsSynchronized && <Typography variant="caption" color="text.secondary">Research illustration only. The target uses the nearest detected opposing zone; no order is placed.</Typography>}
                     </Section>
 
                     <FactorList title="Why AlphaEdge selected this zone" factors={explanation.positive_factors} positive />

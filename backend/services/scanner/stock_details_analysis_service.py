@@ -16,7 +16,10 @@ from backend.engines.demand_supply_engine.zone_detection_engine import (
 from backend.engines.zone_scoring_engine.zone_scoring_engine import ZoneScoringEngine
 from backend.models.zone import Zone, ZoneType
 from backend.services.market_data.market_data_service import MarketDataService
-from backend.services.market_data.timeframe_service import aggregate_timeframe
+from backend.services.market_data.timeframe_service import (
+    INTRADAY_SOURCES,
+    aggregate_timeframe,
+)
 
 
 class StockDetailsAnalysisService:
@@ -160,22 +163,54 @@ class StockDetailsAnalysisService:
             "research_only": True,
         }
 
+    @staticmethod
+    def _trade_plan_is_valid(selected: Zone, plan: dict[str, Any]) -> bool:
+        """Ensure every plan coordinate belongs to the selected chart zone."""
+
+        lower = selected.lower_price
+        upper = selected.upper_price
+        entry_range = plan["entry_range"]
+        entry = plan["illustrative_entry"]
+        stop = plan["invalidation_stop"]
+        target = plan["target"]
+        demand = selected.zone_type == ZoneType.DEMAND
+        return bool(
+            entry_range == [round(lower, 2), round(upper, 2)]
+            and lower <= entry <= upper
+            and (stop < lower if demand else stop > upper)
+            and (target is None or (target > upper if demand else target < lower))
+        )
+
     def build(
         self,
         symbol: str,
         zone_type: str,
-        base_index: int,
+        proximal_price: float,
+        distal_price: float,
+        timeframe: str,
     ) -> dict[str, Any]:
         stock = self._market.get_stock_data(symbol, period="10y", interval="1d")
         nifty = self._market.get_stock_data(
             NIFTY_BENCHMARK, period="10y", interval="1d"
         )
-        detected = self._zones.detect_zones(stock)
-        selected = min(
-            (zone for zone in detected if zone.zone_type.value == zone_type),
-            key=lambda zone: abs(zone.created_index - base_index),
+        if timeframe in INTRADAY_SOURCES:
+            source_period, source_interval = INTRADAY_SOURCES[timeframe]
+            analysis_source = self._market.get_stock_data(
+                symbol,
+                period=source_period,
+                interval=source_interval,
+            )
+        else:
+            analysis_source = stock
+        analysis_data = aggregate_timeframe(analysis_source, timeframe)
+        detected = self._zones.detect_zones(analysis_data)
+        selected = Zone(
+            zone_type=(ZoneType.DEMAND if zone_type == "DEMAND" else ZoneType.SUPPLY),
+            upper_price=max(proximal_price, distal_price),
+            lower_price=min(proximal_price, distal_price),
+            created_index=0,
         )
-        current_price = float(stock["Close"].iloc[-1])
+        current_price = float(analysis_data["Close"].iloc[-1])
         benchmark = self._returns(stock["Close"], nifty["Close"])
         sector_name, sector_symbol = SECTOR_BENCHMARKS.get(symbol, ("UNMAPPED", ""))
         sector: dict[str, Any]
@@ -200,8 +235,18 @@ class StockDetailsAnalysisService:
             for label in ("1D", "1W", "1M")
         ]
         confirmed = sum(item["confirmation"] == "CONFIRMED" for item in timeframes)
+        trade_plan = self._trade_plan(selected, detected, current_price)
+        if not self._trade_plan_is_valid(selected, trade_plan):
+            raise ValueError("Trading plan is not synchronized with selected zone.")
         return {
             "symbol": symbol,
+            "selected_zone": {
+                "symbol": symbol,
+                "zone_type": zone_type,
+                "proximal_price": proximal_price,
+                "distal_price": distal_price,
+                "timeframe": timeframe,
+            },
             "source": "Yahoo Finance delayed OHLCV",
             "nifty_comparison": benchmark,
             "sector": sector,
@@ -213,5 +258,5 @@ class StockDetailsAnalysisService:
                     else "MIXED" if confirmed else "NOT_CONFIRMED"
                 ),
             },
-            "trade_plan": self._trade_plan(selected, detected, current_price),
+            "trade_plan": trade_plan,
         }

@@ -38,7 +38,10 @@ from backend.services.scanner.stock_details_analysis_service import (
 )
 from backend.services.zone_explanation_service import ZoneExplanationService
 from backend.services.market_data.market_data_service import MarketDataService
-from backend.services.market_data.timeframe_service import aggregate_timeframe
+from backend.services.market_data.timeframe_service import (
+    TIMEFRAME_RULES,
+    aggregate_timeframe,
+)
 
 scanner_router = APIRouter(
     prefix="/scanner",
@@ -431,7 +434,9 @@ def get_research_zones(
 def get_stock_details_analysis(
     symbol: str,
     zone_type: Literal["DEMAND", "SUPPLY"] = Query(...),
-    base_index: int = Query(..., ge=0),
+    proximal_price: float = Query(..., gt=0),
+    distal_price: float = Query(..., gt=0),
+    timeframe: str = Query(...),
 ) -> dict[str, object]:
     """Return delayed-data benchmark, timeframe and trade-plan research."""
 
@@ -441,7 +446,15 @@ def get_stock_details_analysis(
             status_code=404, detail="Symbol is not in the scanner universe."
         )
     try:
-        return _stock_details_analysis.build(normalized, zone_type, base_index)
+        if timeframe not in TIMEFRAME_RULES:
+            raise HTTPException(status_code=400, detail="Unsupported timeframe.")
+        return _stock_details_analysis.build(
+            normalized,
+            zone_type,
+            proximal_price,
+            distal_price,
+            timeframe,
+        )
     except (ValueError, LookupError) as error:
         raise HTTPException(
             status_code=404, detail="The selected zone could not be rebuilt."

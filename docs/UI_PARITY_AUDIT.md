@@ -346,3 +346,13 @@ detail breakdown. The panel also explains mixed EMA states, uses Aligned/Partial
 Aligned/Not Aligned wording, summarizes overall relative strength, explains the
 current price's distance and direction from the zone, labels OHLCV pressure confidence
 and requires a confirmation candle instead of suggesting an immediate entry.
+
+The Stock Details trade plan is now keyed to the exact selected chart analysis rather
+than rebuilding a zone from a candle index taken from a different history window. The
+frontend sends symbol, timeframe, type, proximal and distal coordinates; the backend
+uses those exact coordinates, returns them with the plan and derives the nearest
+opposing zone on the selected timeframe. Both backend and frontend validate that entry
+is inside the selected zone, the stop is beyond the correct distal side and any target
+is beyond the zone in the correct direction. Stale calculations are keyed by the full
+selection identity and are not rendered. Any mismatch displays the required out-of-sync
+warning instead of prices from another zone.

@@ -44,3 +44,29 @@ def test_supply_trade_plan_is_direction_aware() -> None:
     assert plan["invalidation_stop"] == 130.5
     assert plan["target"] == 110
     assert plan["risk_reward_ratio"] == 2.73
+
+
+def test_chart_zone_and_trade_plan_coordinates_are_identical() -> None:
+    service = StockDetailsAnalysisService()
+    selected = Zone(ZoneType.SUPPLY, 2511.49, 2469.10, 0)
+    opposing = Zone(ZoneType.DEMAND, 2250, 2200, 20)
+
+    plan = service._trade_plan(selected, [selected, opposing], 2254.30)
+
+    assert plan["entry_range"] == [2469.10, 2511.49]
+    assert selected.lower_price <= plan["illustrative_entry"] <= selected.upper_price
+    assert plan["invalidation_stop"] > selected.upper_price
+    assert plan["target"] < selected.lower_price
+    assert service._trade_plan_is_valid(selected, plan)
+
+
+def test_out_of_sync_trade_plan_is_rejected() -> None:
+    service = StockDetailsAnalysisService()
+    selected = Zone(ZoneType.SUPPLY, 2511.49, 2469.10, 0)
+    stale_plan = service._trade_plan(
+        Zone(ZoneType.SUPPLY, 940.39, 916.48, 0),
+        [Zone(ZoneType.DEMAND, 906.67, 890, 20)],
+        2254.30,
+    )
+
+    assert not service._trade_plan_is_valid(selected, stale_plan)
