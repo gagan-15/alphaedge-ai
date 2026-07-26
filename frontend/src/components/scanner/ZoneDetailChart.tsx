@@ -26,7 +26,7 @@ const patternLabels: Record<string, string> = {
     DROP_BASE_DROP: "DBD",
 };
 
-function ZoneDetailChart({ result, height = 360, showTools = false }: { result: ZoneResearchResult; height?: number; showTools?: boolean }) {
+function ZoneDetailChart({ result, zones = [result], height = 360, showTools = false }: { result: ZoneResearchResult; zones?: ZoneResearchResult[]; height?: number; showTools?: boolean }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<ReturnType<typeof createChart> | null>(null);
     const measuringRef = useRef(false);
@@ -107,27 +107,29 @@ function ZoneDetailChart({ result, height = 360, showTools = false }: { result: 
                     measureStartRef.current = null;
                 });
 
-                if (result.proximal_price !== null && result.distal_price !== null) {
-                    const demand = result.zone_type === "DEMAND";
+                zones.forEach((displayZone, zoneIndex) => {
+                if (displayZone.proximal_price !== null && displayZone.distal_price !== null) {
+                    const demand = displayZone.zone_type === "DEMAND";
                     const zoneColor = demand ? "#1d8cff" : "#ff2f68";
                     const zone = chart.addSeries(BaselineSeries, {
-                        baseValue: { type: "price", price: result.distal_price },
+                        baseValue: { type: "price", price: displayZone.distal_price },
                         topLineColor: zoneColor,
-                        topFillColor1: demand ? "rgba(29,140,255,.52)" : "rgba(255,47,104,.52)",
-                        topFillColor2: demand ? "rgba(29,140,255,.34)" : "rgba(255,47,104,.34)",
+                        topFillColor1: demand ? `rgba(29,140,255,${Math.max(.24, .52 - zoneIndex * .08)})` : `rgba(255,47,104,${Math.max(.24, .52 - zoneIndex * .08)})`,
+                        topFillColor2: demand ? "rgba(29,140,255,.22)" : "rgba(255,47,104,.22)",
                         bottomLineColor: zoneColor,
-                        bottomFillColor1: demand ? "rgba(29,140,255,.52)" : "rgba(255,47,104,.52)",
-                        bottomFillColor2: demand ? "rgba(29,140,255,.34)" : "rgba(255,47,104,.34)",
+                        bottomFillColor1: demand ? "rgba(29,140,255,.38)" : "rgba(255,47,104,.38)",
+                        bottomFillColor2: demand ? "rgba(29,140,255,.22)" : "rgba(255,47,104,.22)",
                         lineWidth: 2,
                         priceLineVisible: false,
                         lastValueVisible: false,
                     });
-                    const start = Math.max(0, Math.min(result.base_index ?? data.length - 45, data.length - 1));
+                    const start = Math.max(0, Math.min(displayZone.base_index ?? data.length - 45, data.length - 1));
                     zone.setData(data.slice(start).map((candle) => ({
                         time: candle.time,
-                        value: result.proximal_price as number,
+                        value: displayZone.proximal_price as number,
                     })));
                 }
+                });
 
                 chart.timeScale().fitContent();
                 setLoading(false);
@@ -145,7 +147,7 @@ function ZoneDetailChart({ result, height = 360, showTools = false }: { result: 
             chartRef.current = null;
             chart = null as never;
         };
-    }, [height, result]);
+    }, [height, result, zones]);
 
     function toggleMeasure() {
         const next = !measuring;

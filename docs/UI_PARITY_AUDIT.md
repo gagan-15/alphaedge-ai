@@ -218,3 +218,8 @@ Gap-up and gap-down departures are supported and visibly marked in scanner
 results. A gap qualifies only when the departure candle does not overlap the
 previous candle range, closes beyond the base boundary and receives directional
 follow-through. A gap by itself cannot make a zone valid.
+
+Scanner rows are grouped by symbol, so a stock appears only once per selected
+timeframe. Opening that row plots every active demand and supply zone for the
+symbol on one full-screen chart and lists each zone's pattern, boundaries, status,
+base date and quality beside the chart.

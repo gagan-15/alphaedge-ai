@@ -10,6 +10,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -50,7 +51,7 @@ function qualityLabel(score: number) {
 function ScannerResultsTable({ results }: ScannerResultsTableProps) {
     const [sortField, setSortField] = useState<"symbol" | "zone_score" | "distance_percent">("zone_score");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-    const [selectedZone, setSelectedZone] = useState<ZoneResearchResult | null>(null);
+    const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>([]);
 
     const sortedResults = useMemo(() => [...results].sort((left, right) => {
         const first = left[sortField];
@@ -60,6 +61,20 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
             : Number(first) - Number(second);
         return sortDirection === "asc" ? comparison : -comparison;
     }), [results, sortDirection, sortField]);
+    const groupedResults = useMemo(() => {
+        const groups = new Map<string, ZoneResearchResult[]>();
+        sortedResults.forEach((result) => {
+            groups.set(result.symbol, [...(groups.get(result.symbol) ?? []), result]);
+        });
+        return [...groups.entries()].map(([symbol, zones]) => ({
+            symbol,
+            zones,
+            primary: [...zones].sort((left, right) =>
+                left.distance_percent - right.distance_percent
+                || right.zone_score - left.zone_score
+            )[0],
+        }));
+    }, [sortedResults]);
 
     function chooseSort(field: typeof sortField) {
         if (field === sortField) {
@@ -83,7 +98,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
             <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
                 <Box sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
                     <Typography variant="h6">Zone Intelligence Results</Typography>
-                    <Chip size="small" label={`${results.length} zones`} />
+                    <Chip size="small" label={`${results.length} zones · ${groupedResults.length} stocks`} />
                     <Typography color="text.secondary" sx={{ ml: "auto", fontSize: ".66rem" }}>
                         Select a row to inspect the highlighted zone
                     </Typography>
@@ -114,31 +129,30 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {sortedResults.map((result) => {
+                                {groupedResults.map(({ symbol, zones, primary: result }) => {
                                     const zoneKey = `${result.symbol}-${result.zone_type}-${result.base_date}-${result.proximal_price}`;
                                     const status = result.status;
                                     return (
-                                            <TableRow key={zoneKey} hover onClick={() => setSelectedZone(result)} sx={{ cursor: "pointer" }}>
+                                            <TableRow key={zoneKey} hover onClick={() => setSelectedZones(zones)} sx={{ cursor: "pointer" }}>
                                                 <TableCell>
                                                     <IconButton size="small" aria-label={`Open ${result.symbol} full-screen chart`}>
                                                         <KeyboardArrowRightRoundedIcon />
                                                     </IconButton>
                                                 </TableCell>
-                                                <TableCell sx={{ fontWeight: 850 }}>{result.symbol}</TableCell>
+                                                <TableCell sx={{ fontWeight: 850 }}>
+                                                    <Stack direction="row" spacing={.75} sx={{ alignItems: "center" }}>
+                                                        <span>{symbol}</span><Chip size="small" label={`${zones.length} zone${zones.length === 1 ? "" : "s"}`} />
+                                                    </Stack>
+                                                </TableCell>
                                                 <TableCell>
-                                                    <Chip
-                                                        size="small"
-                                                        label={result.zone_type ?? "Unknown"}
-                                                        sx={{
-                                                            bgcolor: result.zone_type === "DEMAND" ? "rgba(37,99,235,.28)" : "rgba(225,29,72,.28)",
-                                                            color: result.zone_type === "DEMAND" ? "#93c5fd" : "#fda4af",
-                                                        }}
-                                                    />
+                                                    <Stack direction="row" spacing={.5}>
+                                                        {[...new Set(zones.map((zone) => zone.zone_type))].map((type) => <Chip key={type} size="small" label={type} sx={{ bgcolor: type === "DEMAND" ? "rgba(37,99,235,.28)" : "rgba(225,29,72,.28)", color: type === "DEMAND" ? "#93c5fd" : "#fda4af" }} />)}
+                                                    </Stack>
                                                 </TableCell>
                                                 <TableCell>
                                                     <Box sx={{ display: "flex", gap: .5, alignItems: "center" }}>
-                                                        <Chip size="small" variant="outlined" label={patternLabels[result.pattern_type ?? ""] ?? "Pending"} />
-                                                        {result.gap_type && <Chip size="small" color="warning" label={result.gap_type} />}
+                                                        {[...new Set(zones.map((zone) => patternLabels[zone.pattern_type ?? ""] ?? "Pending"))].slice(0, 2).map((pattern) => <Chip key={pattern} size="small" variant="outlined" label={pattern} />)}
+                                                        {zones.some((zone) => zone.gap_type) && <Chip size="small" color="warning" label="GAP" />}
                                                     </Box>
                                                 </TableCell>
                                                 <TableCell>
@@ -173,8 +187,10 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                     </TableContainer>
                 )}
             </CardContent>
-            <Dialog fullScreen open={selectedZone !== null} onClose={() => setSelectedZone(null)}>
-                {selectedZone && <>
+            <Dialog fullScreen open={selectedZones.length > 0} onClose={() => setSelectedZones([])}>
+                {selectedZones.length > 0 && (() => {
+                    const selectedZone = selectedZones[0];
+                    return <>
                     <DialogTitle sx={{ py: 1.25, borderBottom: "1px solid", borderColor: "divider" }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
                             <FullscreenRoundedIcon color="primary" />
@@ -183,22 +199,31 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                 <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · delayed data · no order execution</Typography>
                             </Box>
                             <Chip sx={{ ml: "auto" }} color={selectedZone.zone_type === "DEMAND" ? "primary" : "error"} label={`${selectedZone.zone_score.toFixed(0)} · ${qualityLabel(selectedZone.zone_score)}`} />
-                            <IconButton aria-label="Close full-screen chart" onClick={() => setSelectedZone(null)}><CloseRoundedIcon /></IconButton>
+                            <IconButton aria-label="Close full-screen chart" onClick={() => setSelectedZones([])}><CloseRoundedIcon /></IconButton>
                         </Box>
                     </DialogTitle>
                     <DialogContent sx={{ p: 1.5, bgcolor: "#050d18" }}>
                         <Grid container spacing={1.5}>
                             <Grid size={{ xs: 12, xl: 8.5 }}>
-                                <ZoneDetailChart result={selectedZone} height={680} showTools />
+                                <ZoneDetailChart result={selectedZone} zones={selectedZones} height={680} showTools />
                             </Grid>
                             <Grid size={{ xs: 12, xl: 3.5 }}>
                                 <Box sx={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}>
+                                    <Card sx={{ mb: 1.25 }}><CardContent>
+                                        <Typography variant="h6">All active zones</Typography>
+                                        <Stack spacing={.75} sx={{ mt: 1 }}>
+                                            {selectedZones.map((zone) => <Box key={`${zone.base_date}-${zone.proximal_price}`} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.5 }}>
+                                                <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography sx={{ fontWeight: 800 }}>{zone.zone_type} · {patternLabels[zone.pattern_type ?? ""]}</Typography><Chip size="small" label={zone.zone_score.toFixed(0)} /></Stack>
+                                                <Typography variant="caption" color="text.secondary">{zone.distal_price.toLocaleString("en-IN")} – {zone.proximal_price.toLocaleString("en-IN")} · {zone.status} · {zone.base_date}</Typography>
+                                            </Box>)}
+                                        </Stack>
+                                    </CardContent></Card>
                                     <ZoneExplanationPanel result={selectedZone} />
                                 </Box>
                             </Grid>
                         </Grid>
                     </DialogContent>
-                </>}
+                </>; })()}
             </Dialog>
         </Card>
     );
