@@ -421,3 +421,9 @@ only after cached confluence data is available. Show-all, temporary hide, clear,
 confirmed-only and strong-only controls do not trigger market-data recalculation.
 Clicking an overlay highlights and scrolls to its matching card; the chart displays
 the selected overlay's range, quality, overlap, distance, freshness and retest count.
+
+The Stock Details chart toolbar now includes a multi-select Indicators control. Users
+can independently combine EMA 9/20/50/100/200 and SMA 20/50/100/200 without changing
+the chart timeframe, selected zone or candle request. EMA lines are solid, SMA lines
+are dashed, each period has a distinct colour and the selection is stored locally.
+Indicator toggles add or remove chart series only; they do not reload market data.

@@ -16,6 +16,12 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
+import Checkbox from "@mui/material/Checkbox";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import ListItemText from "@mui/material/ListItemText";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { type SelectChangeEvent } from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
@@ -38,6 +44,27 @@ const confluenceTimeframes = [
     { timeframe: "6M", name: "Half-Yearly" },
     { timeframe: "1Y", name: "Yearly" },
 ];
+const indicatorOptions = [
+    { id: "EMA_9", label: "EMA 9", kind: "EMA", period: 9, color: "#f59e0b" },
+    { id: "EMA_20", label: "EMA 20", kind: "EMA", period: 20, color: "#a855f7" },
+    { id: "EMA_50", label: "EMA 50", kind: "EMA", period: 50, color: "#3b82f6" },
+    { id: "EMA_100", label: "EMA 100", kind: "EMA", period: 100, color: "#22d3ee" },
+    { id: "EMA_200", label: "EMA 200", kind: "EMA", period: 200, color: "#f43f5e" },
+    { id: "SMA_20", label: "SMA 20", kind: "SMA", period: 20, color: "#84cc16" },
+    { id: "SMA_50", label: "SMA 50", kind: "SMA", period: 50, color: "#eab308" },
+    { id: "SMA_100", label: "SMA 100", kind: "SMA", period: 100, color: "#06b6d4" },
+    { id: "SMA_200", label: "SMA 200", kind: "SMA", period: 200, color: "#ec4899" },
+] as const;
+const indicatorPreferenceKey = "alphaedge.chart.indicators";
+
+function readIndicatorPreference(): string[] {
+    try {
+        const parsed = JSON.parse(localStorage.getItem(indicatorPreferenceKey) ?? "[]");
+        return Array.isArray(parsed) ? parsed.map(String) : [];
+    } catch {
+        return [];
+    }
+}
 
 interface ZoneDetailChartProps {
     result: ZoneResearchResult;
@@ -74,6 +101,7 @@ function ZoneDetailChart({
     const confluenceSeriesMapRef = useRef(new Map<ISeriesApi<"Baseline">, ConfluenceChartOverlay>());
     const measurementAreaSeriesRef = useRef<ISeriesApi<"Baseline"> | null>(null);
     const measurementBoundarySeriesRef = useRef<ISeriesApi<"Line">[]>([]);
+    const indicatorSeriesRef = useRef<ISeriesApi<"Line">[]>([]);
     const measurementSelectionRef = useRef<{
         from: UTCTimestamp;
         to: UTCTimestamp;
@@ -82,6 +110,7 @@ function ZoneDetailChart({
         text: string;
     } | null>(null);
     const candleTimesRef = useRef<UTCTimestamp[]>([]);
+    const candleDataRef = useRef<Array<{ time: UTCTimestamp; close: number }>>([]);
     const candleStepRef = useRef(86_400);
     const measuringRef = useRef(false);
     const crosshairVisibleRef = useRef(true);
@@ -99,6 +128,7 @@ function ZoneDetailChart({
     const [chartReadyVersion, setChartReadyVersion] = useState(0);
     const [zonesVisible, setZonesVisible] = useState(true);
     const [measurementLabel, setMeasurementLabel] = useState<{ left: number; top: number; text: string } | null>(null);
+    const [selectedIndicators, setSelectedIndicators] = useState<string[]>(readIndicatorPreference);
     const executionIndex = confluenceTimeframes.findIndex((item) => item.timeframe === result.timeframe);
     const higherTimeframeButtons = executionIndex < 0 ? [] : confluenceTimeframes.slice(executionIndex + 1);
     const inspectedOverlay = availableConfluenceOverlays.find((overlay) => overlay.timeframe === inspectedConfluenceTimeframe);
@@ -198,6 +228,7 @@ function ZoneDetailChart({
                 }, []).filter((step) => step > 0).sort((left, right) => left - right);
                 const candleStep = recentSteps[Math.floor(recentSteps.length / 2)] || 86_400;
                 candleTimesRef.current = data.map((candle) => candle.time);
+                candleDataRef.current = data.map((candle) => ({ time: candle.time, close: candle.close }));
                 candleStepRef.current = candleStep;
                 const futureZonePoints = 12;
                 chart.subscribeClick((param) => {
@@ -368,8 +399,10 @@ function ZoneDetailChart({
             confluenceSeriesMap.clear();
             measurementAreaSeriesRef.current = null;
             measurementBoundarySeriesRef.current = [];
+            indicatorSeriesRef.current = [];
             measurementSelectionRef.current = null;
             candleTimesRef.current = [];
+            candleDataRef.current = [];
             chart = null as never;
         };
     }, [height, onInspectConfluenceOverlay, result, selectedZoneId, updateMeasurementLabel, zones]);
@@ -445,6 +478,52 @@ function ZoneDetailChart({
         });
     }, [chartReadyVersion, confluenceOverlays]);
 
+    useEffect(() => {
+        const chart = chartRef.current;
+        const data = candleDataRef.current;
+        if (!chart || !data.length) return;
+        indicatorSeriesRef.current.forEach((series) => chart.removeSeries(series));
+        indicatorSeriesRef.current = [];
+
+        indicatorOptions
+            .filter((option) => selectedIndicators.includes(option.id))
+            .forEach((option) => {
+                const series = chart.addSeries(LineSeries, {
+                    color: option.color,
+                    lineWidth: 2,
+                    lineStyle: option.kind === "EMA" ? LineStyle.Solid : LineStyle.Dashed,
+                    priceLineVisible: false,
+                    lastValueVisible: true,
+                    title: option.label,
+                });
+                if (option.kind === "EMA") {
+                    const multiplier = 2 / (option.period + 1);
+                    let average = data[0].close;
+                    series.setData(data.map((point) => {
+                        average = point.close * multiplier + average * (1 - multiplier);
+                        return { time: point.time, value: average };
+                    }));
+                } else {
+                    series.setData(data.slice(option.period - 1).map((point, index) => {
+                        const sourceIndex = index + option.period - 1;
+                        const window = data.slice(sourceIndex - option.period + 1, sourceIndex + 1);
+                        return {
+                            time: point.time,
+                            value: window.reduce((sum, item) => sum + item.close, 0) / option.period,
+                        };
+                    }));
+                }
+                indicatorSeriesRef.current.push(series);
+            });
+    }, [chartReadyVersion, selectedIndicators]);
+
+    function changeIndicators(event: SelectChangeEvent<string[]>) {
+        const value = event.target.value;
+        const next = typeof value === "string" ? value.split(",") : value;
+        setSelectedIndicators(next);
+        localStorage.setItem(indicatorPreferenceKey, JSON.stringify(next));
+    }
+
     function toggleZones() {
         const next = !zonesVisible;
         setZonesVisible(next);
@@ -497,12 +576,31 @@ function ZoneDetailChart({
                     Zone {result.distal_price?.toLocaleString("en-IN")}–{result.proximal_price?.toLocaleString("en-IN")} · {result.timeframe ?? "1D"}
                 </Typography>
             </Stack>
-            {showTools && <Stack direction="row" spacing={1} sx={{ px: 1.5, py: 1, alignItems: "center", borderBottom: "1px solid", borderColor: "divider" }}>
+            {showTools && <Stack direction="row" spacing={1} sx={{ px: 1.5, py: 1, alignItems: "center", flexWrap: "wrap", rowGap: 1, borderBottom: "1px solid", borderColor: "divider" }}>
                 <Button size="small" variant="outlined" onClick={() => chartRef.current?.timeScale().fitContent()}>Fit chart</Button>
                 <Button size="small" variant={measuring ? "contained" : "outlined"} onClick={toggleMeasure}>Measure range</Button>
                 <Button size="small" variant="outlined" onClick={clearMeasurement}>Clear measurement</Button>
                 <Button size="small" variant={crosshairVisible ? "contained" : "outlined"} onClick={toggleCrosshair}>Crosshair {crosshairVisible ? "On" : "Off"}</Button>
                 <Button size="small" variant={zonesVisible ? "outlined" : "contained"} onClick={toggleZones}>{zonesVisible ? "Hide all zones" : "Show zones"}</Button>
+                <FormControl size="small" sx={{ minWidth: 150 }}>
+                    <InputLabel id="chart-indicators-label">Indicators</InputLabel>
+                    <Select<string[]>
+                        labelId="chart-indicators-label"
+                        multiple
+                        value={selectedIndicators}
+                        label="Indicators"
+                        onChange={changeIndicators}
+                        renderValue={(selected) => selected.length ? `${selected.length} selected` : "None"}
+                    >
+                        {indicatorOptions.map((option) => (
+                            <MenuItem key={option.id} value={option.id}>
+                                <Checkbox checked={selectedIndicators.includes(option.id)} />
+                                <Box sx={{ width: 10, height: 10, borderRadius: "50%", bgcolor: option.color, mr: 1 }} />
+                                <ListItemText primary={option.label} secondary={option.kind === "EMA" ? "Follows recent prices faster" : "Smooth average price"} />
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
                 <Chip size="small" label="Hold left mouse button and drag to pan" />
                 <Chip size="small" label="Wheel to zoom" />
                 <Typography variant="caption" color={measuring ? "primary.main" : "text.secondary"} sx={{ ml: "auto" }}>{measurement}</Typography>
