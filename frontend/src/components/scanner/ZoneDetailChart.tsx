@@ -85,7 +85,12 @@ function ZoneDetailChart({
     const candleStepRef = useRef(86_400);
     const measuringRef = useRef(false);
     const crosshairVisibleRef = useRef(true);
-    const measureStartRef = useRef<{ price: number; time: UTCTimestamp } | null>(null);
+    const measureStartRef = useRef<{
+        price: number;
+        time: UTCTimestamp;
+        pointX: number;
+        pointY: number;
+    } | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [measuring, setMeasuring] = useState(false);
@@ -217,6 +222,8 @@ function ZoneDetailChart({
                         measureStartRef.current = {
                             price,
                             time: Number(param.time) as UTCTimestamp,
+                            pointX: param.point.x,
+                            pointY: param.point.y,
                         };
                         setMeasurement(`Start ₹${price.toFixed(2)} · select the second point.`);
                         return;
@@ -260,14 +267,21 @@ function ZoneDetailChart({
                     lowerLine.setData([{ time: from, value: lower }, { time: to, value: lower }]);
                     measurementAreaSeriesRef.current = area;
                     measurementBoundarySeriesRef.current = [upperLine, lowerLine];
+                    const measurementText = `₹${startPrice.toFixed(2)} → ₹${price.toFixed(2)} · ${change >= 0 ? "+" : ""}${change.toFixed(2)} · ${percent >= 0 ? "+" : ""}${percent.toFixed(2)}%`;
                     measurementSelectionRef.current = {
                         from,
                         to,
                         lower,
                         upper,
-                        text: `₹${startPrice.toFixed(2)} → ₹${price.toFixed(2)} · ${change >= 0 ? "+" : ""}${change.toFixed(2)} · ${percent >= 0 ? "+" : ""}${percent.toFixed(2)}%`,
+                        text: measurementText,
                     };
+                    setMeasurementLabel({
+                        left: (measureStartRef.current.pointX + param.point.x) / 2,
+                        top: (measureStartRef.current.pointY + param.point.y) / 2,
+                        text: measurementText,
+                    });
                     updateMeasurementLabel();
+                    window.requestAnimationFrame(updateMeasurementLabel);
                     setMeasurement("Measured range is shown inside the chart.");
                     measureStartRef.current = null;
                 });
@@ -551,6 +565,7 @@ function ZoneDetailChart({
                             color: "#ffd477",
                             fontSize: ".72rem",
                             fontWeight: 850,
+                            zIndex: 20,
                             pointerEvents: "none",
                             whiteSpace: "nowrap",
                         }}
