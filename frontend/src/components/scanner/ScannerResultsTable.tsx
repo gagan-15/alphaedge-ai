@@ -19,7 +19,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Typography from "@mui/material/Typography";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { ZoneResearchResult } from "../../types/scanner";
 import ZoneDetailChart from "./ZoneDetailChart";
@@ -53,6 +53,17 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
     const [sortField, setSortField] = useState<"symbol" | "zone_score" | "distance_percent">("zone_score");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
     const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>([]);
+    const [fullChartHeight, setFullChartHeight] = useState(() =>
+        Math.max(420, Math.min(680, window.innerHeight - 300))
+    );
+
+    useEffect(() => {
+        const updateHeight = () => setFullChartHeight(
+            Math.max(420, Math.min(680, window.innerHeight - 300))
+        );
+        window.addEventListener("resize", updateHeight);
+        return () => window.removeEventListener("resize", updateHeight);
+    }, []);
 
     const sortedResults = useMemo(() => [...results].sort((left, right) => {
         const first = left[sortField];
@@ -203,12 +214,12 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                             <IconButton aria-label="Close full-screen chart" onClick={() => setSelectedZones([])}><CloseRoundedIcon /></IconButton>
                         </Box>
                     </DialogTitle>
-                    <DialogContent sx={{ p: 1.5, bgcolor: "#050d18" }}>
+                    <DialogContent sx={{ p: 1.5, bgcolor: "#050d18", overflowY: { xs: "auto", lg: "hidden" } }}>
                         <Grid container spacing={1.5}>
-                            <Grid size={{ xs: 12, xl: 8.5 }}>
-                                <ZoneDetailChart result={selectedZone} zones={selectedZones} height={680} showTools />
+                            <Grid size={{ xs: 12, lg: 8.5 }}>
+                                <ZoneDetailChart result={selectedZone} zones={selectedZones} height={fullChartHeight} showTools />
                             </Grid>
-                            <Grid size={{ xs: 12, xl: 3.5 }}>
+                            <Grid size={{ xs: 12, lg: 3.5 }}>
                                 <Box sx={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}>
                                     <Card sx={{ mb: 1.25 }}><CardContent>
                                         <Typography variant="h6">All active zones</Typography>

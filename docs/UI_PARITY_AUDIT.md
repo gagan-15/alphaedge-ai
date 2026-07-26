@@ -378,3 +378,9 @@ on the price axis, and the active-zone list repeats the same identifier and exac
 boundary values. Pressed left-mouse movement and wheel scaling are explicitly enabled.
 The toolbar now says that left-drag pans the chart, while Crosshair is a real on/off
 control; Fit Chart and the existing two-point Measure Range remain functional.
+
+The full-screen Scanner chart no longer uses a fixed 680-pixel canvas at every browser
+height. It now fits between 420 and 680 pixels based on the live viewport and updates
+when the window is resized. The chart and analysis panel switch to the desktop
+two-column layout at the normal large-screen breakpoint, preventing the chart from
+being cropped or pushing all intelligence below it at 100% browser zoom.
