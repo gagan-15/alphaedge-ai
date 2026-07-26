@@ -1,17 +1,7 @@
 import { useState } from "react";
 
-import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
-import AutoGraphOutlinedIcon from "@mui/icons-material/AutoGraphOutlined";
-import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined";
 import CachedOutlinedIcon from "@mui/icons-material/CachedOutlined";
 import DashboardCustomizeOutlinedIcon from "@mui/icons-material/DashboardCustomizeOutlined";
-import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
-import NotificationsActiveOutlinedIcon from "@mui/icons-material/NotificationsActiveOutlined";
-import RadarOutlinedIcon from "@mui/icons-material/RadarOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
-import ShowChartOutlinedIcon from "@mui/icons-material/ShowChartOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
-import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
@@ -23,57 +13,23 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 
+import {
+    AIMarketSummaryWidget,
+    IndiaVixWidget,
+    InstitutionalFlowWidget,
+    MarketBreadthWidget,
+    MarketHealthWidget,
+    MarketRegimeWidget,
+    OpportunitiesWidget,
+    ParticipationChartWidget,
+    RiskMeterWidget,
+    SectorRotationWidget,
+    SentimentWidget,
+    SmartAlertsWidget,
+    TradingBiasWidget,
+    VerdictWidget,
+} from "../components/market-overview/MarketOverviewWidgets";
 import OverviewPanel from "../components/market-overview/OverviewPanel";
-
-const kpis = [
-    {
-        title: "Market Health",
-        subtitle: "Participation, momentum and trend strength",
-        icon: InsightsOutlinedIcon,
-        accent: "#32d583",
-    },
-    {
-        title: "Market Regime",
-        subtitle: "Trending, ranging or transition environment",
-        icon: TimelineOutlinedIcon,
-        accent: "#6172f3",
-    },
-    {
-        title: "Trading Bias",
-        subtitle: "Preferred directional research posture",
-        icon: TrendingUpOutlinedIcon,
-        accent: "#22d3ee",
-    },
-    {
-        title: "Risk Meter",
-        subtitle: "Volatility and participation risk context",
-        icon: SecurityOutlinedIcon,
-        accent: "#fdb022",
-    },
-] as const;
-
-function WidgetPlaceholder({ icon: Icon, text }: { icon: typeof AutoGraphOutlinedIcon; text: string }) {
-    return (
-        <Box
-            sx={{
-                height: "100%",
-                minHeight: 104,
-                display: "grid",
-                placeItems: "center",
-                border: "1px dashed rgba(143, 161, 184, .22)",
-                borderRadius: 2,
-                bgcolor: "rgba(4, 12, 25, .28)",
-                textAlign: "center",
-                px: 2,
-            }}
-        >
-            <Box>
-                <Icon sx={{ color: "text.secondary", fontSize: 28 }} />
-                <Typography color="text.secondary" sx={{ mt: 1, fontSize: ".74rem" }}>{text}</Typography>
-            </Box>
-        </Box>
-    );
-}
 
 export default function MarketOverview() {
     const [market, setMarket] = useState("NSE");
@@ -140,19 +96,16 @@ export default function MarketOverview() {
                     eyebrow="Executive intelligence"
                     accent="#8b5cf6"
                     minHeight={190}
-                    action={<Chip size="small" label="AI PLACEHOLDER" variant="outlined" />}
+                    action={<Chip size="small" label="TRANSPARENT DEMO LOGIC" variant="outlined" />}
                 >
-                    <WidgetPlaceholder icon={AutoAwesomeOutlinedIcon} text="AI interpretation is intentionally not connected in this layout phase." />
+                    <AIMarketSummaryWidget />
                 </OverviewPanel>
 
                 <Grid container spacing={2.5}>
-                    {kpis.map(({ title, subtitle, icon: Icon, accent }) => (
-                        <Grid key={title} size={{ xs: 12, md: 6, lg: 3 }}>
-                            <OverviewPanel title={title} subtitle={subtitle} accent={accent} minHeight={210}>
-                                <WidgetPlaceholder icon={Icon} text="Metric widget ready for a validated data source." />
-                            </OverviewPanel>
-                        </Grid>
-                    ))}
+                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle="Participation, momentum and trend strength" accent="#32d583" minHeight={310}><MarketHealthWidget /></OverviewPanel></Grid>
+                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Regime" subtitle="Trending, ranging or transition environment" accent="#6172f3" minHeight={310}><MarketRegimeWidget /></OverviewPanel></Grid>
+                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Trading Bias" subtitle="Preferred directional research posture" accent="#22d3ee" minHeight={310}><TradingBiasWidget /></OverviewPanel></Grid>
+                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Risk Meter" subtitle="Volatility and participation risk context" accent="#fdb022" minHeight={310}><RiskMeterWidget /></OverviewPanel></Grid>
                 </Grid>
 
                 <OverviewPanel
@@ -160,20 +113,20 @@ export default function MarketOverview() {
                     subtitle={`${market} participation workspace · ${timeframe} view`}
                     eyebrow="Breadth through time"
                     minHeight={420}
-                    action={<Chip size="small" label="CHART CONTAINER" variant="outlined" />}
+                    action={<Chip size="small" label="INTERACTIVE DEMO" variant="outlined" />}
                 >
-                    <WidgetPlaceholder icon={ShowChartOutlinedIcon} text="Interactive participation chart will be added without changing this layout." />
+                    <ParticipationChartWidget />
                 </OverviewPanel>
 
                 <Grid container spacing={2.5}>
                     <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="Sector Rotation" subtitle="Leadership, improvement and deterioration by sector" minHeight={330}>
-                            <WidgetPlaceholder icon={RadarOutlinedIcon} text="Sector rotation widget slot" />
+                            <SectorRotationWidget />
                         </OverviewPanel>
                     </Grid>
                     <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="Market Breadth" subtitle="Advancing, declining and unchanged participation" minHeight={330}>
-                            <WidgetPlaceholder icon={AutoGraphOutlinedIcon} text="Market breadth widget slot" />
+                            <MarketBreadthWidget />
                         </OverviewPanel>
                     </Grid>
                 </Grid>
@@ -181,17 +134,17 @@ export default function MarketOverview() {
                 <Grid container spacing={2.5}>
                     <Grid size={{ xs: 12, md: 6, lg: 4 }}>
                         <OverviewPanel title="Institutional Flow" subtitle="FII and DII activity context" minHeight={280}>
-                            <WidgetPlaceholder icon={TimelineOutlinedIcon} text="Institutional flow widget slot" />
+                            <InstitutionalFlowWidget />
                         </OverviewPanel>
                     </Grid>
                     <Grid size={{ xs: 12, md: 6, lg: 4 }}>
                         <OverviewPanel title="India VIX" subtitle="Volatility level, direction and risk state" minHeight={280}>
-                            <WidgetPlaceholder icon={BoltOutlinedIcon} text="Volatility widget slot" />
+                            <IndiaVixWidget />
                         </OverviewPanel>
                     </Grid>
                     <Grid size={{ xs: 12, md: 12, lg: 4 }}>
                         <OverviewPanel title="Market Sentiment" subtitle="Combined participation and risk context" minHeight={280}>
-                            <WidgetPlaceholder icon={InsightsOutlinedIcon} text="Sentiment widget slot" />
+                            <SentimentWidget />
                         </OverviewPanel>
                     </Grid>
                 </Grid>
@@ -199,12 +152,12 @@ export default function MarketOverview() {
                 <Grid container spacing={2.5}>
                     <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="AI Opportunities" subtitle="Research candidates that deserve deeper validation" minHeight={300}>
-                            <WidgetPlaceholder icon={AutoAwesomeOutlinedIcon} text="Opportunity widget slot" />
+                            <OpportunitiesWidget />
                         </OverviewPanel>
                     </Grid>
                     <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="Smart Alerts" subtitle="Important market conditions requiring attention" minHeight={300}>
-                            <WidgetPlaceholder icon={NotificationsActiveOutlinedIcon} text="Alert widget slot" />
+                            <SmartAlertsWidget />
                         </OverviewPanel>
                     </Grid>
                 </Grid>
@@ -215,9 +168,9 @@ export default function MarketOverview() {
                     eyebrow="Decision brief"
                     accent="#32d583"
                     minHeight={220}
-                    action={<Chip size="small" color="warning" variant="outlined" label="SUMMARY PLACEHOLDER" />}
+                    action={<Chip size="small" color="warning" variant="outlined" label="DEMO VERDICT" />}
                 >
-                    <WidgetPlaceholder icon={InsightsOutlinedIcon} text="Premium verdict container ready for validated market intelligence." />
+                    <VerdictWidget />
                 </OverviewPanel>
             </Stack>
         </Box>

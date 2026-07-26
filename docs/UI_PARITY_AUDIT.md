@@ -253,3 +253,12 @@ AI market summary, four decision KPIs, participation chart, sector rotation and
 breadth, institutional flow/VIX/sentiment, opportunities/alerts and a final daily
 verdict. Desktop uses a 12-column grid, tablet collapses to two columns and mobile
 keeps the same information order in one column.
+
+Market Overview widget phase replaces every reserved slot without moving the layout.
+It includes an expandable transparent-logic summary, animated health and confidence
+gauges, regime/bias/risk interpretation, six genuinely different participation
+timeframe datasets, overlay controls, a sector table/heatmap switch, detailed breadth
+metrics, institutional flow, VIX, sentiment, opportunities, alerts and a daily verdict.
+Tooltips and reusable loading/empty-state components are included. Values remain
+explicit development data until approved market, breadth, flow and volatility feeds
+are connected; the summary is deterministic demo logic and is not represented as AI.
