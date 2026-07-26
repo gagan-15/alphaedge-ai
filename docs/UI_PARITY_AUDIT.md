@@ -314,3 +314,13 @@ and share actions. Missing trade-plan, trend, momentum, sector, relative-perform
 historical and risk fields are labelled as unavailable rather than being invented.
 Validated backend services are required before entry, stop, target, probability or
 historical-success values can be shown.
+
+The first Stock Details calculation audit now connects the decision panel to the same
+cached Yahoo OHLCV series used by the chart. Local calculations cover EMA 20/50/200,
+RSI 14, ATR 14, 20-period relative volume, a clearly labelled price-and-volume pressure
+estimate, 10/30/100-candle trend views, direction-aware EMA and RSI checks, wick-based
+zone retests, retest dates, maximum zone penetration, current zone position and close-
+based invalidation. The checklist uses PASS, FAIL, MIXED or UNAVAILABLE with its value,
+threshold, reason and score effect. The existing backend score remains explicitly a
+zone-formation score; data coverage is displayed separately and unavailable sector,
+benchmark, order-flow and historical-backtest fields explain their required source.

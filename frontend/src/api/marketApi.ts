@@ -24,14 +24,23 @@ const marketApi = axios.create({
     timeout: 15000,
 });
 
+const candleCache = new Map<string, Promise<CandleSeriesResult>>();
+
 export async function getMarketCandles(
     symbol: string,
     period = "1y",
     interval = "1d",
     timeframe = "1D",
 ): Promise<CandleSeriesResult> {
-    const response = await marketApi.get<CandleSeriesResult>("/candles", {
+    const key = `${symbol}:${period}:${interval}:${timeframe}`;
+    const cached = candleCache.get(key);
+    if (cached) return cached;
+    const request = marketApi.get<CandleSeriesResult>("/candles", {
         params: { symbol, period, interval, timeframe },
+    }).then((response) => response.data).catch((error) => {
+        candleCache.delete(key);
+        throw error;
     });
-    return response.data;
+    candleCache.set(key, request);
+    return request;
 }
