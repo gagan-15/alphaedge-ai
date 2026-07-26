@@ -181,6 +181,10 @@ labelled chart axes, normalized multi-index lines, a breadth donut, a movers tab
 and sector participation bars. The former oversized placeholder chart is no longer
 routed into the application.
 
+Market Overview range controls now alter the normalized series and x-axis labels
+for 1D, 1W, 1M, 3M and 1Y. They no longer act as selection-only buttons over a
+static chart.
+
 Breached zones are excluded from scanner results. A demand zone is invalid after
 a later candle closes below its distal (lower) boundary; a supply zone is invalid
 after a later candle closes above its distal (upper) boundary. Wicks alone remain

@@ -31,6 +31,14 @@ const series = [
     { name: "FINNIFTY", color: "#22d3ee", values: [33, 36, 39, 35, 43, 40, 48, 44, 51, 49, 57, 61] },
 ];
 
+const rangeProfiles = {
+    "1D": { multiplier: .36, drift: -.15, labels: ["09:15", "11:00", "12:45", "14:15", "15:30"] },
+    "1W": { multiplier: .62, drift: .08, labels: ["Mon", "Tue", "Wed", "Thu", "Fri"] },
+    "1M": { multiplier: 1, drift: 0, labels: ["Jul 01", "Jul 08", "Jul 15", "Jul 22", "Today"] },
+    "3M": { multiplier: 1.32, drift: -.1, labels: ["May", "Jun", "Jul", "Aug", "Today"] },
+    "1Y": { multiplier: 1.75, drift: .18, labels: ["Jul '25", "Oct '25", "Jan '26", "Apr '26", "Jul '26"] },
+} as const;
+
 const movers = [
     ["RELIANCE", "2,978.45", "+0.83%", "12.45M"],
     ["TCS", "3,584.75", "-0.41%", "20.15M"],
@@ -47,10 +55,19 @@ function MiniSpark({ color, down = false }: { color: string; down?: boolean }) {
 
 export default function MarketOverview() {
     const [range, setRange] = useState("1M");
-    const lines = useMemo(() => series.map((item) => {
-        const points = item.values.map((value, index) => `${index * (100 / 11)},${100 - value}`).join(" ");
-        return { ...item, points };
-    }), []);
+    const lines = useMemo(() => {
+        const profile = rangeProfiles[range as keyof typeof rangeProfiles];
+        return series.map((item, seriesIndex) => {
+            const origin = item.values[0];
+            const adjustedValues = item.values.map((value, index) =>
+                44 + (value - origin) * profile.multiplier
+                + index * profile.drift
+                + Math.sin(index * 1.7 + seriesIndex) * (range === "1D" ? 2.4 : 1.1)
+            );
+            const points = adjustedValues.map((value, index) => `${index * (100 / 11)},${100 - value}`).join(" ");
+            return { ...item, points };
+        });
+    }, [range]);
 
     return <Stack spacing={1.35}>
         <Stack direction={{ xs: "column", md: "row" }} sx={{ justifyContent: "space-between", alignItems: { md: "center" } }}>
@@ -69,7 +86,7 @@ export default function MarketOverview() {
         <Grid container spacing={1.35}>
             <Grid size={{ xs: 12, xl: 8.5 }}><Card sx={{ height: 390 }}><CardContent sx={{ height: "100%", p: 1.75 }}>
                 <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
-                    <Box><Typography variant="h6">Relative Market Performance</Typography><Typography variant="caption" color="text.secondary">Normalized index movement · illustrative series</Typography></Box>
+                    <Box><Typography variant="h6">Relative Market Performance</Typography><Typography variant="caption" color="text.secondary">Normalized index movement · illustrative series · selected range: {range}</Typography></Box>
                     <ToggleButtonGroup size="small" exclusive value={range} onChange={(_, value) => value && setRange(value)}>
                         {["1D", "1W", "1M", "3M", "1Y"].map((x) => <ToggleButton key={x} value={x}>{x}</ToggleButton>)}
                     </ToggleButtonGroup>
@@ -88,7 +105,7 @@ export default function MarketOverview() {
                         {lines.map((item) => <polyline key={item.name} points={item.points} fill="none" stroke={item.color} strokeWidth="1.25" vectorEffect="non-scaling-stroke" />)}
                     </Box>
                     <Stack direction="row" sx={{ position: "absolute", left: 38, right: 0, bottom: 0, justifyContent: "space-between" }}>
-                        {["Jul 01", "Jul 08", "Jul 15", "Jul 22", "Today"].map((x) => <Typography key={x} variant="caption" color="text.secondary">{x}</Typography>)}
+                        {rangeProfiles[range as keyof typeof rangeProfiles].labels.map((x) => <Typography key={x} variant="caption" color="text.secondary">{x}</Typography>)}
                     </Stack>
                 </Box>
             </CardContent></Card></Grid>
