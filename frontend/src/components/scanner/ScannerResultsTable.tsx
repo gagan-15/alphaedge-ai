@@ -24,6 +24,7 @@ import { useMemo, useState } from "react";
 import type { ZoneResearchResult } from "../../types/scanner";
 import ZoneDetailChart from "./ZoneDetailChart";
 import ZoneExplanationPanel from "./ZoneExplanationPanel";
+import { zoneSequenceLabel } from "./zoneLabels";
 
 interface ScannerResultsTableProps {
     results: ZoneResearchResult[];
@@ -212,9 +213,9 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                     <Card sx={{ mb: 1.25 }}><CardContent>
                                         <Typography variant="h6">All active zones</Typography>
                                         <Stack spacing={.75} sx={{ mt: 1 }}>
-                                            {selectedZones.map((zone) => <Box key={`${zone.base_date}-${zone.proximal_price}`} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.5 }}>
-                                                <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography sx={{ fontWeight: 800 }}>{zone.zone_type} · {patternLabels[zone.pattern_type ?? ""]}</Typography><Chip size="small" label={zone.zone_score.toFixed(0)} /></Stack>
-                                                <Typography variant="caption" color="text.secondary">{zone.distal_price.toLocaleString("en-IN")} – {zone.proximal_price.toLocaleString("en-IN")} · {zone.status} · {zone.base_date}</Typography>
+                                            {selectedZones.map((zone, zoneIndex) => <Box key={`${zone.base_date}-${zone.proximal_price}`} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.5 }}>
+                                                <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography sx={{ fontWeight: 800 }}>{zoneSequenceLabel(selectedZones, zoneIndex)} · {zone.zone_type} · {patternLabels[zone.pattern_type ?? ""]}</Typography><Chip size="small" label={zone.zone_score.toFixed(0)} /></Stack>
+                                                <Typography variant="caption" color="text.secondary">Proximal ₹{zone.proximal_price.toLocaleString("en-IN")} · Distal ₹{zone.distal_price.toLocaleString("en-IN")} · {zone.status} · {zone.base_date}</Typography>
                                             </Box>)}
                                         </Stack>
                                     </CardContent></Card>

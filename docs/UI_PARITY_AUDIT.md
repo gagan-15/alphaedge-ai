@@ -371,3 +371,10 @@ line, prevents duplicate zone alerts and changes to Alert Created. Share Analysi
 the device share sheet when supported, otherwise copies the research summary, and
 reports cancellation or failure. Open Full Chart was removed because Stock Details is
 already displayed inside the full-screen chart workspace.
+
+Multi-zone chart clarity now assigns independent demand and supply labels (DZ1, DZ2,
+SZ1, SZ2) in chart order. Every zone creates labelled proximal and distal price lines
+on the price axis, and the active-zone list repeats the same identifier and exact
+boundary values. Pressed left-mouse movement and wheel scaling are explicitly enabled.
+The toolbar now says that left-drag pans the chart, while Crosshair is a real on/off
+control; Fit Chart and the existing two-point Measure Range remain functional.

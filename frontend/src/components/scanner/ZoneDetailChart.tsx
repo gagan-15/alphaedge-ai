@@ -3,6 +3,7 @@ import {
     CandlestickSeries,
     ColorType,
     CrosshairMode,
+    LineStyle,
     createChart,
     type UTCTimestamp,
 } from "lightweight-charts";
@@ -18,6 +19,7 @@ import Typography from "@mui/material/Typography";
 
 import { getMarketCandles } from "../../api/marketApi";
 import type { ZoneResearchResult } from "../../types/scanner";
+import { zoneSequenceLabel } from "./zoneLabels";
 
 const patternLabels: Record<string, string> = {
     DROP_BASE_RALLY: "DBR",
@@ -30,10 +32,12 @@ function ZoneDetailChart({ result, zones = [result], height = 360, showTools = f
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<ReturnType<typeof createChart> | null>(null);
     const measuringRef = useRef(false);
+    const crosshairVisibleRef = useRef(true);
     const measureStartRef = useRef<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [measuring, setMeasuring] = useState(false);
+    const [crosshairVisible, setCrosshairVisible] = useState(true);
     const [measurement, setMeasurement] = useState("Measurement tool is off.");
 
     useEffect(() => {
@@ -55,11 +59,20 @@ function ZoneDetailChart({ result, zones = [result], height = 360, showTools = f
                 vertLines: { color: "#132236" },
                 horzLines: { color: "#18273a" },
             },
-            crosshair: { mode: CrosshairMode.Normal },
+            crosshair: { mode: crosshairVisibleRef.current ? CrosshairMode.Normal : CrosshairMode.Hidden },
             rightPriceScale: { borderColor: "#24344a" },
             timeScale: { borderColor: "#24344a", timeVisible: true },
-            handleScroll: true,
-            handleScale: true,
+            handleScroll: {
+                mouseWheel: true,
+                pressedMouseMove: true,
+                horzTouchDrag: true,
+                vertTouchDrag: true,
+            },
+            handleScale: {
+                axisPressedMouseMove: true,
+                mouseWheel: true,
+                pinch: true,
+            },
         });
         chartRef.current = chart;
 
@@ -117,6 +130,7 @@ function ZoneDetailChart({ result, zones = [result], height = 360, showTools = f
                 if (displayZone.proximal_price !== null && displayZone.distal_price !== null) {
                     const demand = displayZone.zone_type === "DEMAND";
                     const zoneColor = demand ? "#1d8cff" : "#ff2f68";
+                    const zoneLabel = zoneSequenceLabel(zones, zoneIndex);
                     const zone = chart.addSeries(BaselineSeries, {
                         baseValue: { type: "price", price: displayZone.distal_price },
                         topLineColor: zoneColor,
@@ -142,6 +156,22 @@ function ZoneDetailChart({ result, zones = [result], height = 360, showTools = f
                         });
                     }
                     zone.setData(zoneData);
+                    candles.createPriceLine({
+                        price: displayZone.proximal_price,
+                        color: zoneColor,
+                        lineWidth: 2,
+                        lineStyle: LineStyle.Solid,
+                        axisLabelVisible: true,
+                        title: `${zoneLabel} PROXIMAL`,
+                    });
+                    candles.createPriceLine({
+                        price: displayZone.distal_price,
+                        color: zoneColor,
+                        lineWidth: 1,
+                        lineStyle: LineStyle.Dashed,
+                        axisLabelVisible: true,
+                        title: `${zoneLabel} DISTAL`,
+                    });
                 }
                 });
 
@@ -172,6 +202,15 @@ function ZoneDetailChart({ result, zones = [result], height = 360, showTools = f
         setMeasurement(next ? "Select two chart points to measure price change." : "Measurement tool is off.");
     }
 
+    function toggleCrosshair() {
+        const next = !crosshairVisible;
+        setCrosshairVisible(next);
+        crosshairVisibleRef.current = next;
+        chartRef.current?.applyOptions({
+            crosshair: { mode: next ? CrosshairMode.Normal : CrosshairMode.Hidden },
+        });
+    }
+
     return (
         <Box sx={{ bgcolor: "#07111e", border: "1px solid", borderColor: "divider", borderRadius: 1.5, overflow: "hidden" }}>
             <Stack direction="row" sx={{ px: 2, py: 1.2, alignItems: "center", gap: 1, borderBottom: "1px solid", borderColor: "divider" }}>
@@ -186,8 +225,8 @@ function ZoneDetailChart({ result, zones = [result], height = 360, showTools = f
             {showTools && <Stack direction="row" spacing={1} sx={{ px: 1.5, py: 1, alignItems: "center", borderBottom: "1px solid", borderColor: "divider" }}>
                 <Button size="small" variant="outlined" onClick={() => chartRef.current?.timeScale().fitContent()}>Fit chart</Button>
                 <Button size="small" variant={measuring ? "contained" : "outlined"} onClick={toggleMeasure}>Measure range</Button>
-                <Chip size="small" label="Crosshair" />
-                <Chip size="small" label="Drag to pan" />
+                <Button size="small" variant={crosshairVisible ? "contained" : "outlined"} onClick={toggleCrosshair}>Crosshair {crosshairVisible ? "On" : "Off"}</Button>
+                <Chip size="small" label="Hold left mouse button and drag to pan" />
                 <Chip size="small" label="Wheel to zoom" />
                 <Typography variant="caption" color={measuring ? "primary.main" : "text.secondary"} sx={{ ml: "auto" }}>{measurement}</Typography>
             </Stack>}
