@@ -28,21 +28,23 @@ export default function OptionChain() {
     const config = underlyingConfig[symbol];
     const chain = useMemo(() => {
         const atm = Math.round(config.spot / config.step) * config.step;
+        const expiryIndex = ["30 Jul 2026", "06 Aug 2026", "27 Aug 2026"].indexOf(expiry);
+        const timeValue = 1 + Math.max(0, expiryIndex) * .18;
         return Array.from({ length: rows }, (_, index) => {
             const strike = atm + (index - Math.floor(rows / 2)) * config.step;
             const distance = (strike - config.spot) / config.step;
             return {
                 strike,
-                callOi: Math.round(12500 + Math.abs(distance) * 1900 + index * 320),
+                callOi: Math.round((12500 + Math.abs(distance) * 1900 + index * 320) * timeValue),
                 callChange: 0.8 + index * 0.22,
-                callLtp: Math.max(8, 110 - distance * config.step * 0.48),
-                putLtp: Math.max(8, 90 + distance * config.step * 0.48),
+                callLtp: Math.max(8, (110 - distance * config.step * 0.48) * timeValue),
+                putLtp: Math.max(8, (90 + distance * config.step * 0.48) * timeValue),
                 putChange: -0.6 - index * 0.18,
-                putOi: Math.round(10500 + Math.abs(distance) * 1700 + (rows - index) * 290),
+                putOi: Math.round((10500 + Math.abs(distance) * 1700 + (rows - index) * 290) * timeValue),
                 atm: strike === atm,
             };
         });
-    }, [config, rows]);
+    }, [config, expiry, rows]);
 
     return <Stack spacing={1.5}>
         <Stack direction={{ xs: "column", md: "row" }} sx={{ justifyContent: "space-between", alignItems: { md: "center" } }}>

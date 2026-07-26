@@ -43,6 +43,15 @@ const intradayTimeframes = [
     { value: "HOUR_6", label: "6H" },
 ] as const;
 
+function scannerPreference<T>(key: "defaultTimeframe" | "minimumQuality", fallback: T): T {
+    try {
+        const preferences = JSON.parse(localStorage.getItem("alphaedge.local.preferences") ?? "{}");
+        return (preferences[key] ?? fallback) as T;
+    } catch {
+        return fallback;
+    }
+}
+
 function Scanner() {
     const [scanner, setScanner] =
         useState<ZoneResearchResponse | null>(null);
@@ -52,9 +61,9 @@ function Scanner() {
         useState<string | null>(null);
     const [searchQuery, setSearchQuery] =
         useState("");
-    const [minimumScore, setMinimumScore] = useState(40);
+    const [minimumScore, setMinimumScore] = useState(() => scannerPreference("minimumQuality", 40));
     const [approvalFilter, setApprovalFilter] = useState("all");
-    const [timeframe, setTimeframe] = useState("DAILY");
+    const [timeframe, setTimeframe] = useState(() => scannerPreference("defaultTimeframe", "DAILY"));
     const [market, setMarket] = useState("NSE");
     const [patternFilter, setPatternFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");

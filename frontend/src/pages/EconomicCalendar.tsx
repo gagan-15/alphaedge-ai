@@ -30,10 +30,11 @@ export default function EconomicCalendar() {
     const [country, setCountry] = useState("All");
     const [impact, setImpact] = useState("All");
     const [window, setWindow] = useState("Upcoming");
-    const visible = useMemo(() => events.filter((item) =>
+    const visible = useMemo(() => events.filter((item, index) =>
         (country === "All" || item.country === country)
         && (impact === "All" || item.impact === impact)
-    ), [country, impact]);
+        && (window === "Upcoming" || index === 0)
+    ), [country, impact, window]);
 
     return <Stack spacing={1.5}>
         <Stack direction={{ xs: "column", md: "row" }} sx={{ justifyContent: "space-between", alignItems: { md: "center" } }}>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -21,6 +21,19 @@ const sectors = [
 
 function MarketBreadth() {
     const [range, setRange] = useState("1D");
+    const breadthPoints = useMemo(() => {
+        const profiles: Record<string, { scale: number; drift: number }> = {
+            "1D": { scale: .45, drift: -.1 },
+            "1W": { scale: .75, drift: .05 },
+            "1M": { scale: 1, drift: 0 },
+            "3M": { scale: 1.35, drift: .12 },
+        };
+        const source = [12, 21, 17, 33, 29, 45, 39, 54, 48, 66, 61, 75, 84];
+        const profile = profiles[range];
+        return source.map((value, index) =>
+            `${index * (100 / 12)},${95 - value * profile.scale - index * profile.drift}`
+        ).join(" ");
+    }, [range]);
     return (
         <Stack spacing={1.5}>
             <Stack direction={{ xs: "column", md: "row" }} sx={{ justifyContent: "space-between", alignItems: { md: "center" } }}>
@@ -47,7 +60,7 @@ function MarketBreadth() {
                         <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
                             <Box>
                                 <Typography variant="h6">Advance–Decline Line</Typography>
-                                <Typography variant="caption" color="text.secondary">Net market participation</Typography>
+                                <Typography variant="caption" color="text.secondary">Net market participation · selected range: {range}</Typography>
                             </Box>
                             <Stack direction="row" spacing={.5}>
                                 {["1D", "1W", "1M", "3M"].map((item) => (
@@ -58,8 +71,8 @@ function MarketBreadth() {
                         <Box component="svg" viewBox="0 0 100 100" preserveAspectRatio="none" sx={{ width: "100%", height: 285, mt: 1 }}>
                             {[20, 40, 60, 80].map((y) => <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#1d2b40" strokeWidth=".35" />)}
                             <defs><linearGradient id="breadthArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#35d07f" stopOpacity=".38" /><stop offset="100%" stopColor="#35d07f" stopOpacity="0" /></linearGradient></defs>
-                            <polygon points="0,88 8,79 16,83 24,67 32,71 40,55 48,61 56,46 64,52 72,34 80,39 88,25 100,16 100,100 0,100" fill="url(#breadthArea)" />
-                            <polyline points="0,88 8,79 16,83 24,67 32,71 40,55 48,61 56,46 64,52 72,34 80,39 88,25 100,16" fill="none" stroke="#35d07f" strokeWidth="1.7" />
+                            <polygon points={`0,100 ${breadthPoints} 100,100`} fill="url(#breadthArea)" />
+                            <polyline points={breadthPoints} fill="none" stroke="#35d07f" strokeWidth="1.7" />
                         </Box>
                     </CardContent></Card>
                 </Grid>

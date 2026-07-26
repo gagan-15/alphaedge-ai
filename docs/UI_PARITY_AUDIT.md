@@ -18,21 +18,39 @@ controls work, its source is identified, and demo values cannot be mistaken for 
 
 ## Current status
 
-| Screen | Current state | Main gaps |
-| --- | --- | --- |
-| Dashboard | Partial | Layout is simpler than the reference; some panels use fixed demo values; shared ticker exists only here; gauges, breadth and movers need source-backed data. |
-| Market Overview | Early partial | Missing multi-index performance chart, breadth donut, detailed movers and proper sector comparison. |
-| Scanner | Partial | General filters and zone results exist, but universe is only four symbols; daily zones use heuristic scoring; filters and zone-chart detail need production validation. |
-| Signals | Partial | Signal rows load, but reference-style tabs, reason columns, scenarios, invalidation and richer confidence explanations are incomplete. |
-| Market Breadth | Early partial | Static summary and bars only; no sourced advance-decline series, 52-week statistics or complete sector breadth. |
-| News & Events | Early partial | Static outlook; no news provider, tabs, source links, timestamps or sentiment pipeline. |
-| Backtesting | Prototype | Button changes the UI, but no historical strategy engine, equity curve, costs, benchmark comparison or downloadable result. |
-| Portfolio | Prototype | Illustrative values; holdings workflow and persistence need completion. |
-| Risk Management | Partial | Basic risk view exists; position sizing and validation need a complete calculator workflow. |
-| Alerts | Partial | Local persistence and delayed checks exist; create/edit/pause/delete flow and notification delivery need completion. |
-| Economic Calendar | Prototype | Static event rows; filters, sourced events, forecast/previous values and timezone handling are missing. |
-| Option Chain | Prototype | Static sample chain; expiry selection and exchange-licensed derivatives data are not connected. |
-| Calculators | Early partial | Position-size calculator works; the other calculator buttons are placeholders. |
+`Working` means the visible local workflow responds correctly. It does not mean that
+the underlying data is licensed, live or production validated.
+
+| Screen | Controls/workflow | Data state | Main production gap |
+| --- | --- | --- | --- |
+| Landing | Working | Product copy only | Final visual and accessibility QA |
+| Login, registration, verification | Working in local/demo mode; API path exists | Local demo or configured account API | Production database, email delivery, rate limits and deployment security |
+| Dashboard | Working core layout, chart ranges and local quick prompts | Mixed delayed and demo | Source every market panel; closer reference-density polish |
+| Market Overview | Working 1D/1W/1M/3M/1Y controls and responsive panels | Demo comparison series | Licensed index, breadth and sector feeds |
+| Scanner / Zone Intelligence | Working filters, multi-timeframe requests, grouped symbols and full-screen chart workspace | Delayed source where available; heuristic zone rules | Larger universe, feed reliability, walk-forward validation and calibrated quality policy |
+| Signals | Working filters and refresh | Derived from current scanner service | Production signal lifecycle, historical validation and notification delivery |
+| Holdings | Working local add/remove/persistence | Local entries plus delayed lookup | Broker-grade reconciliation is intentionally out of scope |
+| Watchlist | Working local add/remove/persistence | Local entries plus delayed lookup | Larger symbol master and reliable licensed quote feed |
+| Market Breadth | Working 1D/1W/1M/3M controls | Demo-labelled | Sourced advance/decline, highs/lows and sector constituents |
+| News & Events | Working research tabs | Demo/provider-unconnected | Licensed news, citations, timestamps and sentiment pipeline |
+| Strategies | Working create, enable, pause and delete | Browser-local templates | Production rule execution and versioned persistence |
+| AI Assistant | Working local prompt templates | Transparent rule-based guidance | Optional production AI provider, evaluation and source grounding |
+| Backtesting | Working input controls and illustrative recalculation | Illustrative only | Timestamped historical engine, benchmark, costs, slippage and walk-forward tests |
+| Risk Management | Working calculations | User-entered values | Validation rules, saved plans and portfolio-level exposure |
+| Alerts | Working create, check, pause, resume and delete | Browser-local; delayed check | Background scheduler and Telegram/email/in-app delivery |
+| Economic Calendar | Working country, impact and Today/Upcoming filters | Demo-labelled | Approved event feed and reliable timezone handling |
+| Option Chain | Working underlying, expiry and strike controls | Demo-labelled | Authorized NSE derivatives feed and exchange timestamps |
+| Calculators | All six tools working | Mathematical inputs only | Input validation, fees/taxes where relevant and saved scenarios |
+| Reports | Working JSON download | Browser-local workspace snapshot | PDF/CSV formats, server history and signed audit trail |
+| Settings | Working save/reset and scanner defaults | Browser-local preferences | Account sync; desktop/background notification implementation |
+
+## Audit conclusion
+
+The product is a functional local research prototype, not a complete real-time product.
+The largest remaining work is not another visual card: it is lawful market data,
+production authentication/infrastructure, validated zone research, a real backtest
+engine, background alerts and complete cross-device QA. Demo panels stay visibly
+labelled and must never be represented as accurate live market data.
 
 ## Data truth
 
