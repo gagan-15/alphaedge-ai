@@ -276,3 +276,9 @@ Labels describe what users can understand and do, such as "Stocks Going Up and D
 "Large Investor Activity" and "Look for Buying Opportunities." Tooltips explain moving
 averages, exchange price limits, market participation and expected price swings in one
 short sentence.
+
+The AI summary score is now named Overall Market Score and is shown as a plain
+`91 / 100` health reading. The visible explanation is limited to four short sentences.
+Seven chips use beginner-friendly names, and the research strip includes a simple
+"What should I do today?" checklist. The Why action opens a side panel with five
+plain-English reasons and never exposes a technical formula.

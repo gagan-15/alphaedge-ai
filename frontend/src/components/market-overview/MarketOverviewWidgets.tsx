@@ -11,7 +11,7 @@ import ShowChartRoundedIcon from "@mui/icons-material/ShowChartRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
-import Collapse from "@mui/material/Collapse";
+import Drawer from "@mui/material/Drawer";
 import Grid from "@mui/material/Grid";
 import LinearProgress from "@mui/material/LinearProgress";
 import Skeleton from "@mui/material/Skeleton";
@@ -96,7 +96,7 @@ interface ExecutiveSummaryData {
     focus: string[];
     avoid: string;
     metrics: ExecutiveMetric[];
-    factors: Array<{ label: string; contribution: number }>;
+    reasons: string[];
 }
 
 const demoExecutiveSummary: ExecutiveSummaryData = {
@@ -110,22 +110,20 @@ const demoExecutiveSummary: ExecutiveSummaryData = {
     focus: ["IT stocks after a small fall", "Banking stocks moving up strongly", "Stocks doing better than the market"],
     avoid: "Buying breakouts in weak sectors",
     metrics: [
-        { label: "Market Direction", value: "Going Up", help: "The main market indexes are still moving upward.", tone: "positive" },
-        { label: "Stocks Taking Part", value: "Healthy", help: "More than 65% of tracked stocks are joining the market rise.", tone: "positive" },
-        { label: "Price Strength", value: "Positive", help: "Recent price moves still show more buying than selling.", tone: "positive" },
-        { label: "Leading Sectors", value: "IT + Banking", help: "IT and banking stocks are doing better than most other sectors.", tone: "positive" },
-        { label: "Expected Swings", value: "Controlled", help: "India VIX is low. This means the market expects smaller price swings.", tone: "neutral" },
-        { label: "Large Investor Activity", value: "Mixed Buying", help: "Indian institutions are buying, while foreign institutions remain careful.", tone: "caution" },
-        { label: "Market Condition", value: "Strong Uptrend", help: "The market is rising and more stocks are joining the rally.", tone: "positive" },
+        { label: "Today's Market", value: "Looking Healthy", help: "The main market indexes are rising and the wider market is supporting the move.", tone: "positive" },
+        { label: "Most Stocks", value: "Going Up", help: "More than 65% of tracked stocks are rising today.", tone: "positive" },
+        { label: "Market Strength", value: "Positive", help: "Recent price moves still show more buying than selling.", tone: "positive" },
+        { label: "Strongest Sectors", value: "Technology + Banking", help: "Technology and banking stocks are doing better than most other sectors.", tone: "positive" },
+        { label: "Price Movement", value: "Stable", help: "Expected market price swings remain controlled.", tone: "neutral" },
+        { label: "Big Investors", value: "Mixed Buying", help: "Indian institutions are buying, while foreign institutions remain careful.", tone: "caution" },
+        { label: "Current Trend", value: "Strong Rise", help: "The market is rising and more stocks are joining the move.", tone: "positive" },
     ],
-    factors: [
-        { label: "Stocks joining the move", contribution: 20 },
-        { label: "Strong and weak sectors", contribution: 16 },
-        { label: "Recent price strength", contribution: 14 },
-        { label: "Strength of the market direction", contribution: 18 },
-        { label: "Expected market swings", contribution: 12 },
-        { label: "Large investor activity", contribution: 9 },
-        { label: "Stocks beating the market", contribution: 11 },
+    reasons: [
+        "Around 72% of tracked stocks are rising today.",
+        "Technology and Banking are the strongest sectors.",
+        "Market fear remains low.",
+        "More companies are making new highs than new lows.",
+        "More stocks are joining the market rise.",
     ],
 };
 
@@ -165,7 +163,8 @@ export function AIMarketSummaryWidget({
     data?: ExecutiveSummaryData | null;
     loading?: boolean;
 }) {
-    const [expanded, setExpanded] = useState(false);
+    const [whyOpen, setWhyOpen] = useState(false);
+    const animatedScore = useCountUp(data?.confidence ?? 0);
     if (loading) return <WidgetLoading rows={5} />;
     if (!data) return <WidgetEmpty message="AI Summary unavailable. Waiting for validated market intelligence." />;
     const headline = data.participation >= 65
@@ -173,7 +172,12 @@ export function AIMarketSummaryWidget({
         : data.participation >= 50
             ? "The market is rising, but only some stocks are taking part."
             : "The main indexes are rising, but too few stocks are joining the move.";
-    const explanation = `${data.participation}% of tracked stocks are taking part in today's move. ${data.leaders.join(" and ")} are currently the strongest sectors, while ${data.laggards.join(" and ")} are becoming weaker. India VIX is ${data.volatility}. It may be safer to look for ${data.focus.slice(0, 2).join(" and ")} instead of buying stocks after a large rise.`;
+    const explanation = [
+        "Today's market is looking healthy.",
+        `About ${data.participation}% of tracked stocks are rising, so the move is not limited to a few large companies.`,
+        `${data.leaders.join(" and ")} are doing well, while price movement remains stable.`,
+        "Look for quality buying opportunities, but avoid stocks that have already risen sharply.",
+    ];
     return <Stack spacing={2.2}>
         <Grid container spacing={2.5} sx={{ alignItems: "stretch" }}>
             <Grid size={{ xs: 12, lg: 9 }}>
@@ -191,7 +195,9 @@ export function AIMarketSummaryWidget({
                     </Stack>
                     <Box sx={{ animation: "executiveHeadline .45s ease both", "@keyframes executiveHeadline": { from: { opacity: 0, transform: "translateY(5px)" }, to: { opacity: 1, transform: "translateY(0)" } } }}>
                         <Typography sx={{ fontSize: { xs: "1.35rem", md: "1.8rem" }, lineHeight: 1.2, letterSpacing: "-.025em", fontWeight: 900 }}>{headline}</Typography>
-                        <Typography color="text.secondary" sx={{ mt: 1.1, maxWidth: 940, fontSize: ".76rem", lineHeight: 1.75 }}>{explanation}</Typography>
+                        <Stack spacing={.45} sx={{ mt: 1.1, maxWidth: 940 }}>
+                            {explanation.map((sentence) => <Typography key={sentence} color="text.secondary" sx={{ fontSize: ".76rem", lineHeight: 1.55 }}>{sentence}</Typography>)}
+                        </Stack>
                     </Box>
                     <Stack direction="row" useFlexGap spacing={1} sx={{ flexWrap: "wrap" }}>
                         {data.metrics.map((metric) => <ExecutiveStatusChip key={metric.label} metric={metric} />)}
@@ -200,25 +206,53 @@ export function AIMarketSummaryWidget({
             </Grid>
             <Grid size={{ xs: 12, lg: 3 }}>
                 <Stack sx={{ height: "100%", justifyContent: "center", alignItems: "center", borderLeft: { lg: "1px solid rgba(143,161,184,.14)" } }}>
-                    <CircularGauge value={data.confidence} label="Explanation confidence" color={colors.violet} />
-                    <Button size="small" sx={{ mt: 1 }} onClick={() => setExpanded((value) => !value)}>{expanded ? "Hide score details" : "Why?"}</Button>
+                    <Box sx={{ width: 142, height: 142, borderRadius: "50%", p: "10px", background: `conic-gradient(${colors.violet} ${animatedScore * 3.6}deg,#17263a 0)` }}>
+                        <Box sx={{ width: "100%", height: "100%", borderRadius: "50%", bgcolor: "#0b1728", display: "grid", placeItems: "center", textAlign: "center" }}>
+                            <Box><Typography sx={{ fontSize: "1.75rem", lineHeight: 1, fontWeight: 900 }}>{animatedScore} <Box component="span" sx={{ fontSize: ".7rem", color: "text.secondary" }}>/ 100</Box></Typography><Typography sx={{ mt: .7, color: colors.green, fontSize: ".66rem", fontWeight: 800 }}>Market looks Healthy</Typography></Box>
+                        </Box>
+                    </Box>
+                    <Typography color="text.secondary" sx={{ mt: 1, maxWidth: 190, textAlign: "center", fontSize: ".58rem" }}>This score shows the overall health of today's market.</Typography>
+                    <Button size="small" sx={{ mt: .6 }} onClick={() => setWhyOpen(true)}>Why?</Button>
                 </Stack>
             </Grid>
         </Grid>
-        <Collapse in={expanded}>
-            <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "rgba(4,12,25,.3)", border: "1px solid rgba(143,161,184,.16)" }}>
-                <Typography sx={{ fontWeight: 850, fontSize: ".72rem" }}>What is included in this confidence score?</Typography>
-                <Grid container spacing={1.25} sx={{ mt: .25 }}>
-                    {data.factors.map((factor) => <Grid key={factor.label} size={{ xs: 12, sm: 6, lg: 4 }}><Stack direction="row" spacing={.8} sx={{ alignItems: "center" }}><CheckCircleOutlineRoundedIcon sx={{ color: colors.green, fontSize: 15 }} /><Box sx={{ flex: 1 }}><Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".62rem" }}>{factor.label}</Typography><Typography sx={{ fontSize: ".62rem", fontWeight: 850 }}>{factor.contribution}%</Typography></Stack><LinearProgress variant="determinate" value={factor.contribution * 5} sx={{ mt: .35, height: 4 }} /></Box></Stack></Grid>)}
-                </Grid>
-                <Typography color="text.secondary" sx={{ mt: 1.2, fontSize: ".58rem" }}>These are example weights. We must test them with reliable historical data before treating the score as accurate.</Typography>
-            </Box>
-        </Collapse>
         <Stack direction={{ xs: "column", lg: "row" }} spacing={1.5} sx={{ p: 1.25, alignItems: { lg: "center" }, borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", bgcolor: "rgba(4,12,25,.22)" }}>
-            <Box sx={{ minWidth: 145 }}><Typography color="text.secondary" sx={{ fontSize: ".56rem", textTransform: "uppercase", letterSpacing: ".08em" }}>What to research today</Typography><Typography sx={{ mt: .2, fontSize: ".7rem", fontWeight: 850 }}>Look for careful buying opportunities</Typography></Box>
+            <Box sx={{ minWidth: 190 }}><Typography color="text.secondary" sx={{ fontSize: ".56rem", textTransform: "uppercase", letterSpacing: ".08em" }}>Good Opportunities To Explore Today</Typography><Typography sx={{ mt: .2, fontSize: ".7rem", fontWeight: 850 }}>Look for careful buying opportunities</Typography></Box>
             <Stack direction="row" useFlexGap spacing={.7} sx={{ flex: 1, flexWrap: "wrap" }}>{data.focus.map((item) => <Chip key={item} size="small" label={item} variant="outlined" />)}<Chip size="small" label={`Avoid: ${data.avoid}`} sx={{ color: colors.red, borderColor: `${colors.red}55` }} variant="outlined" /></Stack>
-            <Button component={RouterLink} to="/scanner" size="small" variant="contained" endIcon={<ArrowForwardRoundedIcon />}>Launch Scanner</Button>
+            <Button component={RouterLink} to="/scanner" size="small" variant="contained" endIcon={<ArrowForwardRoundedIcon />}>Find Matching Stocks</Button>
         </Stack>
+        <Box sx={{ p: 1.5, borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", bgcolor: "rgba(4,12,25,.2)" }}>
+            <Typography sx={{ fontWeight: 850, fontSize: ".78rem" }}>What should I do today?</Typography>
+            <Grid container spacing={.7} sx={{ mt: .7 }}>
+                {[
+                    ["✓", "Look for buying opportunities.", colors.green],
+                    ["✓", "Focus on Technology and Banking stocks.", colors.green],
+                    ["✓", "Wait for a small price fall before buying.", colors.green],
+                    ["✕", "Avoid buying stocks after large price jumps.", colors.red],
+                    ["✕", "Avoid weaker sectors until they improve.", colors.red],
+                ].map(([mark, text, color]) => <Grid key={text} size={{ xs: 12, md: 6 }}><Stack direction="row" spacing={.7}><Typography sx={{ color, fontWeight: 900 }}>{mark}</Typography><Typography color="text.secondary" sx={{ fontSize: ".68rem" }}>{text}</Typography></Stack></Grid>)}
+            </Grid>
+        </Box>
+        <Drawer
+            anchor="right"
+            open={whyOpen}
+            onClose={() => setWhyOpen(false)}
+            slotProps={{ paper: { sx: { width: { xs: "92vw", sm: 420 }, p: 3, bgcolor: "#0b1728", backgroundImage: "none" } } }}
+        >
+            <Typography variant="h5">Why is AlphaEdge saying this?</Typography>
+            <Typography color="text.secondary" sx={{ mt: .8, fontSize: ".72rem", lineHeight: 1.6 }}>These simple points support today's market view.</Typography>
+            <Stack spacing={1.35} sx={{ mt: 3 }}>
+                {data.reasons.map((reason) => <Stack key={reason} direction="row" spacing={1}><CheckCircleOutlineRoundedIcon sx={{ color: colors.green, fontSize: 18 }} /><Typography sx={{ fontSize: ".76rem", lineHeight: 1.5 }}>{reason}</Typography></Stack>)}
+            </Stack>
+            <Box sx={{ mt: "auto", pt: 3 }}>
+                <Box sx={{ p: 2, borderRadius: 2, bgcolor: "rgba(155,138,251,.08)", border: "1px solid rgba(155,138,251,.22)" }}>
+                    <Typography color="text.secondary" sx={{ fontSize: ".62rem" }}>Overall Market Score</Typography>
+                    <Typography sx={{ mt: .4, fontSize: "2rem", fontWeight: 900 }}>{data.confidence} <Box component="span" sx={{ fontSize: ".8rem", color: "text.secondary" }}>/ 100</Box></Typography>
+                    <Typography sx={{ color: colors.green, fontWeight: 800 }}>Market looks Healthy</Typography>
+                </Box>
+                <Button fullWidth variant="outlined" sx={{ mt: 2 }} onClick={() => setWhyOpen(false)}>Close</Button>
+            </Box>
+        </Drawer>
     </Stack>;
 }
 
