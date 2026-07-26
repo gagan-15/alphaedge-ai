@@ -57,6 +57,7 @@ class ScannerResultResponse(APIResponseModel):
 
     timeframe: str | None = None
     pattern_type: str | None = None
+    gap_type: str | None = None
 
 
 class ScannerResponse(APIResponseModel):

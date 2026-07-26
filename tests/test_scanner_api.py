@@ -5,6 +5,7 @@ Tests for the Scanner API response mapping.
 from pandas import DataFrame, date_range
 
 from backend.api.scanner import (
+    _departure_gap,
     _has_completed_test,
     _is_zone_invalidated,
     _measure_zone,
@@ -238,3 +239,20 @@ def test_completed_supply_reaction_is_not_active() -> None:
     )
 
     assert _has_completed_test(zone, data) is True
+
+
+def test_departure_gap_is_marked_for_scanner_result() -> None:
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 102, "Low": 99, "Close": 101},
+            {"Open": 110, "High": 112, "Low": 109, "Close": 111},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.DEMAND,
+        upper_price=102,
+        lower_price=99,
+        created_index=0,
+    )
+
+    assert _departure_gap(zone, data) == "GAP UP"

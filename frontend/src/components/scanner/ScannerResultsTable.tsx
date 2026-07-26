@@ -136,7 +136,10 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                                     />
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Chip size="small" variant="outlined" label={patternLabels[result.pattern_type ?? ""] ?? "Pending"} />
+                                                    <Box sx={{ display: "flex", gap: .5, alignItems: "center" }}>
+                                                        <Chip size="small" variant="outlined" label={patternLabels[result.pattern_type ?? ""] ?? "Pending"} />
+                                                        {result.gap_type && <Chip size="small" color="warning" label={result.gap_type} />}
+                                                    </Box>
                                                 </TableCell>
                                                 <TableCell>
                                                     <Chip size="small" color={status === "IN ZONE" ? "warning" : status === "APPROACHING" ? "success" : "default"} label={status} />

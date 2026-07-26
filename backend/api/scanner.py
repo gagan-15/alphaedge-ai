@@ -186,6 +186,21 @@ def _has_completed_test(zone: Zone, data: DataFrame) -> bool:
     return bool(overlaps.any())
 
 
+def _departure_gap(zone: Zone, data: DataFrame) -> str | None:
+    """Classify a true non-overlapping gap on the departure candle."""
+
+    departure_index = zone.created_index + 1
+    if departure_index >= len(data):
+        return None
+    previous = data.iloc[departure_index - 1]
+    departure = data.iloc[departure_index]
+    if float(departure["Low"]) > float(previous["High"]):
+        return "GAP UP"
+    if float(departure["High"]) < float(previous["Low"]):
+        return "GAP DOWN"
+    return None
+
+
 def build_scanner_response(
     scanner: MarketScannerResult,
 ) -> ScannerResponse:
@@ -322,6 +337,7 @@ def get_research_zones(
 
                 zone_score = _zone_scoring_engine.score([zone]).scored_zones[0]
                 explanation = ZoneExplanationService.build(zone, zone_score)
+                gap_type = _departure_gap(zone, data)
                 demand = zone.zone_type.value == "DEMAND"
                 evidence = (
                     (
@@ -345,12 +361,18 @@ def get_research_zones(
                         "This quality score is rule-based and is not a "
                         "probability that the zone will hold."
                     ),
+                    (
+                        f"Departure includes a confirmed {gap_type.lower()}."
+                        if gap_type
+                        else "No non-overlapping departure gap was detected."
+                    ),
                 )
                 results.append(
                     ZoneResearchResultResponse(
                         symbol=symbol,
                         zone_type=zone.zone_type.value,
                         pattern_type=zone.pattern_type,
+                        gap_type=gap_type,
                         proximal_price=zone.upper_price if demand else zone.lower_price,
                         distal_price=zone.lower_price if demand else zone.upper_price,
                         distance_percent=round(distance, 2),

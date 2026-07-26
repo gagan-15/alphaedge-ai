@@ -40,6 +40,7 @@ export interface ScannerResult {
     base_index: number | null;
     timeframe: string | null;
     pattern_type: string | null;
+    gap_type: string | null;
 }
 
 export interface ScannerResponse {
@@ -54,6 +55,7 @@ export interface ZoneResearchResult {
     symbol: string;
     zone_type: string;
     pattern_type: string | null;
+    gap_type: string | null;
     proximal_price: number;
     distal_price: number;
     distance_percent: number;

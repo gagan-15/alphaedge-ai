@@ -77,7 +77,23 @@ class DepartureDetector:
             low_price=float(departure_candle["Low"]),
         )
 
-        if departure_range < average_base_range * MIN_DEPARTURE_RANGE_MULTIPLIER:
+        previous_candle = market_data.iloc[departure_index - 1]
+        gap_up_size = max(
+            0.0,
+            float(departure_candle["Low"]) - float(previous_candle["High"]),
+        )
+        gap_down_size = max(
+            0.0,
+            float(previous_candle["Low"]) - float(departure_candle["High"]),
+        )
+        gap_impulse = max(gap_up_size, gap_down_size)
+        strong_gap = gap_impulse >= average_base_range * 0.5
+
+        if (
+            departure_range
+            < average_base_range * MIN_DEPARTURE_RANGE_MULTIPLIER
+            and not strong_gap
+        ):
             logger.info("Departure rejected. " "Range too small.")
             return None
 
@@ -97,9 +113,12 @@ class DepartureDetector:
             return None
 
         if (
-            CandleUtils.is_bullish(
-                open_price,
-                close_price,
+            (
+                CandleUtils.is_bullish(
+                    open_price,
+                    close_price,
+                )
+                or gap_up_size > 0
             )
             and close_price > base_high
         ):
@@ -111,9 +130,12 @@ class DepartureDetector:
             )
 
         if (
-            CandleUtils.is_bearish(
-                open_price,
-                close_price,
+            (
+                CandleUtils.is_bearish(
+                    open_price,
+                    close_price,
+                )
+                or gap_down_size > 0
             )
             and close_price < base_low
         ):
@@ -143,15 +165,25 @@ class DepartureDetector:
         departure = market_data.iloc[departure_index]
         leg_in_body = abs(float(leg_in["Close"]) - float(leg_in["Open"]))
         leg_out_body = abs(float(departure["Close"]) - float(departure["Open"]))
+        previous_close = float(market_data.iloc[departure_index - 1]["Close"])
+        effective_impulse = max(
+            leg_out_body,
+            abs(float(departure["Open"]) - previous_close),
+            abs(float(departure["Close"]) - previous_close),
+        )
 
-        if leg_in_body <= 0 or leg_out_body < leg_in_body * 1.1:
+        if leg_in_body <= 0 or effective_impulse < leg_in_body * 1.1:
             return False
 
-        direction = (
-            1.0
-            if float(departure["Close"]) > float(departure["Open"])
-            else -1.0
-        )
+        base_data = market_data.iloc[base.start_index : base.end_index + 1]
+        base_high = float(base_data["High"].max())
+        base_low = float(base_data["Low"].min())
+        if float(departure["Close"]) > base_high:
+            direction = 1.0
+        elif float(departure["Close"]) < base_low:
+            direction = -1.0
+        else:
+            return False
         follow_through = market_data.iloc[
             departure_index : min(departure_index + 3, len(market_data))
         ]
@@ -163,9 +195,6 @@ class DepartureDetector:
             final_close - float(departure["Open"])
         )
 
-        base_data = market_data.iloc[base.start_index : base.end_index + 1]
-        base_high = float(base_data["High"].max())
-        base_low = float(base_data["Low"].min())
         zone_width = max(base_high - base_low, 1e-9)
 
         if direction > 0:

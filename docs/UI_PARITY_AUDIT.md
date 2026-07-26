@@ -213,3 +213,8 @@ instead of expanding the chart inside the table. The workspace includes the
 interactive candlestick chart, highlighted zone, crosshair, pan, wheel zoom,
 fit control, two-point price/percentage measurement and the complete evidence
 and recommendation panel. It does not copy TradingView branding or order tools.
+
+Gap-up and gap-down departures are supported and visibly marked in scanner
+results. A gap qualifies only when the departure candle does not overlap the
+previous candle range, closes beyond the base boundary and receives directional
+follow-through. A gap by itself cannot make a zone valid.
