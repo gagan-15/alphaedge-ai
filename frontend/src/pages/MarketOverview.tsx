@@ -21,7 +21,6 @@ import {
     MarketHealthWidget,
     MarketRegimeWidget,
     OpportunitiesWidget,
-    ParticipationChartWidget,
     RiskMeterWidget,
     SectorRotationWidget,
     SentimentWidget,
@@ -138,25 +137,6 @@ export default function MarketOverview() {
                     {visible.researchFocus && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Today's Research Focus" subtitle="Should you mainly look for buying or selling opportunities?" accent="#22d3ee" minHeight={310}><TradingBiasWidget strategy={snapshot.todayStrategy} direction={snapshot.marketDirection} /></OverviewPanel></Grid>}
                     {visible.marketRisk && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Risk" subtitle="How careful should you be today?" accent="#fdb022" minHeight={310}><RiskMeterWidget riskLevel={snapshot.riskLevel} volatility={snapshot.volatility} /></OverviewPanel></Grid>}
                 </Grid>}
-
-                {visible.participationTrend && <OverviewPanel
-                    title="Market Participation Trend"
-                    subtitle={`See whether more stocks are rising or falling in the ${market} market · ${timeframe} view`}
-                    eyebrow="How many stocks support the move?"
-                    minHeight={420}
-                    action={<Chip size="small" label="INTERACTIVE DEMO" variant="outlined" />}
-                >
-                    <ParticipationChartWidget
-                        key={`${timeframe}-${previewPreferences.marketUniverse}-${previewPreferences.chart.showNifty}-${previewPreferences.chart.showBankNifty}`}
-                        defaultRange={timeframe}
-                        universe={universe}
-                        initialNifty={previewPreferences.chart.showNifty}
-                        initialBankNifty={previewPreferences.chart.showBankNifty}
-                        showEvents={previewPreferences.chart.showEvents}
-                        showInsights={previewPreferences.chart.showAiExplanations}
-                        showTooltips={previewPreferences.chart.showTooltips}
-                    />
-                </OverviewPanel>}
 
                 {(visible.sectorRotation || visible.marketBreadth) && <Grid container spacing={2.5}>
                     {visible.sectorRotation && <Grid size={{ xs: 12, lg: 6 }}>

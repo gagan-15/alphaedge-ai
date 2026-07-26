@@ -33,7 +33,6 @@ const widgetLabels: Record<MarketOverviewWidgetKey, [string, string]> = {
     marketTrend: ["Market Trend", "Shows whether the market is rising, falling or moving sideways."],
     researchFocus: ["Today's Research Focus", "Suggests what type of ideas may be worth checking."],
     marketRisk: ["Market Risk", "Shows how careful you may need to be."],
-    participationTrend: ["Market Participation Trend", "Shows how many stocks are joining the market move."],
     sectorRotation: ["Strong and Weak Sectors", "Shows which business sectors are improving or weakening."],
     marketBreadth: ["Stocks Going Up and Down", "Shows how many tracked stocks are rising or falling."],
     bigInvestorActivity: ["Big Investor Activity", "Shows buying and selling by large investor groups."],
@@ -74,7 +73,7 @@ export default function MarketOverviewCustomizeDrawer({ open, value, onClose, on
     const [resetOpen, setResetOpen] = useState(false);
     const visibleCount = useMemo(() => Object.values(draft.visibleWidgets).filter(Boolean).length, [draft.visibleWidgets]);
     const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(value), [draft, value]);
-    const analysisKeys: MarketOverviewWidgetKey[] = ["marketHealth", "marketTrend", "researchFocus", "marketRisk", "participationTrend", "sectorRotation", "marketBreadth", "bigInvestorActivity", "marketVolatility", "marketSentiment", "aiOpportunities"];
+    const analysisKeys: MarketOverviewWidgetKey[] = ["marketHealth", "marketTrend", "researchFocus", "marketRisk", "sectorRotation", "marketBreadth", "bigInvestorActivity", "marketVolatility", "marketSentiment", "aiOpportunities"];
     const preview = (next: MarketOverviewPreferences) => {
         setDraft(next);
         onPreview(next);

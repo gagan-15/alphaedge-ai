@@ -4,7 +4,6 @@ export const marketOverviewWidgetKeys = [
     "marketTrend",
     "researchFocus",
     "marketRisk",
-    "participationTrend",
     "sectorRotation",
     "marketBreadth",
     "bigInvestorActivity",
@@ -62,9 +61,9 @@ export const defaultMarketOverviewPreferences: MarketOverviewPreferences = {
 
 const presetVisibility: Record<Exclude<DashboardPreset, "custom">, MarketOverviewWidgetKey[]> = {
     beginner: marketOverviewWidgetKeys.slice(),
-    swing: ["aiSummary", "marketHealth", "marketTrend", "researchFocus", "marketRisk", "participationTrend", "sectorRotation", "marketBreadth", "marketVolatility", "aiOpportunities", "todayVerdict"],
-    intraday: ["aiSummary", "marketHealth", "marketTrend", "researchFocus", "marketRisk", "participationTrend", "sectorRotation", "marketBreadth", "marketVolatility", "marketSentiment", "aiOpportunities", "smartAlerts", "todayVerdict"],
-    longTerm: ["aiSummary", "marketHealth", "marketTrend", "marketRisk", "participationTrend", "sectorRotation", "marketBreadth", "bigInvestorActivity", "marketVolatility", "marketSentiment", "todayVerdict"],
+    swing: ["aiSummary", "marketHealth", "marketTrend", "researchFocus", "marketRisk", "sectorRotation", "marketBreadth", "marketVolatility", "aiOpportunities", "todayVerdict"],
+    intraday: ["aiSummary", "marketHealth", "marketTrend", "researchFocus", "marketRisk", "sectorRotation", "marketBreadth", "marketVolatility", "marketSentiment", "aiOpportunities", "smartAlerts", "todayVerdict"],
+    longTerm: ["aiSummary", "marketHealth", "marketTrend", "marketRisk", "sectorRotation", "marketBreadth", "bigInvestorActivity", "marketVolatility", "marketSentiment", "todayVerdict"],
 };
 
 export function preferencesForPreset(preset: Exclude<DashboardPreset, "custom">): MarketOverviewPreferences {

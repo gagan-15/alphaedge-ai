@@ -477,3 +477,7 @@ Remaining backend dependencies are a real breadth universe, maintained sector
 leadership, verified institutional flows, validated sentiment, exchange market-status
 hours and timeframe-specific market calculations. Until those sources are connected,
 the existing research widgets that explicitly identify demo data remain illustrative.
+
+The Market Participation Trend widget and its Customize option were removed from
+Market Overview by product decision. Market breadth remains available through the
+more direct Stocks Going Up and Down section.
