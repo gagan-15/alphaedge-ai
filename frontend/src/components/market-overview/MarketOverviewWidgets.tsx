@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
+import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
+import FullscreenRoundedIcon from "@mui/icons-material/FullscreenRounded";
+import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded";
 import ShowChartRoundedIcon from "@mui/icons-material/ShowChartRounded";
 import Box from "@mui/material/Box";
@@ -13,7 +16,10 @@ import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Drawer from "@mui/material/Drawer";
 import Grid from "@mui/material/Grid";
+import IconButton from "@mui/material/IconButton";
 import LinearProgress from "@mui/material/LinearProgress";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
@@ -305,49 +311,164 @@ export function RiskMeterWidget() {
     </Stack>;
 }
 
-const chartProfiles = {
-    "1D": { labels: ["09:15", "10:45", "12:15", "13:45", "15:30"], values: [2, 8, 5, 16, 13, 22, 18, 27, 31, 28, 36, 42] },
-    "1W": { labels: ["Mon", "Tue", "Wed", "Thu", "Fri"], values: [-8, -2, 7, 4, 11, 17, 13, 20, 25, 22, 29, 34] },
-    "1M": { labels: ["W1", "W2", "W3", "W4", "Today"], values: [-14, -8, -3, 6, 4, 12, 18, 15, 24, 28, 35, 39] },
-    "3M": { labels: ["May", "Jun", "Jul", "Today"], values: [-25, -17, -9, 2, -4, 8, 14, 21, 18, 30, 38, 44] },
-    "6M": { labels: ["Feb", "Mar", "Apr", "May", "Jun", "Jul"], values: [-32, -20, -24, -8, 3, 12, 7, 19, 28, 35, 31, 46] },
-    "1Y": { labels: ["Jul '25", "Oct", "Jan '26", "Apr", "Jul"], values: [-40, -28, -35, -18, -6, 10, 3, 22, 17, 34, 42, 51] },
+interface ParticipationPoint {
+    label: string;
+    date: string;
+    net: number;
+    nifty: number;
+    bank: number;
+    advancing: number;
+    declining: number;
+    highs: number;
+    lows: number;
+    event?: string;
+}
+
+const participationNets = {
+    "1D": [4, 8, 5, 12, 10, 18, 15, 24, 21, 29, 27, 34, 31, 39, 36, 43, 40, 48, 45, 52, 49, 57, 54, 61],
+    "1W": [18, 27, 22, 38, 46],
+    "1M": [-8, -3, 4, 1, 9, 14, 11, 20, 17, 24, 21, 29, 27, 34, 31, 39, 36, 43, 47, 45, 52, 57],
+    "3M": [-18, -9, -3, 6, 2, 14, 11, 23, 20, 32, 28, 41, 48],
+    "6M": [-28, -23, -17, -21, -12, -6, 2, -3, 8, 14, 11, 21, 18, 29, 25, 34, 31, 40, 37, 46, 43, 51, 48, 56, 53, 62],
+    "1Y": [-35, -28, -31, -20, -12, -4, 7, 3, 16, 27, 39, 52],
 } as const;
 
-export function ParticipationChartWidget() {
-    const [range, setRange] = useState<keyof typeof chartProfiles>("1M");
+const axisLabels = {
+    "1D": ["09:15", "10:00", "11:00", "12:00", "13:00", "14:00", "15:30"],
+    "1W": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+    "1M": ["Week 1", "Week 2", "Week 3", "Week 4"],
+    "3M": ["May", "June", "July"],
+    "6M": ["February", "March", "April", "May", "June", "July"],
+    "1Y": ["Aug", "Oct", "Dec", "Feb", "Apr", "Jun", "Jul"],
+} as const;
+
+function buildParticipationData(range: keyof typeof participationNets): ParticipationPoint[] {
+    return participationNets[range].map((net, index, values) => ({
+        label: axisLabels[range][Math.min(axisLabels[range].length - 1, Math.floor(index * axisLabels[range].length / values.length))],
+        date: `${axisLabels[range][Math.min(axisLabels[range].length - 1, Math.floor(index * axisLabels[range].length / values.length))]} · ${range}`,
+        net,
+        nifty: Math.round(index * 2.5 + Math.sin(index * .8) * 4 + 10),
+        bank: Math.round(index * 2.2 + Math.cos(index * .7) * 5 + 8),
+        advancing: 1280 + net * 8 + index * 4,
+        declining: 1180 - net * 5,
+        highs: Math.max(18, 62 + net * 2),
+        lows: Math.max(8, 45 - net),
+        event: index === Math.floor(values.length * .42) ? "RBI policy update" : index === Math.floor(values.length * .72) ? "Major earnings day" : undefined,
+    }));
+}
+
+export function ParticipationChartWidget({ loading = false, available = true }: { loading?: boolean; available?: boolean }) {
+    const [range, setRange] = useState<keyof typeof participationNets>("1M");
+    const [marketLine, setMarketLine] = useState(true);
     const [nifty, setNifty] = useState(true);
     const [bank, setBank] = useState(true);
-    const [events, setEvents] = useState(false);
-    const profile = chartProfiles[range];
-    const points = profile.values.map((value, index) => `${index * 100 / (profile.values.length - 1)},${55 - value * .75}`).join(" ");
-    const niftyPoints = profile.values.map((value, index) => `${index * 100 / (profile.values.length - 1)},${61 - value * .42 + Math.sin(index) * 2}`).join(" ");
-    const bankPoints = profile.values.map((value, index) => `${index * 100 / (profile.values.length - 1)},${65 - value * .34 + Math.cos(index) * 3}`).join(" ");
+    const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+    const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+    const chartAreaRef = useRef<HTMLDivElement>(null);
+    const data = useMemo(() => buildParticipationData(range), [range]);
+    const values = data.map((point) => point.net);
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+    const scaleY = (value: number) => 50 - value * .68;
+    const scaleX = (index: number) => index * 100 / Math.max(1, data.length - 1);
+    const participationPoints = data.map((point, index) => `${scaleX(index)},${scaleY(point.net)}`).join(" ");
+    const niftyPoints = data.map((point, index) => `${scaleX(index)},${scaleY(point.nifty)}`).join(" ");
+    const bankPoints = data.map((point, index) => `${scaleX(index)},${scaleY(point.bank)}`).join(" ");
+    const current = data[data.length - 1];
+    const highestIndex = values.indexOf(maxValue);
+    const lowestIndex = values.indexOf(minValue);
+    const activeIndex = hoverIndex ?? data.length - 1;
+    const active = data[activeIndex];
+    const participationChange = current.net - data[Math.max(0, data.length - 4)].net;
+    const indexChange = current.nifty - data[Math.max(0, data.length - 4)].nifty;
+    const divergence = indexChange > 0 && participationChange < 0;
+    const insight = divergence
+        ? "The index is rising while fewer stocks are rising. Be careful because the market move may be getting weaker."
+        : participationChange > indexChange
+            ? "More companies are joining the rally. The wider market is getting stronger."
+            : "Today's index move is supported by many stocks rising together.";
+    const interpretation = divergence ? "Weakening" : participationChange > 8 ? "Improving" : current.net > 30 ? "Healthy" : "Mixed";
+    const health = current.net > 40 ? "Healthy" : current.net > 15 ? "Fair" : "Weak";
+    const exportData = () => {
+        const csv = ["Date,Advancing,Declining,Net Participation,New Highs,New Lows", ...data.map((point) => `${point.date},${point.advancing},${point.declining},${point.net},${point.highs},${point.lows}`)].join("\n");
+        const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `alphaedge-market-participation-${range}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+        setMenuAnchor(null);
+    };
+    if (loading) return <Stack spacing={1.2}><Skeleton height={64} variant="rounded" /><Skeleton height={400} variant="rounded" /><Skeleton height={58} variant="rounded" /></Stack>;
+    if (!available) return <WidgetEmpty message="Market participation data is currently unavailable." />;
     return <Stack sx={{ height: "100%" }}>
-        <Stack direction={{ xs: "column", md: "row" }} spacing={1} sx={{ justifyContent: "space-between", alignItems: { md: "center" } }}>
+        <Stack direction={{ xs: "column", lg: "row" }} spacing={1} sx={{ justifyContent: "space-between", alignItems: { lg: "center" } }}>
             <ToggleButtonGroup exclusive size="small" value={range} onChange={(_, value) => value && setRange(value)}>
-                {Object.keys(chartProfiles).map((value) => <ToggleButton key={value} value={value}>{value}</ToggleButton>)}
+                {Object.keys(participationNets).map((value) => <ToggleButton key={value} value={value}>{value}</ToggleButton>)}
             </ToggleButtonGroup>
-            <Stack direction="row" spacing={1.2} sx={{ alignItems: "center" }}>
-                {([["Nifty", nifty, setNifty], ["BankNifty", bank, setBank], ["Events", events, setEvents]] as const).map(([label, checked, setter]) => <Stack key={label} direction="row" spacing={.3} sx={{ alignItems: "center" }}><Switch size="small" checked={checked} onChange={(event) => setter(event.target.checked)} /><Typography sx={{ fontSize: ".65rem" }}>{label}</Typography></Stack>)}
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center", flexWrap: "wrap" }}>
+                <Chip size="small" color={divergence ? "warning" : "success"} label={interpretation} />
+                {([["Market Participation", marketLine, setMarketLine], ["Nifty", nifty, setNifty], ["Bank Nifty", bank, setBank]] as const).map(([label, checked, setter]) => <Stack key={label} direction="row" spacing={.2} sx={{ alignItems: "center" }}><Switch size="small" checked={checked} onChange={(event) => setter(event.target.checked)} slotProps={{ input: { "aria-label": `Show ${label}` } }} /><Typography sx={{ fontSize: ".62rem" }}>{label}</Typography></Stack>)}
+                <IconButton aria-label="Chart actions" size="small" onClick={(event) => setMenuAnchor(event.currentTarget)}><MoreVertRoundedIcon /></IconButton>
+                <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={() => setMenuAnchor(null)}>
+                    <MenuItem onClick={() => { void chartAreaRef.current?.requestFullscreen(); setMenuAnchor(null); }}><FullscreenRoundedIcon fontSize="small" sx={{ mr: 1 }} />Expand Chart</MenuItem>
+                    <MenuItem onClick={() => { setNifty(true); setBank(true); setMenuAnchor(null); }}>Compare Indexes</MenuItem>
+                    <MenuItem onClick={exportData}><DownloadRoundedIcon fontSize="small" sx={{ mr: 1 }} />Export CSV</MenuItem>
+                    <MenuItem component={RouterLink} to="/market-breadth">View Detailed Market Data</MenuItem>
+                </Menu>
             </Stack>
         </Stack>
-        <Box sx={{ position: "relative", flex: 1, minHeight: 260, mt: 1.5 }}>
-            <Box sx={{ position: "absolute", left: 0, top: 0, bottom: 24, width: 42, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>{["+50", "+25", "0", "-25"].map((label) => <Typography key={label} color="text.secondary" sx={{ fontSize: ".58rem" }}>{label}</Typography>)}</Box>
-            <Tooltip title="Example: 1,682 stocks rose, 802 fell, 156 reached a one-year high and 23 reached a one-year low." followCursor>
-                <Box component="svg" viewBox="0 0 100 100" preserveAspectRatio="none" sx={{ position: "absolute", left: 44, width: "calc(100% - 44px)", height: "calc(100% - 24px)" }}>
-                    {[15, 40, 65, 90].map((y) => <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#213149" strokeWidth=".45" />)}
-                    <defs><linearGradient id="participationFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={colors.green} stopOpacity=".25" /><stop offset="100%" stopColor={colors.green} stopOpacity="0" /></linearGradient></defs>
-                    <polygon points={`0,100 ${points} 100,100`} fill="url(#participationFill)" />
-                    <polyline points={points} fill="none" stroke={colors.green} strokeWidth="1.8" vectorEffect="non-scaling-stroke" />
-                    {nifty && <polyline points={niftyPoints} fill="none" stroke={colors.blue} strokeWidth="1.15" vectorEffect="non-scaling-stroke" />}
-                    {bank && <polyline points={bankPoints} fill="none" stroke={colors.amber} strokeWidth="1.15" vectorEffect="non-scaling-stroke" />}
-                    {events && <line x1="72" x2="72" y1="5" y2="95" stroke={colors.violet} strokeDasharray="2 2" />}
-                </Box>
-            </Tooltip>
-            <Stack direction="row" sx={{ position: "absolute", left: 44, right: 0, bottom: 0, justifyContent: "space-between" }}>{profile.labels.map((label) => <Typography key={label} color="text.secondary" sx={{ fontSize: ".58rem" }}>{label}</Typography>)}</Stack>
+        <Grid container spacing={1} sx={{ mt: 1.2 }}>
+            {[
+                ["Current", current.net], ["Highest", maxValue], ["Lowest", minValue],
+                ["5-Day Average", Math.round(values.slice(-5).reduce((sum, value) => sum + value, 0) / Math.min(5, values.length))],
+                ["20-Day Average", Math.round(values.slice(-20).reduce((sum, value) => sum + value, 0) / Math.min(20, values.length))],
+            ].map(([label, value]) => <Grid key={label} size={{ xs: 6, sm: 4, lg: 2.4 }}><Box sx={{ p: .9, borderRadius: 2, bgcolor: "rgba(4,12,25,.22)", border: "1px solid rgba(143,161,184,.12)" }}><Typography color="text.secondary" sx={{ fontSize: ".55rem" }}>{label}</Typography><Typography sx={{ mt: .2, fontWeight: 900, color: Number(value) >= 0 ? colors.green : colors.red }}>{Number(value) > 0 ? "+" : ""}{value}</Typography></Box></Grid>)}
+        </Grid>
+        <Box ref={chartAreaRef} sx={{ position: "relative", height: 400, mt: 1.25, bgcolor: "#081322", borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", overflow: "hidden" }}>
+            <Typography color="text.secondary" sx={{ position: "absolute", left: 8, top: "44%", fontSize: ".55rem", transform: "rotate(-90deg)", transformOrigin: "left top" }}>Net Market Participation — stocks up minus stocks down</Typography>
+            <Box sx={{ position: "absolute", left: 50, top: 16, bottom: 28, width: 54, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>{[["Positive", "+50"], ["Zero", "0"], ["Negative", "-25"]].map(([label, value]) => <Box key={label}><Typography sx={{ fontSize: ".53rem", color: label === "Positive" ? colors.green : label === "Negative" ? colors.red : "text.secondary" }}>{label}</Typography><Typography color="text.secondary" sx={{ fontSize: ".5rem" }}>{value}</Typography></Box>)}</Box>
+            <Box
+                component="svg"
+                tabIndex={0}
+                role="img"
+                aria-label={`Market participation chart. Current value ${current.net}. Highest ${maxValue}. Lowest ${minValue}.`}
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                onMouseMove={(event) => {
+                    const bounds = event.currentTarget.getBoundingClientRect();
+                    setHoverIndex(Math.max(0, Math.min(data.length - 1, Math.round((event.clientX - bounds.left) / bounds.width * (data.length - 1)))));
+                }}
+                onMouseLeave={() => setHoverIndex(null)}
+                onKeyDown={(event) => {
+                    if (event.key === "ArrowLeft") setHoverIndex(Math.max(0, activeIndex - 1));
+                    if (event.key === "ArrowRight") setHoverIndex(Math.min(data.length - 1, activeIndex + 1));
+                }}
+                sx={{ position: "absolute", left: 108, top: 16, width: "calc(100% - 124px)", height: "calc(100% - 48px)", outline: "none", "&:focus": { filter: "drop-shadow(0 0 3px #6172f3)" }, "& .participation-line": { strokeDasharray: 500, strokeDashoffset: 500, animation: "drawParticipation .7s ease forwards" }, "@keyframes drawParticipation": { to: { strokeDashoffset: 0 } } }}
+            >
+                {[16, 50, 84].map((y) => <line key={y} x1="0" y1={y} x2="100" y2={y} stroke={y === 50 ? "#61758f" : "#213149"} strokeDasharray={y === 50 ? "2 2" : undefined} strokeWidth=".5" />)}
+                <defs><linearGradient id="participationFillDetailed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={colors.green} stopOpacity=".24" /><stop offset="100%" stopColor={colors.green} stopOpacity="0" /></linearGradient></defs>
+                {marketLine && <><polygon points={`0,100 ${participationPoints} 100,100`} fill="url(#participationFillDetailed)" /><polyline className="participation-line" points={participationPoints} fill="none" stroke={colors.green} strokeWidth="1.8" vectorEffect="non-scaling-stroke" /></>}
+                {nifty && <polyline points={niftyPoints} fill="none" stroke={colors.blue} strokeWidth="1.15" vectorEffect="non-scaling-stroke" />}
+                {bank && <polyline points={bankPoints} fill="none" stroke={colors.amber} strokeWidth="1.15" vectorEffect="non-scaling-stroke" />}
+                {data.map((point, index) => point.event && <Tooltip key={point.event} title={point.event} arrow><circle cx={scaleX(index)} cy="8" r="1.4" fill={colors.violet} /></Tooltip>)}
+                <circle cx={scaleX(highestIndex)} cy={scaleY(maxValue)} r="1.5" fill={colors.green} stroke="#fff" strokeWidth=".45" />
+                <circle cx={scaleX(lowestIndex)} cy={scaleY(minValue)} r="1.5" fill={colors.red} stroke="#fff" strokeWidth=".45" />
+                <circle cx={scaleX(data.length - 1)} cy={scaleY(current.net)} r="1.7" fill={colors.cyan} stroke="#fff" strokeWidth=".45" />
+                <line x1={scaleX(activeIndex)} x2={scaleX(activeIndex)} y1="0" y2="100" stroke="#cbd5e1" strokeDasharray="2 2" strokeWidth=".45" />
+                <circle cx={scaleX(activeIndex)} cy={scaleY(active.net)} r="1.8" fill="#fff" stroke={colors.green} strokeWidth=".7" />
+            </Box>
+            <Stack direction="row" sx={{ position: "absolute", left: 108, right: 16, bottom: 7, justifyContent: "space-between" }}>{axisLabels[range].map((label) => <Typography key={label} color="text.secondary" sx={{ fontSize: ".54rem" }}>{label}</Typography>)}</Stack>
+            <Box sx={{ position: "absolute", right: 18, top: 18, width: 220, p: 1.2, borderRadius: 2, bgcolor: "rgba(7,17,30,.94)", border: "1px solid rgba(143,161,184,.28)", pointerEvents: "none" }}>
+                <Typography sx={{ fontSize: ".66rem", fontWeight: 850 }}>{active.date}</Typography>
+                <Grid container spacing={.4} sx={{ mt: .5 }}>{[["Stocks Up", active.advancing], ["Stocks Down", active.declining], ["Net", active.net], ["Market Health", health], ["New Highs", active.highs], ["New Lows", active.lows]].map(([label, value]) => <Grid key={label} size={6}><Typography color="text.secondary" sx={{ fontSize: ".51rem" }}>{label}</Typography><Typography sx={{ fontSize: ".62rem", fontWeight: 800 }}>{value}</Typography></Grid>)}</Grid>
+                <Typography sx={{ mt: .7, color: active.net > 20 ? colors.green : colors.amber, fontSize: ".57rem" }}>{active.net > 20 ? "Most stocks joined this market rise." : "Only some stocks joined this move."}</Typography>
+            </Box>
         </Box>
-        <Box sx={{ mt: 1.5, p: 1.2, borderRadius: 2, bgcolor: "rgba(50,213,131,.06)", border: "1px solid rgba(50,213,131,.14)" }}><Typography sx={{ color: colors.green, fontSize: ".7rem", fontWeight: 800 }}>Simple explanation</Typography><Typography color="text.secondary" sx={{ mt: .35, fontSize: ".68rem" }}>More stocks are going up than before. This supports the wider market rise.</Typography></Box>
+        <Box sx={{ mt: 1.2, p: 1.2, borderRadius: 2, bgcolor: divergence ? "rgba(253,176,34,.07)" : "rgba(50,213,131,.06)", border: `1px solid ${divergence ? "rgba(253,176,34,.2)" : "rgba(50,213,131,.14)"}` }}>
+            <Typography sx={{ color: divergence ? colors.amber : colors.green, fontSize: ".7rem", fontWeight: 850 }}>{divergence ? "Warning" : "What this means"}</Typography>
+            <Typography color="text.secondary" sx={{ mt: .35, fontSize: ".68rem" }}>{insight}</Typography>
+        </Box>
     </Stack>;
 }
 

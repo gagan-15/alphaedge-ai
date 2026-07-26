@@ -282,3 +282,10 @@ The AI summary score is now named Overall Market Score and is shown as a plain
 Seven chips use beginner-friendly names, and the research strip includes a simple
 "What should I do today?" checklist. The Why action opens a side panel with five
 plain-English reasons and never exposes a technical formula.
+
+Only the Market Participation Trend widget was then upgraded. Its 1D, 1W, 1M, 3M,
+6M and 1Y views use separate intraday, daily, weekly or monthly-density datasets.
+The chart includes simple positive/zero/negative axes, current/high/low and hover
+markers, event markers, Nifty and Bank Nifty comparison lines, quick statistics,
+plain-English strengthening/weakening detection, keyboard navigation, loading and
+empty states, fullscreen, CSV export and a link to detailed market data.
