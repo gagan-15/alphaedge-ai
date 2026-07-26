@@ -29,12 +29,32 @@ import {
     TradingBiasWidget,
     VerdictWidget,
 } from "../components/market-overview/MarketOverviewWidgets";
+import MarketOverviewCustomizeDrawer from "../components/market-overview/MarketOverviewCustomizeDrawer";
 import OverviewPanel from "../components/market-overview/OverviewPanel";
+import {
+    loadMarketOverviewPreferences,
+    saveMarketOverviewPreferences,
+} from "../components/market-overview/marketOverviewPreferences";
+import { useAuth } from "../auth/AuthState";
 
 export default function MarketOverview() {
+    const { user } = useAuth();
+    const userKey = user?.id ?? "local-demo";
+    const [savedPreferences, setSavedPreferences] = useState(() => loadMarketOverviewPreferences(userKey));
+    const [previewPreferences, setPreviewPreferences] = useState(savedPreferences);
+    const [customizeOpen, setCustomizeOpen] = useState(false);
+    const [customizeSession, setCustomizeSession] = useState(0);
     const [market, setMarket] = useState("NSE");
     const [timeframe, setTimeframe] = useState("1D");
     const [lastUpdated, setLastUpdated] = useState("Not refreshed");
+    const visible = previewPreferences.visibleWidgets;
+
+    function saveCustomization(next: typeof savedPreferences) {
+        saveMarketOverviewPreferences(userKey, next);
+        setSavedPreferences(next);
+        setPreviewPreferences(next);
+        setCustomizeOpen(false);
+    }
 
     return (
         <Box sx={{ width: "100%", maxWidth: 1600, mx: "auto", px: { xs: 0, lg: 1 } }}>
@@ -84,13 +104,13 @@ export default function MarketOverview() {
                         >
                             Refresh
                         </Button>
-                        <Button variant="outlined" startIcon={<DashboardCustomizeOutlinedIcon />}>
+                        <Button variant="outlined" startIcon={<DashboardCustomizeOutlinedIcon />} onClick={() => { setPreviewPreferences(savedPreferences); setCustomizeSession((value) => value + 1); setCustomizeOpen(true); }}>
                             Customize
                         </Button>
                     </Stack>
                 </Stack>
 
-                <OverviewPanel
+                {visible.aiSummary && <OverviewPanel
                     title="AI Market Summary"
                     subtitle="A clear explanation of today's market, the main risks and what to research next."
                     eyebrow="Today's market explained"
@@ -99,16 +119,16 @@ export default function MarketOverview() {
                     action={<Chip size="small" label="TRANSPARENT DEMO LOGIC" variant="outlined" />}
                 >
                     <AIMarketSummaryWidget />
-                </OverviewPanel>
+                </OverviewPanel>}
 
-                <Grid container spacing={2.5}>
-                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle="Are most stocks supporting today's market move?" accent="#32d583" minHeight={310}><MarketHealthWidget /></OverviewPanel></Grid>
-                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Direction" subtitle="Is the market rising, falling or moving sideways?" accent="#6172f3" minHeight={310}><MarketRegimeWidget /></OverviewPanel></Grid>
-                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Today's Research Focus" subtitle="Should you mainly look for buying or selling opportunities?" accent="#22d3ee" minHeight={310}><TradingBiasWidget /></OverviewPanel></Grid>
-                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Risk" subtitle="How careful should you be today?" accent="#fdb022" minHeight={310}><RiskMeterWidget /></OverviewPanel></Grid>
-                </Grid>
+                {(visible.marketHealth || visible.marketTrend || visible.researchFocus || visible.marketRisk) && <Grid container spacing={2.5}>
+                    {visible.marketHealth && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle="Are most stocks supporting today's market move?" accent="#32d583" minHeight={310}><MarketHealthWidget /></OverviewPanel></Grid>}
+                    {visible.marketTrend && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Direction" subtitle="Is the market rising, falling or moving sideways?" accent="#6172f3" minHeight={310}><MarketRegimeWidget /></OverviewPanel></Grid>}
+                    {visible.researchFocus && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Today's Research Focus" subtitle="Should you mainly look for buying or selling opportunities?" accent="#22d3ee" minHeight={310}><TradingBiasWidget /></OverviewPanel></Grid>}
+                    {visible.marketRisk && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Risk" subtitle="How careful should you be today?" accent="#fdb022" minHeight={310}><RiskMeterWidget /></OverviewPanel></Grid>}
+                </Grid>}
 
-                <OverviewPanel
+                {visible.participationTrend && <OverviewPanel
                     title="Market Participation Trend"
                     subtitle={`See whether more stocks are rising or falling in the ${market} market · ${timeframe} view`}
                     eyebrow="How many stocks support the move?"
@@ -116,53 +136,53 @@ export default function MarketOverview() {
                     action={<Chip size="small" label="INTERACTIVE DEMO" variant="outlined" />}
                 >
                     <ParticipationChartWidget />
-                </OverviewPanel>
+                </OverviewPanel>}
 
-                <Grid container spacing={2.5}>
-                    <Grid size={{ xs: 12, lg: 6 }}>
+                {(visible.sectorRotation || visible.marketBreadth) && <Grid container spacing={2.5}>
+                    {visible.sectorRotation && <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="Strong and Weak Sectors" subtitle="See where money is moving and which sectors are losing strength." minHeight={330}>
                             <SectorRotationWidget />
                         </OverviewPanel>
-                    </Grid>
-                    <Grid size={{ xs: 12, lg: 6 }}>
+                    </Grid>}
+                    {visible.marketBreadth && <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="Stocks Going Up and Down" subtitle="A wider look at how many stocks are supporting the market." minHeight={330}>
                             <MarketBreadthWidget />
                         </OverviewPanel>
-                    </Grid>
-                </Grid>
+                    </Grid>}
+                </Grid>}
 
-                <Grid container spacing={2.5}>
-                    <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+                {(visible.bigInvestorActivity || visible.marketVolatility || visible.marketSentiment) && <Grid container spacing={2.5}>
+                    {visible.bigInvestorActivity && <Grid size={{ xs: 12, md: 6, lg: 4 }}>
                         <OverviewPanel title="Large Investor Activity" subtitle="See whether foreign and Indian institutions are buying or selling." minHeight={280}>
                             <InstitutionalFlowWidget />
                         </OverviewPanel>
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+                    </Grid>}
+                    {visible.marketVolatility && <Grid size={{ xs: 12, md: 6, lg: 4 }}>
                         <OverviewPanel title="India VIX" subtitle="India VIX measures expected market swings. A higher value means more uncertainty." minHeight={280}>
                             <IndiaVixWidget />
                         </OverviewPanel>
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 12, lg: 4 }}>
+                    </Grid>}
+                    {visible.marketSentiment && <Grid size={{ xs: 12, md: 12, lg: 4 }}>
                         <OverviewPanel title="Market Mood" subtitle="A simple view of whether traders feel fearful or confident." minHeight={280}>
                             <SentimentWidget />
                         </OverviewPanel>
-                    </Grid>
-                </Grid>
+                    </Grid>}
+                </Grid>}
 
-                <Grid container spacing={2.5}>
-                    <Grid size={{ xs: 12, lg: 6 }}>
+                {(visible.aiOpportunities || visible.smartAlerts) && <Grid container spacing={2.5}>
+                    {visible.aiOpportunities && <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="Ideas to Research" subtitle="Groups of stocks that may be worth checking in the scanner." minHeight={300}>
                             <OpportunitiesWidget />
                         </OverviewPanel>
-                    </Grid>
-                    <Grid size={{ xs: 12, lg: 6 }}>
+                    </Grid>}
+                    {visible.smartAlerts && <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="Important Market Changes" subtitle="Recent changes that may need your attention." minHeight={300}>
                             <SmartAlertsWidget />
                         </OverviewPanel>
-                    </Grid>
-                </Grid>
+                    </Grid>}
+                </Grid>}
 
-                <OverviewPanel
+                {visible.todayVerdict && <OverviewPanel
                     title="Today's Verdict"
                     subtitle="A short summary of the market, the risk and what you may want to research."
                     eyebrow="Simple daily summary"
@@ -171,8 +191,18 @@ export default function MarketOverview() {
                     action={<Chip size="small" color="warning" variant="outlined" label="DEMO VERDICT" />}
                 >
                     <VerdictWidget />
-                </OverviewPanel>
+                </OverviewPanel>}
             </Stack>
+            <MarketOverviewCustomizeDrawer
+                key={customizeSession}
+                open={customizeOpen}
+                value={savedPreferences}
+                onClose={() => setCustomizeOpen(false)}
+                onPreview={(next) => {
+                    setPreviewPreferences(next);
+                }}
+                onSave={saveCustomization}
+            />
         </Box>
     );
 }

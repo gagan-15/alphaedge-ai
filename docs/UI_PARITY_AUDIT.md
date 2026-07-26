@@ -289,3 +289,11 @@ The chart includes simple positive/zero/negative axes, current/high/low and hove
 markers, event markers, Nifty and Bank Nifty comparison lines, quick statistics,
 plain-English strengthening/weakening detection, keyboard navigation, loading and
 empty states, fullscreen, CSV export and a link to detailed market data.
+
+Market Overview now has a reusable 440-pixel Customize Drawer connected to the
+existing Customize action. It provides five presets, per-widget visibility, a saved
+default timeframe and stock group, chart preferences, simple/professional language,
+density and number-format choices. Presets and widget visibility preview immediately;
+Cancel restores the saved view, all-widget hiding is blocked, and Save persists a
+versioned preference model under the current local user key. Data and widget business
+logic remain unchanged.
