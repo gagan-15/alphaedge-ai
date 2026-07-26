@@ -21,7 +21,7 @@ export type DashboardTimeframe = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y";
 export type MarketUniverse = "nseAll" | "nifty500" | "nifty200" | "nifty100" | "fo" | "watchlist" | "holdings";
 
 export interface MarketOverviewPreferences {
-    version: 1;
+    version: 2;
     preset: DashboardPreset;
     visibleWidgets: Record<MarketOverviewWidgetKey, boolean>;
     defaultTimeframe: DashboardTimeframe;
@@ -36,15 +36,16 @@ export interface MarketOverviewPreferences {
     language: "simple" | "professional";
     density: "comfortable" | "compact";
     numberFormat: "full" | "short";
+    liveRefreshReady: boolean;
 }
 
 const allVisible = Object.fromEntries(marketOverviewWidgetKeys.map((key) => [key, true])) as Record<MarketOverviewWidgetKey, boolean>;
 
 export const defaultMarketOverviewPreferences: MarketOverviewPreferences = {
-    version: 1,
+    version: 2,
     preset: "beginner",
     visibleWidgets: allVisible,
-    defaultTimeframe: "1D",
+    defaultTimeframe: "1M",
     marketUniverse: "nifty500",
     chart: {
         showNifty: true,
@@ -56,23 +57,27 @@ export const defaultMarketOverviewPreferences: MarketOverviewPreferences = {
     language: "simple",
     density: "comfortable",
     numberFormat: "full",
+    liveRefreshReady: false,
 };
 
 const presetVisibility: Record<Exclude<DashboardPreset, "custom">, MarketOverviewWidgetKey[]> = {
     beginner: marketOverviewWidgetKeys.slice(),
-    swing: ["aiSummary", "marketHealth", "marketTrend", "researchFocus", "marketRisk", "participationTrend", "sectorRotation", "marketBreadth", "marketVolatility", "aiOpportunities", "smartAlerts", "todayVerdict"],
-    intraday: ["aiSummary", "marketHealth", "marketTrend", "researchFocus", "marketRisk", "participationTrend", "sectorRotation", "marketBreadth", "bigInvestorActivity", "marketVolatility", "marketSentiment", "smartAlerts", "todayVerdict"],
+    swing: ["aiSummary", "marketHealth", "marketTrend", "researchFocus", "marketRisk", "participationTrend", "sectorRotation", "marketBreadth", "marketVolatility", "aiOpportunities", "todayVerdict"],
+    intraday: ["aiSummary", "marketHealth", "marketTrend", "researchFocus", "marketRisk", "participationTrend", "sectorRotation", "marketBreadth", "marketVolatility", "marketSentiment", "aiOpportunities", "smartAlerts", "todayVerdict"],
     longTerm: ["aiSummary", "marketHealth", "marketTrend", "marketRisk", "participationTrend", "sectorRotation", "marketBreadth", "bigInvestorActivity", "marketVolatility", "marketSentiment", "todayVerdict"],
 };
 
 export function preferencesForPreset(preset: Exclude<DashboardPreset, "custom">): MarketOverviewPreferences {
     const visible = new Set(presetVisibility[preset]);
-    return {
+    const base: MarketOverviewPreferences = {
         ...defaultMarketOverviewPreferences,
         preset,
         defaultTimeframe: preset === "intraday" ? "1D" : preset === "longTerm" ? "1Y" : preset === "swing" ? "1M" : "1D",
         visibleWidgets: Object.fromEntries(marketOverviewWidgetKeys.map((key) => [key, visible.has(key)])) as Record<MarketOverviewWidgetKey, boolean>,
     };
+    if (preset === "beginner") return { ...base, defaultTimeframe: "1M", language: "simple" as const, density: "comfortable" as const, chart: { ...base.chart, showAiExplanations: true, showTooltips: true } };
+    if (preset === "intraday") return { ...base, density: "compact" as const, liveRefreshReady: true, chart: { ...base.chart, showNifty: true, showEvents: true } };
+    return base;
 }
 
 function storageKey(userId: string) {

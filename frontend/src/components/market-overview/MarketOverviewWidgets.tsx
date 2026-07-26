@@ -133,10 +133,9 @@ const demoExecutiveSummary: ExecutiveSummaryData = {
     ],
 };
 
-function ExecutiveStatusChip({ metric }: { metric: ExecutiveMetric }) {
+function ExecutiveStatusChip({ metric, showTooltip = true }: { metric: ExecutiveMetric; showTooltip?: boolean }) {
     const toneColor = metric.tone === "positive" ? colors.green : metric.tone === "caution" ? colors.amber : colors.blue;
-    return <Tooltip title={metric.help} arrow>
-        <Stack
+    const chip = <Stack
             direction="row"
             spacing={1}
             sx={{
@@ -158,19 +157,30 @@ function ExecutiveStatusChip({ metric }: { metric: ExecutiveMetric }) {
                 <Typography color="text.secondary" sx={{ fontSize: ".55rem", textTransform: "uppercase", letterSpacing: ".07em" }}>{metric.label}</Typography>
                 <Typography noWrap sx={{ mt: .15, color: toneColor, fontSize: ".7rem", fontWeight: 850 }}>{metric.value}</Typography>
             </Box>
-        </Stack>
-    </Tooltip>;
+        </Stack>;
+    return showTooltip ? <Tooltip title={metric.help} arrow>{chip}</Tooltip> : chip;
 }
 
 export function AIMarketSummaryWidget({
     data = demoExecutiveSummary,
     loading = false,
+    timeframe = "1M",
+    universe = "nifty500",
+    language = "simple",
+    showTooltips = true,
 }: {
     data?: ExecutiveSummaryData | null;
     loading?: boolean;
+    timeframe?: string;
+    universe?: string;
+    language?: "simple" | "professional";
+    showTooltips?: boolean;
 }) {
     const [whyOpen, setWhyOpen] = useState(false);
-    const animatedScore = useCountUp(data?.confidence ?? 0);
+    const timeframeScore: Record<string, number> = { "1D": -3, "1W": -1, "1M": 0, "3M": 1, "6M": 2, "1Y": 3 };
+    const universeScore: Record<string, number> = { nseAll: 1, nifty500: 0, nifty200: -1, nifty100: -2, fo: 1, watchlist: -3, holdings: -4 };
+    const marketScore = Math.max(0, Math.min(100, (data?.confidence ?? 0) + (timeframeScore[timeframe] ?? 0) + (universeScore[universe] ?? 0)));
+    const animatedScore = useCountUp(marketScore);
     if (loading) return <WidgetLoading rows={5} />;
     if (!data) return <WidgetEmpty message="AI Summary unavailable. Waiting for validated market intelligence." />;
     const headline = data.participation >= 65
@@ -178,12 +188,21 @@ export function AIMarketSummaryWidget({
         : data.participation >= 50
             ? "The market is rising, but only some stocks are taking part."
             : "The main indexes are rising, but too few stocks are joining the move.";
-    const explanation = [
-        "Today's market is looking healthy.",
-        `About ${data.participation}% of tracked stocks are rising, so the move is not limited to a few large companies.`,
+    const explanation = language === "professional" ? [
+        `The ${timeframe} market structure remains constructive.`,
+        `About ${data.participation}% of the selected ${universe} universe is advancing, confirming broad participation.`,
+        `${data.leaders.join(" and ")} continue to lead while volatility remains controlled.`,
+        "The preferred approach is to buy quality pullbacks and avoid extended breakouts.",
+    ] : [
+        `The market looks healthy in the selected ${timeframe} view.`,
+        `About ${data.participation}% of the selected stocks are rising, so the move is not limited to a few large companies.`,
         `${data.leaders.join(" and ")} are doing well, while price movement remains stable.`,
         "Look for quality buying opportunities, but avoid stocks that have already risen sharply.",
     ];
+    const displayMetrics = language === "professional" ? data.metrics.map((metric) => ({
+        ...metric,
+        label: ({ "Today's Market": "Market Direction", "Most Stocks": "Market Breadth", "Market Strength": "Momentum", "Strongest Sectors": "Sector Leadership", "Price Movement": "Volatility", "Big Investors": "Institutional Flow", "Current Trend": "Market Regime" } as Record<string, string>)[metric.label] ?? metric.label,
+    })) : data.metrics;
     return <Stack spacing={2.2}>
         <Grid container spacing={2.5} sx={{ alignItems: "stretch" }}>
             <Grid size={{ xs: 12, lg: 9 }}>
@@ -206,7 +225,7 @@ export function AIMarketSummaryWidget({
                         </Stack>
                     </Box>
                     <Stack direction="row" useFlexGap spacing={1} sx={{ flexWrap: "wrap" }}>
-                        {data.metrics.map((metric) => <ExecutiveStatusChip key={metric.label} metric={metric} />)}
+                        {displayMetrics.map((metric) => <ExecutiveStatusChip key={metric.label} metric={metric} showTooltip={showTooltips} />)}
                     </Stack>
                 </Stack>
             </Grid>
@@ -253,7 +272,7 @@ export function AIMarketSummaryWidget({
             <Box sx={{ mt: "auto", pt: 3 }}>
                 <Box sx={{ p: 2, borderRadius: 2, bgcolor: "rgba(155,138,251,.08)", border: "1px solid rgba(155,138,251,.22)" }}>
                     <Typography color="text.secondary" sx={{ fontSize: ".62rem" }}>Overall Market Score</Typography>
-                    <Typography sx={{ mt: .4, fontSize: "2rem", fontWeight: 900 }}>{data.confidence} <Box component="span" sx={{ fontSize: ".8rem", color: "text.secondary" }}>/ 100</Box></Typography>
+                    <Typography sx={{ mt: .4, fontSize: "2rem", fontWeight: 900 }}>{marketScore} <Box component="span" sx={{ fontSize: ".8rem", color: "text.secondary" }}>/ 100</Box></Typography>
                     <Typography sx={{ color: colors.green, fontWeight: 800 }}>Market looks Healthy</Typography>
                 </Box>
                 <Button fullWidth variant="outlined" sx={{ mt: 2 }} onClick={() => setWhyOpen(false)}>Close</Button>
@@ -262,23 +281,25 @@ export function AIMarketSummaryWidget({
     </Stack>;
 }
 
-export function MarketHealthWidget() {
+export function MarketHealthWidget({ timeframe = "1M", universe = "nifty500", showTooltips = true }: { timeframe?: string; universe?: string; showTooltips?: boolean }) {
+    const adjustment = (timeframe === "1D" ? -4 : timeframe === "1Y" ? 3 : 0) + (universe === "holdings" || universe === "watchlist" ? -3 : 0);
+    const score = 87 + adjustment;
     const factors = [["Market direction", 5], ["Stocks joining", 4], ["Recent strength", 4], ["Expected swings", 4], ["Safety level", 3]] as const;
-    return <Tooltip title="This example score looks at market direction, how many stocks are rising, recent price strength, expected price swings and risk. It does not predict returns.">
-        <Box>
-            <CircularGauge value={87} label="Strong bullish" />
+    const content = <Box>
+            <CircularGauge value={score} label={score >= 85 ? "Strong and healthy" : "Healthy"} />
             <Stack spacing={.55} sx={{ mt: 1.5 }}>{factors.map(([label, value]) => <Stack key={label} direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".67rem" }}>{label}</Typography><Stars value={value} /></Stack>)}</Stack>
             <Typography color="text.secondary" sx={{ mt: 1.3, fontSize: ".58rem" }}>Updated 10:42 IST</Typography>
-        </Box>
-    </Tooltip>;
+        </Box>;
+    return showTooltips ? <Tooltip title="This example score looks at market direction, how many stocks are rising, recent price strength, expected price swings and risk. It does not predict returns.">{content}</Tooltip> : content;
 }
 
-export function MarketRegimeWidget() {
+export function MarketRegimeWidget({ timeframe = "1M", language = "simple" }: { timeframe?: string; language?: "simple" | "professional" }) {
+    const longTerm = timeframe === "6M" || timeframe === "1Y";
     return <Stack sx={{ height: "100%", justifyContent: "space-between" }}>
         <Box>
             <Box sx={{ width: 54, height: 54, display: "grid", placeItems: "center", borderRadius: 3, bgcolor: `${colors.blue}12`, color: colors.blue }}><ShowChartRoundedIcon fontSize="large" /></Box>
-            <Typography sx={{ mt: 1.5, fontSize: "1.35rem", fontWeight: 900 }}>Strong Uptrend</Typography>
-            <Typography color="text.secondary" sx={{ mt: .7, fontSize: ".72rem", lineHeight: 1.55 }}>The market is rising and more stocks are joining the rally.</Typography>
+            <Typography sx={{ mt: 1.5, fontSize: "1.35rem", fontWeight: 900 }}>{language === "professional" ? "Bullish Trend" : longTerm ? "Healthy Long-Term Rise" : "Strong Uptrend"}</Typography>
+            <Typography color="text.secondary" sx={{ mt: .7, fontSize: ".72rem", lineHeight: 1.55 }}>{language === "professional" ? "Price structure and market breadth remain positive." : longTerm ? "The wider market has continued to rise over a longer period." : "The market is rising and more stocks are joining the rally."}</Typography>
         </Box>
         <Box><Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".68rem" }}>Confidence in this view</Typography><Typography sx={{ fontWeight: 850 }}>88%</Typography></Stack><LinearProgress value={88} variant="determinate" sx={{ mt: .7, height: 7 }} /></Box>
     </Stack>;
@@ -342,8 +363,11 @@ const axisLabels = {
     "1Y": ["Aug", "Oct", "Dec", "Feb", "Apr", "Jun", "Jul"],
 } as const;
 
-function buildParticipationData(range: keyof typeof participationNets): ParticipationPoint[] {
-    return participationNets[range].map((net, index, values) => ({
+function buildParticipationData(range: keyof typeof participationNets, universe = "nifty500"): ParticipationPoint[] {
+    const universeAdjustment: Record<string, number> = { nseAll: 6, nifty500: 0, nifty200: -3, nifty100: -5, fo: 4, watchlist: -8, holdings: -10 };
+    return participationNets[range].map((sourceNet, index, values) => {
+        const net = sourceNet + (universeAdjustment[universe] ?? 0);
+        return {
         label: axisLabels[range][Math.min(axisLabels[range].length - 1, Math.floor(index * axisLabels[range].length / values.length))],
         date: `${axisLabels[range][Math.min(axisLabels[range].length - 1, Math.floor(index * axisLabels[range].length / values.length))]} · ${range}`,
         net,
@@ -354,18 +378,39 @@ function buildParticipationData(range: keyof typeof participationNets): Particip
         highs: Math.max(18, 62 + net * 2),
         lows: Math.max(8, 45 - net),
         event: index === Math.floor(values.length * .42) ? "RBI policy update" : index === Math.floor(values.length * .72) ? "Major earnings day" : undefined,
-    }));
+        };
+    });
 }
 
-export function ParticipationChartWidget({ loading = false, available = true }: { loading?: boolean; available?: boolean }) {
-    const [range, setRange] = useState<keyof typeof participationNets>("1M");
+export function ParticipationChartWidget({
+    loading = false,
+    available = true,
+    defaultRange = "1M",
+    universe = "nifty500",
+    initialNifty = true,
+    initialBankNifty = true,
+    showEvents = true,
+    showInsights = true,
+    showTooltips = true,
+}: {
+    loading?: boolean;
+    available?: boolean;
+    defaultRange?: keyof typeof participationNets;
+    universe?: string;
+    initialNifty?: boolean;
+    initialBankNifty?: boolean;
+    showEvents?: boolean;
+    showInsights?: boolean;
+    showTooltips?: boolean;
+}) {
+    const [range, setRange] = useState<keyof typeof participationNets>(defaultRange);
     const [marketLine, setMarketLine] = useState(true);
-    const [nifty, setNifty] = useState(true);
-    const [bank, setBank] = useState(true);
+    const [nifty, setNifty] = useState(initialNifty);
+    const [bank, setBank] = useState(initialBankNifty);
     const [hoverIndex, setHoverIndex] = useState<number | null>(null);
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
     const chartAreaRef = useRef<HTMLDivElement>(null);
-    const data = useMemo(() => buildParticipationData(range), [range]);
+    const data = useMemo(() => buildParticipationData(range, universe), [range, universe]);
     const values = data.map((point) => point.net);
     const maxValue = Math.max(...values);
     const minValue = Math.min(...values);
@@ -451,7 +496,7 @@ export function ParticipationChartWidget({ loading = false, available = true }: 
                 {marketLine && <><polygon points={`0,100 ${participationPoints} 100,100`} fill="url(#participationFillDetailed)" /><polyline className="participation-line" points={participationPoints} fill="none" stroke={colors.green} strokeWidth="1.8" vectorEffect="non-scaling-stroke" /></>}
                 {nifty && <polyline points={niftyPoints} fill="none" stroke={colors.blue} strokeWidth="1.15" vectorEffect="non-scaling-stroke" />}
                 {bank && <polyline points={bankPoints} fill="none" stroke={colors.amber} strokeWidth="1.15" vectorEffect="non-scaling-stroke" />}
-                {data.map((point, index) => point.event && <Tooltip key={point.event} title={point.event} arrow><circle cx={scaleX(index)} cy="8" r="1.4" fill={colors.violet} /></Tooltip>)}
+                {showEvents && data.map((point, index) => point.event && (showTooltips ? <Tooltip key={point.event} title={point.event} arrow><circle cx={scaleX(index)} cy="8" r="1.4" fill={colors.violet} /></Tooltip> : <circle key={point.event} cx={scaleX(index)} cy="8" r="1.4" fill={colors.violet} />))}
                 <circle cx={scaleX(highestIndex)} cy={scaleY(maxValue)} r="1.5" fill={colors.green} stroke="#fff" strokeWidth=".45" />
                 <circle cx={scaleX(lowestIndex)} cy={scaleY(minValue)} r="1.5" fill={colors.red} stroke="#fff" strokeWidth=".45" />
                 <circle cx={scaleX(data.length - 1)} cy={scaleY(current.net)} r="1.7" fill={colors.cyan} stroke="#fff" strokeWidth=".45" />
@@ -459,16 +504,16 @@ export function ParticipationChartWidget({ loading = false, available = true }: 
                 <circle cx={scaleX(activeIndex)} cy={scaleY(active.net)} r="1.8" fill="#fff" stroke={colors.green} strokeWidth=".7" />
             </Box>
             <Stack direction="row" sx={{ position: "absolute", left: 108, right: 16, bottom: 7, justifyContent: "space-between" }}>{axisLabels[range].map((label) => <Typography key={label} color="text.secondary" sx={{ fontSize: ".54rem" }}>{label}</Typography>)}</Stack>
-            <Box sx={{ position: "absolute", right: 18, top: 18, width: 220, p: 1.2, borderRadius: 2, bgcolor: "rgba(7,17,30,.94)", border: "1px solid rgba(143,161,184,.28)", pointerEvents: "none" }}>
+            {showTooltips && <Box sx={{ position: "absolute", right: 18, top: 18, width: 220, p: 1.2, borderRadius: 2, bgcolor: "rgba(7,17,30,.94)", border: "1px solid rgba(143,161,184,.28)", pointerEvents: "none" }}>
                 <Typography sx={{ fontSize: ".66rem", fontWeight: 850 }}>{active.date}</Typography>
                 <Grid container spacing={.4} sx={{ mt: .5 }}>{[["Stocks Up", active.advancing], ["Stocks Down", active.declining], ["Net", active.net], ["Market Health", health], ["New Highs", active.highs], ["New Lows", active.lows]].map(([label, value]) => <Grid key={label} size={6}><Typography color="text.secondary" sx={{ fontSize: ".51rem" }}>{label}</Typography><Typography sx={{ fontSize: ".62rem", fontWeight: 800 }}>{value}</Typography></Grid>)}</Grid>
                 <Typography sx={{ mt: .7, color: active.net > 20 ? colors.green : colors.amber, fontSize: ".57rem" }}>{active.net > 20 ? "Most stocks joined this market rise." : "Only some stocks joined this move."}</Typography>
-            </Box>
+            </Box>}
         </Box>
-        <Box sx={{ mt: 1.2, p: 1.2, borderRadius: 2, bgcolor: divergence ? "rgba(253,176,34,.07)" : "rgba(50,213,131,.06)", border: `1px solid ${divergence ? "rgba(253,176,34,.2)" : "rgba(50,213,131,.14)"}` }}>
+        {showInsights && <Box sx={{ mt: 1.2, p: 1.2, borderRadius: 2, bgcolor: divergence ? "rgba(253,176,34,.07)" : "rgba(50,213,131,.06)", border: `1px solid ${divergence ? "rgba(253,176,34,.2)" : "rgba(50,213,131,.14)"}` }}>
             <Typography sx={{ color: divergence ? colors.amber : colors.green, fontSize: ".7rem", fontWeight: 850 }}>{divergence ? "Warning" : "What this means"}</Typography>
             <Typography color="text.secondary" sx={{ mt: .35, fontSize: ".68rem" }}>{insight}</Typography>
-        </Box>
+        </Box>}
     </Stack>;
 }
 
@@ -497,8 +542,12 @@ const breadthMetrics = [
     ["High-Volume Stocks Up", 218, "+28", "Rising stocks with more trading activity than usual"], ["High-Volume Stocks Down", 94, "-9", "Falling stocks with more trading activity than usual"], ["Mid-Size Stocks Joining", 68, "+4%", "The percentage of mid-size companies joining the market move"], ["Small Stocks Joining", 61, "+2%", "The percentage of small companies joining the market move"],
 ] as const;
 
-export function MarketBreadthWidget() {
-    return <Grid container spacing={1}>{breadthMetrics.map(([label, value, trend, help]) => <Grid key={label} size={{ xs: 6, sm: 4, lg: 3 }}><Tooltip title={help}><Box sx={{ p: 1.05, borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", bgcolor: "rgba(4,12,25,.24)", transition: "transform .18s ease,border-color .18s ease", "&:hover": { transform: "translateY(-2px)", borderColor: "rgba(97,114,243,.45)" } }}><Typography color="text.secondary" noWrap sx={{ fontSize: ".55rem" }}>{label}</Typography><Stack direction="row" spacing={.55} sx={{ mt: .35, alignItems: "baseline" }}><Typography sx={{ fontWeight: 900 }}>{value.toLocaleString("en-IN")}</Typography><Typography sx={{ color: String(trend).startsWith("-") ? colors.red : colors.green, fontSize: ".56rem" }}>{trend}</Typography></Stack></Box></Tooltip></Grid>)}</Grid>;
+export function MarketBreadthWidget({ shortNumbers = false, showTooltips = true }: { shortNumbers?: boolean; showTooltips?: boolean }) {
+    const format = (value: number) => shortNumbers && value >= 1000 ? `${(value / 1000).toFixed(2)}K` : value.toLocaleString("en-IN");
+    return <Grid container spacing={1}>{breadthMetrics.map(([label, value, trend, help]) => {
+        const metric = <Box sx={{ p: 1.05, borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", bgcolor: "rgba(4,12,25,.24)", transition: "transform .18s ease,border-color .18s ease", "&:hover": { transform: "translateY(-2px)", borderColor: "rgba(97,114,243,.45)" } }}><Typography color="text.secondary" noWrap sx={{ fontSize: ".55rem" }}>{label}</Typography><Stack direction="row" spacing={.55} sx={{ mt: .35, alignItems: "baseline" }}><Typography sx={{ fontWeight: 900 }}>{format(value)}</Typography><Typography sx={{ color: String(trend).startsWith("-") ? colors.red : colors.green, fontSize: ".56rem" }}>{trend}</Typography></Stack></Box>;
+        return <Grid key={label} size={{ xs: 6, sm: 4, lg: 3 }}>{showTooltips ? <Tooltip title={help}>{metric}</Tooltip> : metric}</Grid>;
+    })}</Grid>;
 }
 
 export function InstitutionalFlowWidget() {
@@ -529,7 +578,11 @@ export function SmartAlertsWidget() {
     return <Stack spacing={1}>{alerts.map(([message, severity, time, color]) => <Stack key={message} direction="row" spacing={1.1} sx={{ alignItems: "center", p: 1.1, borderRadius: 2, bgcolor: "rgba(4,12,25,.25)", border: "1px solid rgba(143,161,184,.12)" }}><Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: color, boxShadow: `0 0 10px ${color}` }} /><Box sx={{ flex: 1 }}><Typography sx={{ fontSize: ".72rem", fontWeight: 800 }}>{message}</Typography><Typography color="text.secondary" sx={{ fontSize: ".57rem" }}>{severity} severity</Typography></Box><Typography color="text.secondary" sx={{ fontSize: ".6rem" }}>{time}</Typography></Stack>)}</Stack>;
 }
 
-export function VerdictWidget() {
-    const items = [["Market Direction", "Going up", colors.green], ["Stocks Joining", "Healthy", colors.green], ["Recent Price Strength", "Positive", colors.cyan], ["Risk", "Medium", colors.amber], ["What to Research", "Strong stocks after a small fall", colors.blue], ["Avoid", "Buying breakouts in weak sectors", colors.red]];
-    return <Grid container spacing={2.5} sx={{ alignItems: "center" }}><Grid size={{ xs: 12, lg: 9 }}><Grid container spacing={1.1}>{items.map(([label, value, color]) => <Grid key={label} size={{ xs: 12, sm: 6, md: 4 }}><Box sx={{ p: 1.2, borderRadius: 2, bgcolor: `${color}09`, border: `1px solid ${color}25` }}><Typography color="text.secondary" sx={{ fontSize: ".58rem", textTransform: "uppercase" }}>{label}</Typography><Typography sx={{ mt: .3, color, fontWeight: 850 }}>{value}</Typography></Box></Grid>)}</Grid></Grid><Grid size={{ xs: 12, lg: 3 }}><CircularGauge value={89} label="Overall confidence" color={colors.violet} /></Grid></Grid>;
+export function VerdictWidget({ timeframe = "1M", universe = "nifty500", language = "simple" }: { timeframe?: string; universe?: string; language?: "simple" | "professional" }) {
+    const professional = language === "professional";
+    const items = professional
+        ? [["Market Trend", "Bullish", colors.green], ["Breadth", "Healthy", colors.green], ["Momentum", "Positive", colors.cyan], ["Risk", "Moderate", colors.amber], ["Preferred Setup", "Buy pullbacks", colors.blue], ["Avoid", "Weak-sector breakouts", colors.red]]
+        : [["Market Direction", "Going up", colors.green], ["Stocks Joining", "Healthy", colors.green], ["Recent Price Strength", "Positive", colors.cyan], ["Risk", "Medium", colors.amber], ["What to Research", timeframe === "1D" ? "Strong stocks after a small fall today" : "Strong stocks after a small fall", colors.blue], ["Avoid", "Buying breakouts in weak sectors", colors.red]];
+    const score = 89 + (timeframe === "1Y" ? 2 : timeframe === "1D" ? -2 : 0) + (universe === "holdings" ? -2 : 0);
+    return <Grid container spacing={2.5} sx={{ alignItems: "center" }}><Grid size={{ xs: 12, lg: 9 }}><Grid container spacing={1.1}>{items.map(([label, value, color]) => <Grid key={label} size={{ xs: 12, sm: 6, md: 4 }}><Box sx={{ p: 1.2, borderRadius: 2, bgcolor: `${color}09`, border: `1px solid ${color}25` }}><Typography color="text.secondary" sx={{ fontSize: ".58rem", textTransform: "uppercase" }}>{label}</Typography><Typography sx={{ mt: .3, color, fontWeight: 850 }}>{value}</Typography></Box></Grid>)}</Grid></Grid><Grid size={{ xs: 12, lg: 3 }}><CircularGauge value={score} label="Overall confidence" color={colors.violet} /></Grid></Grid>;
 }

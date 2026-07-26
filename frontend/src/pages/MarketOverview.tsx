@@ -45,9 +45,10 @@ export default function MarketOverview() {
     const [customizeOpen, setCustomizeOpen] = useState(false);
     const [customizeSession, setCustomizeSession] = useState(0);
     const [market, setMarket] = useState("NSE");
-    const [timeframe, setTimeframe] = useState("1D");
+    const [timeframe, setTimeframe] = useState(savedPreferences.defaultTimeframe);
     const [lastUpdated, setLastUpdated] = useState("Not refreshed");
     const visible = previewPreferences.visibleWidgets;
+    const professional = previewPreferences.language === "professional";
 
     function saveCustomization(next: typeof savedPreferences) {
         saveMarketOverviewPreferences(userKey, next);
@@ -58,7 +59,7 @@ export default function MarketOverview() {
 
     return (
         <Box sx={{ width: "100%", maxWidth: 1600, mx: "auto", px: { xs: 0, lg: 1 } }}>
-            <Stack spacing={2.5}>
+            <Stack spacing={2.5} sx={previewPreferences.density === "compact" ? { "& .MuiCardContent-root": { p: "16px !important" } } : undefined}>
                 <Stack
                     direction={{ xs: "column", xl: "row" }}
                     spacing={2}
@@ -70,7 +71,7 @@ export default function MarketOverview() {
                             <Chip size="small" color="success" variant="outlined" label="MARKET OPEN" />
                         </Stack>
                         <Typography color="text.secondary" sx={{ mt: .65 }}>
-                            A simple view of what the market is doing and what you may want to check next.
+                            {professional ? "Market trend, breadth, risk and sector context for active research." : "A simple view of what the market is doing and what you may want to check next."}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
                             Last updated: {lastUpdated}
@@ -93,7 +94,7 @@ export default function MarketOverview() {
                             value={timeframe}
                             onChange={(_, value) => value && setTimeframe(value)}
                         >
-                            {["1D", "1W", "1M", "3M"].map((value) => (
+                            {["1D", "1W", "1M", "3M", "6M", "1Y"].map((value) => (
                                 <ToggleButton key={value} value={value}>{value}</ToggleButton>
                             ))}
                         </ToggleButtonGroup>
@@ -112,18 +113,18 @@ export default function MarketOverview() {
 
                 {visible.aiSummary && <OverviewPanel
                     title="AI Market Summary"
-                    subtitle="A clear explanation of today's market, the main risks and what to research next."
-                    eyebrow="Today's market explained"
+                    subtitle={professional ? "A concise interpretation of market trend, breadth, leadership and risk." : "A clear explanation of today's market, the main risks and what to research next."}
+                    eyebrow={professional ? "Market intelligence" : "Today's market explained"}
                     accent="#8b5cf6"
                     minHeight={190}
                     action={<Chip size="small" label="TRANSPARENT DEMO LOGIC" variant="outlined" />}
                 >
-                    <AIMarketSummaryWidget />
+                    <AIMarketSummaryWidget timeframe={timeframe} universe={previewPreferences.marketUniverse} language={previewPreferences.language} showTooltips={previewPreferences.chart.showTooltips} />
                 </OverviewPanel>}
 
                 {(visible.marketHealth || visible.marketTrend || visible.researchFocus || visible.marketRisk) && <Grid container spacing={2.5}>
-                    {visible.marketHealth && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle="Are most stocks supporting today's market move?" accent="#32d583" minHeight={310}><MarketHealthWidget /></OverviewPanel></Grid>}
-                    {visible.marketTrend && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Direction" subtitle="Is the market rising, falling or moving sideways?" accent="#6172f3" minHeight={310}><MarketRegimeWidget /></OverviewPanel></Grid>}
+                    {visible.marketHealth && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle={professional ? "Composite trend, breadth, momentum, volatility and risk reading." : "Are most stocks supporting today's market move?"} accent="#32d583" minHeight={310}><MarketHealthWidget timeframe={timeframe} universe={previewPreferences.marketUniverse} showTooltips={previewPreferences.chart.showTooltips} /></OverviewPanel></Grid>}
+                    {visible.marketTrend && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title={professional ? "Market Regime" : "Market Direction"} subtitle={professional ? "Identifies whether conditions are trending, ranging or changing." : "Is the market rising, falling or moving sideways?"} accent="#6172f3" minHeight={310}><MarketRegimeWidget timeframe={timeframe} language={previewPreferences.language} /></OverviewPanel></Grid>}
                     {visible.researchFocus && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Today's Research Focus" subtitle="Should you mainly look for buying or selling opportunities?" accent="#22d3ee" minHeight={310}><TradingBiasWidget /></OverviewPanel></Grid>}
                     {visible.marketRisk && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Risk" subtitle="How careful should you be today?" accent="#fdb022" minHeight={310}><RiskMeterWidget /></OverviewPanel></Grid>}
                 </Grid>}
@@ -135,7 +136,16 @@ export default function MarketOverview() {
                     minHeight={420}
                     action={<Chip size="small" label="INTERACTIVE DEMO" variant="outlined" />}
                 >
-                    <ParticipationChartWidget />
+                    <ParticipationChartWidget
+                        key={`${timeframe}-${previewPreferences.marketUniverse}-${previewPreferences.chart.showNifty}-${previewPreferences.chart.showBankNifty}`}
+                        defaultRange={timeframe}
+                        universe={previewPreferences.marketUniverse}
+                        initialNifty={previewPreferences.chart.showNifty}
+                        initialBankNifty={previewPreferences.chart.showBankNifty}
+                        showEvents={previewPreferences.chart.showEvents}
+                        showInsights={previewPreferences.chart.showAiExplanations}
+                        showTooltips={previewPreferences.chart.showTooltips}
+                    />
                 </OverviewPanel>}
 
                 {(visible.sectorRotation || visible.marketBreadth) && <Grid container spacing={2.5}>
@@ -146,7 +156,7 @@ export default function MarketOverview() {
                     </Grid>}
                     {visible.marketBreadth && <Grid size={{ xs: 12, lg: 6 }}>
                         <OverviewPanel title="Stocks Going Up and Down" subtitle="A wider look at how many stocks are supporting the market." minHeight={330}>
-                            <MarketBreadthWidget />
+                            <MarketBreadthWidget shortNumbers={previewPreferences.numberFormat === "short"} showTooltips={previewPreferences.chart.showTooltips} />
                         </OverviewPanel>
                     </Grid>}
                 </Grid>}
@@ -190,7 +200,7 @@ export default function MarketOverview() {
                     minHeight={220}
                     action={<Chip size="small" color="warning" variant="outlined" label="DEMO VERDICT" />}
                 >
-                    <VerdictWidget />
+                    <VerdictWidget timeframe={timeframe} universe={previewPreferences.marketUniverse} language={previewPreferences.language} />
                 </OverviewPanel>}
             </Stack>
             <MarketOverviewCustomizeDrawer
@@ -200,6 +210,7 @@ export default function MarketOverview() {
                 onClose={() => setCustomizeOpen(false)}
                 onPreview={(next) => {
                     setPreviewPreferences(next);
+                    setTimeframe(next.defaultTimeframe);
                 }}
                 onSave={saveCustomization}
             />

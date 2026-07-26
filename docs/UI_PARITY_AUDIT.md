@@ -297,3 +297,11 @@ density and number-format choices. Presets and widget visibility preview immedia
 Cancel restores the saved view, all-widget hiding is blocked, and Save persists a
 versioned preference model under the current local user key. Data and widget business
 logic remain unchanged.
+
+Customize Drawer functionality is now connected end to end. Presets configure their
+timeframe, language, density, comparison lines and visible widgets; every manual change
+switches the preset to Custom. Live preview updates the participation chart, AI summary,
+verdict, health, trend, demo stock universe, explanations, tooltips, density and number
+format. AI Summary cannot be hidden, at least one analysis widget must remain, Reset
+requires confirmation, and Save is enabled only while an "Unsaved Changes" state exists.
+The local schema is version 2 and retains a service boundary for future account storage.

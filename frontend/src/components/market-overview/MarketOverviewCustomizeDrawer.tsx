@@ -4,6 +4,10 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import RestartAltRoundedIcon from "@mui/icons-material/RestartAltRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -67,22 +71,35 @@ interface Props {
 export default function MarketOverviewCustomizeDrawer({ open, value, onClose, onPreview, onSave }: Props) {
     const [draft, setDraft] = useState(value);
     const [warning, setWarning] = useState("");
+    const [resetOpen, setResetOpen] = useState(false);
     const visibleCount = useMemo(() => Object.values(draft.visibleWidgets).filter(Boolean).length, [draft.visibleWidgets]);
-    const update = (next: MarketOverviewPreferences) => {
+    const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(value), [draft, value]);
+    const analysisKeys: MarketOverviewWidgetKey[] = ["marketHealth", "marketTrend", "researchFocus", "marketRisk", "participationTrend", "sectorRotation", "marketBreadth", "bigInvestorActivity", "marketVolatility", "marketSentiment", "aiOpportunities"];
+    const preview = (next: MarketOverviewPreferences) => {
         setDraft(next);
         onPreview(next);
     };
+    const update = (next: MarketOverviewPreferences) => preview({ ...next, preset: "custom" });
     const choosePreset = (preset: DashboardPreset) => {
         if (preset === "custom") update({ ...draft, preset: "custom" });
-        else update(preferencesForPreset(preset));
+        else preview(preferencesForPreset(preset));
     };
     const toggleWidget = (key: MarketOverviewWidgetKey, checked: boolean) => {
+        if (key === "aiSummary" && !checked) {
+            setWarning("AI Market Summary must remain visible.");
+            return;
+        }
         if (!checked && visibleCount === 1 && draft.visibleWidgets[key]) {
             setWarning("Keep at least one widget visible.");
             return;
         }
+        const nextVisibility = { ...draft.visibleWidgets, [key]: checked };
+        if (!analysisKeys.some((analysisKey) => nextVisibility[analysisKey])) {
+            setWarning("Keep at least one market analysis widget visible.");
+            return;
+        }
         setWarning("");
-        update({ ...draft, preset: "custom", visibleWidgets: { ...draft.visibleWidgets, [key]: checked } });
+        update({ ...draft, visibleWidgets: nextVisibility });
     };
     const cancel = () => {
         onPreview(value);
@@ -99,7 +116,7 @@ export default function MarketOverviewCustomizeDrawer({ open, value, onClose, on
                     <Stack spacing={.7}>{presets.map(([key, label, text]) => <PresetButton key={key} label={label} text={text} selected={draft.preset === key} onClick={() => choosePreset(key)} />)}</Stack>
                 </Section>
                 <Section title="Visible Widgets" text={`${visibleCount} of ${marketOverviewWidgetKeys.length} widgets are visible.`}>
-                    <Stack spacing={.3}>{marketOverviewWidgetKeys.map((key) => <FormControlLabel key={key} sx={{ m: 0, py: .4, alignItems: "flex-start" }} control={<Switch size="small" checked={draft.visibleWidgets[key]} onChange={(event) => toggleWidget(key, event.target.checked)} />} label={<RadioLabel title={widgetLabels[key][0]} text={widgetLabels[key][1]} />} />)}</Stack>
+                    <Stack spacing={.3}>{marketOverviewWidgetKeys.map((key) => <FormControlLabel key={key} sx={{ m: 0, py: .4, alignItems: "flex-start" }} control={<Switch size="small" disabled={key === "aiSummary"} checked={draft.visibleWidgets[key]} onChange={(event) => toggleWidget(key, event.target.checked)} />} label={<RadioLabel title={widgetLabels[key][0]} text={key === "aiSummary" ? "This explanation always remains visible." : widgetLabels[key][1]} />} />)}</Stack>
                     {warning && <Typography color="warning.main" sx={{ mt: .7, fontSize: ".65rem" }}>{warning}</Typography>}
                 </Section>
                 <Section title="Default Timeframe" text="Choose the time period you want to see first when you return.">
@@ -126,12 +143,18 @@ export default function MarketOverviewCustomizeDrawer({ open, value, onClose, on
                     <RadioGroup value={draft.numberFormat} onChange={(event) => update({ ...draft, numberFormat: event.target.value as MarketOverviewPreferences["numberFormat"] })}><FormControlLabel value="full" control={<Radio size="small" />} label={<RadioLabel title="Full Numbers" text="Show complete values such as 1,250." />} /><FormControlLabel value="short" control={<Radio size="small" />} label={<RadioLabel title="Short Numbers (1.2K)" text="Shorten large values so they take less space." />} /></RadioGroup>
                 </Section>
             </Stack>
+            {dirty && <Typography color="warning.main" sx={{ px: 2.5, pt: 1, fontSize: ".66rem", fontWeight: 850 }}>Unsaved Changes</Typography>}
             <Stack direction="row" spacing={1} sx={{ p: 2, borderTop: "1px solid", borderColor: "divider" }}>
-                <Button startIcon={<RestartAltRoundedIcon />} onClick={() => update(defaultMarketOverviewPreferences)}>Reset to Default</Button>
+                <Button startIcon={<RestartAltRoundedIcon />} onClick={() => setResetOpen(true)}>Reset to Default</Button>
                 <Button sx={{ ml: "auto" }} onClick={cancel}>Cancel</Button>
-                <Button variant="contained" onClick={() => onSave(draft)}>Save Dashboard</Button>
+                <Button variant="contained" disabled={!dirty} onClick={() => onSave(draft)}>Save Dashboard</Button>
             </Stack>
         </Stack>
+        <Dialog open={resetOpen} onClose={() => setResetOpen(false)}>
+            <DialogTitle>Reset Market Overview?</DialogTitle>
+            <DialogContent><Typography color="text.secondary">This will restore the AlphaEdge default choices in the preview. Click Save Dashboard if you want to keep them.</Typography></DialogContent>
+            <DialogActions><Button onClick={() => setResetOpen(false)}>Keep My Choices</Button><Button color="warning" variant="contained" onClick={() => { preview(defaultMarketOverviewPreferences); setResetOpen(false); }}>Reset Preview</Button></DialogActions>
+        </Dialog>
     </Drawer>;
 }
 
