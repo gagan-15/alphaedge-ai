@@ -4,6 +4,7 @@ import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
 import { useEffect, useMemo, useState } from "react";
 
 import { getTimeframeConfluence } from "../../api/scannerApi";
@@ -13,6 +14,7 @@ import type {
     TimeframeConfluenceResponse,
     ZoneResearchResult,
 } from "../../types/scanner";
+import { overlayStyles } from "../../services/overlayService";
 
 interface Props {
     result: ZoneResearchResult;
@@ -22,6 +24,7 @@ interface Props {
     onToggleVisibility: () => void;
     onClearOverlays: () => void;
     onAvailableOverlays: (overlays: ConfluenceChartOverlay[]) => void;
+    inspectedTimeframe?: string;
 }
 
 function overlayFrom(frame: ConfluenceTimeframe): ConfluenceChartOverlay | null {
@@ -32,6 +35,11 @@ function overlayFrom(frame: ConfluenceTimeframe): ConfluenceChartOverlay | null 
         zoneType: frame.zone.zone_type,
         proximalPrice: frame.zone.proximal_price,
         distalPrice: frame.zone.distal_price,
+        quality: frame.zone.quality,
+        overlapPercent: frame.zone.overlap_percent,
+        distancePercent: frame.zone.distance_percent,
+        freshness: frame.zone.freshness,
+        retests: frame.zone.retests,
     };
 }
 
@@ -43,10 +51,12 @@ function TimeframeConfluenceExplorer({
     onToggleVisibility,
     onClearOverlays,
     onAvailableOverlays,
+    inspectedTimeframe,
 }: Props) {
     const [received, setReceived] = useState<{ key: string; data: TimeframeConfluenceResponse } | null>(null);
     const [failedKey, setFailedKey] = useState("");
     const [confirmedOnly, setConfirmedOnly] = useState(false);
+    const [strongOnly, setStrongOnly] = useState(false);
     const requestKey = `${result.symbol}:${result.timeframe}:${result.zone_type}:${result.proximal_price}:${result.distal_price}:${result.base_date}`;
     const response = received?.key === requestKey ? received.data : null;
     const error = failedKey === requestKey ? "Higher-timeframe analysis is unavailable right now." : "";
@@ -79,11 +89,20 @@ function TimeframeConfluenceExplorer({
         };
     }, [onAvailableOverlays, requestKey, result]);
 
+    useEffect(() => {
+        if (!inspectedTimeframe) return;
+        document.getElementById(`confluence-card-${inspectedTimeframe}`)?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+        });
+    }, [inspectedTimeframe]);
+
     const frames = useMemo(
-        () => response?.higher_timeframes.filter(
-            (frame) => !confirmedOnly || frame.status === "CONFIRMED",
+        () => response?.higher_timeframes.filter((frame) =>
+            (!confirmedOnly || frame.status === "CONFIRMED")
+            && (!strongOnly || (frame.zone?.quality ?? 0) >= 75)
         ) ?? [],
-        [confirmedOnly, response],
+        [confirmedOnly, response, strongOnly],
     );
     const availableOverlays = useMemo(
         () => response?.higher_timeframes
@@ -124,6 +143,9 @@ function TimeframeConfluenceExplorer({
                 <Button size="small" variant={!confirmedOnly ? "contained" : "outlined"} onClick={() => setConfirmedOnly(false)}>
                     Show all cards
                 </Button>
+                <Button size="small" variant={strongOnly ? "contained" : "outlined"} onClick={() => setStrongOnly((value) => !value)}>
+                    Show strong confluence only
+                </Button>
                 <Button size="small" variant="outlined" onClick={onToggleVisibility}>
                     {overlaysHidden ? "Show overlays" : "Hide overlays"}
                 </Button>
@@ -144,8 +166,15 @@ function TimeframeConfluenceExplorer({
                 const overlay = overlayFrom(frame);
                 const selected = activeTimeframes.includes(frame.timeframe) && !overlaysHidden;
                 return (
-                    <Box
+                    <Tooltip
                         key={frame.timeframe}
+                        placement="left"
+                        title={frame.zone
+                            ? `${frame.timeframe_name} · ${frame.zone.zone_type} · ₹${frame.zone.lower_price.toLocaleString("en-IN")}–₹${frame.zone.upper_price.toLocaleString("en-IN")} · Quality ${frame.zone.quality.toFixed(0)} · Overlap ${frame.zone.overlap_percent.toFixed(1)}% · Distance ${frame.zone.distance_percent.toFixed(2)}% · ${frame.zone.freshness} · ${frame.zone.retests} retests`
+                            : `${frame.timeframe_name}: no validated zone`}
+                    >
+                    <Box
+                        id={`confluence-card-${frame.timeframe}`}
                         component={overlay ? "button" : "div"}
                         type={overlay ? "button" : undefined}
                         onClick={overlay ? () => {
@@ -158,9 +187,9 @@ function TimeframeConfluenceExplorer({
                             textAlign: "left",
                             font: "inherit",
                             cursor: overlay ? "pointer" : "default",
-                            bgcolor: selected ? "rgba(99,102,241,.12)" : "transparent",
+                            bgcolor: selected || inspectedTimeframe === frame.timeframe ? "rgba(99,102,241,.12)" : "transparent",
                             border: "1px solid",
-                            borderColor: selected ? "primary.main" : "divider",
+                            borderColor: selected || inspectedTimeframe === frame.timeframe ? overlayStyles[frame.timeframe]?.color ?? "primary.main" : "divider",
                             borderRadius: 1.5,
                         }}
                     >
@@ -179,11 +208,14 @@ function TimeframeConfluenceExplorer({
                                 <Typography variant="caption">₹{frame.zone.lower_price.toLocaleString("en-IN")}–₹{frame.zone.upper_price.toLocaleString("en-IN")}</Typography>
                                 <Typography variant="caption">Overlap {frame.zone.overlap_percent.toFixed(1)}%</Typography>
                                 <Typography variant="caption">Distance {frame.zone.distance_percent.toFixed(2)}%</Typography>
+                                <Typography variant="caption">{frame.zone.freshness}</Typography>
+                                <Typography variant="caption">Retests {frame.zone.retests}</Typography>
                             </Stack>
                         )}
                         <Typography variant="body2" color="text.secondary" sx={{ mt: .5 }}>{frame.explanation}</Typography>
                         {overlay && <Typography variant="caption" color="primary.main">{selected ? "Shown on chart. Click to remove." : "Click to show this zone on the chart."}</Typography>}
                     </Box>
+                    </Tooltip>
                 );
             })}
             {!frames.length && <Typography color="text.secondary">No confirmed higher-timeframe zones were found.</Typography>}

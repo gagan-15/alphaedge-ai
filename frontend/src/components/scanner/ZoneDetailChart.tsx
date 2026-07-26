@@ -22,6 +22,7 @@ import Typography from "@mui/material/Typography";
 import { getMarketCandles } from "../../api/marketApi";
 import type { ConfluenceChartOverlay, ZoneResearchResult } from "../../types/scanner";
 import { zoneSequenceLabel } from "./zoneLabels";
+import { overlayStyles } from "../../services/overlayService";
 
 const patternLabels: Record<string, string> = {
     DROP_BASE_RALLY: "DBR",
@@ -41,9 +42,12 @@ const confluenceTimeframes = [
 interface ZoneDetailChartProps {
     result: ZoneResearchResult;
     zones?: ZoneResearchResult[];
+    selectedZoneId?: string;
     confluenceOverlays?: ConfluenceChartOverlay[];
     availableConfluenceOverlays?: ConfluenceChartOverlay[];
     onToggleConfluenceOverlay?: (overlay: ConfluenceChartOverlay) => void;
+    onInspectConfluenceOverlay?: (timeframe: string) => void;
+    inspectedConfluenceTimeframe?: string;
     height?: number;
     showTools?: boolean;
 }
@@ -51,9 +55,12 @@ interface ZoneDetailChartProps {
 function ZoneDetailChart({
     result,
     zones = [result],
+    selectedZoneId,
     confluenceOverlays = [],
     availableConfluenceOverlays = [],
     onToggleConfluenceOverlay,
+    onInspectConfluenceOverlay,
+    inspectedConfluenceTimeframe,
     height = 360,
     showTools = false,
 }: ZoneDetailChartProps) {
@@ -64,6 +71,7 @@ function ZoneDetailChart({
     const baseZoneBoundarySeriesRef = useRef<ISeriesApi<"Line">[]>([]);
     const confluenceSeriesRef = useRef<ISeriesApi<"Baseline">[]>([]);
     const confluenceBoundarySeriesRef = useRef<ISeriesApi<"Line">[]>([]);
+    const confluenceSeriesMapRef = useRef(new Map<ISeriesApi<"Baseline">, ConfluenceChartOverlay>());
     const measurementAreaSeriesRef = useRef<ISeriesApi<"Baseline"> | null>(null);
     const measurementBoundarySeriesRef = useRef<ISeriesApi<"Line">[]>([]);
     const measurementSelectionRef = useRef<{
@@ -88,6 +96,7 @@ function ZoneDetailChart({
     const [measurementLabel, setMeasurementLabel] = useState<{ left: number; top: number; text: string } | null>(null);
     const executionIndex = confluenceTimeframes.findIndex((item) => item.timeframe === result.timeframe);
     const higherTimeframeButtons = executionIndex < 0 ? [] : confluenceTimeframes.slice(executionIndex + 1);
+    const inspectedOverlay = availableConfluenceOverlays.find((overlay) => overlay.timeframe === inspectedConfluenceTimeframe);
     const updateMeasurementLabel = useCallback(() => {
         const chart = chartRef.current;
         const candles = candleSeriesRef.current;
@@ -115,6 +124,7 @@ function ZoneDetailChart({
         const container = containerRef.current;
         if (!container) return;
         let cancelled = false;
+        const confluenceSeriesMap = confluenceSeriesMapRef.current;
         setLoading(true);
         setError("");
 
@@ -186,6 +196,14 @@ function ZoneDetailChart({
                 candleStepRef.current = candleStep;
                 const futureZonePoints = 12;
                 chart.subscribeClick((param) => {
+                    if (!measuringRef.current && onInspectConfluenceOverlay) {
+                        for (const [series, overlay] of confluenceSeriesMap) {
+                            if (param.seriesData.has(series)) {
+                                onInspectConfluenceOverlay(overlay.timeframe);
+                                return;
+                            }
+                        }
+                    }
                     if (!measuringRef.current || !param.point || !param.time) return;
                     const price = candles.coordinateToPrice(param.point.y);
                     if (price === null) return;
@@ -260,15 +278,16 @@ function ZoneDetailChart({
                     const demand = displayZone.zone_type === "DEMAND";
                     const zoneColor = demand ? "#1d8cff" : "#ff2f68";
                     const zoneLabel = zoneSequenceLabel(zones, zoneIndex);
+                    const selected = !selectedZoneId || zoneLabel === selectedZoneId;
                     const zone = chart.addSeries(BaselineSeries, {
                         baseValue: { type: "price", price: displayZone.distal_price },
                         topLineColor: zoneColor,
-                        topFillColor1: demand ? `rgba(29,140,255,${Math.max(.24, .52 - zoneIndex * .08)})` : `rgba(255,47,104,${Math.max(.24, .52 - zoneIndex * .08)})`,
-                        topFillColor2: demand ? "rgba(29,140,255,.22)" : "rgba(255,47,104,.22)",
+                        topFillColor1: demand ? `rgba(29,140,255,${selected ? .48 : .12})` : `rgba(255,47,104,${selected ? .48 : .12})`,
+                        topFillColor2: demand ? `rgba(29,140,255,${selected ? .22 : .06})` : `rgba(255,47,104,${selected ? .22 : .06})`,
                         bottomLineColor: zoneColor,
                         bottomFillColor1: demand ? "rgba(29,140,255,.38)" : "rgba(255,47,104,.38)",
                         bottomFillColor2: demand ? "rgba(29,140,255,.22)" : "rgba(255,47,104,.22)",
-                        lineWidth: 2,
+                        lineWidth: selected ? 3 : 1,
                         priceLineVisible: false,
                         lastValueVisible: false,
                     });
@@ -288,7 +307,7 @@ function ZoneDetailChart({
                     baseZoneAreaSeriesRef.current.push(zone);
                     const proximalBoundary = chart.addSeries(LineSeries, {
                         color: zoneColor,
-                        lineWidth: 2,
+                        lineWidth: selected ? 3 : 1,
                         lineStyle: LineStyle.Solid,
                         priceLineVisible: false,
                         lastValueVisible: true,
@@ -296,7 +315,7 @@ function ZoneDetailChart({
                     });
                     const distalBoundary = chart.addSeries(LineSeries, {
                         color: zoneColor,
-                        lineWidth: 1,
+                        lineWidth: selected ? 2 : 1,
                         lineStyle: LineStyle.Dashed,
                         priceLineVisible: false,
                         lastValueVisible: true,
@@ -332,13 +351,14 @@ function ZoneDetailChart({
             baseZoneBoundarySeriesRef.current = [];
             confluenceSeriesRef.current = [];
             confluenceBoundarySeriesRef.current = [];
+            confluenceSeriesMap.clear();
             measurementAreaSeriesRef.current = null;
             measurementBoundarySeriesRef.current = [];
             measurementSelectionRef.current = null;
             candleTimesRef.current = [];
             chart = null as never;
         };
-    }, [height, result, updateMeasurementLabel, zones]);
+    }, [height, onInspectConfluenceOverlay, result, selectedZoneId, updateMeasurementLabel, zones]);
 
     useEffect(() => {
         const chart = chartRef.current;
@@ -350,11 +370,13 @@ function ZoneDetailChart({
         confluenceSeriesRef.current.forEach((series) => chart.removeSeries(series));
         confluenceBoundarySeriesRef.current = [];
         confluenceSeriesRef.current = [];
+        confluenceSeriesMapRef.current.clear();
 
         const styles = [LineStyle.Dashed, LineStyle.Dotted, LineStyle.LargeDashed, LineStyle.SparseDotted];
         confluenceOverlays.forEach((overlay, index) => {
             const demand = overlay.zoneType === "DEMAND";
-            const color = demand ? "#1d8cff" : "#ff2f68";
+            const style = overlayStyles[overlay.timeframe] ?? { color: demand ? "#1d8cff" : "#ff2f68", width: 2 as const };
+            const color = style.color;
             const lower = Math.min(overlay.proximalPrice, overlay.distalPrice);
             const upper = Math.max(overlay.proximalPrice, overlay.distalPrice);
             const series = chart.addSeries(BaselineSeries, {
@@ -365,8 +387,8 @@ function ZoneDetailChart({
                 bottomLineColor: color,
                 bottomFillColor1: demand ? "rgba(29,140,255,.12)" : "rgba(255,47,104,.12)",
                 bottomFillColor2: "rgba(0,0,0,0)",
-                lineWidth: 2,
-                lineStyle: styles[index % styles.length],
+                lineWidth: style.width,
+                lineStyle: overlay.timeframe === "1M" ? LineStyle.Solid : styles[index % styles.length],
                 priceLineVisible: false,
                 lastValueVisible: false,
                 autoscaleInfoProvider: () => null,
@@ -385,10 +407,11 @@ function ZoneDetailChart({
             }
             series.setData(overlayData);
             confluenceSeriesRef.current.push(series);
+            confluenceSeriesMapRef.current.set(series, overlay);
             const upperBoundary = chart.addSeries(LineSeries, {
                 color,
-                lineWidth: 1,
-                lineStyle: styles[index % styles.length],
+                lineWidth: style.width,
+                lineStyle: overlay.timeframe === "1M" ? LineStyle.Solid : styles[index % styles.length],
                 priceLineVisible: false,
                 lastValueVisible: true,
                 title: `${overlay.timeframe} HTF`,
@@ -396,8 +419,8 @@ function ZoneDetailChart({
             });
             const lowerBoundary = chart.addSeries(LineSeries, {
                 color,
-                lineWidth: 1,
-                lineStyle: styles[index % styles.length],
+                lineWidth: style.width,
+                lineStyle: overlay.timeframe === "1M" ? LineStyle.Solid : styles[index % styles.length],
                 priceLineVisible: false,
                 lastValueVisible: false,
                 autoscaleInfoProvider: () => null,
@@ -484,7 +507,12 @@ function ZoneDetailChart({
                             size="small"
                             variant={selected ? "contained" : "outlined"}
                             onClick={() => onToggleConfluenceOverlay(overlay)}
-                            sx={{ color: selected ? undefined : overlay.zoneType === "DEMAND" ? "#60a5fa" : "#ff6b8a" }}
+                            sx={{
+                                color: selected ? "#07111e" : overlayStyles[overlay.timeframe]?.color,
+                                bgcolor: selected ? overlayStyles[overlay.timeframe]?.color : undefined,
+                                borderColor: overlayStyles[overlay.timeframe]?.color,
+                                "&:hover": { bgcolor: selected ? overlayStyles[overlay.timeframe]?.color : undefined },
+                            }}
                         >
                             {timeframe.name}
                         </Button>;
@@ -493,6 +521,16 @@ function ZoneDetailChart({
                         No higher timeframe is selected by default.
                     </Typography>
                 </Stack>
+            )}
+            {inspectedOverlay && (
+                <Box sx={{ px: 1.5, py: 1, bgcolor: "rgba(15,23,42,.96)", borderBottom: "1px solid", borderColor: overlayStyles[inspectedOverlay.timeframe]?.color ?? "divider" }}>
+                    <Typography sx={{ fontWeight: 850 }}>
+                        {inspectedOverlay.timeframeName} · {inspectedOverlay.zoneType === "DEMAND" ? "Demand" : "Supply"} · ₹{Math.min(inspectedOverlay.proximalPrice, inspectedOverlay.distalPrice).toLocaleString("en-IN")}–₹{Math.max(inspectedOverlay.proximalPrice, inspectedOverlay.distalPrice).toLocaleString("en-IN")}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                        Quality {inspectedOverlay.quality.toFixed(0)} · Overlap {inspectedOverlay.overlapPercent.toFixed(1)}% · Distance {inspectedOverlay.distancePercent.toFixed(2)}% · {inspectedOverlay.freshness} · {inspectedOverlay.retests} retests
+                    </Typography>
+                </Box>
             )}
             {loading && <Box sx={{ height, display: "grid", placeItems: "center" }}><CircularProgress size={28} /></Box>}
             {error && <Alert severity="warning">{error}</Alert>}

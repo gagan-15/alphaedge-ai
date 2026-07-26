@@ -404,3 +404,20 @@ percentage are displayed inside the selected range and follow it during pan and 
 Higher-timeframe buttons are also available directly above the chart, start unselected
 and add only the timeframe the user chooses. Far-away overlays are excluded from candle
 autoscaling so they cannot flatten the market chart.
+
+Stock Details now uses one stable selected zone ID as its source of truth. Demand and
+supply IDs are assigned deterministically from type, base date and coordinates, so
+sorting the scanner cannot silently rename a zone. Opening a grouped scanner row uses
+the exact row zone; it no longer falls back to the first or highest-quality zone. The
+header, selected chart emphasis, AI Decision, Trade Confidence, Trading Plan, checklist,
+analysis sections and confluence request all receive the same selected result. All
+Active Zones is now a no-reload selector with a clear Selected state. Scanner Quality
+and the main Details Zone Quality both display the same rule-based scanner score.
+
+Higher-timeframe overlays use a shared style and preference service: Weekly is orange,
+Monthly purple, Quarterly blue, Half-Yearly cyan and Yearly gold, with distinct line
+weights or patterns. The last enabled timeframe set is stored locally and restored
+only after cached confluence data is available. Show-all, temporary hide, clear,
+confirmed-only and strong-only controls do not trigger market-data recalculation.
+Clicking an overlay highlights and scrolls to its matching card; the chart displays
+the selected overlay's range, quality, overlap, distance, freshness and retest count.

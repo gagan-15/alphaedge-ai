@@ -192,6 +192,10 @@ class TimeframeConfluenceService:
                         "quality": round(score, 1),
                         "overlap_percent": round(overlap, 1),
                         "distance_percent": round(distance, 2),
+                        "freshness": (
+                            "Fresh" if selected.is_fresh else "Retested"
+                        ),
+                        "retests": selected.touch_count,
                     },
                     "explanation": self._explanation(
                         timeframe,

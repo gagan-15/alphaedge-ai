@@ -50,12 +50,12 @@ function readObjects(key: string): Record<string, unknown>[] {
     }
 }
 
-function recommendation(analysis: StockZoneAnalysis | null, tradeConfidence: number) {
+function recommendation(analysis: StockZoneAnalysis | null, zoneQuality: number, tradeConfidence: number) {
     if (analysis?.broken) return "Invalidated";
     if (!analysis) return "Calculating";
-    if (analysis.zoneQualityScore >= 75 && tradeConfidence >= 70) return "Strong setup — wait for confirmation";
-    if (analysis.zoneQualityScore >= 60 && tradeConfidence >= 50) return "Watch";
-    if (analysis.zoneQualityScore >= 60) return "Wait for confirmation";
+    if (zoneQuality >= 75 && tradeConfidence >= 70) return "Strong setup — wait for confirmation";
+    if (zoneQuality >= 60 && tradeConfidence >= 50) return "Watch";
+    if (zoneQuality >= 60) return "Wait for confirmation";
     return "Weak setup";
 }
 
@@ -106,6 +106,7 @@ interface ZoneExplanationPanelProps {
     onToggleConfluenceVisibility?: () => void;
     onClearConfluenceOverlays?: () => void;
     onAvailableConfluenceOverlays?: (overlays: ConfluenceChartOverlay[]) => void;
+    inspectedConfluenceTimeframe?: string;
 }
 
 function ZoneExplanationPanel({
@@ -116,6 +117,7 @@ function ZoneExplanationPanel({
     onToggleConfluenceVisibility,
     onClearConfluenceOverlays,
     onAvailableConfluenceOverlays,
+    inspectedConfluenceTimeframe,
 }: ZoneExplanationPanelProps) {
     const [message, setMessage] = useState("");
     const selectedAnalysisKey = `${result.symbol}:${result.timeframe}:${result.zone_type}:${result.proximal_price}:${result.distal_price}:${result.base_index}`;
@@ -305,7 +307,7 @@ function ZoneExplanationPanel({
                             <Grid size={{ xs: 6 }}>
                                 <Typography color="text.secondary" variant="overline">Zone Quality</Typography>
                                 <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
-                                    <Typography variant="h2">{analysis?.zoneQualityScore.toFixed(0) ?? "—"}</Typography>
+                                    <Typography variant="h2">{result.zone_score.toFixed(0)}</Typography>
                                     <Typography color="text.secondary">/ 100</Typography>
                                 </Stack>
                                 <Typography variant="caption" color="text.secondary">How well the zone itself was formed.</Typography>
@@ -319,7 +321,7 @@ function ZoneExplanationPanel({
                                 <Typography variant="caption" color="text.secondary">How supportive current conditions are.</Typography>
                             </Grid>
                             <Grid size={{ xs: 12 }}>
-                                <Chip label={recommendation(analysis, tradeConfidence)} color={analysis?.broken ? "error" : analysis && analysis.zoneQualityScore >= 75 && tradeConfidence >= 70 ? "success" : "warning"} />
+                                <Chip label={recommendation(analysis, result.zone_score, tradeConfidence)} color={analysis?.broken ? "error" : analysis && result.zone_score >= 75 && tradeConfidence >= 70 ? "success" : "warning"} />
                                 <Typography sx={{ mt: 1, fontWeight: 800 }}>{dataConfidence}</Typography>
                                 <Typography variant="caption" color="text.secondary">This shows data coverage, not the chance of profit.</Typography>
                             </Grid>
@@ -452,6 +454,7 @@ function ZoneExplanationPanel({
                                 onToggleVisibility={onToggleConfluenceVisibility}
                                 onClearOverlays={onClearConfluenceOverlays}
                                 onAvailableOverlays={onAvailableConfluenceOverlays}
+                                inspectedTimeframe={inspectedConfluenceTimeframe}
                             />
                         </Section>
                     )}

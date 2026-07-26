@@ -116,6 +116,8 @@ export interface ConfluenceZone {
     quality: number;
     overlap_percent: number;
     distance_percent: number;
+    freshness: string;
+    retests: number;
 }
 
 export interface ConfluenceTimeframe {
@@ -147,4 +149,9 @@ export interface ConfluenceChartOverlay {
     zoneType: string;
     proximalPrice: number;
     distalPrice: number;
+    quality: number;
+    overlapPercent: number;
+    distancePercent: number;
+    freshness: string;
+    retests: number;
 }

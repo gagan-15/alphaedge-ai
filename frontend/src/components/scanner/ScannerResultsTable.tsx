@@ -19,12 +19,14 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import Typography from "@mui/material/Typography";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { ConfluenceChartOverlay, ZoneResearchResult } from "../../types/scanner";
 import ZoneDetailChart from "./ZoneDetailChart";
 import ZoneExplanationPanel from "./ZoneExplanationPanel";
 import { zoneSequenceLabel } from "./zoneLabels";
+import { readOverlayTimeframes, saveOverlayTimeframes } from "../../services/overlayService";
+import { selectZoneById, zoneIdFor } from "../../services/zoneSelectionService";
 
 interface ScannerResultsTableProps {
     results: ZoneResearchResult[];
@@ -53,9 +55,11 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
     const [sortField, setSortField] = useState<"symbol" | "zone_score" | "distance_percent">("zone_score");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
     const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>([]);
+    const [selectedZoneId, setSelectedZoneId] = useState("");
     const [confluenceOverlays, setConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
     const [availableConfluenceOverlays, setAvailableConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
     const [confluenceOverlaysHidden, setConfluenceOverlaysHidden] = useState(false);
+    const [inspectedConfluenceTimeframe, setInspectedConfluenceTimeframe] = useState("");
     const [fullChartHeight, setFullChartHeight] = useState(() =>
         Math.max(420, Math.min(680, window.innerHeight - 300))
     );
@@ -100,25 +104,47 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
         }
     }
 
-    function openStock(zones: ZoneResearchResult[]) {
+    function openStock(zones: ZoneResearchResult[], selectedZone: ZoneResearchResult) {
         setConfluenceOverlays([]);
         setAvailableConfluenceOverlays([]);
         setConfluenceOverlaysHidden(false);
+        setInspectedConfluenceTimeframe("");
         setSelectedZones(zones);
+        setSelectedZoneId(zoneIdFor(zones, selectedZone));
     }
 
     function closeStock() {
         setSelectedZones([]);
+        setSelectedZoneId("");
         setConfluenceOverlays([]);
         setAvailableConfluenceOverlays([]);
         setConfluenceOverlaysHidden(false);
+        setInspectedConfluenceTimeframe("");
     }
 
     function toggleConfluenceOverlay(overlay: ConfluenceChartOverlay) {
         setConfluenceOverlaysHidden(false);
-        setConfluenceOverlays((current) => current.some((item) => item.timeframe === overlay.timeframe)
-            ? current.filter((item) => item.timeframe !== overlay.timeframe)
-            : [...current, overlay]);
+        setInspectedConfluenceTimeframe("");
+        setConfluenceOverlays((current) => {
+            const next = current.some((item) => item.timeframe === overlay.timeframe)
+                ? current.filter((item) => item.timeframe !== overlay.timeframe)
+                : [...current, overlay];
+            saveOverlayTimeframes(next.map((item) => item.timeframe));
+            return next;
+        });
+    }
+
+    const handleAvailableConfluenceOverlays = useCallback((overlays: ConfluenceChartOverlay[]) => {
+        setAvailableConfluenceOverlays(overlays);
+        const saved = readOverlayTimeframes();
+        setConfluenceOverlays(overlays.filter((overlay) => saved.includes(overlay.timeframe)));
+    }, []);
+
+    function chooseZone(zone: ZoneResearchResult) {
+        setSelectedZoneId(zoneIdFor(selectedZones, zone));
+        setConfluenceOverlays([]);
+        setAvailableConfluenceOverlays([]);
+        setConfluenceOverlaysHidden(false);
     }
 
     function sortableLabel(field: typeof sortField, label: string) {
@@ -169,7 +195,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                     const zoneKey = `${result.symbol}-${result.zone_type}-${result.base_date}-${result.proximal_price}`;
                                     const status = result.status;
                                     return (
-                                            <TableRow key={zoneKey} hover onClick={() => openStock(zones)} sx={{ cursor: "pointer" }}>
+                                            <TableRow key={zoneKey} hover onClick={() => openStock(zones, result)} sx={{ cursor: "pointer" }}>
                                                 <TableCell>
                                                     <IconButton size="small" aria-label={`Open ${result.symbol} full-screen chart`}>
                                                         <KeyboardArrowRightRoundedIcon />
@@ -225,14 +251,15 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
             </CardContent>
             <Dialog fullScreen open={selectedZones.length > 0} onClose={closeStock}>
                 {selectedZones.length > 0 && (() => {
-                    const selectedZone = selectedZones[0];
+                    const selectedZone = selectZoneById(selectedZones, selectedZoneId);
+                    if (!selectedZone) return null;
                     return <>
                     <DialogTitle sx={{ py: 1.25, borderBottom: "1px solid", borderColor: "divider" }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
                             <FullscreenRoundedIcon color="primary" />
                             <Box>
-                                <Typography variant="h6">{selectedZone.symbol} · {selectedZone.zone_type} · {patternLabels[selectedZone.pattern_type ?? ""]}</Typography>
-                                <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · delayed data · no order execution</Typography>
+                                <Typography variant="h6">{selectedZone.symbol} · Selected Zone {selectedZoneId} · {selectedZone.zone_type} · {patternLabels[selectedZone.pattern_type ?? ""]}</Typography>
+                                <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · Quality {selectedZone.zone_score.toFixed(0)} · delayed data · no order execution</Typography>
                             </Box>
                             <Chip sx={{ ml: "auto" }} color={selectedZone.zone_type === "DEMAND" ? "primary" : "error"} label={`${selectedZone.zone_score.toFixed(0)} · scanner rank`} />
                             <IconButton aria-label="Close full-screen chart" onClick={closeStock}><CloseRoundedIcon /></IconButton>
@@ -244,9 +271,12 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                 <ZoneDetailChart
                                     result={selectedZone}
                                     zones={selectedZones}
+                                    selectedZoneId={selectedZoneId}
                                     confluenceOverlays={confluenceOverlaysHidden ? [] : confluenceOverlays}
                                     availableConfluenceOverlays={availableConfluenceOverlays}
                                     onToggleConfluenceOverlay={toggleConfluenceOverlay}
+                                    onInspectConfluenceOverlay={setInspectedConfluenceTimeframe}
+                                    inspectedConfluenceTimeframe={inspectedConfluenceTimeframe}
                                     height={fullChartHeight}
                                     showTools
                                 />
@@ -256,10 +286,23 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                     <Card sx={{ mb: 1.25 }}><CardContent>
                                         <Typography variant="h6">All active zones</Typography>
                                         <Stack spacing={.75} sx={{ mt: 1 }}>
-                                            {selectedZones.map((zone, zoneIndex) => <Box key={`${zone.base_date}-${zone.proximal_price}`} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.5 }}>
-                                                <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography sx={{ fontWeight: 800 }}>{zoneSequenceLabel(selectedZones, zoneIndex)} · {zone.zone_type} · {patternLabels[zone.pattern_type ?? ""]}</Typography><Chip size="small" label={zone.zone_score.toFixed(0)} /></Stack>
-                                                <Typography variant="caption" color="text.secondary">Proximal ₹{zone.proximal_price.toLocaleString("en-IN")} · Distal ₹{zone.distal_price.toLocaleString("en-IN")} · {zone.status} · {zone.base_date}</Typography>
-                                            </Box>)}
+                                            {selectedZones.map((zone, zoneIndex) => {
+                                                const zoneId = zoneSequenceLabel(selectedZones, zoneIndex);
+                                                const selected = zoneId === selectedZoneId;
+                                                return <Box
+                                                    key={`${zone.base_date}-${zone.proximal_price}`}
+                                                    component="button"
+                                                    type="button"
+                                                    onClick={() => chooseZone(zone)}
+                                                    sx={{ width: "100%", p: 1, textAlign: "left", color: "inherit", font: "inherit", cursor: "pointer", bgcolor: selected ? "rgba(99,102,241,.14)" : "transparent", border: "1px solid", borderColor: selected ? "primary.main" : "divider", borderRadius: 1.5 }}
+                                                >
+                                                    <Stack direction="row" sx={{ justifyContent: "space-between", gap: 1 }}>
+                                                        <Typography sx={{ fontWeight: 800 }}>{selected ? "✓ " : ""}{zoneId} · {zone.zone_type} · {patternLabels[zone.pattern_type ?? ""]}</Typography>
+                                                        <Chip size="small" label={`Quality ${zone.zone_score.toFixed(0)}`} />
+                                                    </Stack>
+                                                    <Typography variant="caption" color="text.secondary">Status {zone.status} · Base {zone.base_date}{selected ? " · Selected" : " · Click to analyze"}</Typography>
+                                                </Box>;
+                                            })}
                                         </Stack>
                                     </CardContent></Card>
                                     <ZoneExplanationPanel
@@ -271,8 +314,10 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                         onClearConfluenceOverlays={() => {
                                             setConfluenceOverlays([]);
                                             setConfluenceOverlaysHidden(false);
+                                            saveOverlayTimeframes([]);
                                         }}
-                                        onAvailableConfluenceOverlays={setAvailableConfluenceOverlays}
+                                        onAvailableConfluenceOverlays={handleAvailableConfluenceOverlays}
+                                        inspectedConfluenceTimeframe={inspectedConfluenceTimeframe}
                                     />
                                 </Box>
                             </Grid>
