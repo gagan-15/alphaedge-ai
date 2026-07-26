@@ -37,13 +37,13 @@ function saveUnique(key: string, value: string) {
     localStorage.setItem(key, JSON.stringify([...new Set([...readList(key), value])]));
 }
 
-function recommendation(result: ZoneResearchResult, analysis: StockZoneAnalysis | null) {
+function recommendation(analysis: StockZoneAnalysis | null, tradeConfidence: number) {
     if (analysis?.broken) return "Invalidated";
-    if (result.status === "IN ZONE" && result.zone_score >= 75) return "Wait for confirmation";
-    if (result.distance_percent <= 3 && result.zone_score >= 75) return "Watch closely";
-    if (result.zone_score >= 75) return "Add to watchlist";
-    if (result.zone_score >= 60) return "Wait for stronger evidence";
-    return "Avoid for now";
+    if (!analysis) return "Calculating";
+    if (analysis.zoneQualityScore >= 75 && tradeConfidence >= 70) return "Strong setup — wait for confirmation";
+    if (analysis.zoneQualityScore >= 60 && tradeConfidence >= 50) return "Watch";
+    if (analysis.zoneQualityScore >= 60) return "Wait for confirmation";
+    return "Weak setup";
 }
 
 function Field({ label, value, note }: { label: string; value: string; note?: string }) {
@@ -90,6 +90,7 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
     const [analysis, setAnalysis] = useState<StockZoneAnalysis | null>(null);
     const [backendAnalysis, setBackendAnalysis] = useState<StockDetailsBackendAnalysis | null>(null);
     const [analysisError, setAnalysisError] = useState("");
+    const [scoreDetailsOpen, setScoreDetailsOpen] = useState(false);
     const explanation = result.explanation;
     const rawZoneScore = result.raw_zone_score ?? (
         result.freshness_score
@@ -119,6 +120,20 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
     });
     const availableChecks = displayChecks?.filter((item) => item.status !== "UNAVAILABLE").length ?? 0;
     const dataConfidence = displayChecks ? `${availableChecks} of ${displayChecks.length} checks calculated` : "Calculating data confidence";
+    const tradeFactors = [
+        ["EMA alignment", 12, displayChecks?.find((item) => item.label === "EMA alignment")],
+        ["Trend", 12, displayChecks?.find((item) => item.label === "Trend confirmation")],
+        ["RSI", 8, displayChecks?.find((item) => item.label === "RSI condition")],
+        ["Volume", 8, displayChecks?.find((item) => item.label === "Volume confirmation")],
+        ["Relative strength", 12, displayChecks?.find((item) => item.label === "Relative strength")],
+        ["Sector strength", 8, backendAnalysis?.sector.comparison?.["3m"] ? { status: backendAnalysis.sector.comparison["3m"].status === "OUTPERFORMING" ? "PASS" : backendAnalysis.sector.comparison["3m"].status === "UNDERPERFORMING" ? "FAIL" : "MIXED", reason: "Three-month stock return compared with its sector benchmark." } : undefined],
+        ["Multiple timeframes", 15, displayChecks?.find((item) => item.label === "Multiple timeframes")],
+        ["Risk and reward", 15, displayChecks?.find((item) => item.label === "Risk and reward")],
+        ["Market context", 5, backendAnalysis?.nifty_comparison?.["3m"] ? { status: (backendAnalysis.nifty_comparison["3m"].benchmark_return ?? 0) > 2 ? "PASS" : (backendAnalysis.nifty_comparison["3m"].benchmark_return ?? 0) < -2 ? "FAIL" : "MIXED", reason: "Three-month Nifty direction." } : undefined],
+        ["Confluence", 5, { status: result.merge_score >= 7.5 ? "PASS" : result.merge_score > 0 ? "MIXED" : "FAIL", reason: "Overlap with another detected zone." }],
+    ] as const;
+    const awarded = (weight: number, status?: string) => status === "PASS" ? weight : status === "MIXED" ? weight * .5 : 0;
+    const tradeConfidence = Math.round(tradeFactors.reduce((sum, [, weight, factor]) => sum + awarded(weight, factor?.status), 0));
 
     useEffect(() => {
         let active = true;
@@ -174,36 +189,50 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
                 <Stack spacing={2.25} divider={<Divider flexItem />}>
                     <Section title="AI Decision">
                         <Grid container spacing={1.5}>
-                            <Grid size={{ xs: 5 }}>
-                                <Typography color="text.secondary" variant="overline">Zone quality</Typography>
+                            <Grid size={{ xs: 6 }}>
+                                <Typography color="text.secondary" variant="overline">Zone Quality</Typography>
                                 <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
-                                    <Typography variant="h2">{explanation.overall_score.toFixed(0)}</Typography>
+                                    <Typography variant="h2">{analysis?.zoneQualityScore.toFixed(0) ?? "—"}</Typography>
                                     <Typography color="text.secondary">/ 100</Typography>
                                 </Stack>
+                                <Typography variant="caption" color="text.secondary">How well the zone itself was formed.</Typography>
                             </Grid>
-                            <Grid size={{ xs: 7 }}>
-                                <Chip label={recommendation(result, analysis)} color={analysis?.broken ? "error" : result.zone_score >= 75 ? "success" : "warning"} />
+                            <Grid size={{ xs: 6 }}>
+                                <Typography color="text.secondary" variant="overline">Trade Confidence</Typography>
+                                <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
+                                    <Typography variant="h2">{analysis ? tradeConfidence : "—"}</Typography>
+                                    <Typography color="text.secondary">/ 100</Typography>
+                                </Stack>
+                                <Typography variant="caption" color="text.secondary">How supportive current conditions are.</Typography>
+                            </Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <Chip label={recommendation(analysis, tradeConfidence)} color={analysis?.broken ? "error" : analysis && analysis.zoneQualityScore >= 75 && tradeConfidence >= 70 ? "success" : "warning"} />
                                 <Typography sx={{ mt: 1, fontWeight: 800 }}>{dataConfidence}</Typography>
                                 <Typography variant="caption" color="text.secondary">This shows data coverage, not the chance of profit.</Typography>
                             </Grid>
                         </Grid>
                         <Typography color="text.secondary" sx={{ mt: 1 }}>{explanation.summary}</Typography>
-                        <Box sx={{ mt: 1.25, p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.25 }}>
-                            <Typography variant="caption" color="text.secondary">Exact zone-only score</Typography>
-                            <Typography variant="body2">
-                                Freshness {result.freshness_score.toFixed(1)} + Departure {result.strength_score.toFixed(1)} + Retests {result.touch_score.toFixed(1)} + Overlap {result.merge_score.toFixed(1)}
-                                {" = "}{rawZoneScore.toFixed(1)}
-                            </Typography>
-                            {qualityCap < rawZoneScore && <Typography variant="caption" color="warning.main">
-                                Final score capped at {qualityCap.toFixed(1)} because departure strength did not qualify for a higher rating.
-                            </Typography>}
-                        </Box>
+                        <Button size="small" sx={{ mt: 1 }} onClick={() => setScoreDetailsOpen((open) => !open)}>{scoreDetailsOpen ? "Hide Details" : "Expand Details"}</Button>
+                        {scoreDetailsOpen && <Stack spacing={1} sx={{ mt: 1 }}>
+                            <Typography sx={{ fontWeight: 800 }}>Zone Quality Details</Typography>
+                            {analysis?.zoneQualityFactors.map((factor) => <Box key={factor.factor} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.25 }}>
+                                <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography variant="body2" sx={{ fontWeight: 800 }}>{factor.factor}</Typography><Typography variant="body2">{factor.points.toFixed(1)} / {factor.weight}</Typography></Stack>
+                                <Typography variant="caption" color="text.secondary">{factor.reason}</Typography>
+                            </Box>)}
+                            <Typography sx={{ fontWeight: 800, mt: 1 }}>Trade Confidence Details</Typography>
+                            {tradeFactors.map(([factor, weight, status]) => <Box key={factor} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.25 }}>
+                                <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography variant="body2" sx={{ fontWeight: 800 }}>{factor}</Typography><Typography variant="body2">{awarded(weight, status?.status).toFixed(1)} / {weight}</Typography></Stack>
+                                <Typography variant="caption" color="text.secondary">{status?.reason ?? "Unavailable with the current data source."}</Typography>
+                            </Box>)}
+                            <Typography variant="caption" color="text.secondary">Previous backend zone score: {rawZoneScore.toFixed(1)} raw, capped at {qualityCap.toFixed(1)}. It is kept only for API compatibility.</Typography>
+                        </Stack>}
                     </Section>
 
                     <Section title="Trading Plan">
                         <Grid container spacing={1}>
                             <Grid size={{ xs: 6 }}><Field label="Entry range" value={backendAnalysis ? `₹${backendAnalysis.trade_plan.entry_range[0].toLocaleString("en-IN")} – ₹${backendAnalysis.trade_plan.entry_range[1].toLocaleString("en-IN")}` : "Calculating from active zones…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Expected holding period" value="Requires a validated outcome backtest" /></Grid>
+                            <Grid size={{ xs: 12 }}><Field label="Suggested trigger" value={result.zone_type === "DEMAND" ? "Wait for a bullish confirmation candle inside the demand zone before considering the setup." : "Wait for a bearish rejection candle inside the supply zone before considering the setup."} note="Do not use the zone as an immediate entry." /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Illustrative entry" value={backendAnalysis ? `₹${backendAnalysis.trade_plan.illustrative_entry.toLocaleString("en-IN")}` : "Calculating…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Invalidation stop" value={backendAnalysis ? `₹${backendAnalysis.trade_plan.invalidation_stop.toLocaleString("en-IN")}` : "Calculating…"} note={backendAnalysis?.trade_plan.stop_buffer_rule} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Target" value={backendAnalysis?.trade_plan.target ? `₹${backendAnalysis.trade_plan.target.toLocaleString("en-IN")}` : backendAnalysis?.trade_plan.target_basis ?? "Calculating…"} /></Grid>
@@ -241,7 +270,8 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
                             <Grid size={{ xs: 6 }}><Field label="First retest" value={analysis?.firstRetest ?? (analysis ? "No later retest" : "Calculating…")} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Latest retest" value={analysis?.latestRetest ?? (analysis ? "No later retest" : "Calculating…")} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Maximum penetration" value={analysis ? `${analysis.maximumPenetration.toFixed(1)}%` : "Calculating…"} /></Grid>
-                            <Grid size={{ xs: 6 }}><Field label="Current status" value={analysis?.position ?? "Calculating…"} /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Current status" value={analysis?.positionExplanation ?? "Calculating…"} /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Distance from zone" value={analysis ? `${analysis.distanceFromZone.toFixed(2)}%` : "Calculating…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Zone quality" value={`${result.zone_score.toFixed(0)} / 100`} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Departure" value={result.strength_score >= 70 ? "Strong" : "Needs caution"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Nearest demand" value={result.zone_type === "DEMAND" ? currentZone : "Not available"} /></Grid>
@@ -258,12 +288,12 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
                             <Grid size={{ xs: 6 }}><Field label="EMA 20" value={analysis ? number(analysis.ema20) : "Calculating…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="EMA 50" value={analysis ? number(analysis.ema50) : "Calculating…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="EMA 200" value={analysis ? number(analysis.ema200) : "Calculating…"} /></Grid>
-                            <Grid size={{ xs: 6 }}><Field label="EMA alignment" value={analysis?.emaAlignment ?? "Calculating…"} /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="EMA alignment" value={analysis?.emaAlignment ?? "Calculating…"} note={analysis?.emaAlignment === "Mixed" ? `EMA 20 is ${analysis.ema20 !== null && analysis.ema50 !== null && analysis.ema20 > analysis.ema50 ? "above" : "below"} EMA 50, but the full direction does not agree${analysis.ema200 === null ? " because EMA 200 needs more history" : " with EMA 200"}.` : undefined} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="RSI (14)" value={analysis ? number(analysis.rsi14) : "Calculating…"} note={analysis ? `RSI is ${analysis.rsiDirection.toLowerCase()}.` : undefined} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="ATR (14)" value={analysis ? number(analysis.atr14) : "Calculating…"} note="ATR estimates normal price movement." /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Current volume" value={analysis ? analysis.currentVolume?.toLocaleString("en-IN") ?? "Volume unavailable from source" : "Calculating…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Relative volume" value={analysis ? number(analysis.relativeVolume, "×") : "Calculating…"} note="Compared with the latest 20 periods." /></Grid>
-                            <Grid size={{ xs: 12 }}><Field label="Buying and selling pressure" value={analysis?.pressure ?? "Calculating…"} note="This is an OHLCV estimate, not true bid/ask order flow." /></Grid>
+                            <Grid size={{ xs: 12 }}><Field label="Buying and selling pressure" value={analysis?.pressure ?? "Calculating…"} note={analysis ? `${analysis.pressureConfidence} confidence. This is an OHLCV estimate, not true bid/ask order flow.` : undefined} /></Grid>
                         </Grid>
                     </Section>
 
@@ -275,6 +305,13 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
                                 const comparison = backendAnalysis?.nifty_comparison[period];
                                 return <Grid key={period} size={{ xs: 6 }}><Field label={`${period.toUpperCase()} stock vs Nifty`} value={comparison?.difference === undefined ? comparison?.status ?? "Calculating…" : `${comparison.difference >= 0 ? "+" : ""}${comparison.difference.toFixed(2)}% · ${comparison.status.toLowerCase()}`} /></Grid>;
                             })}
+                            <Grid size={{ xs: 6 }}><Field label="Overall relative strength" value={(() => {
+                                if (!backendAnalysis) return "Calculating…";
+                                const values = Object.values(backendAnalysis.nifty_comparison).filter((item) => typeof item.difference === "number");
+                                if (!values.length) return "Insufficient aligned history";
+                                const average = values.reduce((sum, item) => sum + (item.difference ?? 0), 0) / values.length;
+                                return average > 2 ? "Outperforming" : average < -2 ? "Underperforming" : "Matching Market";
+                            })()} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Stock vs sector (3M)" value={backendAnalysis?.sector.comparison?.["3m"]?.difference === undefined ? backendAnalysis?.sector.status ?? "Calculating…" : `${backendAnalysis.sector.comparison["3m"].difference! >= 0 ? "+" : ""}${backendAnalysis.sector.comparison["3m"].difference!.toFixed(2)}%`} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="True institutional money flow" value="Requires institutional-flow data" /></Grid>
                         </Grid>
@@ -283,10 +320,10 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
                     <Section title="Multiple Timeframes">
                         <Stack spacing={.8}>
                             {backendAnalysis?.multi_timeframe.frames.map((frame) => <Box key={frame.timeframe} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.25 }}>
-                                <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography sx={{ fontWeight: 800 }}>{frame.timeframe}</Typography><Chip size="small" label={frame.confirmation.replaceAll("_", " ")} color={frame.confirmation === "CONFIRMED" ? "success" : "default"} /></Stack>
+                                <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography sx={{ fontWeight: 800 }}>{frame.timeframe}</Typography><Chip size="small" label={frame.confirmation === "CONFIRMED" ? "Aligned" : frame.confirmation === "NOT_CONFIRMED" ? "Not Aligned" : frame.confirmation === "MIXED" ? "Partially Aligned" : "Insufficient History"} color={frame.confirmation === "CONFIRMED" ? "success" : "default"} /></Stack>
                                 <Typography variant="caption" color="text.secondary">Trend: {frame.trend.toLowerCase()} · EMA alignment: {frame.ema_alignment.toLowerCase()}</Typography>
                             </Box>) ?? <Typography color="text.secondary">Calculating daily, weekly and monthly confirmation…</Typography>}
-                            {backendAnalysis && <Typography variant="caption" color="text.secondary">Combined result: {backendAnalysis.multi_timeframe.status.replaceAll("_", " ").toLowerCase()}</Typography>}
+                            {backendAnalysis && <Typography variant="caption" color="text.secondary">Combined result: {backendAnalysis.multi_timeframe.status === "CONFIRMED" ? "Aligned" : backendAnalysis.multi_timeframe.status === "MIXED" ? "Partially Aligned" : "Not Aligned"}</Typography>}
                         </Stack>
                     </Section>
 

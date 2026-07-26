@@ -198,7 +198,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                 <Typography variant="h6">{selectedZone.symbol} · {selectedZone.zone_type} · {patternLabels[selectedZone.pattern_type ?? ""]}</Typography>
                                 <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · delayed data · no order execution</Typography>
                             </Box>
-                            <Chip sx={{ ml: "auto" }} color={selectedZone.zone_type === "DEMAND" ? "primary" : "error"} label={`${selectedZone.zone_score.toFixed(0)} · ${qualityLabel(selectedZone.zone_score)}`} />
+                            <Chip sx={{ ml: "auto" }} color={selectedZone.zone_type === "DEMAND" ? "primary" : "error"} label={`${selectedZone.zone_score.toFixed(0)} · scanner rank`} />
                             <IconButton aria-label="Close full-screen chart" onClick={() => setSelectedZones([])}><CloseRoundedIcon /></IconButton>
                         </Box>
                     </DialogTitle>

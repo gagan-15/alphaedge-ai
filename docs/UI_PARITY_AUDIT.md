@@ -335,3 +335,14 @@ and EMA confirmation, finds the nearest detected opposing zone and derives a
 direction-aware research entry range, invalidation buffer, opposing-zone target and
 risk/reward ratio. These values are delayed-data research illustrations, not orders or
 personalized advice. Historical zone outcome backtesting remains a separate later phase.
+
+Stock Details now separates Zone Quality from Trade Confidence. Zone Quality is a
+100-point formation score using freshness 20, base quality 15, departure 25, retests
+15, overlap 10, ATR-relative width 5 and active pattern structure 10. Trade Confidence
+uses current EMA alignment 12, trend 12, RSI 8, volume 8, relative strength 12, sector
+comparison 8, multi-timeframe alignment 15, risk/reward 15, Nifty context 5 and zone
+confluence 5. Unavailable conditions receive zero points and remain visible in the
+detail breakdown. The panel also explains mixed EMA states, uses Aligned/Partially
+Aligned/Not Aligned wording, summarizes overall relative strength, explains the
+current price's distance and direction from the zone, labels OHLCV pressure confidence
+and requires a confirmation candle instead of suggesting an immediate entry.
