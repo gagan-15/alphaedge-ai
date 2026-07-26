@@ -12,8 +12,10 @@ import type { ScannerResponse, ZoneResearchResponse } from "../types/scanner";
 
 const api = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 10000,
+    timeout: 60000,
 });
+
+const researchZoneRequests = new Map<string, Promise<ZoneResearchResponse>>();
 
 export async function getScanner(): Promise<ScannerResponse> {
     try {
@@ -33,10 +35,15 @@ export async function getScanner(): Promise<ScannerResponse> {
 }
 
 export async function getResearchZones(timeframe = "DAILY"): Promise<ZoneResearchResponse> {
-    const response = await api.get<ZoneResearchResponse>("/scanner/zones", {
+    const active = researchZoneRequests.get(timeframe);
+    if (active) return active;
+    const request = api.get<ZoneResearchResponse>("/scanner/zones", {
         params: { timeframe },
+    }).then((response) => response.data).finally(() => {
+        researchZoneRequests.delete(timeframe);
     });
-    return response.data;
+    researchZoneRequests.set(timeframe, request);
+    return request;
 }
 
 export interface ComparisonPeriod {
