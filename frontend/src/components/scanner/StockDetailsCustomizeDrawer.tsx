@@ -30,6 +30,7 @@ function StockDetailsCustomizeDrawer({ open, value, onClose, onChange }: StockDe
             anchor="right"
             open={open}
             onClose={onClose}
+            sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}
             slotProps={{ paper: { sx: { width: { xs: "100%", sm: 440 }, maxWidth: "100%" } } }}
         >
             <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between", p: 2.5 }}>
