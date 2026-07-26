@@ -590,7 +590,18 @@ function ZoneDetailChart({
     }
 
     return (
-        <Box sx={{ bgcolor: "#07111e", border: "1px solid", borderColor: "divider", borderRadius: 1.5, overflow: "hidden" }}>
+        <Box sx={{
+            bgcolor: "#07111e",
+            color: "#f3f7fb",
+            border: "1px solid #2b3d55",
+            borderRadius: 1.5,
+            overflow: "hidden",
+            "& .MuiTypography-colorTextSecondary": { color: "#9fb0c5" },
+            "& .MuiInputLabel-root": { color: "#9fb0c5" },
+            "& .MuiSelect-select": { color: "#f3f7fb" },
+            "& .MuiOutlinedInput-notchedOutline": { borderColor: "#40536c" },
+            "& .MuiSvgIcon-root": { color: "inherit" },
+        }}>
             <Stack direction="row" sx={{ px: 2, py: 1.2, alignItems: "center", gap: 1, borderBottom: "1px solid", borderColor: "divider" }}>
                 <Typography sx={{ fontWeight: 850 }}>{result.symbol}</Typography>
                 <Typography color={result.zone_type === "DEMAND" ? "#60a5fa" : "#ff6b8a"} sx={{ fontSize: ".68rem", fontWeight: 850 }}>

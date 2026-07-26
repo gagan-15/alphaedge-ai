@@ -486,3 +486,8 @@ The application header now includes a Dark/Light theme control beside Logout. Da
 remains the default. The selected mode is stored locally and restored on the next
 visit. The shared theme provider updates page backgrounds, cards, drawers, navigation,
 search, typography contrast and scrollbar colors without changing routing or data.
+
+Light-mode contrast was hardened after visual review. Header icons and account text
+now use the active theme text colour, light cards use clearer borders and shadows,
+and intentionally dark chart workspaces keep light labels, secondary text, controls,
+inputs and chart borders instead of inheriting unreadable light-theme text colours.

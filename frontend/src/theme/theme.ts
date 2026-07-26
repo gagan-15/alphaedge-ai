@@ -8,7 +8,7 @@ export function createAppTheme(mode: AppThemeMode) {
         background: "#07101f", paper: "#0b1627", border: "#1d2b40",
         primary: "#6366f1", text: "#f3f7fb", textMuted: "#8fa1b8",
     } : {
-        background: "#f4f7fb", paper: "#ffffff", border: "#d8e1ec",
+        background: "#f3f6fa", paper: "#ffffff", border: "#c8d4e3",
         primary: "#4f46e5", text: "#142033", textMuted: "#607089",
     };
 
@@ -64,6 +64,7 @@ export function createAppTheme(mode: AppThemeMode) {
                     root: {
                         backgroundImage: "none",
                         backgroundColor: alpha(colors.background, .96),
+                        color: colors.text,
                         borderBottom: `1px solid ${colors.border}`,
                         boxShadow: "none",
                         backdropFilter: "blur(14px)",
@@ -75,6 +76,7 @@ export function createAppTheme(mode: AppThemeMode) {
                     paper: {
                         backgroundImage: "none",
                         backgroundColor: dark ? "#081322" : "#ffffff",
+                        color: colors.text,
                         borderRight: `1px solid ${colors.border}`,
                     },
                 },
