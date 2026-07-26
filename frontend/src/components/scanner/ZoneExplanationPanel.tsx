@@ -128,6 +128,26 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
             const ratio = backendAnalysis.trade_plan.risk_reward_ratio;
             return { ...item, status: ratio === null ? "UNAVAILABLE" : ratio >= 2 ? "PASS" : "FAIL", value: ratio === null ? "No validated opposing target" : `1 : ${ratio}`, threshold: "At least 1 : 2", reason: backendAnalysis.trade_plan.target_basis, scoreEffect: "Context only" } as const;
         }
+        if (item.label === "Sector strength" && backendAnalysis) {
+            const comparison = backendAnalysis.sector.sector_vs_nifty?.["3m"];
+            if (comparison?.difference === undefined) {
+                return { ...item, status: "UNAVAILABLE", value: backendAnalysis.sector.status ?? "Insufficient aligned sector history", threshold: "Requires a mapped sector index and aligned history", reason: "The sector comparison could not be calculated.", scoreEffect: "Context only" } as const;
+            }
+            const supportsDirection = result.zone_type === "DEMAND"
+                ? comparison.difference > 2
+                : comparison.difference < -2;
+            const opposesDirection = result.zone_type === "DEMAND"
+                ? comparison.difference < -2
+                : comparison.difference > 2;
+            return {
+                ...item,
+                status: supportsDirection ? "PASS" : opposesDirection ? "FAIL" : "MIXED",
+                value: `${backendAnalysis.sector.name} is ${comparison.difference >= 0 ? "+" : ""}${comparison.difference.toFixed(2)}% versus Nifty over 3 months`,
+                threshold: result.zone_type === "DEMAND" ? "Sector should beat Nifty by more than 2%" : "Sector should trail Nifty by more than 2%",
+                reason: supportsDirection ? "The sector direction supports this zone." : opposesDirection ? "The sector direction works against this zone." : "The sector is moving close to the wider market.",
+                scoreEffect: "Included in Trade Confidence only",
+            } as const;
+        }
         return item;
     });
     const availableChecks = displayChecks?.filter((item) => item.status !== "UNAVAILABLE").length ?? 0;
@@ -138,7 +158,7 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
         ["RSI", 8, displayChecks?.find((item) => item.label === "RSI condition")],
         ["Volume", 8, displayChecks?.find((item) => item.label === "Volume confirmation")],
         ["Relative strength", 12, displayChecks?.find((item) => item.label === "Relative strength")],
-        ["Sector strength", 8, backendAnalysis?.sector.comparison?.["3m"] ? { status: backendAnalysis.sector.comparison["3m"].status === "OUTPERFORMING" ? "PASS" : backendAnalysis.sector.comparison["3m"].status === "UNDERPERFORMING" ? "FAIL" : "MIXED", reason: "Three-month stock return compared with its sector benchmark." } : undefined],
+        ["Sector strength", 8, displayChecks?.find((item) => item.label === "Sector strength")],
         ["Multiple timeframes", 15, displayChecks?.find((item) => item.label === "Multiple timeframes")],
         ["Risk and reward", 15, displayChecks?.find((item) => item.label === "Risk and reward")],
         ["Market context", 5, backendAnalysis?.nifty_comparison?.["3m"] ? { status: (backendAnalysis.nifty_comparison["3m"].benchmark_return ?? 0) > 2 ? "PASS" : (backendAnalysis.nifty_comparison["3m"].benchmark_return ?? 0) < -2 ? "FAIL" : "MIXED", reason: "Three-month Nifty direction." } : undefined],

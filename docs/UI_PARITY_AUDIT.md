@@ -356,3 +356,10 @@ is inside the selected zone, the stop is beyond the correct distal side and any 
 is beyond the zone in the correct direction. Stale calculations are keyed by the full
 selection identity and are not rendered. Any mismatch displays the required out-of-sync
 warning instead of prices from another zone.
+
+Sector Strength is now connected to the maintained free benchmark mapping instead of
+remaining unavailable in the checklist. The three-month sector-index return is aligned
+with Nifty history and interpreted by zone direction: sector outperformance supports
+demand research, while sector underperformance supports supply research. A difference
+within two percentage points is shown as mixed. The result contributes only to Trade
+Confidence and never changes the zone-formation score.
