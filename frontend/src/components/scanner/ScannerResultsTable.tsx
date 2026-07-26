@@ -27,6 +27,10 @@ import ZoneExplanationPanel from "./ZoneExplanationPanel";
 import { zoneSequenceLabel } from "./zoneLabels";
 import { readOverlayTimeframes, saveOverlayTimeframes } from "../../services/overlayService";
 import { selectZoneById, zoneIdFor } from "../../services/zoneSelectionService";
+import { getMarketCandles } from "../../api/marketApi";
+import { getStockDetailsAnalysis } from "../../api/scannerApi";
+import { analyzeStockZone } from "./stockZoneAnalysis";
+import { buildTradeConfidence } from "./tradeConfidence";
 
 interface ScannerResultsTableProps {
     results: ZoneResearchResult[];
@@ -51,9 +55,14 @@ function qualityLabel(score: number) {
     return "Rejected";
 }
 
+function resultKey(result: ZoneResearchResult) {
+    return `${result.symbol}:${result.timeframe}:${result.zone_type}:${result.proximal_price}:${result.distal_price}:${result.base_index}`;
+}
+
 function ScannerResultsTable({ results }: ScannerResultsTableProps) {
-    const [sortField, setSortField] = useState<"symbol" | "zone_score" | "distance_percent">("zone_score");
+    const [sortField, setSortField] = useState<"symbol" | "trade_confidence" | "zone_score" | "distance_percent">("trade_confidence");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+    const [confidenceScores, setConfidenceScores] = useState<Record<string, number>>({});
     const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>([]);
     const [selectedZoneId, setSelectedZoneId] = useState("");
     const [confluenceOverlays, setConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
@@ -72,14 +81,35 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
         return () => window.removeEventListener("resize", updateHeight);
     }, []);
 
+    useEffect(() => {
+        let active = true;
+        void Promise.all(results.map(async (result) => {
+            const intraday = ["5m", "15m", "75m", "125m", "1H", "2H", "4H", "6H"].includes(result.timeframe);
+            const period = intraday ? "1mo" : result.timeframe === "1D" ? "1y" : "10y";
+            const interval = intraday ? (result.timeframe.includes("H") ? "1h" : result.timeframe === "5m" || result.timeframe === "125m" ? "5m" : "15m") : "1d";
+            try {
+                const [candles, backend] = await Promise.all([
+                    getMarketCandles(result.symbol, period, interval, result.timeframe),
+                    getStockDetailsAnalysis(result),
+                ]);
+                return [resultKey(result), buildTradeConfidence(result, analyzeStockZone(result, candles.candles), backend).score] as const;
+            } catch {
+                return [resultKey(result), buildTradeConfidence(result, null, null).score] as const;
+            }
+        })).then((entries) => {
+            if (active) setConfidenceScores(Object.fromEntries(entries));
+        });
+        return () => { active = false; };
+    }, [results]);
+
     const sortedResults = useMemo(() => [...results].sort((left, right) => {
-        const first = left[sortField];
-        const second = right[sortField];
+        const first = sortField === "trade_confidence" ? confidenceScores[resultKey(left)] ?? -1 : left[sortField];
+        const second = sortField === "trade_confidence" ? confidenceScores[resultKey(right)] ?? -1 : right[sortField];
         const comparison = typeof first === "string"
             ? first.localeCompare(String(second))
             : Number(first) - Number(second);
         return sortDirection === "asc" ? comparison : -comparison;
-    }), [results, sortDirection, sortField]);
+    }), [confidenceScores, results, sortDirection, sortField]);
     const groupedResults = useMemo(() => {
         const groups = new Map<string, ZoneResearchResult[]>();
         sortedResults.forEach((result) => {
@@ -89,11 +119,12 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
             symbol,
             zones,
             primary: [...zones].sort((left, right) =>
-                left.distance_percent - right.distance_percent
+                (confidenceScores[resultKey(right)] ?? -1) - (confidenceScores[resultKey(left)] ?? -1)
+                || left.distance_percent - right.distance_percent
                 || right.zone_score - left.zone_score
             )[0],
         }));
-    }, [sortedResults]);
+    }, [confidenceScores, sortedResults]);
 
     function chooseSort(field: typeof sortField) {
         if (field === sortField) {
@@ -184,7 +215,8 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                     <TableCell align="right">Proximal</TableCell>
                                     <TableCell align="right">Distal</TableCell>
                                     <TableCell align="right">Distance</TableCell>
-                                    <TableCell align="right">{sortableLabel("zone_score", "Quality")}</TableCell>
+                                    <TableCell align="right">{sortableLabel("trade_confidence", "Trade Confidence")}</TableCell>
+                                    <TableCell align="right">{sortableLabel("zone_score", "Zone Quality")}</TableCell>
                                     <TableCell align="right">LTP / Entry</TableCell>
                                     <TableCell>Base date</TableCell>
                                     <TableCell>Timeframe</TableCell>
@@ -226,6 +258,10 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                                     {result.distance_percent === null ? "—" : `${result.distance_percent.toFixed(2)}%`}
                                                 </TableCell>
                                                 <TableCell align="right">
+                                                    <Typography sx={{ fontWeight: 900 }}>{confidenceScores[resultKey(result)] ?? "…"}</Typography>
+                                                    <Typography variant="caption" color="text.secondary">Today</Typography>
+                                                </TableCell>
+                                                <TableCell align="right">
                                                     <Box sx={{ display: "inline-flex", gap: .7, alignItems: "center" }}>
                                                         <Box>
                                                             <Typography sx={{ fontWeight: 850 }}>{result.zone_score.toFixed(0)}</Typography>
@@ -253,15 +289,16 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                 {selectedZones.length > 0 && (() => {
                     const selectedZone = selectZoneById(selectedZones, selectedZoneId);
                     if (!selectedZone) return null;
+                    const selectedConfidence = confidenceScores[resultKey(selectedZone)];
                     return <>
                     <DialogTitle sx={{ py: 1.25, borderBottom: "1px solid", borderColor: "divider" }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
                             <FullscreenRoundedIcon color="primary" />
                             <Box>
                                 <Typography variant="h6">{selectedZone.symbol} · Selected Zone {selectedZoneId} · {selectedZone.zone_type} · {patternLabels[selectedZone.pattern_type ?? ""]}</Typography>
-                                <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · Quality {selectedZone.zone_score.toFixed(0)} · delayed data · no order execution</Typography>
+                                <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · Trade Confidence {selectedConfidence ?? "calculating"} · Zone Quality {selectedZone.zone_score.toFixed(0)} · delayed data · no order execution</Typography>
                             </Box>
-                            <Chip sx={{ ml: "auto" }} color={selectedZone.zone_type === "DEMAND" ? "primary" : "error"} label={`${selectedZone.zone_score.toFixed(0)} · scanner rank`} />
+                            <Chip sx={{ ml: "auto" }} color={selectedZone.zone_type === "DEMAND" ? "primary" : "error"} label={`${selectedConfidence ?? "…"} · Trade Confidence`} />
                             <IconButton aria-label="Close full-screen chart" onClick={closeStock}><CloseRoundedIcon /></IconButton>
                         </Box>
                     </DialogTitle>
@@ -304,7 +341,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                                 >
                                                     <Stack direction="row" sx={{ justifyContent: "space-between", gap: 1 }}>
                                                         <Typography sx={{ fontWeight: 800 }}>{selected ? "✓ " : ""}{zoneId} · {zone.zone_type} · {patternLabels[zone.pattern_type ?? ""]}</Typography>
-                                                        <Chip size="small" label={`Quality ${zone.zone_score.toFixed(0)}`} />
+                                                        <Chip size="small" label={`Confidence ${confidenceScores[resultKey(zone)] ?? "…"} · Quality ${zone.zone_score.toFixed(0)}`} />
                                                     </Stack>
                                                     <Typography variant="caption" color="text.secondary">Status {zone.status} · Base {zone.base_date}{selected ? " · Selected" : " · Click to analyze"}</Typography>
                                                 </Box>;

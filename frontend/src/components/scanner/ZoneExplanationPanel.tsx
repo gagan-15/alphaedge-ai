@@ -27,6 +27,7 @@ import {
     defaultStockDetailsVisibility,
     type StockDetailsVisibility,
 } from "./stockDetailsPreferences";
+import { buildTradeConfidence, explainScoreDifference } from "./tradeConfidence";
 
 const watchlistKey = "alphaedge.local.watchlist";
 const watchlistZonesKey = "alphaedge.local.watchlist.zones";
@@ -64,15 +65,6 @@ function readObjects(key: string): Record<string, unknown>[] {
     } catch {
         return [];
     }
-}
-
-function recommendation(analysis: StockZoneAnalysis | null, zoneQuality: number, tradeConfidence: number) {
-    if (analysis?.broken) return "Invalidated";
-    if (!analysis) return "Calculating";
-    if (zoneQuality >= 75 && tradeConfidence >= 70) return "Strong setup — wait for confirmation";
-    if (zoneQuality >= 60 && tradeConfidence >= 50) return "Watch";
-    if (zoneQuality >= 60) return "Wait for confirmation";
-    return "Weak setup";
 }
 
 function Field({ label, value, note }: { label: string; value: string; note?: string }) {
@@ -204,22 +196,8 @@ function ZoneExplanationPanel({
         }
         return item;
     });
-    const availableChecks = displayChecks?.filter((item) => item.status !== "UNAVAILABLE").length ?? 0;
-    const dataConfidence = displayChecks ? `${availableChecks} of ${displayChecks.length} checks calculated` : "Calculating data confidence";
-    const tradeFactors = [
-        ["EMA alignment", 12, displayChecks?.find((item) => item.label === "EMA alignment")],
-        ["Trend", 12, displayChecks?.find((item) => item.label === "Trend confirmation")],
-        ["RSI", 8, displayChecks?.find((item) => item.label === "RSI condition")],
-        ["Volume", 8, displayChecks?.find((item) => item.label === "Volume confirmation")],
-        ["Relative strength", 12, displayChecks?.find((item) => item.label === "Relative strength")],
-        ["Sector strength", 8, displayChecks?.find((item) => item.label === "Sector strength")],
-        ["Multiple timeframes", 15, displayChecks?.find((item) => item.label === "Multiple timeframes")],
-        ["Risk and reward", 15, displayChecks?.find((item) => item.label === "Risk and reward")],
-        ["Market context", 5, backendAnalysis?.nifty_comparison?.["3m"] ? { status: (backendAnalysis.nifty_comparison["3m"].benchmark_return ?? 0) > 2 ? "PASS" : (backendAnalysis.nifty_comparison["3m"].benchmark_return ?? 0) < -2 ? "FAIL" : "MIXED", reason: "Three-month Nifty direction." } : undefined],
-        ["Confluence", 5, { status: result.merge_score >= 7.5 ? "PASS" : result.merge_score > 0 ? "MIXED" : "FAIL", reason: "Overlap with another detected zone." }],
-    ] as const;
-    const awarded = (weight: number, status?: string) => status === "PASS" ? weight : status === "MIXED" ? weight * .5 : 0;
-    const tradeConfidence = Math.round(tradeFactors.reduce((sum, [, weight, factor]) => sum + awarded(weight, factor?.status), 0));
+    const confidence = buildTradeConfidence(result, analysis, backendAnalysis);
+    const tradeConfidence = confidence.score;
     const zoneLower = Math.min(result.proximal_price, result.distal_price);
     const zoneUpper = Math.max(result.proximal_price, result.distal_price);
     const plan = backendAnalysis?.trade_plan;
@@ -333,41 +311,44 @@ function ZoneExplanationPanel({
                 <Stack spacing={2.25} divider={<Divider flexItem />}>
                     {visibleSections.decision && <Section title="AI Decision">
                         <Grid container spacing={1.5}>
-                            <Grid size={{ xs: 6 }}>
-                                <Typography color="text.secondary" variant="overline">Zone Quality</Typography>
-                                <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
-                                    <Typography variant="h2">{result.zone_score.toFixed(0)}</Typography>
-                                    <Typography color="text.secondary">/ 100</Typography>
-                                </Stack>
-                                <Typography variant="caption" color="text.secondary">How well the zone itself was formed.</Typography>
-                            </Grid>
-                            <Grid size={{ xs: 6 }}>
+                            <Grid size={{ xs: 12 }}>
                                 <Typography color="text.secondary" variant="overline">Trade Confidence</Typography>
                                 <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
-                                    <Typography variant="h2">{analysis ? tradeConfidence : "—"}</Typography>
+                                    <Typography variant="h1">{analysis ? tradeConfidence : "—"}</Typography>
                                     <Typography color="text.secondary">/ 100</Typography>
                                 </Stack>
-                                <Typography variant="caption" color="text.secondary">How supportive current conditions are.</Typography>
+                                <Chip sx={{ mt: .5 }} label={analysis?.broken ? "Invalidated" : analysis ? confidence.recommendation : "Calculating"} color={analysis?.broken ? "error" : tradeConfidence >= 75 ? "success" : "warning"} />
+                                <Typography sx={{ mt: 1, fontWeight: 700 }}>This is the main score to use when deciding whether today's setup is worth considering.</Typography>
                             </Grid>
                             <Grid size={{ xs: 12 }}>
-                                <Chip label={recommendation(analysis, result.zone_score, tradeConfidence)} color={analysis?.broken ? "error" : analysis && result.zone_score >= 75 && tradeConfidence >= 70 ? "success" : "warning"} />
-                                <Typography sx={{ mt: 1, fontWeight: 800 }}>{dataConfidence}</Typography>
+                                <Typography color="text.secondary" variant="overline">Zone Quality</Typography>
+                                <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
+                                    <Typography variant="h3">{result.zone_score.toFixed(0)}</Typography>
+                                    <Typography color="text.secondary">/ 100</Typography>
+                                </Stack>
+                                <Typography variant="caption" color="text.secondary">This score measures only how well the Demand/Supply zone was formed.</Typography>
+                            </Grid>
+                            <Grid size={{ xs: 12 }}>
+                                <Typography sx={{ mt: 1, fontWeight: 800 }}>Data connected for {confidence.calculatedWeight} of {confidence.totalWeight} confidence points</Typography>
                                 <Typography variant="caption" color="text.secondary">This shows data coverage, not the chance of profit.</Typography>
                             </Grid>
                         </Grid>
+                        {analysis && <Typography sx={{ mt: 1.5 }}>{explainScoreDifference(result.zone_score, tradeConfidence, result.zone_type)}</Typography>}
                         <Typography color="text.secondary" sx={{ mt: 1 }}>{explanation.summary}</Typography>
-                        <Button size="small" sx={{ mt: 1 }} onClick={() => setScoreDetailsOpen((open) => !open)}>{scoreDetailsOpen ? "Hide Details" : "Expand Details"}</Button>
+                        <Button size="small" sx={{ mt: 1 }} onClick={() => setScoreDetailsOpen((open) => !open)}>{scoreDetailsOpen ? "Hide score explanation" : "Why is Trade Confidence this score?"}</Button>
                         {scoreDetailsOpen && <Stack spacing={1} sx={{ mt: 1 }}>
-                            <Typography sx={{ fontWeight: 800 }}>Zone Quality Details</Typography>
-                            {analysis?.zoneQualityFactors.map((factor) => <Box key={factor.factor} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.25 }}>
-                                <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography variant="body2" sx={{ fontWeight: 800 }}>{factor.factor}</Typography><Typography variant="body2">{factor.points.toFixed(1)} / {factor.weight}</Typography></Stack>
-                                <Typography variant="caption" color="text.secondary">{factor.reason}</Typography>
+                            <Typography sx={{ fontWeight: 800 }}>Trade Confidence breakdown</Typography>
+                            {confidence.factors.map((factor) => <Box key={factor.key} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.25 }}>
+                                <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>{factor.status === "PASS" ? "✓" : factor.status === "FAIL" ? "✕" : factor.status === "MIXED" ? "◐" : "—"} {factor.label}</Typography>
+                                    <Typography variant="body2">{factor.status === "UNAVAILABLE" ? "Not available" : `${factor.weight} points available`}</Typography>
+                                </Stack>
+                                <Typography variant="caption" color="text.secondary">{factor.explanation}</Typography>
                             </Box>)}
-                            <Typography sx={{ fontWeight: 800, mt: 1 }}>Trade Confidence Details</Typography>
-                            {tradeFactors.map(([factor, weight, status]) => <Box key={factor} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.25 }}>
-                                <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography variant="body2" sx={{ fontWeight: 800 }}>{factor}</Typography><Typography variant="body2">{awarded(weight, status?.status).toFixed(1)} / {weight}</Typography></Stack>
-                                <Typography variant="caption" color="text.secondary">{status?.reason ?? "Unavailable with the current data source."}</Typography>
-                            </Box>)}
+                            <Typography sx={{ fontWeight: 800 }}>Final recommendation: {confidence.recommendation}.</Typography>
+                            <Typography variant="caption" color="text.secondary">Data connected for {confidence.calculatedWeight} of {confidence.totalWeight} possible points. Missing inputs receive no points and are never guessed.</Typography>
+                            <Typography sx={{ fontWeight: 800, mt: 1 }}>Zone Quality inputs</Typography>
+                            {analysis?.zoneQualityFactors.map((factor) => <Typography key={factor.factor} variant="caption" color="text.secondary">{factor.factor}: {factor.reason}</Typography>)}
                             <Typography variant="caption" color="text.secondary">Previous backend zone score: {rawZoneScore.toFixed(1)} raw, capped at {qualityCap.toFixed(1)}. It is kept only for API compatibility.</Typography>
                         </Stack>}
                     </Section>}

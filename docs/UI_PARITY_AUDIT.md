@@ -437,3 +437,14 @@ The Stock Details analysis panel now includes a Customize drawer. Users can hide
 show each right-side section independently, restore all sections in one click, and
 keep their choices on the same device. The control prevents every section from being
 hidden at once and does not change any scanner data or calculations.
+
+Trade Confidence is now the main decision-support score in Scanner and Stock Details.
+The unchanged Zone Quality score measures only zone formation: freshness, departure,
+retests, base/width evidence, overlap and structure. Trade Confidence combines Zone
+Quality with the available EMA, trend, RSI, volume, multi-timeframe, sector, relative
+strength, risk/reward, confirmation and current-price-position evidence. Market
+breadth, verified institutional activity and validated sentiment remain visible as
+unavailable inputs and receive no points; the product does not invent those values.
+Scanner rows load this same shared model, show both scores and rank stocks by Trade
+Confidence. Stock Details places Trade Confidence first and explains in simple English
+why it may differ from Zone Quality.
