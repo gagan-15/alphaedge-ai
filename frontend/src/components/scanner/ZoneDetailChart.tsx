@@ -9,7 +9,7 @@ import {
     type ISeriesApi,
     type UTCTimestamp,
 } from "lightweight-charts";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -29,11 +29,21 @@ const patternLabels: Record<string, string> = {
     RALLY_BASE_DROP: "RBD",
     DROP_BASE_DROP: "DBD",
 };
+const confluenceTimeframes = [
+    { timeframe: "1D", name: "Daily" },
+    { timeframe: "1W", name: "Weekly" },
+    { timeframe: "1M", name: "Monthly" },
+    { timeframe: "3M", name: "Quarterly" },
+    { timeframe: "6M", name: "Half-Yearly" },
+    { timeframe: "1Y", name: "Yearly" },
+];
 
 interface ZoneDetailChartProps {
     result: ZoneResearchResult;
     zones?: ZoneResearchResult[];
     confluenceOverlays?: ConfluenceChartOverlay[];
+    availableConfluenceOverlays?: ConfluenceChartOverlay[];
+    onToggleConfluenceOverlay?: (overlay: ConfluenceChartOverlay) => void;
     height?: number;
     showTools?: boolean;
 }
@@ -42,6 +52,8 @@ function ZoneDetailChart({
     result,
     zones = [result],
     confluenceOverlays = [],
+    availableConfluenceOverlays = [],
+    onToggleConfluenceOverlay,
     height = 360,
     showTools = false,
 }: ZoneDetailChartProps) {
@@ -54,6 +66,13 @@ function ZoneDetailChart({
     const confluenceBoundarySeriesRef = useRef<ISeriesApi<"Line">[]>([]);
     const measurementAreaSeriesRef = useRef<ISeriesApi<"Baseline"> | null>(null);
     const measurementBoundarySeriesRef = useRef<ISeriesApi<"Line">[]>([]);
+    const measurementSelectionRef = useRef<{
+        from: UTCTimestamp;
+        to: UTCTimestamp;
+        lower: number;
+        upper: number;
+        text: string;
+    } | null>(null);
     const candleTimesRef = useRef<UTCTimestamp[]>([]);
     const candleStepRef = useRef(86_400);
     const measuringRef = useRef(false);
@@ -66,6 +85,31 @@ function ZoneDetailChart({
     const [measurement, setMeasurement] = useState("Measurement tool is off.");
     const [chartReadyVersion, setChartReadyVersion] = useState(0);
     const [zonesVisible, setZonesVisible] = useState(true);
+    const [measurementLabel, setMeasurementLabel] = useState<{ left: number; top: number; text: string } | null>(null);
+    const executionIndex = confluenceTimeframes.findIndex((item) => item.timeframe === result.timeframe);
+    const higherTimeframeButtons = executionIndex < 0 ? [] : confluenceTimeframes.slice(executionIndex + 1);
+    const updateMeasurementLabel = useCallback(() => {
+        const chart = chartRef.current;
+        const candles = candleSeriesRef.current;
+        const selection = measurementSelectionRef.current;
+        if (!chart || !candles || !selection) {
+            setMeasurementLabel(null);
+            return;
+        }
+        const fromX = chart.timeScale().timeToCoordinate(selection.from);
+        const toX = chart.timeScale().timeToCoordinate(selection.to);
+        const upperY = candles.priceToCoordinate(selection.upper);
+        const lowerY = candles.priceToCoordinate(selection.lower);
+        if (fromX === null || toX === null || upperY === null || lowerY === null) {
+            setMeasurementLabel(null);
+            return;
+        }
+        setMeasurementLabel({
+            left: Math.min(fromX, toX) + Math.abs(toX - fromX) / 2,
+            top: Math.min(upperY, lowerY) + Math.abs(lowerY - upperY) / 2,
+            text: selection.text,
+        });
+    }, []);
 
     useEffect(() => {
         const container = containerRef.current;
@@ -105,6 +149,7 @@ function ZoneDetailChart({
 
         const observer = new ResizeObserver(() => {
             chart.applyOptions({ width: container.clientWidth });
+            updateMeasurementLabel();
         });
         observer.observe(container);
 
@@ -197,9 +242,18 @@ function ZoneDetailChart({
                     lowerLine.setData([{ time: from, value: lower }, { time: to, value: lower }]);
                     measurementAreaSeriesRef.current = area;
                     measurementBoundarySeriesRef.current = [upperLine, lowerLine];
-                    setMeasurement(`₹${startPrice.toFixed(2)} → ₹${price.toFixed(2)} · ${change >= 0 ? "+" : ""}${change.toFixed(2)} (${percent >= 0 ? "+" : ""}${percent.toFixed(2)}%)`);
+                    measurementSelectionRef.current = {
+                        from,
+                        to,
+                        lower,
+                        upper,
+                        text: `₹${startPrice.toFixed(2)} → ₹${price.toFixed(2)} · ${change >= 0 ? "+" : ""}${change.toFixed(2)} · ${percent >= 0 ? "+" : ""}${percent.toFixed(2)}%`,
+                    };
+                    updateMeasurementLabel();
+                    setMeasurement("Measured range is shown inside the chart.");
                     measureStartRef.current = null;
                 });
+                chart.timeScale().subscribeVisibleLogicalRangeChange(updateMeasurementLabel);
 
                 zones.forEach((displayZone, zoneIndex) => {
                 if (displayZone.proximal_price !== null && displayZone.distal_price !== null) {
@@ -280,10 +334,11 @@ function ZoneDetailChart({
             confluenceBoundarySeriesRef.current = [];
             measurementAreaSeriesRef.current = null;
             measurementBoundarySeriesRef.current = [];
+            measurementSelectionRef.current = null;
             candleTimesRef.current = [];
             chart = null as never;
         };
-    }, [height, result, zones]);
+    }, [height, result, updateMeasurementLabel, zones]);
 
     useEffect(() => {
         const chart = chartRef.current;
@@ -314,6 +369,7 @@ function ZoneDetailChart({
                 lineStyle: styles[index % styles.length],
                 priceLineVisible: false,
                 lastValueVisible: false,
+                autoscaleInfoProvider: () => null,
             });
             const startIndex = Math.max(0, times.length - Math.max(36, Math.floor(times.length * .3)));
             const overlayData = times.slice(startIndex).map((time) => ({
@@ -336,6 +392,7 @@ function ZoneDetailChart({
                 priceLineVisible: false,
                 lastValueVisible: true,
                 title: `${overlay.timeframe} HTF`,
+                autoscaleInfoProvider: () => null,
             });
             const lowerBoundary = chart.addSeries(LineSeries, {
                 color,
@@ -343,6 +400,7 @@ function ZoneDetailChart({
                 lineStyle: styles[index % styles.length],
                 priceLineVisible: false,
                 lastValueVisible: false,
+                autoscaleInfoProvider: () => null,
             });
             upperBoundary.setData(overlayData);
             lowerBoundary.setData(overlayData.map((point) => ({ ...point, value: lower })));
@@ -376,6 +434,8 @@ function ZoneDetailChart({
         }
         measurementBoundarySeriesRef.current.forEach((series) => chart.removeSeries(series));
         measurementBoundarySeriesRef.current = [];
+        measurementSelectionRef.current = null;
+        setMeasurementLabel(null);
         measureStartRef.current = null;
         setMeasurement(measuring ? "Select two chart points to highlight a range." : "Measurement tool is off.");
     }
@@ -410,24 +470,57 @@ function ZoneDetailChart({
                 <Chip size="small" label="Wheel to zoom" />
                 <Typography variant="caption" color={measuring ? "primary.main" : "text.secondary"} sx={{ ml: "auto" }}>{measurement}</Typography>
             </Stack>}
-            {confluenceOverlays.length > 0 && (
+            {higherTimeframeButtons.length > 0 && onToggleConfluenceOverlay && (
                 <Stack direction="row" sx={{ px: 1.5, py: .75, alignItems: "center", gap: .75, borderBottom: "1px solid", borderColor: "divider", flexWrap: "wrap" }}>
-                    <Typography variant="caption" sx={{ fontWeight: 850 }}>Timeframe zones shown:</Typography>
-                    <Chip size="small" label={`${result.timeframe} selected zone`} />
-                    {confluenceOverlays.map((overlay) => (
-                        <Chip
+                    <Typography variant="caption" sx={{ fontWeight: 850 }}>Higher timeframe zones:</Typography>
+                    {higherTimeframeButtons.map((timeframe) => {
+                        const overlay = availableConfluenceOverlays.find((item) => item.timeframe === timeframe.timeframe);
+                        if (!overlay) {
+                            return <Button key={timeframe.timeframe} size="small" variant="outlined" disabled>{timeframe.name}</Button>;
+                        }
+                        const selected = confluenceOverlays.some((active) => active.timeframe === overlay.timeframe);
+                        return <Button
                             key={overlay.timeframe}
                             size="small"
-                            variant="outlined"
-                            label={`${overlay.timeframeName} · ${overlay.zoneType === "DEMAND" ? "Demand" : "Supply"}`}
-                            sx={{ color: overlay.zoneType === "DEMAND" ? "#60a5fa" : "#ff6b8a" }}
-                        />
-                    ))}
+                            variant={selected ? "contained" : "outlined"}
+                            onClick={() => onToggleConfluenceOverlay(overlay)}
+                            sx={{ color: selected ? undefined : overlay.zoneType === "DEMAND" ? "#60a5fa" : "#ff6b8a" }}
+                        >
+                            {timeframe.name}
+                        </Button>;
+                    })}
+                    <Typography variant="caption" color="text.secondary">
+                        No higher timeframe is selected by default.
+                    </Typography>
                 </Stack>
             )}
             {loading && <Box sx={{ height, display: "grid", placeItems: "center" }}><CircularProgress size={28} /></Box>}
             {error && <Alert severity="warning">{error}</Alert>}
-            <Box ref={containerRef} sx={{ height: loading || error ? 0 : height }} />
+            <Box sx={{ position: "relative" }}>
+                <Box ref={containerRef} sx={{ height: loading || error ? 0 : height }} />
+                {measurementLabel && (
+                    <Box
+                        sx={{
+                            position: "absolute",
+                            left: measurementLabel.left,
+                            top: measurementLabel.top,
+                            transform: "translate(-50%, -50%)",
+                            px: 1,
+                            py: .5,
+                            bgcolor: "rgba(7,17,30,.9)",
+                            border: "1px solid #f5b942",
+                            borderRadius: 1,
+                            color: "#ffd477",
+                            fontSize: ".72rem",
+                            fontWeight: 850,
+                            pointerEvents: "none",
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        {measurementLabel.text}
+                    </Box>
+                )}
+            </Box>
             <Typography color="text.secondary" sx={{ px: 2, py: 1, fontSize: ".62rem" }}>
                 Highlighted area is the detected research zone · drag to pan · wheel to zoom · delayed data may apply
             </Typography>

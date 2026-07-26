@@ -21,6 +21,7 @@ interface Props {
     onToggleOverlay: (overlay: ConfluenceChartOverlay) => void;
     onToggleVisibility: () => void;
     onClearOverlays: () => void;
+    onAvailableOverlays: (overlays: ConfluenceChartOverlay[]) => void;
 }
 
 function overlayFrom(frame: ConfluenceTimeframe): ConfluenceChartOverlay | null {
@@ -41,6 +42,7 @@ function TimeframeConfluenceExplorer({
     onToggleOverlay,
     onToggleVisibility,
     onClearOverlays,
+    onAvailableOverlays,
 }: Props) {
     const [received, setReceived] = useState<{ key: string; data: TimeframeConfluenceResponse } | null>(null);
     const [failedKey, setFailedKey] = useState("");
@@ -60,7 +62,14 @@ function TimeframeConfluenceExplorer({
                     && data.execution_zone.zone_type === result.zone_type
                     && data.execution_zone.proximal_price === result.proximal_price
                     && data.execution_zone.distal_price === result.distal_price;
-                if (sameSelection) setReceived({ key: requestKey, data });
+                if (sameSelection) {
+                    setReceived({ key: requestKey, data });
+                    onAvailableOverlays(
+                        data.higher_timeframes
+                            .map(overlayFrom)
+                            .filter((overlay): overlay is ConfluenceChartOverlay => overlay !== null),
+                    );
+                }
             })
             .catch(() => {
                 if (active) setFailedKey(requestKey);
@@ -68,7 +77,7 @@ function TimeframeConfluenceExplorer({
         return () => {
             active = false;
         };
-    }, [requestKey, result]);
+    }, [onAvailableOverlays, requestKey, result]);
 
     const frames = useMemo(
         () => response?.higher_timeframes.filter(

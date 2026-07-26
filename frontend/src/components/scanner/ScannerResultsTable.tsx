@@ -54,6 +54,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
     const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>([]);
     const [confluenceOverlays, setConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
+    const [availableConfluenceOverlays, setAvailableConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
     const [confluenceOverlaysHidden, setConfluenceOverlaysHidden] = useState(false);
     const [fullChartHeight, setFullChartHeight] = useState(() =>
         Math.max(420, Math.min(680, window.innerHeight - 300))
@@ -101,6 +102,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
 
     function openStock(zones: ZoneResearchResult[]) {
         setConfluenceOverlays([]);
+        setAvailableConfluenceOverlays([]);
         setConfluenceOverlaysHidden(false);
         setSelectedZones(zones);
     }
@@ -108,6 +110,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
     function closeStock() {
         setSelectedZones([]);
         setConfluenceOverlays([]);
+        setAvailableConfluenceOverlays([]);
         setConfluenceOverlaysHidden(false);
     }
 
@@ -242,6 +245,8 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                     result={selectedZone}
                                     zones={selectedZones}
                                     confluenceOverlays={confluenceOverlaysHidden ? [] : confluenceOverlays}
+                                    availableConfluenceOverlays={availableConfluenceOverlays}
+                                    onToggleConfluenceOverlay={toggleConfluenceOverlay}
                                     height={fullChartHeight}
                                     showTools
                                 />
@@ -267,6 +272,7 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                             setConfluenceOverlays([]);
                                             setConfluenceOverlaysHidden(false);
                                         }}
+                                        onAvailableConfluenceOverlays={setAvailableConfluenceOverlays}
                                     />
                                 </Box>
                             </Grid>

@@ -105,6 +105,7 @@ interface ZoneExplanationPanelProps {
     onToggleConfluenceOverlay?: (overlay: ConfluenceChartOverlay) => void;
     onToggleConfluenceVisibility?: () => void;
     onClearConfluenceOverlays?: () => void;
+    onAvailableConfluenceOverlays?: (overlays: ConfluenceChartOverlay[]) => void;
 }
 
 function ZoneExplanationPanel({
@@ -114,6 +115,7 @@ function ZoneExplanationPanel({
     onToggleConfluenceOverlay,
     onToggleConfluenceVisibility,
     onClearConfluenceOverlays,
+    onAvailableConfluenceOverlays,
 }: ZoneExplanationPanelProps) {
     const [message, setMessage] = useState("");
     const selectedAnalysisKey = `${result.symbol}:${result.timeframe}:${result.zone_type}:${result.proximal_price}:${result.distal_price}:${result.base_index}`;
@@ -440,7 +442,7 @@ function ZoneExplanationPanel({
                         </Stack>
                     </Section>
 
-                    {onToggleConfluenceOverlay && onToggleConfluenceVisibility && onClearConfluenceOverlays && (
+                    {onToggleConfluenceOverlay && onToggleConfluenceVisibility && onClearConfluenceOverlays && onAvailableConfluenceOverlays && (
                         <Section title="Higher Timeframe Confluence">
                             <TimeframeConfluenceExplorer
                                 result={result}
@@ -449,6 +451,7 @@ function ZoneExplanationPanel({
                                 onToggleOverlay={onToggleConfluenceOverlay}
                                 onToggleVisibility={onToggleConfluenceVisibility}
                                 onClearOverlays={onClearConfluenceOverlays}
+                                onAvailableOverlays={onAvailableConfluenceOverlays}
                             />
                         </Section>
                     )}

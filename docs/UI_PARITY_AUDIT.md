@@ -399,4 +399,8 @@ slightly into the future. The chart toolbar also includes Hide all zones, which 
 both scanner and higher-timeframe overlays while keeping the market candles, pan,
 zoom, crosshair and measuring tools available. Measure Range now uses two chart clicks
 to draw the selected price-and-time range directly over the candles; Clear Measurement
-removes that drawing without changing the market view.
+removes that drawing without changing the market view. The measured prices, change and
+percentage are displayed inside the selected range and follow it during pan and zoom.
+Higher-timeframe buttons are also available directly above the chart, start unselected
+and add only the timeframe the user chooses. Far-away overlays are excluded from candle
+autoscaling so they cannot flatten the market chart.
