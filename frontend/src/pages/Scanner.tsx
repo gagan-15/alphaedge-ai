@@ -16,6 +16,7 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { useSearchParams } from "react-router-dom";
 
 import { getResearchZones } from "../api/scannerApi";
 import ScannerResultsTable from "../components/scanner/ScannerResultsTable";
@@ -53,6 +54,8 @@ function scannerPreference<T>(key: "defaultTimeframe" | "minimumQuality", fallba
 }
 
 function Scanner() {
+    const [searchParams] = useSearchParams();
+    const requestedSetup = searchParams.get("setup")?.toLowerCase() ?? "";
     const [scanner, setScanner] =
         useState<ZoneResearchResponse | null>(null);
     const [isLoading, setIsLoading] =
@@ -61,8 +64,8 @@ function Scanner() {
         useState<string | null>(null);
     const [searchQuery, setSearchQuery] =
         useState("");
-    const [minimumScore, setMinimumScore] = useState(() => scannerPreference("minimumQuality", 40));
-    const [approvalFilter, setApprovalFilter] = useState("all");
+    const [minimumScore, setMinimumScore] = useState(() => requestedSetup ? 75 : scannerPreference("minimumQuality", 40));
+    const [approvalFilter, setApprovalFilter] = useState(() => requestedSetup.includes("demand") || requestedSetup.includes("buying") ? "approved" : "all");
     const [timeframe, setTimeframe] = useState(() => scannerPreference("defaultTimeframe", "DAILY"));
     const [market, setMarket] = useState("NSE");
     const [patternFilter, setPatternFilter] = useState("all");

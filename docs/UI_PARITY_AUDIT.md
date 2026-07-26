@@ -305,3 +305,13 @@ verdict, health, trend, demo stock universe, explanations, tooltips, density and
 format. AI Summary cannot be hidden, at least one analysis widget must remain, Reset
 requires confirmation, and Save is enabled only while an "Unsaved Changes" state exists.
 The local schema is version 2 and retains a service boundary for future account storage.
+
+Market Overview interaction phase makes the dashboard a working navigation hub without
+changing its layout or data logic. Summary, health, trend, risk, participation, investor
+activity, volatility, sentiment and verdict cards now open accessible detail drawers.
+Research-focus and opportunity actions open the existing scanner with a recommended
+minimum quality filter, while risk and alert actions link to their existing pages.
+Sector and market-breadth drill-downs show an honest Coming Soon drawer because the
+current scanner feed does not yet include the full sector and market-universe fields
+needed for accurate filtering. All interactive cards provide keyboard access, focus
+feedback, a pointer cursor and a short exploration tooltip.
