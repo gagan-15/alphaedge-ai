@@ -91,6 +91,12 @@ function ZoneDetailChart({ result, zones = [result], height = 360, showTools = f
                     borderVisible: false,
                 });
                 candles.setData(data);
+                const recentSteps = data.slice(-12).reduce<number[]>((steps, candle, index, recent) => {
+                    if (index > 0) steps.push(Number(candle.time) - Number(recent[index - 1].time));
+                    return steps;
+                }, []).filter((step) => step > 0).sort((left, right) => left - right);
+                const candleStep = recentSteps[Math.floor(recentSteps.length / 2)] || 86_400;
+                const futureZonePoints = 12;
                 chart.subscribeClick((param) => {
                     if (!measuringRef.current || !param.point) return;
                     const price = candles.coordinateToPrice(param.point.y);
@@ -124,14 +130,23 @@ function ZoneDetailChart({ result, zones = [result], height = 360, showTools = f
                         lastValueVisible: false,
                     });
                     const start = Math.max(0, Math.min(displayZone.base_index ?? data.length - 45, data.length - 1));
-                    zone.setData(data.slice(start).map((candle) => ({
+                    const zoneData = data.slice(start).map((candle) => ({
                         time: candle.time,
                         value: displayZone.proximal_price as number,
-                    })));
+                    }));
+                    const latestTime = Number(data[data.length - 1].time);
+                    for (let point = 1; point <= futureZonePoints; point += 1) {
+                        zoneData.push({
+                            time: (latestTime + candleStep * point) as UTCTimestamp,
+                            value: displayZone.proximal_price as number,
+                        });
+                    }
+                    zone.setData(zoneData);
                 }
                 });
 
                 chart.timeScale().fitContent();
+                chart.timeScale().applyOptions({ rightOffset: 3 });
                 setLoading(false);
             })
             .catch(() => {
