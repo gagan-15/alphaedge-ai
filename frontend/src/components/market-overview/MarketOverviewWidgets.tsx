@@ -77,7 +77,7 @@ function Stars({ value }: { value: number }) {
 
 function CircularGauge({ value, label, color = colors.green }: { value: number; label: string; color?: string }) {
     const animated = useCountUp(value);
-    return <Box sx={{ width: 132, height: 132, mx: "auto", borderRadius: "50%", p: "10px", background: `conic-gradient(${color} ${animated * 3.6}deg,#17263a 0)`, transition: "background .25s ease" }}>
+    return <Box sx={{ width: 132, height: 132, mx: "auto", borderRadius: "50%", p: "10px", background: (theme) => `conic-gradient(${color} ${animated * 3.6}deg,${theme.palette.mode === "dark" ? "#17263a" : "#dfe6ef"} 0)`, transition: "background .25s ease" }}>
         <Box sx={{ width: "100%", height: "100%", borderRadius: "50%", bgcolor: "background.paper", display: "grid", placeItems: "center", textAlign: "center" }}>
             <Box><Typography sx={{ fontSize: "2rem", lineHeight: 1, fontWeight: 900 }}>{animated}</Typography><Typography color="text.secondary" sx={{ mt: .5, fontSize: ".66rem" }}>{label}</Typography></Box>
         </Box>
@@ -145,7 +145,7 @@ function ExecutiveStatusChip({ metric, showTooltip = true }: { metric: Executive
                 alignItems: "center",
                 borderRadius: 2,
                 border: "1px solid rgba(143,161,184,.16)",
-                bgcolor: "rgba(4,12,25,.2)",
+                bgcolor: "action.hover",
                 transition: "transform .18s ease,border-color .18s ease",
                 "&:hover": { transform: "translateY(-2px)", borderColor: `${toneColor}55` },
             }}
@@ -231,7 +231,7 @@ export function AIMarketSummaryWidget({
             </Grid>
             <Grid size={{ xs: 12, lg: 3 }}>
                 <Stack sx={{ height: "100%", justifyContent: "center", alignItems: "center", borderLeft: { lg: "1px solid rgba(143,161,184,.14)" } }}>
-                    <Box sx={{ width: 142, height: 142, borderRadius: "50%", p: "10px", background: `conic-gradient(${colors.violet} ${animatedScore * 3.6}deg,#17263a 0)` }}>
+                    <Box sx={{ width: 142, height: 142, borderRadius: "50%", p: "10px", background: (theme) => `conic-gradient(${colors.violet} ${animatedScore * 3.6}deg,${theme.palette.mode === "dark" ? "#17263a" : "#dfe6ef"} 0)` }}>
                         <Box sx={{ width: "100%", height: "100%", borderRadius: "50%", bgcolor: "background.paper", display: "grid", placeItems: "center", textAlign: "center" }}>
                             <Box><Typography sx={{ fontSize: "1.75rem", lineHeight: 1, fontWeight: 900 }}>{animatedScore} <Box component="span" sx={{ fontSize: ".7rem", color: "text.secondary" }}>/ 100</Box></Typography><Typography sx={{ mt: .7, color: colors.green, fontSize: ".66rem", fontWeight: 800 }}>Market looks Healthy</Typography></Box>
                         </Box>
@@ -241,12 +241,12 @@ export function AIMarketSummaryWidget({
                 </Stack>
             </Grid>
         </Grid>
-        <Stack direction={{ xs: "column", lg: "row" }} spacing={1.5} sx={{ p: 1.25, alignItems: { lg: "center" }, borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", bgcolor: "rgba(4,12,25,.22)" }}>
+        <Stack direction={{ xs: "column", lg: "row" }} spacing={1.5} sx={{ p: 1.25, alignItems: { lg: "center" }, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "action.hover" }}>
             <Box sx={{ minWidth: 190 }}><Typography color="text.secondary" sx={{ fontSize: ".56rem", textTransform: "uppercase", letterSpacing: ".08em" }}>Good Opportunities To Explore Today</Typography><Typography sx={{ mt: .2, fontSize: ".7rem", fontWeight: 850 }}>Look for careful buying opportunities</Typography></Box>
             <Stack direction="row" useFlexGap spacing={.7} sx={{ flex: 1, flexWrap: "wrap" }}>{data.focus.map((item) => <Chip key={item} size="small" label={item} variant="outlined" />)}<Chip size="small" label={`Avoid: ${data.avoid}`} sx={{ color: colors.red, borderColor: `${colors.red}55` }} variant="outlined" /></Stack>
             <Button component={RouterLink} to="/scanner" size="small" variant="contained" endIcon={<ArrowForwardRoundedIcon />}>Find Matching Stocks</Button>
         </Stack>
-        <Box sx={{ p: 1.5, borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", bgcolor: "rgba(4,12,25,.2)" }}>
+        <Box sx={{ p: 1.5, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "action.hover" }}>
             <Typography sx={{ fontWeight: 850, fontSize: ".78rem" }}>What should I do today?</Typography>
             <Grid container spacing={.7} sx={{ mt: .7 }}>
                 {[
@@ -466,7 +466,7 @@ export function ParticipationChartWidget({
                 ["Current", current.net], ["Highest", maxValue], ["Lowest", minValue],
                 ["5-Day Average", Math.round(values.slice(-5).reduce((sum, value) => sum + value, 0) / Math.min(5, values.length))],
                 ["20-Day Average", Math.round(values.slice(-20).reduce((sum, value) => sum + value, 0) / Math.min(20, values.length))],
-            ].map(([label, value]) => <Grid key={label} size={{ xs: 6, sm: 4, lg: 2.4 }}><Box sx={{ p: .9, borderRadius: 2, bgcolor: "rgba(4,12,25,.22)", border: "1px solid rgba(143,161,184,.12)" }}><Typography color="text.secondary" sx={{ fontSize: ".55rem" }}>{label}</Typography><Typography sx={{ mt: .2, fontWeight: 900, color: Number(value) >= 0 ? colors.green : colors.red }}>{Number(value) > 0 ? "+" : ""}{value}</Typography></Box></Grid>)}
+            ].map(([label, value]) => <Grid key={label} size={{ xs: 6, sm: 4, lg: 2.4 }}><Box sx={{ p: .9, borderRadius: 2, bgcolor: "action.hover", border: "1px solid", borderColor: "divider" }}><Typography color="text.secondary" sx={{ fontSize: ".55rem" }}>{label}</Typography><Typography sx={{ mt: .2, fontWeight: 900, color: Number(value) >= 0 ? colors.green : colors.red }}>{Number(value) > 0 ? "+" : ""}{value}</Typography></Box></Grid>)}
         </Grid>
         <Box ref={chartAreaRef} sx={{ position: "relative", height: 400, mt: 1.25, bgcolor: "#081322", color: "#f3f7fb", borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", overflow: "hidden" }}>
             <Typography color="text.secondary" sx={{ position: "absolute", left: 8, top: "44%", fontSize: ".55rem", transform: "rotate(-90deg)", transformOrigin: "left top" }}>Net Market Participation — stocks up minus stocks down</Typography>
@@ -502,7 +502,7 @@ export function ParticipationChartWidget({
                 <circle cx={scaleX(activeIndex)} cy={scaleY(active.net)} r="1.8" fill="#fff" stroke={colors.green} strokeWidth=".7" />
             </Box>
             <Stack direction="row" sx={{ position: "absolute", left: 108, right: 16, bottom: 7, justifyContent: "space-between" }}>{axisLabels[range].map((label) => <Typography key={label} color="text.secondary" sx={{ fontSize: ".54rem" }}>{label}</Typography>)}</Stack>
-            {showTooltips && <Box sx={{ position: "absolute", right: 18, top: 18, width: 220, p: 1.2, borderRadius: 2, bgcolor: "rgba(7,17,30,.94)", border: "1px solid rgba(143,161,184,.28)", pointerEvents: "none" }}>
+            {showTooltips && <Box sx={{ position: "absolute", right: 18, top: 18, width: 220, p: 1.2, borderRadius: 2, bgcolor: "rgba(7,17,30,.94)", color: "#f3f7fb", border: "1px solid rgba(143,161,184,.28)", pointerEvents: "none" }}>
                 <Typography sx={{ fontSize: ".66rem", fontWeight: 850 }}>{active.date}</Typography>
                 <Grid container spacing={.4} sx={{ mt: .5 }}>{[["Stocks Up", active.advancing], ["Stocks Down", active.declining], ["Net", active.net], ["Market Health", health], ["New Highs", active.highs], ["New Lows", active.lows]].map(([label, value]) => <Grid key={label} size={6}><Typography color="text.secondary" sx={{ fontSize: ".51rem" }}>{label}</Typography><Typography sx={{ fontSize: ".62rem", fontWeight: 800 }}>{value}</Typography></Grid>)}</Grid>
                 <Typography sx={{ mt: .7, color: active.net > 20 ? colors.green : colors.amber, fontSize: ".57rem" }}>{active.net > 20 ? "Most stocks joined this market rise." : "Only some stocks joined this move."}</Typography>
@@ -550,7 +550,7 @@ export function MarketBreadthWidget({ participation = 62, shortNumbers = false, 
             ? [metric[0], Math.round(total * (100 - participation) / 100), metric[2], metric[3]] as const
             : metric);
     return <Grid container spacing={1}>{sharedMetrics.map(([label, value, trend, help]) => {
-        const metric = <Box sx={{ p: 1.05, borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", bgcolor: "rgba(4,12,25,.24)", transition: "transform .18s ease,border-color .18s ease", "&:hover": { transform: "translateY(-2px)", borderColor: "rgba(97,114,243,.45)" } }}><Typography color="text.secondary" noWrap sx={{ fontSize: ".55rem" }}>{label}</Typography><Stack direction="row" spacing={.55} sx={{ mt: .35, alignItems: "baseline" }}><Typography sx={{ fontWeight: 900 }}>{format(value)}</Typography><Typography sx={{ color: String(trend).startsWith("-") ? colors.red : colors.green, fontSize: ".56rem" }}>{trend}</Typography></Stack></Box>;
+        const metric = <Box sx={{ p: 1.05, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "action.hover", transition: "transform .18s ease,border-color .18s ease", "&:hover": { transform: "translateY(-2px)", borderColor: "rgba(97,114,243,.45)" } }}><Typography color="text.secondary" noWrap sx={{ fontSize: ".55rem" }}>{label}</Typography><Stack direction="row" spacing={.55} sx={{ mt: .35, alignItems: "baseline" }}><Typography sx={{ fontWeight: 900 }}>{format(value)}</Typography><Typography sx={{ color: String(trend).startsWith("-") ? colors.red : colors.green, fontSize: ".56rem" }}>{trend}</Typography></Stack></Box>;
         return <Grid key={label} size={{ xs: 6, sm: 4, lg: 3 }}>{showTooltips ? <Tooltip title={help}>{metric}</Tooltip> : metric}</Grid>;
     })}</Grid>;
 }
@@ -580,7 +580,7 @@ export function OpportunitiesWidget() {
 
 export function SmartAlertsWidget() {
     const alerts = [["More stocks are joining the rise", "Important", "2m", colors.green], ["Bank Nifty is stronger than the wider market", "Medium", "8m", colors.blue], ["Metal stocks are becoming weaker", "Medium", "14m", colors.amber], ["Small companies are doing better than large companies", "Information", "21m", colors.cyan]];
-    return <Stack spacing={1}>{alerts.map(([message, severity, time, color]) => <Stack key={message} direction="row" spacing={1.1} sx={{ alignItems: "center", p: 1.1, borderRadius: 2, bgcolor: "rgba(4,12,25,.25)", border: "1px solid rgba(143,161,184,.12)" }}><Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: color, boxShadow: `0 0 10px ${color}` }} /><Box sx={{ flex: 1 }}><Typography sx={{ fontSize: ".72rem", fontWeight: 800 }}>{message}</Typography><Typography color="text.secondary" sx={{ fontSize: ".57rem" }}>{severity} severity</Typography></Box><Typography color="text.secondary" sx={{ fontSize: ".6rem" }}>{time}</Typography></Stack>)}</Stack>;
+    return <Stack spacing={1}>{alerts.map(([message, severity, time, color]) => <Stack key={message} direction="row" spacing={1.1} sx={{ alignItems: "center", p: 1.1, borderRadius: 2, bgcolor: "action.hover", border: "1px solid", borderColor: "divider" }}><Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: color, boxShadow: `0 0 10px ${color}` }} /><Box sx={{ flex: 1 }}><Typography sx={{ fontSize: ".72rem", fontWeight: 800 }}>{message}</Typography><Typography color="text.secondary" sx={{ fontSize: ".57rem" }}>{severity} severity</Typography></Box><Typography color="text.secondary" sx={{ fontSize: ".6rem" }}>{time}</Typography></Stack>)}</Stack>;
 }
 
 export function VerdictWidget({ timeframe = "1M", universe = "nifty500", language = "simple" }: { timeframe?: string; universe?: string; language?: "simple" | "professional" }) {

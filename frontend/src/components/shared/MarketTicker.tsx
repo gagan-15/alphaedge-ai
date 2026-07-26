@@ -27,7 +27,9 @@ function MarketTicker() {
                 overflow: "hidden",
                 borderTop: "1px solid",
                 borderColor: "divider",
-                bgcolor: "rgba(5, 14, 29, 0.97)",
+                bgcolor: (theme) => theme.palette.mode === "dark" ? "rgba(5,14,29,.97)" : "rgba(255,255,255,.97)",
+                color: "text.primary",
+                boxShadow: (theme) => theme.palette.mode === "light" ? "0 -5px 18px rgba(28,45,72,.08)" : "none",
                 backdropFilter: "blur(14px)",
             }}
         >

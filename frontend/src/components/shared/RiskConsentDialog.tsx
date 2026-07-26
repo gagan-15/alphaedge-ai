@@ -39,7 +39,7 @@ function RiskConsentDialog() {
                         "Market conditions are unpredictable. Historical patterns and model estimates do not guarantee future results.",
                         "AlphaEdge does not execute trades. Use your own judgment, risk limits and professional advice when needed.",
                     ].map((message) => (
-                        <Box key={message} sx={{ width: "100%", p: 1.5, textAlign: "left", border: "1px solid", borderColor: "divider", borderRadius: 1, bgcolor: "rgba(255,255,255,.02)" }}>
+                        <Box key={message} sx={{ width: "100%", p: 1.5, textAlign: "left", border: "1px solid", borderColor: "divider", borderRadius: 1, bgcolor: "action.hover" }}>
                             <Typography color="text.secondary">• {message}</Typography>
                         </Box>
                     ))}

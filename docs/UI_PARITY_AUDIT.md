@@ -491,3 +491,9 @@ Light-mode contrast was hardened after visual review. Header icons and account t
 now use the active theme text colour, light cards use clearer borders and shadows,
 and intentionally dark chart workspaces keep light labels, secondary text, controls,
 inputs and chart borders instead of inheriting unreadable light-theme text colours.
+
+A full shared-surface theme audit also corrected dark-only backgrounds outside chart
+workspaces. The delayed market ticker, Market Overview summary strips, status cards,
+metric tiles, alert rows and gauge tracks now use the active theme. Chart canvases
+remain dark for price readability, with explicit light chart labels and tooltips.
+The public landing and login presentation remain intentionally branded dark surfaces.

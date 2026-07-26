@@ -160,7 +160,7 @@ function TradingChart() {
     }
 
     return (
-        <Card sx={{ height: 430, overflow: "hidden" }}>
+        <Card sx={{ height: 430, overflow: "hidden", bgcolor: "#07111e", color: "#f3f7fb" }}>
             <Stack direction="row" sx={{ height: 42, px: 1.5, alignItems: "center", justifyContent: "space-between", bgcolor: "#091423" }}>
                 <Box>
                     <Typography sx={{ fontWeight: 800, fontSize: "0.78rem" }}>RELIANCE INDUSTRIES LTD · 1D · NSE</Typography>
@@ -196,7 +196,7 @@ function TradingChart() {
                 <Box ref={containerRef} sx={{ flex: 1, minWidth: 0, height: "100%" }} />
             </Box>
             <Stack direction="row" sx={{ height: 40, px: 1.5, alignItems: "center", bgcolor: "#091423" }}>
-                <Typography color="text.secondary" variant="caption">
+                <Typography sx={{ color: "#9fb0c5" }} variant="caption">
                     Drag to pan · wheel to zoom · {dataLabel}
                 </Typography>
                 <Link
