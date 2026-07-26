@@ -410,6 +410,21 @@ function ZoneDetailChart({
                 <Chip size="small" label="Wheel to zoom" />
                 <Typography variant="caption" color={measuring ? "primary.main" : "text.secondary"} sx={{ ml: "auto" }}>{measurement}</Typography>
             </Stack>}
+            {confluenceOverlays.length > 0 && (
+                <Stack direction="row" sx={{ px: 1.5, py: .75, alignItems: "center", gap: .75, borderBottom: "1px solid", borderColor: "divider", flexWrap: "wrap" }}>
+                    <Typography variant="caption" sx={{ fontWeight: 850 }}>Timeframe zones shown:</Typography>
+                    <Chip size="small" label={`${result.timeframe} selected zone`} />
+                    {confluenceOverlays.map((overlay) => (
+                        <Chip
+                            key={overlay.timeframe}
+                            size="small"
+                            variant="outlined"
+                            label={`${overlay.timeframeName} · ${overlay.zoneType === "DEMAND" ? "Demand" : "Supply"}`}
+                            sx={{ color: overlay.zoneType === "DEMAND" ? "#60a5fa" : "#ff6b8a" }}
+                        />
+                    ))}
+                </Stack>
+            )}
             {loading && <Box sx={{ height, display: "grid", placeItems: "center" }}><CircularProgress size={28} /></Box>}
             {error && <Alert severity="warning">{error}</Alert>}
             <Box ref={containerRef} sx={{ height: loading || error ? 0 : height }} />

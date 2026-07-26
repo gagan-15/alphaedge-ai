@@ -76,6 +76,21 @@ function TimeframeConfluenceExplorer({
         ) ?? [],
         [confirmedOnly, response],
     );
+    const availableOverlays = useMemo(
+        () => response?.higher_timeframes
+            .map(overlayFrom)
+            .filter((overlay): overlay is ConfluenceChartOverlay => overlay !== null) ?? [],
+        [response],
+    );
+
+    function showAllTimeframesOnChart() {
+        availableOverlays.forEach((overlay) => {
+            if (!activeTimeframes.includes(overlay.timeframe)) {
+                onToggleOverlay(overlay);
+            }
+        });
+        if (overlaysHidden) onToggleVisibility();
+    }
 
     if (loading) {
         return <Box sx={{ py: 2, display: "flex", justifyContent: "center" }}><CircularProgress size={22} /></Box>;
@@ -86,11 +101,19 @@ function TimeframeConfluenceExplorer({
     return (
         <Stack spacing={1.25}>
             <Stack direction="row" sx={{ flexWrap: "wrap", gap: .75 }}>
+                <Button
+                    size="small"
+                    variant="contained"
+                    disabled={!availableOverlays.length}
+                    onClick={showAllTimeframesOnChart}
+                >
+                    Show all timeframe zones on chart
+                </Button>
                 <Button size="small" variant={confirmedOnly ? "contained" : "outlined"} onClick={() => setConfirmedOnly(true)}>
                     Show only confirmed
                 </Button>
                 <Button size="small" variant={!confirmedOnly ? "contained" : "outlined"} onClick={() => setConfirmedOnly(false)}>
-                    Show all
+                    Show all cards
                 </Button>
                 <Button size="small" variant="outlined" onClick={onToggleVisibility}>
                     {overlaysHidden ? "Show overlays" : "Hide overlays"}
