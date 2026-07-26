@@ -305,3 +305,12 @@ verdict, health, trend, demo stock universe, explanations, tooltips, density and
 format. AI Summary cannot be hidden, at least one analysis widget must remain, Reset
 requires confirmation, and Save is enabled only while an "Unsaved Changes" state exists.
 The local schema is version 2 and retains a service boundary for future account storage.
+
+The Scanner full-screen research chart now uses its existing right-side panel as a
+decision workspace. It explains the rule-based quality score, gives a cautious research
+recommendation, shows the available zone evidence, failed or unconfirmed checks, zone
+freshness, retests and departure strength, and provides working local watchlist, alert
+and share actions. Missing trade-plan, trend, momentum, sector, relative-performance,
+historical and risk fields are labelled as unavailable rather than being invented.
+Validated backend services are required before entry, stop, target, probability or
+historical-success values can be shown.
