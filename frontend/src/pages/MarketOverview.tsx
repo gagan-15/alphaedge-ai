@@ -50,7 +50,7 @@ export default function MarketOverview() {
                             <Chip size="small" color="success" variant="outlined" label="MARKET OPEN" />
                         </Stack>
                         <Typography color="text.secondary" sx={{ mt: .65 }}>
-                            Institutional market context for faster research decisions.
+                            A simple view of what the market is doing and what you may want to check next.
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
                             Last updated: {lastUpdated}
@@ -92,8 +92,8 @@ export default function MarketOverview() {
 
                 <OverviewPanel
                     title="AI Market Summary"
-                    subtitle="A concise interpretation of market health, leadership, risk and the preferred research approach will appear here."
-                    eyebrow="Executive intelligence"
+                    subtitle="A clear explanation of today's market, the main risks and what to research next."
+                    eyebrow="Today's market explained"
                     accent="#8b5cf6"
                     minHeight={190}
                     action={<Chip size="small" label="TRANSPARENT DEMO LOGIC" variant="outlined" />}
@@ -102,16 +102,16 @@ export default function MarketOverview() {
                 </OverviewPanel>
 
                 <Grid container spacing={2.5}>
-                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle="Participation, momentum and trend strength" accent="#32d583" minHeight={310}><MarketHealthWidget /></OverviewPanel></Grid>
-                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Regime" subtitle="Trending, ranging or transition environment" accent="#6172f3" minHeight={310}><MarketRegimeWidget /></OverviewPanel></Grid>
-                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Trading Bias" subtitle="Preferred directional research posture" accent="#22d3ee" minHeight={310}><TradingBiasWidget /></OverviewPanel></Grid>
-                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Risk Meter" subtitle="Volatility and participation risk context" accent="#fdb022" minHeight={310}><RiskMeterWidget /></OverviewPanel></Grid>
+                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle="Are most stocks supporting today's market move?" accent="#32d583" minHeight={310}><MarketHealthWidget /></OverviewPanel></Grid>
+                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Direction" subtitle="Is the market rising, falling or moving sideways?" accent="#6172f3" minHeight={310}><MarketRegimeWidget /></OverviewPanel></Grid>
+                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Today's Research Focus" subtitle="Should you mainly look for buying or selling opportunities?" accent="#22d3ee" minHeight={310}><TradingBiasWidget /></OverviewPanel></Grid>
+                    <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Risk" subtitle="How careful should you be today?" accent="#fdb022" minHeight={310}><RiskMeterWidget /></OverviewPanel></Grid>
                 </Grid>
 
                 <OverviewPanel
                     title="Market Participation Trend"
-                    subtitle={`${market} participation workspace · ${timeframe} view`}
-                    eyebrow="Breadth through time"
+                    subtitle={`See whether more stocks are rising or falling in the ${market} market · ${timeframe} view`}
+                    eyebrow="How many stocks support the move?"
                     minHeight={420}
                     action={<Chip size="small" label="INTERACTIVE DEMO" variant="outlined" />}
                 >
@@ -120,12 +120,12 @@ export default function MarketOverview() {
 
                 <Grid container spacing={2.5}>
                     <Grid size={{ xs: 12, lg: 6 }}>
-                        <OverviewPanel title="Sector Rotation" subtitle="Leadership, improvement and deterioration by sector" minHeight={330}>
+                        <OverviewPanel title="Strong and Weak Sectors" subtitle="See where money is moving and which sectors are losing strength." minHeight={330}>
                             <SectorRotationWidget />
                         </OverviewPanel>
                     </Grid>
                     <Grid size={{ xs: 12, lg: 6 }}>
-                        <OverviewPanel title="Market Breadth" subtitle="Advancing, declining and unchanged participation" minHeight={330}>
+                        <OverviewPanel title="Stocks Going Up and Down" subtitle="A wider look at how many stocks are supporting the market." minHeight={330}>
                             <MarketBreadthWidget />
                         </OverviewPanel>
                     </Grid>
@@ -133,17 +133,17 @@ export default function MarketOverview() {
 
                 <Grid container spacing={2.5}>
                     <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-                        <OverviewPanel title="Institutional Flow" subtitle="FII and DII activity context" minHeight={280}>
+                        <OverviewPanel title="Large Investor Activity" subtitle="See whether foreign and Indian institutions are buying or selling." minHeight={280}>
                             <InstitutionalFlowWidget />
                         </OverviewPanel>
                     </Grid>
                     <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-                        <OverviewPanel title="India VIX" subtitle="Volatility level, direction and risk state" minHeight={280}>
+                        <OverviewPanel title="India VIX" subtitle="India VIX measures expected market swings. A higher value means more uncertainty." minHeight={280}>
                             <IndiaVixWidget />
                         </OverviewPanel>
                     </Grid>
                     <Grid size={{ xs: 12, md: 12, lg: 4 }}>
-                        <OverviewPanel title="Market Sentiment" subtitle="Combined participation and risk context" minHeight={280}>
+                        <OverviewPanel title="Market Mood" subtitle="A simple view of whether traders feel fearful or confident." minHeight={280}>
                             <SentimentWidget />
                         </OverviewPanel>
                     </Grid>
@@ -151,12 +151,12 @@ export default function MarketOverview() {
 
                 <Grid container spacing={2.5}>
                     <Grid size={{ xs: 12, lg: 6 }}>
-                        <OverviewPanel title="AI Opportunities" subtitle="Research candidates that deserve deeper validation" minHeight={300}>
+                        <OverviewPanel title="Ideas to Research" subtitle="Groups of stocks that may be worth checking in the scanner." minHeight={300}>
                             <OpportunitiesWidget />
                         </OverviewPanel>
                     </Grid>
                     <Grid size={{ xs: 12, lg: 6 }}>
-                        <OverviewPanel title="Smart Alerts" subtitle="Important market conditions requiring attention" minHeight={300}>
+                        <OverviewPanel title="Important Market Changes" subtitle="Recent changes that may need your attention." minHeight={300}>
                             <SmartAlertsWidget />
                         </OverviewPanel>
                     </Grid>
@@ -164,8 +164,8 @@ export default function MarketOverview() {
 
                 <OverviewPanel
                     title="Today's Verdict"
-                    subtitle="The final market posture, preferred strategy, risk level and next scan will be summarized here."
-                    eyebrow="Decision brief"
+                    subtitle="A short summary of the market, the risk and what you may want to research."
+                    eyebrow="Simple daily summary"
                     accent="#32d583"
                     minHeight={220}
                     action={<Chip size="small" color="warning" variant="outlined" label="DEMO VERDICT" />}

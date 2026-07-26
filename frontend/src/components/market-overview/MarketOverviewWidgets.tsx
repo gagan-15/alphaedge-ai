@@ -106,26 +106,26 @@ const demoExecutiveSummary: ExecutiveSummaryData = {
     participation: 72,
     leaders: ["Financials", "IT"],
     laggards: ["Metal", "Auto"],
-    volatility: "below its recent average",
-    focus: ["IT pullbacks", "Banking momentum", "High relative-strength stocks"],
-    avoid: "Weak-sector breakouts",
+    volatility: "below its recent average, so price swings are still controlled",
+    focus: ["IT stocks after a small fall", "Banking stocks moving up strongly", "Stocks doing better than the market"],
+    avoid: "Buying breakouts in weak sectors",
     metrics: [
-        { label: "Trend", value: "Bullish", help: "The tracked index trend remains above its medium-term reference structure.", tone: "positive" },
-        { label: "Breadth", value: "Healthy", help: "More than 65% of tracked stocks are participating in the current market trend.", tone: "positive" },
-        { label: "Momentum", value: "Positive", help: "Short- and medium-term momentum measures remain constructive.", tone: "positive" },
-        { label: "Leadership", value: "IT + Banking", help: "IT and banking currently contribute the strongest relative performance.", tone: "positive" },
-        { label: "Volatility", value: "Controlled", help: "India VIX remains below its recent stress range.", tone: "neutral" },
-        { label: "Institutional Flow", value: "Mixed Buying", help: "Domestic buying currently offsets cautious foreign participation.", tone: "caution" },
-        { label: "Market Regime", value: "Bull Expansion", help: "Trend and breadth are expanding together rather than diverging.", tone: "positive" },
+        { label: "Market Direction", value: "Going Up", help: "The main market indexes are still moving upward.", tone: "positive" },
+        { label: "Stocks Taking Part", value: "Healthy", help: "More than 65% of tracked stocks are joining the market rise.", tone: "positive" },
+        { label: "Price Strength", value: "Positive", help: "Recent price moves still show more buying than selling.", tone: "positive" },
+        { label: "Leading Sectors", value: "IT + Banking", help: "IT and banking stocks are doing better than most other sectors.", tone: "positive" },
+        { label: "Expected Swings", value: "Controlled", help: "India VIX is low. This means the market expects smaller price swings.", tone: "neutral" },
+        { label: "Large Investor Activity", value: "Mixed Buying", help: "Indian institutions are buying, while foreign institutions remain careful.", tone: "caution" },
+        { label: "Market Condition", value: "Strong Uptrend", help: "The market is rising and more stocks are joining the rally.", tone: "positive" },
     ],
     factors: [
-        { label: "Breadth Participation", contribution: 20 },
-        { label: "Sector Leadership", contribution: 16 },
-        { label: "Momentum", contribution: 14 },
-        { label: "Trend Strength", contribution: 18 },
-        { label: "India VIX", contribution: 12 },
-        { label: "Institutional Flow", contribution: 9 },
-        { label: "Relative Strength", contribution: 11 },
+        { label: "Stocks joining the move", contribution: 20 },
+        { label: "Strong and weak sectors", contribution: 16 },
+        { label: "Recent price strength", contribution: 14 },
+        { label: "Strength of the market direction", contribution: 18 },
+        { label: "Expected market swings", contribution: 12 },
+        { label: "Large investor activity", contribution: 9 },
+        { label: "Stocks beating the market", contribution: 11 },
     ],
 };
 
@@ -169,11 +169,11 @@ export function AIMarketSummaryWidget({
     if (loading) return <WidgetLoading rows={5} />;
     if (!data) return <WidgetEmpty message="AI Summary unavailable. Waiting for validated market intelligence." />;
     const headline = data.participation >= 65
-        ? "Healthy participation supports the current uptrend"
+        ? "More stocks are joining the market rise. This is a healthy sign."
         : data.participation >= 50
-            ? "Index strength is positive, but participation remains selective"
-            : "Weak participation is reducing confidence behind index gains";
-    const explanation = `The tracked market currently shows ${data.participation}% participation, which supports a constructive internal picture. ${data.leaders.join(" and ")} remain the strongest contributors, while ${data.laggards.join(" and ")} are losing relative strength. India VIX is ${data.volatility}, suggesting controlled but not absent risk. Current conditions favour ${data.focus.slice(0, 2).join(" and ")} instead of chasing extended moves.`;
+            ? "The market is rising, but only some stocks are taking part."
+            : "The main indexes are rising, but too few stocks are joining the move.";
+    const explanation = `${data.participation}% of tracked stocks are taking part in today's move. ${data.leaders.join(" and ")} are currently the strongest sectors, while ${data.laggards.join(" and ")} are becoming weaker. India VIX is ${data.volatility}. It may be safer to look for ${data.focus.slice(0, 2).join(" and ")} instead of buying stocks after a large rise.`;
     return <Stack spacing={2.2}>
         <Grid container spacing={2.5} sx={{ alignItems: "stretch" }}>
             <Grid size={{ xs: 12, lg: 9 }}>
@@ -181,7 +181,7 @@ export function AIMarketSummaryWidget({
                     <Stack direction="row" spacing={1.15} sx={{ alignItems: "center" }}>
                         <Box sx={{ width: 38, height: 38, display: "grid", placeItems: "center", borderRadius: 2, color: colors.violet, bgcolor: `${colors.violet}10` }}><AutoAwesomeOutlinedIcon /></Box>
                         <Box>
-                            <Typography sx={{ fontSize: ".62rem", fontWeight: 850, letterSpacing: ".12em", color: "primary.light" }}>EXECUTIVE INTELLIGENCE</Typography>
+                            <Typography sx={{ fontSize: ".62rem", fontWeight: 850, letterSpacing: ".12em", color: "primary.light" }}>TODAY'S MARKET EXPLAINED</Typography>
                             <Stack direction="row" spacing={1} sx={{ mt: .35, alignItems: "center", flexWrap: "wrap" }}>
                                 <Typography color="text.secondary" sx={{ fontSize: ".62rem" }}>Updated {data.updatedAt}</Typography>
                                 <Box sx={{ width: 3, height: 3, borderRadius: "50%", bgcolor: "text.secondary" }} />
@@ -200,22 +200,22 @@ export function AIMarketSummaryWidget({
             </Grid>
             <Grid size={{ xs: 12, lg: 3 }}>
                 <Stack sx={{ height: "100%", justifyContent: "center", alignItems: "center", borderLeft: { lg: "1px solid rgba(143,161,184,.14)" } }}>
-                    <CircularGauge value={data.confidence} label="AI Confidence" color={colors.violet} />
+                    <CircularGauge value={data.confidence} label="Explanation confidence" color={colors.violet} />
                     <Button size="small" sx={{ mt: 1 }} onClick={() => setExpanded((value) => !value)}>{expanded ? "Hide score details" : "Why?"}</Button>
                 </Stack>
             </Grid>
         </Grid>
         <Collapse in={expanded}>
             <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "rgba(4,12,25,.3)", border: "1px solid rgba(143,161,184,.16)" }}>
-                <Typography sx={{ fontWeight: 850, fontSize: ".72rem" }}>Market confidence contribution</Typography>
+                <Typography sx={{ fontWeight: 850, fontSize: ".72rem" }}>What is included in this confidence score?</Typography>
                 <Grid container spacing={1.25} sx={{ mt: .25 }}>
                     {data.factors.map((factor) => <Grid key={factor.label} size={{ xs: 12, sm: 6, lg: 4 }}><Stack direction="row" spacing={.8} sx={{ alignItems: "center" }}><CheckCircleOutlineRoundedIcon sx={{ color: colors.green, fontSize: 15 }} /><Box sx={{ flex: 1 }}><Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".62rem" }}>{factor.label}</Typography><Typography sx={{ fontSize: ".62rem", fontWeight: 850 }}>{factor.contribution}%</Typography></Stack><LinearProgress variant="determinate" value={factor.contribution * 5} sx={{ mt: .35, height: 4 }} /></Box></Stack></Grid>)}
                 </Grid>
-                <Typography color="text.secondary" sx={{ mt: 1.2, fontSize: ".58rem" }}>Transparent placeholder weighting only. Production confidence requires validated inputs, calibration and monitoring.</Typography>
+                <Typography color="text.secondary" sx={{ mt: 1.2, fontSize: ".58rem" }}>These are example weights. We must test them with reliable historical data before treating the score as accurate.</Typography>
             </Box>
         </Collapse>
         <Stack direction={{ xs: "column", lg: "row" }} spacing={1.5} sx={{ p: 1.25, alignItems: { lg: "center" }, borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", bgcolor: "rgba(4,12,25,.22)" }}>
-            <Box sx={{ minWidth: 145 }}><Typography color="text.secondary" sx={{ fontSize: ".56rem", textTransform: "uppercase", letterSpacing: ".08em" }}>Today's Research Focus</Typography><Typography sx={{ mt: .2, fontSize: ".7rem", fontWeight: 850 }}>Selective long setups</Typography></Box>
+            <Box sx={{ minWidth: 145 }}><Typography color="text.secondary" sx={{ fontSize: ".56rem", textTransform: "uppercase", letterSpacing: ".08em" }}>What to research today</Typography><Typography sx={{ mt: .2, fontSize: ".7rem", fontWeight: 850 }}>Look for careful buying opportunities</Typography></Box>
             <Stack direction="row" useFlexGap spacing={.7} sx={{ flex: 1, flexWrap: "wrap" }}>{data.focus.map((item) => <Chip key={item} size="small" label={item} variant="outlined" />)}<Chip size="small" label={`Avoid: ${data.avoid}`} sx={{ color: colors.red, borderColor: `${colors.red}55` }} variant="outlined" /></Stack>
             <Button component={RouterLink} to="/scanner" size="small" variant="contained" endIcon={<ArrowForwardRoundedIcon />}>Launch Scanner</Button>
         </Stack>
@@ -223,8 +223,8 @@ export function AIMarketSummaryWidget({
 }
 
 export function MarketHealthWidget() {
-    const factors = [["Trend", 5], ["Participation", 4], ["Momentum", 4], ["Volatility", 4], ["Risk", 3]] as const;
-    return <Tooltip title="Demo score combines trend, breadth, momentum, volatility and risk factors. It is not a prediction.">
+    const factors = [["Market direction", 5], ["Stocks joining", 4], ["Recent strength", 4], ["Expected swings", 4], ["Safety level", 3]] as const;
+    return <Tooltip title="This example score looks at market direction, how many stocks are rising, recent price strength, expected price swings and risk. It does not predict returns.">
         <Box>
             <CircularGauge value={87} label="Strong bullish" />
             <Stack spacing={.55} sx={{ mt: 1.5 }}>{factors.map(([label, value]) => <Stack key={label} direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".67rem" }}>{label}</Typography><Stars value={value} /></Stack>)}</Stack>
@@ -237,10 +237,10 @@ export function MarketRegimeWidget() {
     return <Stack sx={{ height: "100%", justifyContent: "space-between" }}>
         <Box>
             <Box sx={{ width: 54, height: 54, display: "grid", placeItems: "center", borderRadius: 3, bgcolor: `${colors.blue}12`, color: colors.blue }}><ShowChartRoundedIcon fontSize="large" /></Box>
-            <Typography sx={{ mt: 1.5, fontSize: "1.35rem", fontWeight: 900 }}>Bull Expansion</Typography>
-            <Typography color="text.secondary" sx={{ mt: .7, fontSize: ".72rem", lineHeight: 1.55 }}>Price trend and participation are expanding together.</Typography>
+            <Typography sx={{ mt: 1.5, fontSize: "1.35rem", fontWeight: 900 }}>Strong Uptrend</Typography>
+            <Typography color="text.secondary" sx={{ mt: .7, fontSize: ".72rem", lineHeight: 1.55 }}>The market is rising and more stocks are joining the rally.</Typography>
         </Box>
-        <Box><Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".68rem" }}>Regime probability</Typography><Typography sx={{ fontWeight: 850 }}>88%</Typography></Stack><LinearProgress value={88} variant="determinate" sx={{ mt: .7, height: 7 }} /></Box>
+        <Box><Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".68rem" }}>Confidence in this view</Typography><Typography sx={{ fontWeight: 850 }}>88%</Typography></Stack><LinearProgress value={88} variant="determinate" sx={{ mt: .7, height: 7 }} /></Box>
     </Stack>;
 }
 
@@ -248,18 +248,18 @@ export function TradingBiasWidget() {
     return <Stack sx={{ height: "100%", justifyContent: "space-between" }}>
         <Box>
             <ArrowUpwardRoundedIcon sx={{ color: colors.green, fontSize: 56, transform: "rotate(35deg)" }} />
-            <Typography sx={{ fontSize: "1.4rem", fontWeight: 900 }}>Long Bias</Typography>
+            <Typography sx={{ fontSize: "1.4rem", fontWeight: 900 }}>Look for Buying Opportunities</Typography>
         </Box>
         <Box>
-            <Typography color="text.secondary" sx={{ fontSize: ".62rem", textTransform: "uppercase" }}>Preferred strategy</Typography>
-            <Typography sx={{ mt: .45, fontWeight: 800 }}>Buy pullbacks · Momentum breakouts</Typography>
-            <Typography color="error.main" sx={{ mt: 1, fontSize: ".69rem" }}>Avoid counter-trend shorts</Typography>
+            <Typography color="text.secondary" sx={{ fontSize: ".62rem", textTransform: "uppercase" }}>Ideas to research</Typography>
+            <Typography sx={{ mt: .45, fontWeight: 800 }}>Strong stocks after a small fall · Stocks breaking above resistance</Typography>
+            <Typography color="error.main" sx={{ mt: 1, fontSize: ".69rem" }}>Avoid selling strong stocks only because they have risen</Typography>
         </Box>
     </Stack>;
 }
 
 export function RiskMeterWidget() {
-    const factors = [["Gap risk", "Low", colors.green], ["Liquidity", "Healthy", colors.green], ["Volatility", "Moderate", colors.amber], ["Trend stability", "High", colors.blue]];
+    const factors = [["Sudden opening move", "Low", colors.green], ["Ease of buying and selling", "Healthy", colors.green], ["Expected price swings", "Medium", colors.amber], ["Market direction stability", "High", colors.blue]];
     return <Stack>
         <Box sx={{ width: 170, height: 86, mx: "auto", overflow: "hidden", position: "relative" }}>
             <Box sx={{ width: 170, height: 170, borderRadius: "50%", background: `conic-gradient(from 270deg,${colors.green} 0 25%,${colors.amber} 25% 38%,${colors.red} 38% 50%,transparent 50%)`, p: "15px" }}>
@@ -300,7 +300,7 @@ export function ParticipationChartWidget() {
         </Stack>
         <Box sx={{ position: "relative", flex: 1, minHeight: 260, mt: 1.5 }}>
             <Box sx={{ position: "absolute", left: 0, top: 0, bottom: 24, width: 42, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>{["+50", "+25", "0", "-25"].map((label) => <Typography key={label} color="text.secondary" sx={{ fontSize: ".58rem" }}>{label}</Typography>)}</Box>
-            <Tooltip title="Demo point: Advances 1,682 · Declines 802 · Net breadth +880 · Health 87 · Highs 156 · Lows 23" followCursor>
+            <Tooltip title="Example: 1,682 stocks rose, 802 fell, 156 reached a one-year high and 23 reached a one-year low." followCursor>
                 <Box component="svg" viewBox="0 0 100 100" preserveAspectRatio="none" sx={{ position: "absolute", left: 44, width: "calc(100% - 44px)", height: "calc(100% - 24px)" }}>
                     {[15, 40, 65, 90].map((y) => <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#213149" strokeWidth=".45" />)}
                     <defs><linearGradient id="participationFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={colors.green} stopOpacity=".25" /><stop offset="100%" stopColor={colors.green} stopOpacity="0" /></linearGradient></defs>
@@ -313,33 +313,33 @@ export function ParticipationChartWidget() {
             </Tooltip>
             <Stack direction="row" sx={{ position: "absolute", left: 44, right: 0, bottom: 0, justifyContent: "space-between" }}>{profile.labels.map((label) => <Typography key={label} color="text.secondary" sx={{ fontSize: ".58rem" }}>{label}</Typography>)}</Stack>
         </Box>
-        <Box sx={{ mt: 1.5, p: 1.2, borderRadius: 2, bgcolor: "rgba(50,213,131,.06)", border: "1px solid rgba(50,213,131,.14)" }}><Typography sx={{ color: colors.green, fontSize: ".7rem", fontWeight: 800 }}>AI insight</Typography><Typography color="text.secondary" sx={{ mt: .35, fontSize: ".68rem" }}>Participation has improved over the selected period and currently supports the broader market trend.</Typography></Box>
+        <Box sx={{ mt: 1.5, p: 1.2, borderRadius: 2, bgcolor: "rgba(50,213,131,.06)", border: "1px solid rgba(50,213,131,.14)" }}><Typography sx={{ color: colors.green, fontSize: ".7rem", fontWeight: 800 }}>Simple explanation</Typography><Typography color="text.secondary" sx={{ mt: .35, fontSize: ".68rem" }}>More stocks are going up than before. This supports the wider market rise.</Typography></Box>
     </Stack>;
 }
 
 const sectorRows = [
-    ["IT", "8/10", "↑↑", "Strong", "Leading", colors.green],
-    ["Bank", "7/10", "↑", "Positive", "Leading", colors.green],
-    ["FMCG", "6/10", "→", "Stable", "Improving", colors.cyan],
-    ["Auto", "4/10", "↓", "Soft", "Weakening", colors.amber],
-    ["Metal", "2/10", "↓↓", "Negative", "Lagging", colors.red],
+    ["IT", "8/10", "↑↑", "Strong", "Doing well", colors.green],
+    ["Bank", "7/10", "↑", "Positive", "Doing well", colors.green],
+    ["FMCG", "6/10", "→", "Stable", "Getting stronger", colors.cyan],
+    ["Auto", "4/10", "↓", "Soft", "Getting weaker", colors.amber],
+    ["Metal", "2/10", "↓↓", "Negative", "Doing poorly", colors.red],
 ] as const;
 
 export function SectorRotationWidget() {
     const [heatmap, setHeatmap] = useState(false);
     return <Stack sx={{ height: "100%" }}>
         {heatmap ? <Grid container spacing={1} sx={{ flex: 1 }}>{sectorRows.map(([sector, strength, , , status, color]) => <Grid key={sector} size={{ xs: 6, sm: 4 }}><Box sx={{ height: "100%", minHeight: 72, p: 1.2, borderRadius: 2, bgcolor: `${color}18`, border: `1px solid ${color}45` }}><Typography sx={{ fontWeight: 900 }}>{sector}</Typography><Typography sx={{ color, fontSize: "1.1rem", fontWeight: 900 }}>{strength}</Typography><Typography color="text.secondary" sx={{ fontSize: ".58rem" }}>{status}</Typography></Box></Grid>)}</Grid> :
-            <Box sx={{ overflowX: "auto", flex: 1 }}><Table size="small"><TableHead><TableRow>{["Sector", "Strength", "Money Flow", "Trend", "Status"].map((heading) => <TableCell key={heading}>{heading}</TableCell>)}</TableRow></TableHead><TableBody>{sectorRows.map(([sector, strength, flow, trend, status, color]) => <TableRow key={sector} hover><TableCell sx={{ fontWeight: 850 }}>{sector}</TableCell><TableCell>{strength}</TableCell><TableCell sx={{ color, fontWeight: 900 }}>{flow}</TableCell><TableCell>{trend}</TableCell><TableCell><Chip size="small" label={status} sx={{ color, bgcolor: `${color}12`, border: `1px solid ${color}30` }} /></TableCell></TableRow>)}</TableBody></Table></Box>}
+            <Box sx={{ overflowX: "auto", flex: 1 }}><Table size="small"><TableHead><TableRow>{["Sector", "Strength", "Money Moving", "Direction", "Simple View"].map((heading) => <TableCell key={heading}>{heading}</TableCell>)}</TableRow></TableHead><TableBody>{sectorRows.map(([sector, strength, flow, trend, status, color]) => <TableRow key={sector} hover><TableCell sx={{ fontWeight: 850 }}>{sector}</TableCell><TableCell>{strength}</TableCell><TableCell sx={{ color, fontWeight: 900 }}>{flow}</TableCell><TableCell>{trend}</TableCell><TableCell><Chip size="small" label={status} sx={{ color, bgcolor: `${color}12`, border: `1px solid ${color}30` }} /></TableCell></TableRow>)}</TableBody></Table></Box>}
         <Button size="small" endIcon={<OpenInNewRoundedIcon />} onClick={() => setHeatmap((value) => !value)} sx={{ mt: 1.5, alignSelf: "flex-start" }}>{heatmap ? "View Table" : "View Heatmap"}</Button>
     </Stack>;
 }
 
 const breadthMetrics = [
-    ["Advancing", 1682, "+62", "Advancers in tracked universe"], ["Declining", 802, "-18", "Decliners in tracked universe"], ["Unchanged", 126, "+4", "Unchanged symbols"],
-    ["52W Highs", 156, "+21", "New 52-week highs"], ["52W Lows", 23, "-6", "New 52-week lows"], ["Above 20 EMA", 1764, "+3.2%", "Stocks above 20-day EMA"],
-    ["Above 50 EMA", 1521, "+2.1%", "Stocks above 50-day EMA"], ["Above 200 EMA", 1318, "+1.4%", "Stocks above 200-day EMA"], ["Gap Ups", 84, "+12", "Opening above prior high"],
-    ["Gap Downs", 31, "-5", "Opening below prior low"], ["Upper Circuit", 42, "+7", "Symbols at upper circuit"], ["Lower Circuit", 11, "-2", "Symbols at lower circuit"],
-    ["High Vol. Advances", 218, "+28", "Advancers with elevated volume"], ["High Vol. Declines", 94, "-9", "Decliners with elevated volume"], ["Midcap Participation", 68, "+4%", "Midcap participation percentage"], ["Smallcap Participation", 61, "+2%", "Smallcap participation percentage"],
+    ["Stocks Up", 1682, "+62", "The number of tracked stocks that are rising today"], ["Stocks Down", 802, "-18", "The number of tracked stocks that are falling today"], ["No Change", 126, "+4", "Stocks with almost no price change"],
+    ["One-Year Highs", 156, "+21", "Stocks trading at their highest price in one year"], ["One-Year Lows", 23, "-6", "Stocks trading at their lowest price in one year"], ["Above 20-Day Average", 1764, "+3.2%", "Stocks trading above their average price from the last 20 days"],
+    ["Above 50-Day Average", 1521, "+2.1%", "Stocks trading above their average price from the last 50 days"], ["Above 200-Day Average", 1318, "+1.4%", "Stocks trading above their average price from the last 200 days"], ["Opened Higher", 84, "+12", "Stocks that opened clearly above yesterday's trading range"],
+    ["Opened Lower", 31, "-5", "Stocks that opened clearly below yesterday's trading range"], ["Maximum Daily Rise", 42, "+7", "Stocks that reached their exchange-set daily rise limit"], ["Maximum Daily Fall", 11, "-2", "Stocks that reached their exchange-set daily fall limit"],
+    ["High-Volume Stocks Up", 218, "+28", "Rising stocks with more trading activity than usual"], ["High-Volume Stocks Down", 94, "-9", "Falling stocks with more trading activity than usual"], ["Mid-Size Stocks Joining", 68, "+4%", "The percentage of mid-size companies joining the market move"], ["Small Stocks Joining", 61, "+2%", "The percentage of small companies joining the market move"],
 ] as const;
 
 export function MarketBreadthWidget() {
@@ -347,7 +347,7 @@ export function MarketBreadthWidget() {
 }
 
 export function InstitutionalFlowWidget() {
-    const rows = [["FII", "-1,248 Cr", "Selling"], ["DII", "+2,129 Cr", "Buying"], ["Retail", "+684 Cr", "Buying"], ["Proprietary", "-214 Cr", "Selling"]];
+    const rows = [["Foreign institutions", "-1,248 Cr", "Selling"], ["Indian institutions", "+2,129 Cr", "Buying"], ["Individual investors", "+684 Cr", "Buying"], ["Trading firms", "-214 Cr", "Selling"]];
     return <Stack spacing={1.1}>{rows.map(([label, value, state]) => <Stack key={label} direction="row" sx={{ justifyContent: "space-between", alignItems: "center", p: 1, borderBottom: "1px solid rgba(143,161,184,.12)" }}><Box><Typography sx={{ fontWeight: 800 }}>{label}</Typography><Typography color="text.secondary" sx={{ fontSize: ".6rem" }}>Net {state}</Typography></Box><Stack direction="row" spacing={.5} sx={{ alignItems: "center", color: value.startsWith("+") ? colors.green : colors.red }}>{value.startsWith("+") ? <ArrowUpwardRoundedIcon fontSize="small" /> : <ArrowDownwardRoundedIcon fontSize="small" />}<Typography sx={{ fontWeight: 850 }}>{value}</Typography></Stack></Stack>)}<Typography color="text.secondary" sx={{ fontSize: ".58rem" }}>Demo values · Updated after previous session</Typography></Stack>;
 }
 
@@ -360,21 +360,21 @@ export function IndiaVixWidget() {
 }
 
 export function SentimentWidget() {
-    return <Grid container spacing={2} sx={{ alignItems: "center" }}><Grid size={{ xs: 12, sm: 6 }}><CircularGauge value={72} label="Optimistic" color={colors.green} /></Grid><Grid size={{ xs: 12, sm: 6 }}><Stack spacing={1}>{[["FII", "Cautious", colors.amber], ["Retail", "Neutral", colors.blue], ["Options", "Bullish", colors.green]].map(([label, value, color]) => <Stack key={label} direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".68rem" }}>{label}</Typography><Typography sx={{ color, fontSize: ".68rem", fontWeight: 850 }}>{value}</Typography></Stack>)}</Stack></Grid></Grid>;
+    return <Grid container spacing={2} sx={{ alignItems: "center" }}><Grid size={{ xs: 12, sm: 6 }}><CircularGauge value={72} label="Mostly confident" color={colors.green} /></Grid><Grid size={{ xs: 12, sm: 6 }}><Stack spacing={1}>{[["Foreign institutions", "Careful", colors.amber], ["Individual investors", "Neutral", colors.blue], ["Options market", "Positive", colors.green]].map(([label, value, color]) => <Stack key={label} direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".68rem" }}>{label}</Typography><Typography sx={{ color, fontSize: ".68rem", fontWeight: 850 }}>{value}</Typography></Stack>)}</Stack></Grid></Grid>;
 }
 
 export function OpportunitiesWidget() {
-    const items = [["Demand Zones", 18, colors.blue], ["Momentum", 12, colors.green], ["Breakouts", 7, colors.violet], ["Pullbacks", 14, colors.cyan], ["Trend Continuation", 9, colors.amber]];
+    const items = [["Buying Areas", 18, colors.blue], ["Stocks Moving Strongly", 12, colors.green], ["Stocks Breaking Above Resistance", 7, colors.violet], ["Strong Stocks After a Small Fall", 14, colors.cyan], ["Stocks Continuing Up", 9, colors.amber]];
     const [selected, setSelected] = useState("");
     return <Stack spacing={1}><Grid container spacing={1.1}>{items.map(([label, count, color]) => <Grid key={label as string} size={{ xs: 12, sm: 6 }}><Box sx={{ p: 1.25, borderRadius: 2, border: "1px solid rgba(143,161,184,.15)", transition: "transform .18s ease", "&:hover": { transform: "translateY(-2px)" } }}><Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}><Box><Typography sx={{ fontWeight: 800, fontSize: ".72rem" }}>{label}</Typography><Typography sx={{ color, fontSize: "1.35rem", fontWeight: 900 }}>{count}</Typography></Box><Button size="small" endIcon={<ArrowForwardRoundedIcon />} onClick={() => setSelected(String(label))}>Scan</Button></Stack></Box></Grid>)}</Grid>{selected && <Typography color="primary.light" sx={{ fontSize: ".65rem" }}>{selected} selected. Scanner hand-off will use the existing scanner route in the integration phase.</Typography>}</Stack>;
 }
 
 export function SmartAlertsWidget() {
-    const alerts = [["Breadth improving", "High", "2m", colors.green], ["Bank Nifty leading", "Medium", "8m", colors.blue], ["Metal sector weakening", "Medium", "14m", colors.amber], ["Smallcaps outperforming", "Info", "21m", colors.cyan]];
+    const alerts = [["More stocks are joining the rise", "Important", "2m", colors.green], ["Bank Nifty is stronger than the wider market", "Medium", "8m", colors.blue], ["Metal stocks are becoming weaker", "Medium", "14m", colors.amber], ["Small companies are doing better than large companies", "Information", "21m", colors.cyan]];
     return <Stack spacing={1}>{alerts.map(([message, severity, time, color]) => <Stack key={message} direction="row" spacing={1.1} sx={{ alignItems: "center", p: 1.1, borderRadius: 2, bgcolor: "rgba(4,12,25,.25)", border: "1px solid rgba(143,161,184,.12)" }}><Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: color, boxShadow: `0 0 10px ${color}` }} /><Box sx={{ flex: 1 }}><Typography sx={{ fontSize: ".72rem", fontWeight: 800 }}>{message}</Typography><Typography color="text.secondary" sx={{ fontSize: ".57rem" }}>{severity} severity</Typography></Box><Typography color="text.secondary" sx={{ fontSize: ".6rem" }}>{time}</Typography></Stack>)}</Stack>;
 }
 
 export function VerdictWidget() {
-    const items = [["Market", "Bullish", colors.green], ["Participation", "Healthy", colors.green], ["Momentum", "Positive", colors.cyan], ["Risk", "Moderate", colors.amber], ["Strategy", "Buy pullbacks", colors.blue], ["Avoid", "Weak-sector breakouts", colors.red]];
+    const items = [["Market Direction", "Going up", colors.green], ["Stocks Joining", "Healthy", colors.green], ["Recent Price Strength", "Positive", colors.cyan], ["Risk", "Medium", colors.amber], ["What to Research", "Strong stocks after a small fall", colors.blue], ["Avoid", "Buying breakouts in weak sectors", colors.red]];
     return <Grid container spacing={2.5} sx={{ alignItems: "center" }}><Grid size={{ xs: 12, lg: 9 }}><Grid container spacing={1.1}>{items.map(([label, value, color]) => <Grid key={label} size={{ xs: 12, sm: 6, md: 4 }}><Box sx={{ p: 1.2, borderRadius: 2, bgcolor: `${color}09`, border: `1px solid ${color}25` }}><Typography color="text.secondary" sx={{ fontSize: ".58rem", textTransform: "uppercase" }}>{label}</Typography><Typography sx={{ mt: .3, color, fontWeight: 850 }}>{value}</Typography></Box></Grid>)}</Grid></Grid><Grid size={{ xs: 12, lg: 3 }}><CircularGauge value={89} label="Overall confidence" color={colors.violet} /></Grid></Grid>;
 }

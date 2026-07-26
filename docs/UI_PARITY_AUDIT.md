@@ -269,3 +269,10 @@ are derived from a reusable typed input object rather than fixed page copy. It i
 animated confidence, chip tooltips, expandable score contributions, professional
 loading/empty states and a working scanner hand-off. The displayed model remains
 transparent demonstration logic until a validated intelligence service is connected.
+
+All Market Overview user-facing copy now follows the plain-language rule. Technical
+terms are removed where possible and immediately explained when they are necessary.
+Labels describe what users can understand and do, such as "Stocks Going Up and Down,"
+"Large Investor Activity" and "Look for Buying Opportunities." Tooltips explain moving
+averages, exchange price limits, market participation and expected price swings in one
+short sentence.
