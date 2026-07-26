@@ -111,6 +111,8 @@ class ZoneResearchResultResponse(APIResponseModel):
     strength_score: float
     touch_score: float
     merge_score: float
+    raw_zone_score: float
+    quality_cap: float
     is_fresh: bool
     touch_count: int
     merged_count: int

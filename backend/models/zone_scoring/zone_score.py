@@ -27,3 +27,7 @@ class ZoneScore:
     merge_bonus: float
 
     total_score: float
+
+    raw_score: float = 0.0
+
+    quality_cap: float = 100.0

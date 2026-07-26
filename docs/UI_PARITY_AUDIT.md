@@ -324,3 +324,14 @@ based invalidation. The checklist uses PASS, FAIL, MIXED or UNAVAILABLE with its
 threshold, reason and score effect. The existing backend score remains explicitly a
 zone-formation score; data coverage is displayed separately and unavailable sector,
 benchmark, order-flow and historical-backtest fields explain their required source.
+
+The next Stock Details backend phase corrects the exact zone score and adds the
+requested research context in order. The API now returns raw score, final score and
+the departure-based quality cap; a single detection has no false overlap bonus and
+retests reduce their contribution by a documented amount. A dedicated details endpoint
+calculates aligned 1/3/6-month stock-versus-Nifty returns, uses a maintained benchmark
+map for the current four-stock scanner universe, combines daily/weekly/monthly trend
+and EMA confirmation, finds the nearest detected opposing zone and derives a
+direction-aware research entry range, invalidation buffer, opposing-zone target and
+risk/reward ratio. These values are delayed-data research illustrations, not orders or
+personalized advice. Historical zone outcome backtesting remains a separate later phase.

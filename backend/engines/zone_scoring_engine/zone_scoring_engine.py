@@ -58,11 +58,11 @@ class ZoneScoringEngine:
 
             touch = max(
                 0.0,
-                self._config.touch_weight - zone.touch_count,
+                self._config.touch_weight - zone.touch_count * 8.0,
             )
 
             merge_bonus = min(
-                zone.merged_count,
+                max(0, zone.merged_count - 1) * 7.5,
                 self._config.merge_bonus_weight,
             )
 
@@ -95,6 +95,8 @@ class ZoneScoringEngine:
                         quality_cap,
                         self._config.maximum_score,
                     ),
+                    raw_score=min(total, self._config.maximum_score),
+                    quality_cap=quality_cap,
                 )
             )
 

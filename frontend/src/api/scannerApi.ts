@@ -38,3 +38,46 @@ export async function getResearchZones(timeframe = "DAILY"): Promise<ZoneResearc
     });
     return response.data;
 }
+
+export interface ComparisonPeriod {
+    stock_return?: number;
+    benchmark_return?: number;
+    difference?: number;
+    status: string;
+}
+
+export interface StockDetailsBackendAnalysis {
+    source: string;
+    nifty_comparison: Record<string, ComparisonPeriod>;
+    sector: {
+        name: string;
+        benchmark: string | null;
+        status?: string;
+        comparison?: Record<string, ComparisonPeriod>;
+        sector_vs_nifty?: Record<string, ComparisonPeriod>;
+    };
+    multi_timeframe: {
+        status: string;
+        frames: Array<{ timeframe: string; trend: string; ema_alignment: string; confirmation: string }>;
+    };
+    trade_plan: {
+        entry_range: [number, number];
+        illustrative_entry: number;
+        invalidation_stop: number;
+        stop_buffer_rule: string;
+        target: number | null;
+        target_basis: string;
+        risk_per_share: number;
+        reward_per_share: number | null;
+        risk_reward_ratio: number | null;
+        distance_to_entry_percent: number;
+        research_only: boolean;
+    };
+}
+
+export async function getStockDetailsAnalysis(symbol: string, zoneType: string, baseIndex: number): Promise<StockDetailsBackendAnalysis> {
+    const response = await api.get<StockDetailsBackendAnalysis>(`/scanner/zones/${encodeURIComponent(symbol)}/analysis`, {
+        params: { zone_type: zoneType, base_index: baseIndex },
+    });
+    return response.data;
+}

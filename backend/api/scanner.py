@@ -8,7 +8,7 @@ Sprint:
 from dataclasses import replace
 from typing import Literal
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 from pandas import DataFrame
 
 from backend.api.models.scanner_response import (
@@ -33,6 +33,9 @@ from backend.models.zone import Zone, ZoneType
 from backend.services.scanner.scanner_service import (
     ScannerService,
 )
+from backend.services.scanner.stock_details_analysis_service import (
+    StockDetailsAnalysisService,
+)
 from backend.services.zone_explanation_service import ZoneExplanationService
 from backend.services.market_data.market_data_service import MarketDataService
 from backend.services.market_data.timeframe_service import aggregate_timeframe
@@ -47,6 +50,7 @@ _zone_market_data = MarketDataService()
 _zone_engine = ZoneDetectionEngine()
 _zone_scoring_engine = ZoneScoringEngine()
 _zone_config = ScannerConfig()
+_stock_details_analysis = StockDetailsAnalysisService()
 
 ZoneTimeframe = Literal[
     "MINUTE_5",
@@ -121,8 +125,7 @@ def _measure_zone(zone: Zone, data: DataFrame) -> Zone:
             (departure["Close"] > zone.upper_price).sum()
         ) / len(departure)
         reversal_penalty = (
-            0.45 if float(departure["Close"].iloc[-1]) <= zone.upper_price
-            else 1.0
+            0.45 if float(departure["Close"].iloc[-1]) <= zone.upper_price else 1.0
         )
     else:
         departure_multiple = max(
@@ -133,21 +136,21 @@ def _measure_zone(zone: Zone, data: DataFrame) -> Zone:
             (departure["Close"] < zone.lower_price).sum()
         ) / len(departure)
         reversal_penalty = (
-            0.45 if float(departure["Close"].iloc[-1]) >= zone.lower_price
-            else 1.0
+            0.45 if float(departure["Close"].iloc[-1]) >= zone.lower_price else 1.0
         )
 
     later = data.iloc[departure_end:]
     touches = int(
-        (
-            (later["Low"] <= zone.upper_price)
-            & (later["High"] >= zone.lower_price)
-        ).sum()
+        ((later["Low"] <= zone.upper_price) & (later["High"] >= zone.lower_price)).sum()
     )
-    departure_strength = min(
-        35.0,
-        departure_multiple / 3.0 * 35.0,
-    ) * follow_through_ratio * reversal_penalty
+    departure_strength = (
+        min(
+            35.0,
+            departure_multiple / 3.0 * 35.0,
+        )
+        * follow_through_ratio
+        * reversal_penalty
+    )
 
     return replace(
         zone,
@@ -179,9 +182,8 @@ def _has_completed_test(zone: Zone, data: DataFrame) -> bool:
     if prior_candles.empty:
         return False
 
-    overlaps = (
-        (prior_candles["Low"] <= zone.upper_price)
-        & (prior_candles["High"] >= zone.lower_price)
+    overlaps = (prior_candles["Low"] <= zone.upper_price) & (
+        prior_candles["High"] >= zone.lower_price
     )
     return bool(overlaps.any())
 
@@ -228,32 +230,20 @@ def build_scanner_response(
                 .entry_confirmation.trade_setup.risk_reward_ratio
             ),
             confirmation_score=(
-                opportunity.risk_management_result
-                .entry_confirmation.confirmation_score
+                opportunity.risk_management_result.entry_confirmation.confirmation_score
             ),
             volume_confirmed=(
-                opportunity.risk_management_result
-                .entry_confirmation.volume_confirmed
+                opportunity.risk_management_result.entry_confirmation.volume_confirmed
             ),
             trend_confirmed=(
-                opportunity.risk_management_result
-                .entry_confirmation.trend_confirmed
+                opportunity.risk_management_result.entry_confirmation.trend_confirmed
             ),
             momentum_confirmed=(
-                opportunity.risk_management_result
-                .entry_confirmation.momentum_confirmed
+                opportunity.risk_management_result.entry_confirmation.momentum_confirmed
             ),
-            confirmed=(
-                opportunity.risk_management_result
-                .entry_confirmation.confirmed
-            ),
-            approved=(
-                opportunity.risk_management_result.approved
-            ),
-            rejection_reason=(
-                opportunity.risk_management_result
-                .rejection_reason
-            ),
+            confirmed=(opportunity.risk_management_result.entry_confirmation.confirmed),
+            approved=(opportunity.risk_management_result.approved),
+            rejection_reason=(opportunity.risk_management_result.rejection_reason),
             zone_type=opportunity.zone_type,
             proximal_price=opportunity.proximal_price,
             distal_price=opportunity.distal_price,
@@ -381,6 +371,8 @@ def get_research_zones(
                         strength_score=round(zone_score.strength_score, 1),
                         touch_score=round(zone_score.touch_score, 1),
                         merge_score=round(zone_score.merge_bonus, 1),
+                        raw_zone_score=round(zone_score.raw_score, 1),
+                        quality_cap=round(zone_score.quality_cap, 1),
                         is_fresh=zone.is_fresh,
                         touch_count=zone.touch_count,
                         merged_count=zone.merged_count,
@@ -414,9 +406,7 @@ def get_research_zones(
                                 )
                                 for factor in explanation.negative_factors
                             ),
-                            educational_insight=(
-                                explanation.educational_insight
-                            ),
+                            educational_insight=(explanation.educational_insight),
                         ),
                         current_price=current_price,
                         timeframe=_TIMEFRAME_LABELS[timeframe],
@@ -435,3 +425,29 @@ def get_research_zones(
         timeframe=_TIMEFRAME_LABELS[timeframe],
         results=tuple(results),
     )
+
+
+@scanner_router.get("/zones/{symbol}/analysis")
+def get_stock_details_analysis(
+    symbol: str,
+    zone_type: Literal["DEMAND", "SUPPLY"] = Query(...),
+    base_index: int = Query(..., ge=0),
+) -> dict[str, object]:
+    """Return delayed-data benchmark, timeframe and trade-plan research."""
+
+    normalized = symbol.strip().upper()
+    if normalized not in _zone_config.symbols:
+        raise HTTPException(
+            status_code=404, detail="Symbol is not in the scanner universe."
+        )
+    try:
+        return _stock_details_analysis.build(normalized, zone_type, base_index)
+    except (ValueError, LookupError) as error:
+        raise HTTPException(
+            status_code=404, detail="The selected zone could not be rebuilt."
+        ) from error
+    except Exception as error:
+        raise HTTPException(
+            status_code=503,
+            detail="Detailed stock analysis is temporarily unavailable.",
+        ) from error
