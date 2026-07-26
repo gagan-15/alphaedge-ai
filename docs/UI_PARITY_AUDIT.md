@@ -262,3 +262,10 @@ metrics, institutional flow, VIX, sentiment, opportunities, alerts and a daily v
 Tooltips and reusable loading/empty-state components are included. Values remain
 explicit development data until approved market, breadth, flow and volatility feeds
 are connected; the summary is deterministic demo logic and is not represented as AI.
+
+The AI Market Summary alone was then upgraded into an executive interpretation panel.
+Its headline, narrative, status chips, research focus and confidence-factor breakdown
+are derived from a reusable typed input object rather than fixed page copy. It includes
+animated confidence, chip tooltips, expandable score contributions, professional
+loading/empty states and a working scanner hand-off. The displayed model remains
+transparent demonstration logic until a validated intelligence service is connected.

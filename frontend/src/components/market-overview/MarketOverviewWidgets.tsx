@@ -4,6 +4,7 @@ import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
+import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded";
 import ShowChartRoundedIcon from "@mui/icons-material/ShowChartRounded";
@@ -25,6 +26,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { Link as RouterLink } from "react-router-dom";
 
 const colors = {
     green: "#32d583",
@@ -61,13 +63,6 @@ export function WidgetEmpty({ message }: { message: string }) {
     </Box>;
 }
 
-function StatusPill({ label, value, color }: { label: string; value: string; color: string }) {
-    return <Box sx={{ px: 1.15, py: .75, borderRadius: 2, border: `1px solid ${color}35`, bgcolor: `${color}10` }}>
-        <Typography color="text.secondary" sx={{ fontSize: ".58rem", textTransform: "uppercase", letterSpacing: ".08em" }}>{label}</Typography>
-        <Typography sx={{ mt: .2, color, fontSize: ".72rem", fontWeight: 850 }}>{value}</Typography>
-    </Box>;
-}
-
 function Stars({ value }: { value: number }) {
     return <Typography aria-label={`${value} out of 5`} sx={{ color: colors.amber, letterSpacing: ".08em", fontSize: ".78rem" }}>
         {"★".repeat(value)}<Box component="span" sx={{ color: "#334155" }}>{"★".repeat(5 - value)}</Box>
@@ -83,37 +78,148 @@ function CircularGauge({ value, label, color = colors.green }: { value: number; 
     </Box>;
 }
 
-export function AIMarketSummaryWidget() {
+interface ExecutiveMetric {
+    label: string;
+    value: string;
+    help: string;
+    tone: "positive" | "neutral" | "caution";
+}
+
+interface ExecutiveSummaryData {
+    updatedAt: string;
+    marketStatus: string;
+    confidence: number;
+    participation: number;
+    leaders: string[];
+    laggards: string[];
+    volatility: string;
+    focus: string[];
+    avoid: string;
+    metrics: ExecutiveMetric[];
+    factors: Array<{ label: string; contribution: number }>;
+}
+
+const demoExecutiveSummary: ExecutiveSummaryData = {
+    updatedAt: "09:18 AM",
+    marketStatus: "Market Open",
+    confidence: 91,
+    participation: 72,
+    leaders: ["Financials", "IT"],
+    laggards: ["Metal", "Auto"],
+    volatility: "below its recent average",
+    focus: ["IT pullbacks", "Banking momentum", "High relative-strength stocks"],
+    avoid: "Weak-sector breakouts",
+    metrics: [
+        { label: "Trend", value: "Bullish", help: "The tracked index trend remains above its medium-term reference structure.", tone: "positive" },
+        { label: "Breadth", value: "Healthy", help: "More than 65% of tracked stocks are participating in the current market trend.", tone: "positive" },
+        { label: "Momentum", value: "Positive", help: "Short- and medium-term momentum measures remain constructive.", tone: "positive" },
+        { label: "Leadership", value: "IT + Banking", help: "IT and banking currently contribute the strongest relative performance.", tone: "positive" },
+        { label: "Volatility", value: "Controlled", help: "India VIX remains below its recent stress range.", tone: "neutral" },
+        { label: "Institutional Flow", value: "Mixed Buying", help: "Domestic buying currently offsets cautious foreign participation.", tone: "caution" },
+        { label: "Market Regime", value: "Bull Expansion", help: "Trend and breadth are expanding together rather than diverging.", tone: "positive" },
+    ],
+    factors: [
+        { label: "Breadth Participation", contribution: 20 },
+        { label: "Sector Leadership", contribution: 16 },
+        { label: "Momentum", contribution: 14 },
+        { label: "Trend Strength", contribution: 18 },
+        { label: "India VIX", contribution: 12 },
+        { label: "Institutional Flow", contribution: 9 },
+        { label: "Relative Strength", contribution: 11 },
+    ],
+};
+
+function ExecutiveStatusChip({ metric }: { metric: ExecutiveMetric }) {
+    const toneColor = metric.tone === "positive" ? colors.green : metric.tone === "caution" ? colors.amber : colors.blue;
+    return <Tooltip title={metric.help} arrow>
+        <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+                minWidth: 150,
+                flex: "1 1 150px",
+                p: 1.1,
+                alignItems: "center",
+                borderRadius: 2,
+                border: "1px solid rgba(143,161,184,.16)",
+                bgcolor: "rgba(4,12,25,.2)",
+                transition: "transform .18s ease,border-color .18s ease",
+                "&:hover": { transform: "translateY(-2px)", borderColor: `${toneColor}55` },
+            }}
+        >
+            <Box sx={{ width: 27, height: 27, flex: "0 0 auto", display: "grid", placeItems: "center", borderRadius: 1.4, color: toneColor, bgcolor: `${toneColor}10` }}>
+                <CheckCircleOutlineRoundedIcon sx={{ fontSize: 16 }} />
+            </Box>
+            <Box sx={{ minWidth: 0 }}>
+                <Typography color="text.secondary" sx={{ fontSize: ".55rem", textTransform: "uppercase", letterSpacing: ".07em" }}>{metric.label}</Typography>
+                <Typography noWrap sx={{ mt: .15, color: toneColor, fontSize: ".7rem", fontWeight: 850 }}>{metric.value}</Typography>
+            </Box>
+        </Stack>
+    </Tooltip>;
+}
+
+export function AIMarketSummaryWidget({
+    data = demoExecutiveSummary,
+    loading = false,
+}: {
+    data?: ExecutiveSummaryData | null;
+    loading?: boolean;
+}) {
     const [expanded, setExpanded] = useState(false);
-    return <Grid container spacing={2.5} sx={{ height: "100%", alignItems: "stretch" }}>
-        <Grid size={{ xs: 12, lg: 9 }}>
-            <Stack spacing={2}>
-                <Stack direction="row" spacing={1.2} sx={{ alignItems: "center" }}>
-                    <Box sx={{ width: 38, height: 38, display: "grid", placeItems: "center", borderRadius: 2, color: colors.violet, bgcolor: `${colors.violet}14` }}><AutoAwesomeOutlinedIcon /></Box>
-                    <Box><Typography sx={{ fontSize: "1.05rem", fontWeight: 850 }}>Healthy participation supports the current uptrend</Typography><Typography color="text.secondary" sx={{ mt: .35, lineHeight: 1.6 }}>Financials and IT are leading while volatility remains controlled. Breadth is constructive, but selective weakness in metals argues against chasing every breakout.</Typography></Box>
-                </Stack>
-                <Stack direction="row" useFlexGap spacing={1} sx={{ flexWrap: "wrap" }}>
-                    <StatusPill label="Trend" value="Bullish" color={colors.green} />
-                    <StatusPill label="Breadth" value="Healthy" color={colors.green} />
-                    <StatusPill label="Momentum" value="Positive" color={colors.cyan} />
-                    <StatusPill label="Volatility" value="Controlled" color={colors.blue} />
-                    <StatusPill label="Leadership" value="IT + Banks" color={colors.violet} />
-                </Stack>
-                <Collapse in={expanded}>
-                    <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "rgba(155,138,251,.07)", border: "1px solid rgba(155,138,251,.18)" }}>
-                        <Typography sx={{ fontWeight: 800, fontSize: ".72rem" }}>Why this interpretation?</Typography>
-                        <Typography color="text.secondary" sx={{ mt: .6, fontSize: ".7rem", lineHeight: 1.6 }}>Advancers exceed decliners, most tracked stocks remain above medium-term averages, Bank Nifty leadership is positive, and India VIX remains below its recent stress range. This is transparent demo logic, not generated AI.</Typography>
+    if (loading) return <WidgetLoading rows={5} />;
+    if (!data) return <WidgetEmpty message="AI Summary unavailable. Waiting for validated market intelligence." />;
+    const headline = data.participation >= 65
+        ? "Healthy participation supports the current uptrend"
+        : data.participation >= 50
+            ? "Index strength is positive, but participation remains selective"
+            : "Weak participation is reducing confidence behind index gains";
+    const explanation = `The tracked market currently shows ${data.participation}% participation, which supports a constructive internal picture. ${data.leaders.join(" and ")} remain the strongest contributors, while ${data.laggards.join(" and ")} are losing relative strength. India VIX is ${data.volatility}, suggesting controlled but not absent risk. Current conditions favour ${data.focus.slice(0, 2).join(" and ")} instead of chasing extended moves.`;
+    return <Stack spacing={2.2}>
+        <Grid container spacing={2.5} sx={{ alignItems: "stretch" }}>
+            <Grid size={{ xs: 12, lg: 9 }}>
+                <Stack spacing={2}>
+                    <Stack direction="row" spacing={1.15} sx={{ alignItems: "center" }}>
+                        <Box sx={{ width: 38, height: 38, display: "grid", placeItems: "center", borderRadius: 2, color: colors.violet, bgcolor: `${colors.violet}10` }}><AutoAwesomeOutlinedIcon /></Box>
+                        <Box>
+                            <Typography sx={{ fontSize: ".62rem", fontWeight: 850, letterSpacing: ".12em", color: "primary.light" }}>EXECUTIVE INTELLIGENCE</Typography>
+                            <Stack direction="row" spacing={1} sx={{ mt: .35, alignItems: "center", flexWrap: "wrap" }}>
+                                <Typography color="text.secondary" sx={{ fontSize: ".62rem" }}>Updated {data.updatedAt}</Typography>
+                                <Box sx={{ width: 3, height: 3, borderRadius: "50%", bgcolor: "text.secondary" }} />
+                                <Typography sx={{ color: colors.green, fontSize: ".62rem", fontWeight: 800 }}>{data.marketStatus}</Typography>
+                            </Stack>
+                        </Box>
+                    </Stack>
+                    <Box sx={{ animation: "executiveHeadline .45s ease both", "@keyframes executiveHeadline": { from: { opacity: 0, transform: "translateY(5px)" }, to: { opacity: 1, transform: "translateY(0)" } } }}>
+                        <Typography sx={{ fontSize: { xs: "1.35rem", md: "1.8rem" }, lineHeight: 1.2, letterSpacing: "-.025em", fontWeight: 900 }}>{headline}</Typography>
+                        <Typography color="text.secondary" sx={{ mt: 1.1, maxWidth: 940, fontSize: ".76rem", lineHeight: 1.75 }}>{explanation}</Typography>
                     </Box>
-                </Collapse>
-            </Stack>
+                    <Stack direction="row" useFlexGap spacing={1} sx={{ flexWrap: "wrap" }}>
+                        {data.metrics.map((metric) => <ExecutiveStatusChip key={metric.label} metric={metric} />)}
+                    </Stack>
+                </Stack>
+            </Grid>
+            <Grid size={{ xs: 12, lg: 3 }}>
+                <Stack sx={{ height: "100%", justifyContent: "center", alignItems: "center", borderLeft: { lg: "1px solid rgba(143,161,184,.14)" } }}>
+                    <CircularGauge value={data.confidence} label="AI Confidence" color={colors.violet} />
+                    <Button size="small" sx={{ mt: 1 }} onClick={() => setExpanded((value) => !value)}>{expanded ? "Hide score details" : "Why?"}</Button>
+                </Stack>
+            </Grid>
         </Grid>
-        <Grid size={{ xs: 12, lg: 3 }}>
-            <Stack sx={{ height: "100%", justifyContent: "center", alignItems: "center" }}>
-                <CircularGauge value={91} label="Confidence" color={colors.violet} />
-                <Button size="small" sx={{ mt: 1 }} onClick={() => setExpanded((value) => !value)}>{expanded ? "Hide reasons" : "Why?"}</Button>
-            </Stack>
-        </Grid>
-    </Grid>;
+        <Collapse in={expanded}>
+            <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "rgba(4,12,25,.3)", border: "1px solid rgba(143,161,184,.16)" }}>
+                <Typography sx={{ fontWeight: 850, fontSize: ".72rem" }}>Market confidence contribution</Typography>
+                <Grid container spacing={1.25} sx={{ mt: .25 }}>
+                    {data.factors.map((factor) => <Grid key={factor.label} size={{ xs: 12, sm: 6, lg: 4 }}><Stack direction="row" spacing={.8} sx={{ alignItems: "center" }}><CheckCircleOutlineRoundedIcon sx={{ color: colors.green, fontSize: 15 }} /><Box sx={{ flex: 1 }}><Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography color="text.secondary" sx={{ fontSize: ".62rem" }}>{factor.label}</Typography><Typography sx={{ fontSize: ".62rem", fontWeight: 850 }}>{factor.contribution}%</Typography></Stack><LinearProgress variant="determinate" value={factor.contribution * 5} sx={{ mt: .35, height: 4 }} /></Box></Stack></Grid>)}
+                </Grid>
+                <Typography color="text.secondary" sx={{ mt: 1.2, fontSize: ".58rem" }}>Transparent placeholder weighting only. Production confidence requires validated inputs, calibration and monitoring.</Typography>
+            </Box>
+        </Collapse>
+        <Stack direction={{ xs: "column", lg: "row" }} spacing={1.5} sx={{ p: 1.25, alignItems: { lg: "center" }, borderRadius: 2, border: "1px solid rgba(143,161,184,.14)", bgcolor: "rgba(4,12,25,.22)" }}>
+            <Box sx={{ minWidth: 145 }}><Typography color="text.secondary" sx={{ fontSize: ".56rem", textTransform: "uppercase", letterSpacing: ".08em" }}>Today's Research Focus</Typography><Typography sx={{ mt: .2, fontSize: ".7rem", fontWeight: 850 }}>Selective long setups</Typography></Box>
+            <Stack direction="row" useFlexGap spacing={.7} sx={{ flex: 1, flexWrap: "wrap" }}>{data.focus.map((item) => <Chip key={item} size="small" label={item} variant="outlined" />)}<Chip size="small" label={`Avoid: ${data.avoid}`} sx={{ color: colors.red, borderColor: `${colors.red}55` }} variant="outlined" /></Stack>
+            <Button component={RouterLink} to="/scanner" size="small" variant="contained" endIcon={<ArrowForwardRoundedIcon />}>Launch Scanner</Button>
+        </Stack>
+    </Stack>;
 }
 
 export function MarketHealthWidget() {
