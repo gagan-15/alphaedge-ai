@@ -245,3 +245,11 @@ Scanner rows are grouped by symbol, so a stock appears only once per selected
 timeframe. Opening that row plots every active demand and supply zone for the
 symbol on one full-screen chart and lists each zone's pattern, boundaries, status,
 base date and quality beside the chart.
+
+Market Overview layout phase two establishes a reusable institutional information
+hierarchy without adding unvalidated calculations or feeds. The existing route and
+global navigation remain unchanged. The page now reserves ordered sections for an
+AI market summary, four decision KPIs, participation chart, sector rotation and
+breadth, institutional flow/VIX/sentiment, opportunities/alerts and a final daily
+verdict. Desktop uses a 12-column grid, tablet collapses to two columns and mobile
+keeps the same information order in one column.

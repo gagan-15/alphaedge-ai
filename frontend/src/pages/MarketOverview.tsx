@@ -1,130 +1,225 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
+import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
+import AutoGraphOutlinedIcon from "@mui/icons-material/AutoGraphOutlined";
+import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined";
+import CachedOutlinedIcon from "@mui/icons-material/CachedOutlined";
+import DashboardCustomizeOutlinedIcon from "@mui/icons-material/DashboardCustomizeOutlined";
+import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
+import NotificationsActiveOutlinedIcon from "@mui/icons-material/NotificationsActiveOutlined";
+import RadarOutlinedIcon from "@mui/icons-material/RadarOutlined";
+import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import ShowChartOutlinedIcon from "@mui/icons-material/ShowChartOutlined";
+import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
+import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
+import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";
-import LinearProgress from "@mui/material/LinearProgress";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Typography from "@mui/material/Typography";
 
-const indices = [
-    { name: "NIFTY 50", value: "24,731.45", change: 0.85, color: "#32d583" },
-    { name: "SENSEX", value: "81,214.85", change: 0.78, color: "#fdb022" },
-    { name: "BANK NIFTY", value: "54,372.15", change: 1.15, color: "#6172f3" },
-    { name: "FINNIFTY", value: "24,125.20", change: 1.02, color: "#22d3ee" },
-    { name: "INDIA VIX", value: "12.45", change: -2.35, color: "#f04438" },
-];
+import OverviewPanel from "../components/market-overview/OverviewPanel";
 
-const series = [
-    { name: "NIFTY 50", color: "#32d583", values: [42, 45, 49, 52, 51, 58, 56, 64, 61, 69, 65, 73] },
-    { name: "SENSEX", color: "#fdb022", values: [38, 41, 40, 47, 45, 52, 50, 57, 59, 63, 60, 66] },
-    { name: "BANK NIFTY", color: "#6172f3", values: [36, 40, 37, 44, 48, 46, 54, 52, 59, 56, 64, 60] },
-    { name: "FINNIFTY", color: "#22d3ee", values: [33, 36, 39, 35, 43, 40, 48, 44, 51, 49, 57, 61] },
-];
+const kpis = [
+    {
+        title: "Market Health",
+        subtitle: "Participation, momentum and trend strength",
+        icon: InsightsOutlinedIcon,
+        accent: "#32d583",
+    },
+    {
+        title: "Market Regime",
+        subtitle: "Trending, ranging or transition environment",
+        icon: TimelineOutlinedIcon,
+        accent: "#6172f3",
+    },
+    {
+        title: "Trading Bias",
+        subtitle: "Preferred directional research posture",
+        icon: TrendingUpOutlinedIcon,
+        accent: "#22d3ee",
+    },
+    {
+        title: "Risk Meter",
+        subtitle: "Volatility and participation risk context",
+        icon: SecurityOutlinedIcon,
+        accent: "#fdb022",
+    },
+] as const;
 
-const rangeProfiles = {
-    "1D": { multiplier: .36, drift: -.15, labels: ["09:15", "11:00", "12:45", "14:15", "15:30"] },
-    "1W": { multiplier: .62, drift: .08, labels: ["Mon", "Tue", "Wed", "Thu", "Fri"] },
-    "1M": { multiplier: 1, drift: 0, labels: ["Jul 01", "Jul 08", "Jul 15", "Jul 22", "Today"] },
-    "3M": { multiplier: 1.32, drift: -.1, labels: ["May", "Jun", "Jul", "Aug", "Today"] },
-    "1Y": { multiplier: 1.75, drift: .18, labels: ["Jul '25", "Oct '25", "Jan '26", "Apr '26", "Jul '26"] },
-} as const;
-
-const movers = [
-    ["RELIANCE", "2,978.45", "+0.83%", "12.45M"],
-    ["TCS", "3,584.75", "-0.41%", "20.15M"],
-    ["HDFCBANK", "1,654.20", "+1.12%", "18.22M"],
-    ["INFY", "1,512.10", "+0.35%", "13.12M"],
-    ["ICICIBANK", "1,234.55", "+0.70%", "11.84M"],
-];
-
-function MiniSpark({ color, down = false }: { color: string; down?: boolean }) {
-    return <Box component="svg" viewBox="0 0 100 28" sx={{ width: "100%", height: 28 }}>
-        <polyline points={down ? "0,6 12,9 24,8 36,15 48,13 60,20 72,17 84,23 100,25" : "0,24 12,21 24,22 36,15 48,17 60,10 72,13 84,7 100,3"} fill="none" stroke={color} strokeWidth="2" />
-    </Box>;
+function WidgetPlaceholder({ icon: Icon, text }: { icon: typeof AutoGraphOutlinedIcon; text: string }) {
+    return (
+        <Box
+            sx={{
+                height: "100%",
+                minHeight: 104,
+                display: "grid",
+                placeItems: "center",
+                border: "1px dashed rgba(143, 161, 184, .22)",
+                borderRadius: 2,
+                bgcolor: "rgba(4, 12, 25, .28)",
+                textAlign: "center",
+                px: 2,
+            }}
+        >
+            <Box>
+                <Icon sx={{ color: "text.secondary", fontSize: 28 }} />
+                <Typography color="text.secondary" sx={{ mt: 1, fontSize: ".74rem" }}>{text}</Typography>
+            </Box>
+        </Box>
+    );
 }
 
 export default function MarketOverview() {
-    const [range, setRange] = useState("1M");
-    const lines = useMemo(() => {
-        const profile = rangeProfiles[range as keyof typeof rangeProfiles];
-        return series.map((item, seriesIndex) => {
-            const origin = item.values[0];
-            const adjustedValues = item.values.map((value, index) =>
-                44 + (value - origin) * profile.multiplier
-                + index * profile.drift
-                + Math.sin(index * 1.7 + seriesIndex) * (range === "1D" ? 2.4 : 1.1)
-            );
-            const points = adjustedValues.map((value, index) => `${index * (100 / 11)},${100 - value}`).join(" ");
-            return { ...item, points };
-        });
-    }, [range]);
+    const [market, setMarket] = useState("NSE");
+    const [timeframe, setTimeframe] = useState("1D");
+    const [lastUpdated, setLastUpdated] = useState("Not refreshed");
 
-    return <Stack spacing={1.35}>
-        <Stack direction={{ xs: "column", md: "row" }} sx={{ justifyContent: "space-between", alignItems: { md: "center" } }}>
-            <Box><Typography variant="h4">Market Overview</Typography><Typography color="text.secondary">Index performance, participation and sector context.</Typography></Box>
-            <Chip color="warning" label="DELAYED DEVELOPMENT DATA" />
-        </Stack>
-        <Grid container spacing={1.1}>{indices.map((item) => <Grid key={item.name} size={{ xs: 12, sm: 6, lg: 2.4 }}>
-            <Card><CardContent sx={{ p: 1.6, "&:last-child": { pb: 1.4 } }}>
-                <Typography variant="caption" color="text.secondary">{item.name}</Typography>
-                <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "end", mt: .5 }}>
-                    <Box><Typography variant="h5">{item.value}</Typography><Typography variant="body2" sx={{ color: item.change >= 0 ? "success.main" : "error.main", fontWeight: 800 }}>{item.change >= 0 ? "▲" : "▼"} {Math.abs(item.change).toFixed(2)}%</Typography></Box>
-                    <Box sx={{ width: 74 }}><MiniSpark color={item.color} down={item.change < 0} /></Box>
-                </Stack>
-            </CardContent></Card>
-        </Grid>)}</Grid>
-        <Grid container spacing={1.35}>
-            <Grid size={{ xs: 12, xl: 8.5 }}><Card sx={{ height: 390 }}><CardContent sx={{ height: "100%", p: 1.75 }}>
-                <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
-                    <Box><Typography variant="h6">Relative Market Performance</Typography><Typography variant="caption" color="text.secondary">Normalized index movement · illustrative series · selected range: {range}</Typography></Box>
-                    <ToggleButtonGroup size="small" exclusive value={range} onChange={(_, value) => value && setRange(value)}>
-                        {["1D", "1W", "1M", "3M", "1Y"].map((x) => <ToggleButton key={x} value={x}>{x}</ToggleButton>)}
-                    </ToggleButtonGroup>
-                </Stack>
-                <Stack direction="row" spacing={2} sx={{ mt: 1.5 }}>{lines.map((item) => <Stack key={item.name} direction="row" spacing={.6} sx={{ alignItems: "center" }}>
-                    <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: item.color }} /><Typography variant="caption">{item.name}</Typography>
-                </Stack>)}</Stack>
-                <Box sx={{ position: "relative", height: 270, mt: 1 }}>
-                    <Box sx={{ position: "absolute", left: 0, top: 8, bottom: 24, width: 34, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                        {["+4%", "+2%", "0%", "-2%"].map((x) => <Typography key={x} variant="caption" color="text.secondary">{x}</Typography>)}
+    return (
+        <Box sx={{ width: "100%", maxWidth: 1600, mx: "auto", px: { xs: 0, lg: 1 } }}>
+            <Stack spacing={2.5}>
+                <Stack
+                    direction={{ xs: "column", xl: "row" }}
+                    spacing={2}
+                    sx={{ justifyContent: "space-between", alignItems: { xl: "center" } }}
+                >
+                    <Box>
+                        <Stack direction="row" spacing={1} sx={{ alignItems: "center", flexWrap: "wrap" }}>
+                            <Typography variant="h4">Market Overview</Typography>
+                            <Chip size="small" color="success" variant="outlined" label="MARKET OPEN" />
+                        </Stack>
+                        <Typography color="text.secondary" sx={{ mt: .65 }}>
+                            Institutional market context for faster research decisions.
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                            Last updated: {lastUpdated}
+                        </Typography>
                     </Box>
-                    <Box component="svg" viewBox="0 0 100 100" preserveAspectRatio="none" sx={{ position: "absolute", left: 38, right: 0, width: "calc(100% - 38px)", height: 235 }}>
-                        <defs><linearGradient id="marketGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#32d583" stopOpacity=".16" /><stop offset="1" stopColor="#32d583" stopOpacity="0" /></linearGradient></defs>
-                        {[15, 40, 65, 90].map((y) => <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="#20314a" strokeWidth=".45" />)}
-                        <polygon points={`0,100 ${lines[0].points} 100,100`} fill="url(#marketGlow)" />
-                        {lines.map((item) => <polyline key={item.name} points={item.points} fill="none" stroke={item.color} strokeWidth="1.25" vectorEffect="non-scaling-stroke" />)}
-                    </Box>
-                    <Stack direction="row" sx={{ position: "absolute", left: 38, right: 0, bottom: 0, justifyContent: "space-between" }}>
-                        {rangeProfiles[range as keyof typeof rangeProfiles].labels.map((x) => <Typography key={x} variant="caption" color="text.secondary">{x}</Typography>)}
+
+                    <Stack
+                        direction={{ xs: "column", sm: "row" }}
+                        spacing={1}
+                        useFlexGap
+                        sx={{ alignItems: { sm: "center" }, flexWrap: "wrap" }}
+                    >
+                        <Select size="small" value={market} onChange={(event) => setMarket(event.target.value)} sx={{ minWidth: 108 }}>
+                            <MenuItem value="NSE">NSE</MenuItem>
+                            <MenuItem value="BSE">BSE</MenuItem>
+                        </Select>
+                        <ToggleButtonGroup
+                            size="small"
+                            exclusive
+                            value={timeframe}
+                            onChange={(_, value) => value && setTimeframe(value)}
+                        >
+                            {["1D", "1W", "1M", "3M"].map((value) => (
+                                <ToggleButton key={value} value={value}>{value}</ToggleButton>
+                            ))}
+                        </ToggleButtonGroup>
+                        <Button
+                            variant="outlined"
+                            startIcon={<CachedOutlinedIcon />}
+                            onClick={() => setLastUpdated(new Date().toLocaleTimeString("en-IN"))}
+                        >
+                            Refresh
+                        </Button>
+                        <Button variant="outlined" startIcon={<DashboardCustomizeOutlinedIcon />}>
+                            Customize
+                        </Button>
                     </Stack>
-                </Box>
-            </CardContent></Card></Grid>
-            <Grid size={{ xs: 12, xl: 3.5 }}><Card sx={{ height: 390 }}><CardContent sx={{ p: 1.75 }}>
-                <Typography variant="h6">Market Breadth</Typography><Typography variant="caption" color="text.secondary">Tracked-symbol participation</Typography>
-                <Stack direction="row" spacing={2} sx={{ alignItems: "center", my: 2.5 }}>
-                    <Box sx={{ width: 128, height: 128, borderRadius: "50%", background: "conic-gradient(#32d583 0 62%, #f04438 62% 95%, #667085 95%)", position: "relative", "&::after": { content: '""', position: "absolute", inset: 24, borderRadius: "50%", bgcolor: "background.paper" } }} />
-                    <Stack spacing={1.2}>{[["Advancing", "1,682", "#32d583"], ["Declining", "802", "#f04438"], ["Unchanged", "126", "#98a2b3"]].map(([label, value, color]) => <Box key={label}><Typography variant="caption" sx={{ color }}>{label}</Typography><Typography sx={{ fontWeight: 850 }}>{value}</Typography></Box>)}</Stack>
                 </Stack>
-                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "rgba(50,213,131,.07)", border: "1px solid rgba(50,213,131,.18)" }}><Typography variant="caption" color="text.secondary">Participation reading</Typography><Typography variant="h5" color="success.main">Broadly positive</Typography><Typography variant="caption">62% of tracked symbols advancing</Typography></Box>
-            </CardContent></Card></Grid>
-        </Grid>
-        <Grid container spacing={1.35}>
-            <Grid size={{ xs: 12, lg: 7 }}><Card><CardContent sx={{ p: 1.5 }}><Typography variant="h6" sx={{ mb: .75 }}>Top Market Movers</Typography>
-                <Table size="small"><TableHead><TableRow>{["Symbol", "Price", "Change", "Volume"].map((x) => <TableCell key={x}>{x}</TableCell>)}</TableRow></TableHead><TableBody>{movers.map((row) => <TableRow key={row[0]} hover>{row.map((value, index) => <TableCell key={value} sx={{ fontWeight: index === 0 ? 800 : 500, color: index === 2 ? (value.startsWith("+") ? "success.main" : "error.main") : undefined }}>{value}</TableCell>)}</TableRow>)}</TableBody></Table>
-            </CardContent></Card></Grid>
-            <Grid size={{ xs: 12, lg: 5 }}><Card><CardContent sx={{ p: 1.5 }}><Typography variant="h6">Sector Performance</Typography>
-                {[["Nifty IT", 82, "+1.62%"], ["Nifty Bank", 69, "+1.15%"], ["Nifty FMCG", 58, "+0.98%"], ["Nifty Auto", 34, "-0.32%"], ["Nifty Metal", 27, "-0.85%"]].map(([name, value, change]) => <Box key={name as string} sx={{ mt: 1.15 }}><Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography variant="body2">{name}</Typography><Typography variant="body2" sx={{ color: (change as string).startsWith("+") ? "success.main" : "error.main" }}>{change}</Typography></Stack><LinearProgress variant="determinate" value={value as number} color={(change as string).startsWith("+") ? "success" : "error"} sx={{ mt: .45, height: 5 }} /></Box>)}
-            </CardContent></Card></Grid>
-        </Grid>
-    </Stack>;
+
+                <OverviewPanel
+                    title="AI Market Summary"
+                    subtitle="A concise interpretation of market health, leadership, risk and the preferred research approach will appear here."
+                    eyebrow="Executive intelligence"
+                    accent="#8b5cf6"
+                    minHeight={190}
+                    action={<Chip size="small" label="AI PLACEHOLDER" variant="outlined" />}
+                >
+                    <WidgetPlaceholder icon={AutoAwesomeOutlinedIcon} text="AI interpretation is intentionally not connected in this layout phase." />
+                </OverviewPanel>
+
+                <Grid container spacing={2.5}>
+                    {kpis.map(({ title, subtitle, icon: Icon, accent }) => (
+                        <Grid key={title} size={{ xs: 12, md: 6, lg: 3 }}>
+                            <OverviewPanel title={title} subtitle={subtitle} accent={accent} minHeight={210}>
+                                <WidgetPlaceholder icon={Icon} text="Metric widget ready for a validated data source." />
+                            </OverviewPanel>
+                        </Grid>
+                    ))}
+                </Grid>
+
+                <OverviewPanel
+                    title="Market Participation Trend"
+                    subtitle={`${market} participation workspace · ${timeframe} view`}
+                    eyebrow="Breadth through time"
+                    minHeight={420}
+                    action={<Chip size="small" label="CHART CONTAINER" variant="outlined" />}
+                >
+                    <WidgetPlaceholder icon={ShowChartOutlinedIcon} text="Interactive participation chart will be added without changing this layout." />
+                </OverviewPanel>
+
+                <Grid container spacing={2.5}>
+                    <Grid size={{ xs: 12, lg: 6 }}>
+                        <OverviewPanel title="Sector Rotation" subtitle="Leadership, improvement and deterioration by sector" minHeight={330}>
+                            <WidgetPlaceholder icon={RadarOutlinedIcon} text="Sector rotation widget slot" />
+                        </OverviewPanel>
+                    </Grid>
+                    <Grid size={{ xs: 12, lg: 6 }}>
+                        <OverviewPanel title="Market Breadth" subtitle="Advancing, declining and unchanged participation" minHeight={330}>
+                            <WidgetPlaceholder icon={AutoGraphOutlinedIcon} text="Market breadth widget slot" />
+                        </OverviewPanel>
+                    </Grid>
+                </Grid>
+
+                <Grid container spacing={2.5}>
+                    <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+                        <OverviewPanel title="Institutional Flow" subtitle="FII and DII activity context" minHeight={280}>
+                            <WidgetPlaceholder icon={TimelineOutlinedIcon} text="Institutional flow widget slot" />
+                        </OverviewPanel>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+                        <OverviewPanel title="India VIX" subtitle="Volatility level, direction and risk state" minHeight={280}>
+                            <WidgetPlaceholder icon={BoltOutlinedIcon} text="Volatility widget slot" />
+                        </OverviewPanel>
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 12, lg: 4 }}>
+                        <OverviewPanel title="Market Sentiment" subtitle="Combined participation and risk context" minHeight={280}>
+                            <WidgetPlaceholder icon={InsightsOutlinedIcon} text="Sentiment widget slot" />
+                        </OverviewPanel>
+                    </Grid>
+                </Grid>
+
+                <Grid container spacing={2.5}>
+                    <Grid size={{ xs: 12, lg: 6 }}>
+                        <OverviewPanel title="AI Opportunities" subtitle="Research candidates that deserve deeper validation" minHeight={300}>
+                            <WidgetPlaceholder icon={AutoAwesomeOutlinedIcon} text="Opportunity widget slot" />
+                        </OverviewPanel>
+                    </Grid>
+                    <Grid size={{ xs: 12, lg: 6 }}>
+                        <OverviewPanel title="Smart Alerts" subtitle="Important market conditions requiring attention" minHeight={300}>
+                            <WidgetPlaceholder icon={NotificationsActiveOutlinedIcon} text="Alert widget slot" />
+                        </OverviewPanel>
+                    </Grid>
+                </Grid>
+
+                <OverviewPanel
+                    title="Today's Verdict"
+                    subtitle="The final market posture, preferred strategy, risk level and next scan will be summarized here."
+                    eyebrow="Decision brief"
+                    accent="#32d583"
+                    minHeight={220}
+                    action={<Chip size="small" color="warning" variant="outlined" label="SUMMARY PLACEHOLDER" />}
+                >
+                    <WidgetPlaceholder icon={InsightsOutlinedIcon} text="Premium verdict container ready for validated market intelligence." />
+                </OverviewPanel>
+            </Stack>
+        </Box>
+    );
 }
