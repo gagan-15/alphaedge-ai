@@ -65,8 +65,8 @@ export interface ZoneResearchResult {
     strength_score: number;
     touch_score: number;
     merge_score: number;
-    raw_zone_score: number;
-    quality_cap: number;
+    raw_zone_score?: number;
+    quality_cap?: number;
     is_fresh: boolean;
     touch_count: number;
     merged_count: number;

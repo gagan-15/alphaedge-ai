@@ -91,6 +91,13 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
     const [backendAnalysis, setBackendAnalysis] = useState<StockDetailsBackendAnalysis | null>(null);
     const [analysisError, setAnalysisError] = useState("");
     const explanation = result.explanation;
+    const rawZoneScore = result.raw_zone_score ?? (
+        result.freshness_score
+        + result.strength_score
+        + result.touch_score
+        + result.merge_score
+    );
+    const qualityCap = result.quality_cap ?? result.zone_score;
     const currentZone = `${result.distal_price.toLocaleString("en-IN")} – ${result.proximal_price.toLocaleString("en-IN")}`;
     const unavailable = "Unavailable with the current data source";
     const number = (value: number | null, suffix = "") => value === null ? "Insufficient candle history" : `${value.toFixed(2)}${suffix}`;
@@ -185,10 +192,10 @@ function ZoneExplanationPanel({ result }: { result: ZoneResearchResult }) {
                             <Typography variant="caption" color="text.secondary">Exact zone-only score</Typography>
                             <Typography variant="body2">
                                 Freshness {result.freshness_score.toFixed(1)} + Departure {result.strength_score.toFixed(1)} + Retests {result.touch_score.toFixed(1)} + Overlap {result.merge_score.toFixed(1)}
-                                {" = "}{result.raw_zone_score.toFixed(1)}
+                                {" = "}{rawZoneScore.toFixed(1)}
                             </Typography>
-                            {result.quality_cap < result.raw_zone_score && <Typography variant="caption" color="warning.main">
-                                Final score capped at {result.quality_cap.toFixed(1)} because departure strength did not qualify for a higher rating.
+                            {qualityCap < rawZoneScore && <Typography variant="caption" color="warning.main">
+                                Final score capped at {qualityCap.toFixed(1)} because departure strength did not qualify for a higher rating.
                             </Typography>}
                         </Box>
                     </Section>
