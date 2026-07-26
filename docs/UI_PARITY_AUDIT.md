@@ -427,3 +427,8 @@ can independently combine EMA 9/20/50/100/200 and SMA 20/50/100/200 without chan
 the chart timeframe, selected zone or candle request. EMA lines are solid, SMA lines
 are dashed, each period has a distinct colour and the selection is stored locally.
 Indicator toggles add or remove chart series only; they do not reload market data.
+
+The Stock Details chart also includes a Reset chart action. It restores the fitted
+candle view, detected zones, crosshair and default spacing. It clears measurements,
+EMA/SMA indicators and optional higher-timeframe overlays without changing the
+selected stock, timeframe or scanner zone.

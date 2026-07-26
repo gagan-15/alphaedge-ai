@@ -277,6 +277,12 @@ function ScannerResultsTable({ results }: ScannerResultsTableProps) {
                                     onToggleConfluenceOverlay={toggleConfluenceOverlay}
                                     onInspectConfluenceOverlay={setInspectedConfluenceTimeframe}
                                     inspectedConfluenceTimeframe={inspectedConfluenceTimeframe}
+                                    onResetChart={() => {
+                                        setConfluenceOverlays([]);
+                                        setConfluenceOverlaysHidden(false);
+                                        setInspectedConfluenceTimeframe("");
+                                        saveOverlayTimeframes([]);
+                                    }}
                                     height={fullChartHeight}
                                     showTools
                                 />

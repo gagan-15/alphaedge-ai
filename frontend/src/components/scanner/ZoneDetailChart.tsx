@@ -75,6 +75,7 @@ interface ZoneDetailChartProps {
     onToggleConfluenceOverlay?: (overlay: ConfluenceChartOverlay) => void;
     onInspectConfluenceOverlay?: (timeframe: string) => void;
     inspectedConfluenceTimeframe?: string;
+    onResetChart?: () => void;
     height?: number;
     showTools?: boolean;
 }
@@ -88,6 +89,7 @@ function ZoneDetailChart({
     onToggleConfluenceOverlay,
     onInspectConfluenceOverlay,
     inspectedConfluenceTimeframe,
+    onResetChart,
     height = 360,
     showTools = false,
 }: ZoneDetailChartProps) {
@@ -556,6 +558,28 @@ function ZoneDetailChart({
         setMeasurement(measuring ? "Select two chart points to highlight a range." : "Measurement tool is off.");
     }
 
+    function resetChart() {
+        clearMeasurement();
+        setMeasuring(false);
+        measuringRef.current = false;
+        setCrosshairVisible(true);
+        crosshairVisibleRef.current = true;
+        chartRef.current?.applyOptions({
+            crosshair: { mode: CrosshairMode.Normal },
+        });
+        setZonesVisible(true);
+        baseZoneAreaSeriesRef.current.forEach((series) => series.applyOptions({ visible: true }));
+        baseZoneBoundarySeriesRef.current.forEach((series) => series.applyOptions({ visible: true }));
+        confluenceSeriesRef.current.forEach((series) => series.applyOptions({ visible: true }));
+        confluenceBoundarySeriesRef.current.forEach((series) => series.applyOptions({ visible: true }));
+        setSelectedIndicators([]);
+        localStorage.removeItem(indicatorPreferenceKey);
+        chartRef.current?.timeScale().fitContent();
+        chartRef.current?.timeScale().applyOptions({ rightOffset: 3 });
+        setMeasurement("Measurement tool is off.");
+        onResetChart?.();
+    }
+
     function toggleCrosshair() {
         const next = !crosshairVisible;
         setCrosshairVisible(next);
@@ -578,6 +602,7 @@ function ZoneDetailChart({
             </Stack>
             {showTools && <Stack direction="row" spacing={1} sx={{ px: 1.5, py: 1, alignItems: "center", flexWrap: "wrap", rowGap: 1, borderBottom: "1px solid", borderColor: "divider" }}>
                 <Button size="small" variant="outlined" onClick={() => chartRef.current?.timeScale().fitContent()}>Fit chart</Button>
+                <Button size="small" variant="outlined" color="warning" onClick={resetChart}>Reset chart</Button>
                 <Button size="small" variant={measuring ? "contained" : "outlined"} onClick={toggleMeasure}>Measure range</Button>
                 <Button size="small" variant="outlined" onClick={clearMeasurement}>Clear measurement</Button>
                 <Button size="small" variant={crosshairVisible ? "contained" : "outlined"} onClick={toggleCrosshair}>Crosshair {crosshairVisible ? "On" : "Off"}</Button>
