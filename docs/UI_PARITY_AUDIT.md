@@ -432,3 +432,8 @@ The Stock Details chart also includes a Reset chart action. It restores the fitt
 candle view, detected zones, crosshair and default spacing. It clears measurements,
 EMA/SMA indicators and optional higher-timeframe overlays without changing the
 selected stock, timeframe or scanner zone.
+
+The Stock Details analysis panel now includes a Customize drawer. Users can hide or
+show each right-side section independently, restore all sections in one click, and
+keep their choices on the same device. The control prevents every section from being
+hidden at once and does not change any scanner data or calculations.

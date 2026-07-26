@@ -3,6 +3,7 @@ import BookmarkAddRoundedIcon from "@mui/icons-material/BookmarkAddRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
 import ShareRoundedIcon from "@mui/icons-material/ShareRounded";
+import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -21,10 +22,25 @@ import type { ZoneExplanationFactor, ZoneResearchResult } from "../../types/scan
 import { analyzeStockZone, type StockZoneAnalysis } from "./stockZoneAnalysis";
 import TimeframeConfluenceExplorer from "./TimeframeConfluenceExplorer";
 import type { ConfluenceChartOverlay } from "../../types/scanner";
+import StockDetailsCustomizeDrawer from "./StockDetailsCustomizeDrawer";
+import {
+    defaultStockDetailsVisibility,
+    type StockDetailsVisibility,
+} from "./stockDetailsPreferences";
 
 const watchlistKey = "alphaedge.local.watchlist";
 const watchlistZonesKey = "alphaedge.local.watchlist.zones";
 const alertsKey = "alphaedge.local.alerts";
+const stockDetailsVisibilityKey = "alphaedge.stock-details.visible-sections";
+
+function readVisibility(): StockDetailsVisibility {
+    try {
+        const stored = JSON.parse(localStorage.getItem(stockDetailsVisibilityKey) ?? "{}") as Partial<StockDetailsVisibility>;
+        return { ...defaultStockDetailsVisibility, ...stored };
+    } catch {
+        return defaultStockDetailsVisibility;
+    }
+}
 
 function readList(key: string): string[] {
     try {
@@ -129,6 +145,8 @@ function ZoneExplanationPanel({
     const [watchlistSavedKey, setWatchlistSavedKey] = useState("");
     const [alertSavedKey, setAlertSavedKey] = useState("");
     const [actionBusy, setActionBusy] = useState<"" | "watchlist" | "alert" | "share">("");
+    const [customizeOpen, setCustomizeOpen] = useState(false);
+    const [visibleSections, setVisibleSections] = useState<StockDetailsVisibility>(readVisibility);
     const explanation = result.explanation;
     const sameNumber = (left: number, right: number) => Math.abs(left - right) <= Math.max(0.01, Math.abs(right) * 0.000001);
     const backendAnalysis = receivedBackendAnalysis
@@ -217,6 +235,12 @@ function ZoneExplanationPanel({
     const alertAdded = alertSavedKey === selectedAnalysisKey
         || readObjects(alertsKey).some((item) => item.zoneId === selectedAnalysisKey);
 
+    function updateVisibleSections(next: StockDetailsVisibility) {
+        if (!Object.values(next).some(Boolean)) return;
+        setVisibleSections(next);
+        localStorage.setItem(stockDetailsVisibilityKey, JSON.stringify(next));
+    }
+
     useEffect(() => {
         let active = true;
         const intraday = ["5m", "15m", "75m", "125m", "1H", "2H", "4H", "6H"].includes(result.timeframe);
@@ -301,8 +325,13 @@ function ZoneExplanationPanel({
     return (
         <Card variant="outlined" sx={{ mb: 1.5, overflow: "hidden" }}>
             <CardContent>
+                <Stack direction="row" sx={{ justifyContent: "flex-end", mb: 1 }}>
+                    <Button size="small" variant="outlined" startIcon={<TuneRoundedIcon />} onClick={() => setCustomizeOpen(true)}>
+                        Customize
+                    </Button>
+                </Stack>
                 <Stack spacing={2.25} divider={<Divider flexItem />}>
-                    <Section title="AI Decision">
+                    {visibleSections.decision && <Section title="AI Decision">
                         <Grid container spacing={1.5}>
                             <Grid size={{ xs: 6 }}>
                                 <Typography color="text.secondary" variant="overline">Zone Quality</Typography>
@@ -341,9 +370,9 @@ function ZoneExplanationPanel({
                             </Box>)}
                             <Typography variant="caption" color="text.secondary">Previous backend zone score: {rawZoneScore.toFixed(1)} raw, capped at {qualityCap.toFixed(1)}. It is kept only for API compatibility.</Typography>
                         </Stack>}
-                    </Section>
+                    </Section>}
 
-                    <Section title="Trading Plan">
+                    {visibleSections.plan && <Section title="Trading Plan">
                         {receivedBackendAnalysis && !planIsSynchronized
                             ? <Typography color="warning.main">Trading plan unavailable because the selected analysis is out of sync.</Typography>
                             : <Grid container spacing={1}>
@@ -358,12 +387,12 @@ function ZoneExplanationPanel({
                             <Grid size={{ xs: 6 }}><Field label="Reward per share" value={backendAnalysis?.trade_plan.reward_per_share ? `₹${backendAnalysis.trade_plan.reward_per_share.toLocaleString("en-IN")}` : "No validated opposing target"} /></Grid>
                         </Grid>}
                         {planIsSynchronized && <Typography variant="caption" color="text.secondary">Research illustration only. The target uses the nearest detected opposing zone; no order is placed.</Typography>}
-                    </Section>
+                    </Section>}
 
-                    <FactorList title="Why AlphaEdge selected this zone" factors={explanation.positive_factors} positive />
-                    <FactorList title="What could weaken this setup" factors={explanation.negative_factors} positive={false} />
+                    {visibleSections.strengths && <FactorList title="Why AlphaEdge selected this zone" factors={explanation.positive_factors} positive />}
+                    {visibleSections.weaknesses && <FactorList title="What could weaken this setup" factors={explanation.negative_factors} positive={false} />}
 
-                    <Section title="AI Checklist">
+                    {visibleSections.checklist && <Section title="AI Checklist">
                         {!analysis && !analysisError && <Typography color="text.secondary">Calculating from delayed OHLCV candles…</Typography>}
                         {analysisError && <Button size="small" color="warning" onClick={() => window.location.reload()}>{analysisError} Retry</Button>}
                         {displayChecks && <Stack spacing={1}>{displayChecks.map((item) => (
@@ -376,9 +405,9 @@ function ZoneExplanationPanel({
                                 <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>{item.reason} · {item.scoreEffect}</Typography>
                             </Box>
                         ))}</Stack>}
-                    </Section>
+                    </Section>}
 
-                    <Section title="Demand / Supply Analysis">
+                    {visibleSections.zoneAnalysis && <Section title="Demand / Supply Analysis">
                         <Grid container spacing={1}>
                             <Grid size={{ xs: 6 }}><Field label="Current zone" value={currentZone} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Zone type" value={result.zone_type} /></Grid>
@@ -394,9 +423,9 @@ function ZoneExplanationPanel({
                             <Grid size={{ xs: 6 }}><Field label="Nearest demand" value={result.zone_type === "DEMAND" ? currentZone : "Not available"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Nearest supply" value={result.zone_type === "SUPPLY" ? currentZone : "Not available"} /></Grid>
                         </Grid>
-                    </Section>
+                    </Section>}
 
-                    <Section title="Trend and Momentum">
+                    {visibleSections.trend && <Section title="Trend and Momentum">
                         <Grid container spacing={1}>
                             <Grid size={{ xs: 6 }}><Field label="Short-term trend" value={analysis?.shortTrend ?? "Calculating…"} note="Change over the latest 10 candles." /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Medium-term trend" value={analysis?.mediumTrend ?? "Calculating…"} note="Change over the latest 30 candles." /></Grid>
@@ -412,9 +441,9 @@ function ZoneExplanationPanel({
                             <Grid size={{ xs: 6 }}><Field label="Relative volume" value={analysis ? number(analysis.relativeVolume, "×") : "Calculating…"} note="Compared with the latest 20 periods." /></Grid>
                             <Grid size={{ xs: 12 }}><Field label="Buying and selling pressure" value={analysis?.pressure ?? "Calculating…"} note={analysis ? `${analysis.pressureConfidence} confidence. This is an OHLCV estimate, not true bid/ask order flow.` : undefined} /></Grid>
                         </Grid>
-                    </Section>
+                    </Section>}
 
-                    <Section title="Sector and Relative Performance">
+                    {visibleSections.sector && <Section title="Sector and Relative Performance">
                         <Grid container spacing={1}>
                             <Grid size={{ xs: 6 }}><Field label="Current sector" value={backendAnalysis?.sector.name ?? "Loading maintained mapping…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Sector benchmark" value={backendAnalysis?.sector.benchmark ?? "Sector benchmark mapping required"} /></Grid>
@@ -432,9 +461,9 @@ function ZoneExplanationPanel({
                             <Grid size={{ xs: 6 }}><Field label="Stock vs sector (3M)" value={backendAnalysis?.sector.comparison?.["3m"]?.difference === undefined ? backendAnalysis?.sector.status ?? "Calculating…" : `${backendAnalysis.sector.comparison["3m"].difference! >= 0 ? "+" : ""}${backendAnalysis.sector.comparison["3m"].difference!.toFixed(2)}%`} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="True institutional money flow" value="Requires institutional-flow data" /></Grid>
                         </Grid>
-                    </Section>
+                    </Section>}
 
-                    <Section title="Multiple Timeframes">
+                    {visibleSections.timeframes && <Section title="Multiple Timeframes">
                         <Stack spacing={.8}>
                             {backendAnalysis?.multi_timeframe.frames.map((frame) => <Box key={frame.timeframe} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.25 }}>
                                 <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography sx={{ fontWeight: 800 }}>{frame.timeframe}</Typography><Chip size="small" label={frame.confirmation === "CONFIRMED" ? "Aligned" : frame.confirmation === "NOT_CONFIRMED" ? "Not Aligned" : frame.confirmation === "MIXED" ? "Partially Aligned" : "Insufficient History"} color={frame.confirmation === "CONFIRMED" ? "success" : "default"} /></Stack>
@@ -442,9 +471,9 @@ function ZoneExplanationPanel({
                             </Box>) ?? <Typography color="text.secondary">Calculating daily, weekly and monthly confirmation…</Typography>}
                             {backendAnalysis && <Typography variant="caption" color="text.secondary">Combined result: {backendAnalysis.multi_timeframe.status === "CONFIRMED" ? "Aligned" : backendAnalysis.multi_timeframe.status === "MIXED" ? "Partially Aligned" : "Not Aligned"}</Typography>}
                         </Stack>
-                    </Section>
+                    </Section>}
 
-                    {onToggleConfluenceOverlay && onToggleConfluenceVisibility && onClearConfluenceOverlays && onAvailableConfluenceOverlays && (
+                    {visibleSections.confluence && onToggleConfluenceOverlay && onToggleConfluenceVisibility && onClearConfluenceOverlays && onAvailableConfluenceOverlays && (
                         <Section title="Higher Timeframe Confluence">
                             <TimeframeConfluenceExplorer
                                 result={result}
@@ -459,24 +488,30 @@ function ZoneExplanationPanel({
                         </Section>
                     )}
 
-                    <Section title="History and Risk">
+                    {visibleSections.history && <Section title="History and Risk">
                         <Grid container spacing={1}>
                             {["Similar past zones", "Average gain", "Average loss", "Historical success rate", "Probability", "Volatility", "Gap risk", "Liquidity"].map((label) => (
                                 <Grid key={label} size={{ xs: 6 }}><Field label={label} value={label === "Volatility" && analysis ? number(analysis.atr14) : label === "Liquidity" ? "Requires average traded-value rules" : label === "Gap risk" ? "Requires next-session gap history" : "Requires historical-zone backtest"} /></Grid>
                             ))}
                         </Grid>
                         <Typography variant="caption" color="text.secondary">{unavailable}: historical testing and probability need a validated, time-safe zone backtest. They are never guessed.</Typography>
-                    </Section>
+                    </Section>}
 
-                    <Section title="Actions">
+                    {visibleSections.actions && <Section title="Actions">
                         <Grid container spacing={1}>
                             <Grid size={{ xs: 6 }}><Button fullWidth variant="outlined" disabled={watchlistAdded || actionBusy === "watchlist"} startIcon={<BookmarkAddRoundedIcon />} onClick={addToWatchlist}>{watchlistAdded ? "Added" : "Add to Watchlist"}</Button></Grid>
                             <Grid size={{ xs: 6 }}><Button fullWidth variant="outlined" disabled={alertAdded || actionBusy === "alert"} startIcon={<AddAlertRoundedIcon />} onClick={createAlert}>{alertAdded ? "Alert Created" : "Create Alert"}</Button></Grid>
                             <Grid size={{ xs: 12 }}><Button fullWidth variant="outlined" disabled={actionBusy === "share"} startIcon={<ShareRoundedIcon />} onClick={() => void share()}>{actionBusy === "share" ? "Sharing…" : "Share Analysis"}</Button></Grid>
                         </Grid>
-                    </Section>
+                    </Section>}
                 </Stack>
             </CardContent>
+            <StockDetailsCustomizeDrawer
+                open={customizeOpen}
+                value={visibleSections}
+                onClose={() => setCustomizeOpen(false)}
+                onChange={updateVisibleSections}
+            />
             <Snackbar open={Boolean(message)} autoHideDuration={2500} onClose={() => setMessage("")} message={message} />
         </Card>
     );
