@@ -497,3 +497,17 @@ workspaces. The delayed market ticker, Market Overview summary strips, status ca
 metric tiles, alert rows and gauge tracks now use the active theme. Chart canvases
 remain dark for price readability, with explicit light chart labels and tooltips.
 The public landing and login presentation remain intentionally branded dark surfaces.
+
+## Dashboard milestone 1.1
+
+Dashboard is now an AI-first market decision page. A compact full-width AI Market
+Verdict combines the market direction, risk, confidence, today's research strategy,
+Nifty, Bank Nifty, India VIX and simple market breadth. The remaining space is split
+between the top Demand Zone and Supply Zone opportunity tables.
+
+`DashboardOpportunityTable` is shared by both sides and accepts the opportunity type,
+opportunity data and display limit. It does not calculate or rank zones. Dashboard
+uses the existing daily Scanner endpoint in the order returned by the backend and
+uses the existing Trade Confidence function. Watchlist, holdings, alerts, shortcuts,
+notifications and recent-research cards were removed from Dashboard only; their
+dedicated pages and routes were not changed.

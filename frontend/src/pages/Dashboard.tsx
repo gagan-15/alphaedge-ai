@@ -1,146 +1,184 @@
-import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
-import BookmarkRoundedIcon from "@mui/icons-material/BookmarkRounded";
-import NotificationsActiveRoundedIcon from "@mui/icons-material/NotificationsActiveRounded";
-import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
-import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
+import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { Link as RouterLink } from "react-router-dom";
+import { alpha } from "@mui/material/styles";
+import { useEffect, useMemo, useState } from "react";
 
-import AlertCard from "../components/dashboard/AlertCard";
+import { getResearchZones } from "../api/scannerApi";
+import DashboardOpportunityTable, {
+    type DashboardOpportunity,
+} from "../components/dashboard/DashboardOpportunityTable";
+import { buildTradeConfidence } from "../components/scanner/tradeConfidence";
 import { useMarketIntelligence } from "../market-intelligence/MarketIntelligenceState";
-import { getResearchLabel } from "../utils/researchLanguage";
+import type { ZoneResearchResult } from "../types/scanner";
 
-function readStringList(key: string): string[] {
-    try {
-        const value = JSON.parse(localStorage.getItem(key) ?? "[]");
-        return Array.isArray(value) ? value.map(String) : [];
-    } catch {
-        return [];
-    }
+function marketValue(label: string, value: string, change?: number) {
+    return (
+        <Box sx={{ minWidth: 0, flex: "1 1 140px" }}>
+            <Typography color="text.secondary" sx={{ fontSize: "0.61rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</Typography>
+            <Stack direction="row" spacing={0.7} sx={{ mt: 0.3, alignItems: "baseline" }}>
+                <Typography sx={{ fontSize: "1rem", fontWeight: 900 }}>{value}</Typography>
+                {change !== undefined && (
+                    <Typography sx={{ color: change >= 0 ? "success.main" : "error.main", fontSize: "0.65rem", fontWeight: 850 }}>
+                        {change >= 0 ? "+" : ""}{change.toFixed(2)}%
+                    </Typography>
+                )}
+            </Stack>
+        </Box>
+    );
 }
 
-function readRecentResearch() {
-    try {
-        const value = JSON.parse(localStorage.getItem("alphaedge.local.watchlist.zones") ?? "[]");
-        return Array.isArray(value) ? value.slice(-3).reverse() as Array<Record<string, string>> : [];
-    } catch {
-        return [];
-    }
+function toOpportunity(zone: ZoneResearchResult): DashboardOpportunity {
+    return {
+        zone,
+        tradeConfidence: buildTradeConfidence(zone, null, null).score,
+    };
 }
 
 export default function Dashboard() {
     const { dashboard, snapshot, lastUpdated, isLoading, error } = useMarketIntelligence();
-    const watchlist = readStringList("alphaedge.local.watchlist").slice(0, 5);
-    const recentResearch = readRecentResearch();
+    const [zones, setZones] = useState<ZoneResearchResult[]>([]);
+    const [zonesLoading, setZonesLoading] = useState(true);
+    const [zonesError, setZonesError] = useState("");
+
+    useEffect(() => {
+        let active = true;
+        void getResearchZones("DAILY")
+            .then((response) => {
+                if (active) setZones(response.results);
+            })
+            .catch(() => {
+                if (active) setZonesError("Zone opportunities could not be loaded. Open the Scanner to try again.");
+            })
+            .finally(() => {
+                if (active) setZonesLoading(false);
+            });
+        return () => { active = false; };
+    }, []);
+
+    const demandOpportunities = useMemo(
+        () => zones.filter((zone) => zone.zone_type === "DEMAND").map(toOpportunity),
+        [zones],
+    );
+    const supplyOpportunities = useMemo(
+        () => zones.filter((zone) => zone.zone_type === "SUPPLY").map(toOpportunity),
+        [zones],
+    );
 
     if (isLoading && !dashboard) {
-        return <Box sx={{ minHeight: "60vh", display: "grid", placeItems: "center" }}><Stack spacing={2} sx={{ alignItems: "center" }}><CircularProgress /><Typography color="text.secondary">Loading your workspace...</Typography></Stack></Box>;
+        return (
+            <Box sx={{ minHeight: "60vh", display: "grid", placeItems: "center" }}>
+                <Stack spacing={2} sx={{ alignItems: "center" }}>
+                    <CircularProgress />
+                    <Typography color="text.secondary">Loading market intelligence...</Typography>
+                </Stack>
+            </Box>
+        );
     }
+
     if (!dashboard) {
-        return <Card><CardContent><Typography variant="h6">Your workspace is unavailable</Typography><Typography color="text.secondary">{error || "Market data could not be loaded."}</Typography></CardContent></Card>;
+        return (
+            <Card>
+                <CardContent>
+                    <Typography variant="h6">Dashboard is unavailable</Typography>
+                    <Typography color="text.secondary">{error || "Market data could not be loaded."}</Typography>
+                </CardContent>
+            </Card>
+        );
     }
+
+    const bullish = snapshot.marketDirection === "Bullish";
+    const bearish = snapshot.marketDirection === "Bearish";
+    const verdictColor = bullish ? "#31c77a" : bearish ? "#ff5c67" : "#f5b942";
 
     return (
         <Stack spacing={2}>
-            <Stack direction={{ xs: "column", md: "row" }} sx={{ justifyContent: "space-between", alignItems: { md: "center" } }}>
-                <Box>
-                    <Typography variant="h4">My Trading Workspace</Typography>
-                    <Typography color="text.secondary">Your signals, saved stocks, alerts and next research steps.</Typography>
-                </Box>
-                <Typography variant="caption" color="text.secondary">Market updated {lastUpdated?.toLocaleTimeString("en-IN") ?? "recently"}</Typography>
-            </Stack>
-
-            <Card><CardContent>
-                <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ alignItems: { md: "center" } }}>
-                    <Box sx={{ flex: 1 }}>
-                        <Typography variant="overline" color="text.secondary">Quick Market Snapshot</Typography>
-                        <Typography variant="h5">{snapshot.marketDirection} · {snapshot.riskLevel}</Typography>
-                        <Typography color="text.secondary" sx={{ mt: .5 }}>{snapshot.todayStrategy}</Typography>
-                    </Box>
-                    <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }}>
-                        <Chip label={`Nifty ${dashboard.market.nifty_change >= 0 ? "+" : ""}${dashboard.market.nifty_change}%`} color={dashboard.market.nifty_change >= 0 ? "success" : "error"} variant="outlined" />
-                        <Chip label={`India VIX ${dashboard.market.india_vix}`} variant="outlined" />
-                        <Button component={RouterLink} to="/market-overview" endIcon={<ArrowForwardRoundedIcon />}>Why is the market doing this?</Button>
-                    </Stack>
-                </Stack>
-            </CardContent></Card>
-
-            <Grid container spacing={2}>
-                <Grid size={{ xs: 12, lg: 8 }}>
-                    <Card sx={{ height: "100%" }}><CardContent>
-                        <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
-                            <Box><Typography variant="h5">Today's AI Signals</Typography><Typography color="text.secondary">Start with the setups that match the most rules.</Typography></Box>
-                            <Button component={RouterLink} to="/signals">View all</Button>
-                        </Stack>
-                        <Grid container spacing={1.5} sx={{ mt: .5 }}>
-                            {dashboard.signals.slice(0, 6).map((signal) => <Grid key={signal.symbol} size={{ xs: 12, sm: 6, lg: 4 }}>
-                                <Box sx={{ p: 1.5, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
-                                    <Stack direction="row" sx={{ justifyContent: "space-between" }}><Typography sx={{ fontWeight: 900 }}>{signal.symbol}</Typography><Chip size="small" label={getResearchLabel(signal.action)} color={signal.action === "BUY" ? "success" : signal.action === "SELL" ? "error" : "warning"} /></Stack>
-                                    <Typography variant="h6" sx={{ mt: 1 }}>₹{signal.price.toLocaleString("en-IN")}</Typography>
-                                    <Typography variant="caption" color="text.secondary">{signal.confidence}% of current rules matched</Typography>
+            <Card sx={{ overflow: "hidden" }}>
+                <CardContent sx={{ p: { xs: 2, lg: 2.25 }, "&:last-child": { pb: { xs: 2, lg: 2.25 } } }}>
+                    <Grid container spacing={{ xs: 2, lg: 2.5 }} sx={{ alignItems: "center" }}>
+                        <Grid size={{ xs: 12, lg: 5 }}>
+                            <Stack direction="row" spacing={1.25} sx={{ alignItems: "center" }}>
+                                <Box sx={{ width: 40, height: 40, display: "grid", placeItems: "center", borderRadius: 2.5, color: verdictColor, bgcolor: alpha(verdictColor, 0.12) }}>
+                                    <AutoAwesomeRoundedIcon />
                                 </Box>
-                            </Grid>)}
+                                <Box>
+                                    <Typography variant="overline" sx={{ color: verdictColor, fontWeight: 900 }}>AI Market Verdict</Typography>
+                                    <Typography variant="h4">{snapshot.marketDirection} Market · {snapshot.riskLevel}</Typography>
+                                </Box>
+                            </Stack>
+                            <Typography color="text.secondary" sx={{ mt: 1.15, maxWidth: 600 }}>
+                                {snapshot.marketHealth}. {snapshot.todayStrategy}
+                            </Typography>
+                            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 1.4, alignItems: { sm: "center" } }}>
+                                <Box sx={{ minWidth: 210 }}>
+                                    <Stack direction="row" sx={{ justifyContent: "space-between" }}>
+                                        <Typography color="text.secondary" sx={{ fontSize: "0.65rem" }}>Confidence Score</Typography>
+                                        <Typography sx={{ fontWeight: 900 }}>{snapshot.aiConfidence}%</Typography>
+                                    </Stack>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={snapshot.aiConfidence}
+                                        sx={{ mt: 0.65, height: 7, "& .MuiLinearProgress-bar": { bgcolor: verdictColor } }}
+                                    />
+                                </Box>
+                                <Chip label={`Today's Strategy: ${snapshot.todayStrategy}`} variant="outlined" sx={{ color: verdictColor, borderColor: alpha(verdictColor, 0.45), fontWeight: 800 }} />
+                            </Stack>
                         </Grid>
-                    </CardContent></Card>
-                </Grid>
-                <Grid size={{ xs: 12, lg: 4 }}><AlertCard alerts={dashboard.alerts.slice(0, 4)} /></Grid>
 
-                <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-                    <Card sx={{ height: "100%" }}><CardContent>
-                        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}><BookmarkRoundedIcon color="primary" /><Typography variant="h6">My Watchlist</Typography></Stack>
-                        <Stack spacing={1} divider={<Divider flexItem />} sx={{ mt: 1.5 }}>
-                            {(watchlist.length ? watchlist : ["No stocks saved yet"]).map((symbol) => <Typography key={symbol} color={watchlist.length ? "text.primary" : "text.secondary"}>{symbol}</Typography>)}
-                        </Stack>
-                        <Button component={RouterLink} to="/watchlist" sx={{ mt: 1.5 }}>Open watchlist</Button>
-                    </CardContent></Card>
-                </Grid>
+                        <Grid size={{ xs: 12, lg: 7 }}>
+                            <Stack
+                                direction="row"
+                                useFlexGap
+                                spacing={2}
+                                sx={{
+                                    p: 1.6,
+                                    flexWrap: "wrap",
+                                    borderRadius: 2.5,
+                                    border: "1px solid",
+                                    borderColor: "divider",
+                                    bgcolor: "action.hover",
+                                }}
+                            >
+                                {marketValue("Nifty", dashboard.market.nifty50.toLocaleString("en-IN"), dashboard.market.nifty_change)}
+                                {marketValue("Bank Nifty", dashboard.market.bank_nifty.toLocaleString("en-IN"), dashboard.market.bank_nifty_change)}
+                                {marketValue("India VIX", dashboard.market.india_vix.toFixed(2), dashboard.market.india_vix_change)}
+                                {marketValue("Market Breadth", `${snapshot.marketBreadth}%`)}
+                            </Stack>
+                            <Typography color="text.secondary" sx={{ mt: 0.8, textAlign: { lg: "right" }, fontSize: "0.61rem" }}>
+                                Market updated {lastUpdated?.toLocaleTimeString("en-IN") ?? "recently"} · research data may be delayed
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            </Card>
 
-                <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-                    <Card sx={{ height: "100%" }}><CardContent>
-                        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}><PlayArrowRoundedIcon color="primary" /><Typography variant="h6">Continue Last Research</Typography></Stack>
-                        <Stack spacing={1} sx={{ mt: 1.5 }}>
-                            {(recentResearch.length ? recentResearch : [{ symbol: "No recent stock research" }]).map((item, index) => <Box key={`${item.symbol}-${index}`}>
-                                <Typography sx={{ fontWeight: 800 }}>{item.symbol}</Typography>
-                                {item.zoneType && <Typography variant="caption" color="text.secondary">{item.timeframe} · {item.zoneType} zone</Typography>}
-                            </Box>)}
-                        </Stack>
-                        <Button component={RouterLink} to="/scanner" sx={{ mt: 1.5 }}>Continue research</Button>
-                    </CardContent></Card>
-                </Grid>
+            {zonesError && (
+                <Typography color="warning.main" sx={{ px: 0.5, fontSize: "0.68rem" }}>{zonesError}</Typography>
+            )}
 
-                <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-                    <Card sx={{ height: "100%" }}><CardContent>
-                        <Typography variant="h6">My Holdings Summary</Typography>
-                        <Typography color="text.secondary" sx={{ mt: 1.5 }}>Invested capital</Typography>
-                        <Typography variant="h5">₹{dashboard.portfolio.invested_capital.toLocaleString("en-IN")}</Typography>
-                        <Typography color="text.secondary" sx={{ mt: .75 }}>{dashboard.portfolio.total_positions} saved positions</Typography>
-                        <Button component={RouterLink} to="/holdings" sx={{ mt: 1.5 }}>View holdings</Button>
-                    </CardContent></Card>
+            <Grid container spacing={2} sx={{ alignItems: "stretch" }}>
+                <Grid size={{ xs: 12, lg: 6 }}>
+                    <DashboardOpportunityTable
+                        type="demand"
+                        opportunities={demandOpportunities}
+                        limit={5}
+                        loading={zonesLoading}
+                    />
                 </Grid>
-
-                <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-                    <Card sx={{ height: "100%" }}><CardContent>
-                        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}><SearchRoundedIcon color="primary" /><Typography variant="h6">Scanner Shortcut</Typography></Stack>
-                        <Typography color="text.secondary" sx={{ mt: 1 }}>Find stocks near fresh demand or supply zones.</Typography>
-                        <Button component={RouterLink} to="/scanner" variant="contained" sx={{ mt: 2 }}>Run scanner</Button>
-                    </CardContent></Card>
-                </Grid>
-
-                <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-                    <Card sx={{ height: "100%" }}><CardContent>
-                        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}><NotificationsActiveRoundedIcon color="primary" /><Typography variant="h6">AI Notifications</Typography></Stack>
-                        <Typography color="text.secondary" sx={{ mt: 1 }}>{dashboard.alerts.filter((alert) => alert.requires_action).length} items may need your attention.</Typography>
-                        <Button component={RouterLink} to="/alerts" sx={{ mt: 1.5 }}>Review alerts</Button>
-                    </CardContent></Card>
+                <Grid size={{ xs: 12, lg: 6 }}>
+                    <DashboardOpportunityTable
+                        type="supply"
+                        opportunities={supplyOpportunities}
+                        limit={5}
+                        loading={zonesLoading}
+                    />
                 </Grid>
             </Grid>
         </Stack>
