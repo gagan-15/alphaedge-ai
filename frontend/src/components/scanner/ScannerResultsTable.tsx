@@ -34,6 +34,11 @@ import { buildTradeConfidence } from "./tradeConfidence";
 
 interface ScannerResultsTableProps {
     results: ZoneResearchResult[];
+    initialSelection?: {
+        symbol: string;
+        timeframe: string;
+        selectedZone: "demand" | "supply";
+    };
 }
 
 const patternLabels: Record<string, string> = {
@@ -55,16 +60,39 @@ function qualityLabel(score: number) {
     return "Rejected";
 }
 
+function normalizedTimeframe(value: string) {
+    const aliases: Record<string, string> = {
+        DAILY: "1D",
+        WEEKLY: "1W",
+        MONTHLY: "1M",
+        QUARTERLY: "3M",
+        HALFYEARLY: "6M",
+        YEARLY: "1Y",
+    };
+    return aliases[value.toUpperCase()] ?? value.toUpperCase();
+}
+
 function resultKey(result: ZoneResearchResult) {
     return `${result.symbol}:${result.timeframe}:${result.zone_type}:${result.proximal_price}:${result.distal_price}:${result.base_index}`;
 }
 
-function ScannerResultsTable({ results }: ScannerResultsTableProps) {
+function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableProps) {
+    const initialZones = initialSelection
+        ? results.filter((zone) =>
+            zone.symbol === initialSelection.symbol
+            && normalizedTimeframe(zone.timeframe) === normalizedTimeframe(initialSelection.timeframe)
+        )
+        : [];
+    const initialZone = initialSelection
+        ? initialZones.find((zone) => zone.zone_type === initialSelection.selectedZone.toUpperCase())
+        : undefined;
     const [sortField, setSortField] = useState<"symbol" | "trade_confidence" | "zone_score" | "distance_percent">("trade_confidence");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
     const [confidenceScores, setConfidenceScores] = useState<Record<string, number>>({});
-    const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>([]);
-    const [selectedZoneId, setSelectedZoneId] = useState("");
+    const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>(initialZone ? initialZones : []);
+    const [selectedZoneId, setSelectedZoneId] = useState(() =>
+        initialZone ? zoneIdFor(initialZones, initialZone) : ""
+    );
     const [confluenceOverlays, setConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
     const [availableConfluenceOverlays, setAvailableConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
     const [confluenceOverlaysHidden, setConfluenceOverlaysHidden] = useState(false);

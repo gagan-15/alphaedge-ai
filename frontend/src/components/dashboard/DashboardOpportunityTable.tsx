@@ -124,9 +124,23 @@ export default function DashboardOpportunityTable({
                                     hover
                                     tabIndex={0}
                                     role="link"
-                                    onClick={() => navigate("/scanner")}
+                                    onClick={() => navigate("/scanner", {
+                                        state: {
+                                            symbol: zone.symbol,
+                                            timeframe,
+                                            selectedZone: type,
+                                        },
+                                    })}
                                     onKeyDown={(event) => {
-                                        if (event.key === "Enter" || event.key === " ") navigate("/scanner");
+                                        if (event.key === "Enter" || event.key === " ") {
+                                            navigate("/scanner", {
+                                                state: {
+                                                    symbol: zone.symbol,
+                                                    timeframe,
+                                                    selectedZone: type,
+                                                },
+                                            });
+                                        }
                                     }}
                                     sx={{
                                         cursor: "pointer",

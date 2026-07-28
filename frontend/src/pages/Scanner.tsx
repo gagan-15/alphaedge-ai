@@ -58,6 +58,8 @@ function Scanner() {
     const initialFilters = location.state as {
         zoneType?: "DEMAND" | "SUPPLY";
         timeframe?: string;
+        symbol?: string;
+        selectedZone?: "demand" | "supply";
     } | null;
     const [scanner, setScanner] =
         useState<ZoneResearchResponse | null>(null);
@@ -69,9 +71,9 @@ function Scanner() {
         useState("");
     const [minimumScore, setMinimumScore] = useState(() => scannerPreference("minimumQuality", 40));
     const [approvalFilter, setApprovalFilter] = useState(
-        initialFilters?.zoneType === "DEMAND"
+        initialFilters?.zoneType === "DEMAND" || initialFilters?.selectedZone === "demand"
             ? "approved"
-            : initialFilters?.zoneType === "SUPPLY"
+            : initialFilters?.zoneType === "SUPPLY" || initialFilters?.selectedZone === "supply"
                 ? "rejected"
                 : "all",
     );
@@ -288,7 +290,17 @@ function Scanner() {
             )}
 
             <ScannerResultsTable
+                key={initialFilters?.symbol && initialFilters.selectedZone
+                    ? `${initialFilters.symbol}:${initialFilters.timeframe ?? timeframe}:${initialFilters.selectedZone}:${visibleResults.length}`
+                    : "scanner-results"}
                 results={visibleResults}
+                initialSelection={initialFilters?.symbol && initialFilters.selectedZone
+                    ? {
+                        symbol: initialFilters.symbol,
+                        timeframe: initialFilters.timeframe ?? timeframe,
+                        selectedZone: initialFilters.selectedZone,
+                    }
+                    : undefined}
             />
         </Stack>
     );
