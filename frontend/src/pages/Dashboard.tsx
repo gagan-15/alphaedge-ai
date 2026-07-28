@@ -22,9 +22,9 @@ function marketValue(label: string, value: string, change?: number) {
         <Box sx={{ minWidth: 0, flex: "1 1 118px" }}>
             <Typography color="text.secondary" sx={{ fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</Typography>
             <Stack direction="row" spacing={0.6} sx={{ mt: 0.25, alignItems: "baseline" }}>
-                <Typography sx={{ fontSize: "0.94rem", fontWeight: 950 }}>{value}</Typography>
+                <Typography sx={{ fontSize: "0.94rem", fontWeight: 700 }}>{value}</Typography>
                 {change !== undefined && (
-                    <Typography sx={{ color: change >= 0 ? "success.main" : "error.main", fontSize: "0.61rem", fontWeight: 850 }}>
+                    <Typography sx={{ color: change >= 0 ? "success.main" : "error.main", fontSize: "0.61rem", fontWeight: 600 }}>
                         {change >= 0 ? "+" : ""}{change.toFixed(2)}%
                     </Typography>
                 )}
@@ -90,7 +90,7 @@ export default function Dashboard() {
                                 </Box>
                                 <Box>
                                     <Typography variant="overline" sx={{ color: verdictColor, fontWeight: 900, letterSpacing: "0.09em" }}>Market Verdict</Typography>
-                                    <Typography variant="h4">
+                                    <Typography variant="h4" sx={{ fontWeight: 600 }}>
                                         {dashboard ? `${snapshot.marketDirection} Market · ${snapshot.riskLevel}` : "Market verdict pending"}
                                     </Typography>
                                 </Box>
@@ -112,14 +112,14 @@ export default function Dashboard() {
                                     <CircularProgress variant="determinate" value={100} size={66} thickness={4.2} sx={{ color: "action.hover", position: "absolute", inset: 0 }} />
                                     <CircularProgress variant="determinate" value={dashboard ? snapshot.aiConfidence : 0} size={66} thickness={4.2} sx={{ color: verdictColor, position: "absolute", inset: 0 }} />
                                     <Box sx={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
-                                        <Typography sx={{ fontSize: "0.9rem", fontWeight: 950 }}>{dashboard ? snapshot.aiConfidence : "—"}</Typography>
+                                        <Typography sx={{ fontSize: "0.9rem", fontWeight: 800 }}>{dashboard ? snapshot.aiConfidence : "—"}</Typography>
                                     </Box>
                                 </Box>
                                 <Box sx={{ minWidth: 0 }}>
                                     <Typography color="text.secondary" sx={{ fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.07em" }}>Confidence</Typography>
-                                    <Typography sx={{ mt: 0.2, fontWeight: 900 }}>{dashboard ? "Current market view" : "Waiting for data"}</Typography>
+                                    <Typography sx={{ mt: 0.2, fontWeight: 600 }}>{dashboard ? "Current market view" : "Waiting for data"}</Typography>
                                     <Typography color="text.secondary" sx={{ mt: 0.7, fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.07em" }}>Today's Strategy</Typography>
-                                    <Typography sx={{ mt: 0.15, color: verdictColor, fontSize: "0.65rem", fontWeight: 850 }}>
+                                    <Typography sx={{ mt: 0.15, color: verdictColor, fontSize: "0.65rem", fontWeight: 600 }}>
                                         {dashboard ? snapshot.todayStrategy : "Waiting for market data"}
                                     </Typography>
                                 </Box>

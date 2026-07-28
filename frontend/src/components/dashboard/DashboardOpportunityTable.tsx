@@ -94,7 +94,15 @@ export default function DashboardOpportunityTable({
                 <TableContainer sx={{ flex: 1, height: 340, minHeight: 340 }}>
                     <Table size="small" aria-label={title} sx={{ minWidth: 650 }}>
                         <TableHead>
-                            <TableRow>
+                            <TableRow
+                                sx={{
+                                    "& th": {
+                                        color: "text.secondary",
+                                        fontSize: "0.68rem",
+                                        fontWeight: 500,
+                                    },
+                                }}
+                            >
                                 <TableCell width={46}>Rank</TableCell>
                                 <TableCell>Stock</TableCell>
                                 <TableCell align="center">AI Score</TableCell>
@@ -123,30 +131,30 @@ export default function DashboardOpportunityTable({
                                     }}
                                 >
                                     <TableCell>
-                                        <Typography sx={{ color: "text.secondary", fontSize: "0.68rem", fontWeight: 900 }}>#{index + 1}</Typography>
+                                        <Typography sx={{ color: "text.secondary", fontSize: "0.68rem", fontWeight: 500 }}>#{index + 1}</Typography>
                                     </TableCell>
                                     <TableCell>
-                                        <Typography sx={{ fontWeight: 950 }}>{zone.symbol}</Typography>
-                                        <Typography color="text.secondary" sx={{ fontSize: "0.58rem" }}>{zone.timeframe} · {zone.status}</Typography>
+                                        <Typography sx={{ color: "text.primary", fontSize: "0.86rem", fontWeight: 600 }}>{zone.symbol}</Typography>
+                                        <Typography color="text.secondary" sx={{ fontSize: "0.75rem", fontWeight: 400 }}>{zone.timeframe} · {zone.status}</Typography>
                                     </TableCell>
                                     <TableCell align="center">
                                         <Box sx={{ display: "inline-grid", minWidth: 48, height: 38, px: 0.85, placeItems: "center", borderRadius: 1.8, color: accent, bgcolor: alpha(accent, 0.13), border: `1px solid ${alpha(accent, 0.3)}` }}>
-                                            <Typography sx={{ fontSize: "1.08rem", lineHeight: 1, fontWeight: 950 }}>{zone.zone_score.toFixed(0)}</Typography>
+                                            <Typography sx={{ fontSize: "1.12rem", lineHeight: 1, fontWeight: 900 }}>{zone.zone_score.toFixed(0)}</Typography>
                                         </Box>
                                     </TableCell>
                                     <TableCell>
-                                        <Typography sx={{ fontSize: "0.7rem", fontWeight: 800, whiteSpace: "nowrap" }}>
+                                        <Typography sx={{ fontSize: "0.7rem", fontWeight: 500, whiteSpace: "nowrap" }}>
                                             ₹{formatPrice(Math.min(zone.proximal_price, zone.distal_price))}
                                             {" – "}
                                             ₹{formatPrice(Math.max(zone.proximal_price, zone.distal_price))}
                                         </Typography>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <Typography sx={{ fontSize: "0.7rem", fontWeight: 850 }}>{zone.distance_percent.toFixed(2)}%</Typography>
+                                        <Typography sx={{ fontSize: "0.7rem", fontWeight: 500 }}>{zone.distance_percent.toFixed(2)}%</Typography>
                                     </TableCell>
                                     <TableCell align="right">
                                         <Stack spacing={0.4} sx={{ minWidth: 78, alignItems: "flex-end" }}>
-                                            <Typography sx={{ fontSize: "0.72rem", fontWeight: 900 }}>{tradeConfidence}%</Typography>
+                                            <Typography sx={{ fontSize: "0.72rem", fontWeight: 500 }}>{tradeConfidence}%</Typography>
                                             <LinearProgress
                                                 variant="determinate"
                                                 value={tradeConfidence}
