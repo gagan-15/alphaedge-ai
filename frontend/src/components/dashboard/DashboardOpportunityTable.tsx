@@ -31,6 +31,7 @@ interface DashboardOpportunityTableProps {
     type: DashboardOpportunityType;
     opportunities: DashboardOpportunity[];
     limit: number;
+    timeframe?: string;
     loading?: boolean;
     error?: string;
 }
@@ -43,6 +44,7 @@ export default function DashboardOpportunityTable({
     type,
     opportunities,
     limit,
+    timeframe = "DAILY",
     loading = false,
     error = "",
 }: DashboardOpportunityTableProps) {
@@ -82,6 +84,10 @@ export default function DashboardOpportunityTable({
                     <Button
                         component={RouterLink}
                         to="/scanner"
+                        state={{
+                            zoneType: demand ? "DEMAND" : "SUPPLY",
+                            timeframe,
+                        }}
                         size="small"
                         variant="outlined"
                         endIcon={<ArrowForwardRoundedIcon />}

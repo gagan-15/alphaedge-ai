@@ -167,6 +167,7 @@ export default function Dashboard() {
                         type="demand"
                         opportunities={demandOpportunities}
                         limit={5}
+                        timeframe="DAILY"
                         loading={zonesLoading}
                         error={zonesError}
                     />
@@ -176,6 +177,7 @@ export default function Dashboard() {
                         type="supply"
                         opportunities={supplyOpportunities}
                         limit={5}
+                        timeframe="DAILY"
                         loading={zonesLoading}
                         error={zonesError}
                     />

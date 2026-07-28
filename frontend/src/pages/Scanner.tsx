@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -53,6 +54,11 @@ function scannerPreference<T>(key: "defaultTimeframe" | "minimumQuality", fallba
 }
 
 function Scanner() {
+    const location = useLocation();
+    const initialFilters = location.state as {
+        zoneType?: "DEMAND" | "SUPPLY";
+        timeframe?: string;
+    } | null;
     const [scanner, setScanner] =
         useState<ZoneResearchResponse | null>(null);
     const [isLoading, setIsLoading] =
@@ -62,8 +68,16 @@ function Scanner() {
     const [searchQuery, setSearchQuery] =
         useState("");
     const [minimumScore, setMinimumScore] = useState(() => scannerPreference("minimumQuality", 40));
-    const [approvalFilter, setApprovalFilter] = useState("all");
-    const [timeframe, setTimeframe] = useState(() => scannerPreference("defaultTimeframe", "DAILY"));
+    const [approvalFilter, setApprovalFilter] = useState(
+        initialFilters?.zoneType === "DEMAND"
+            ? "approved"
+            : initialFilters?.zoneType === "SUPPLY"
+                ? "rejected"
+                : "all",
+    );
+    const [timeframe, setTimeframe] = useState(
+        () => initialFilters?.timeframe ?? scannerPreference("defaultTimeframe", "DAILY"),
+    );
     const [market, setMarket] = useState("NSE");
     const [patternFilter, setPatternFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
