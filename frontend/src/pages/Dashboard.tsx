@@ -2,9 +2,8 @@ import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
-import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { alpha } from "@mui/material/styles";
@@ -20,12 +19,12 @@ import type { ZoneResearchResult } from "../types/scanner";
 
 function marketValue(label: string, value: string, change?: number) {
     return (
-        <Box sx={{ minWidth: 0, flex: "1 1 140px" }}>
-            <Typography color="text.secondary" sx={{ fontSize: "0.61rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</Typography>
-            <Stack direction="row" spacing={0.7} sx={{ mt: 0.3, alignItems: "baseline" }}>
-                <Typography sx={{ fontSize: "1rem", fontWeight: 900 }}>{value}</Typography>
+        <Box sx={{ minWidth: 0, flex: "1 1 118px" }}>
+            <Typography color="text.secondary" sx={{ fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</Typography>
+            <Stack direction="row" spacing={0.6} sx={{ mt: 0.25, alignItems: "baseline" }}>
+                <Typography sx={{ fontSize: "0.94rem", fontWeight: 950 }}>{value}</Typography>
                 {change !== undefined && (
-                    <Typography sx={{ color: change >= 0 ? "success.main" : "error.main", fontSize: "0.65rem", fontWeight: 850 }}>
+                    <Typography sx={{ color: change >= 0 ? "success.main" : "error.main", fontSize: "0.61rem", fontWeight: 850 }}>
                         {change >= 0 ? "+" : ""}{change.toFixed(2)}%
                     </Typography>
                 )}
@@ -82,52 +81,59 @@ export default function Dashboard() {
     return (
         <Stack spacing={2}>
             <Card sx={{ overflow: "hidden" }}>
-                <CardContent sx={{ p: { xs: 2, lg: 2.25 }, "&:last-child": { pb: { xs: 2, lg: 2.25 } } }}>
-                    <Grid container spacing={{ xs: 2, lg: 2.5 }} sx={{ alignItems: "center" }}>
-                        <Grid size={{ xs: 12, lg: 5 }}>
+                <CardContent sx={{ p: { xs: 2, lg: 2.1 }, "&:last-child": { pb: { xs: 2, lg: 2.1 } } }}>
+                    <Grid container spacing={{ xs: 2, lg: 2.2 }} sx={{ alignItems: "stretch" }}>
+                        <Grid size={{ xs: 12, md: 6, lg: 4 }}>
                             <Stack direction="row" spacing={1.25} sx={{ alignItems: "center" }}>
                                 <Box sx={{ width: 40, height: 40, display: "grid", placeItems: "center", borderRadius: 2.5, color: verdictColor, bgcolor: alpha(verdictColor, 0.12) }}>
                                     <AutoAwesomeRoundedIcon />
                                 </Box>
                                 <Box>
-                                    <Typography variant="overline" sx={{ color: verdictColor, fontWeight: 900 }}>AI Market Verdict</Typography>
+                                    <Typography variant="overline" sx={{ color: verdictColor, fontWeight: 900, letterSpacing: "0.09em" }}>Market Verdict</Typography>
                                     <Typography variant="h4">
                                         {dashboard ? `${snapshot.marketDirection} Market · ${snapshot.riskLevel}` : "Market verdict pending"}
                                     </Typography>
                                 </Box>
                             </Stack>
-                            <Typography color="text.secondary" sx={{ mt: 1.15, maxWidth: 600 }}>
+                            <Typography color="text.secondary" sx={{ mt: 1.05, maxWidth: 560 }}>
                                 {dashboard
                                     ? `${snapshot.marketHealth}. ${snapshot.todayStrategy}`
                                     : "Market data is unavailable right now. Zone research can still be reviewed below."}
                             </Typography>
-                            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 1.4, alignItems: { sm: "center" } }}>
-                                <Box sx={{ minWidth: 210 }}>
-                                    <Stack direction="row" sx={{ justifyContent: "space-between" }}>
-                                        <Typography color="text.secondary" sx={{ fontSize: "0.65rem" }}>Confidence Score</Typography>
-                                        <Typography sx={{ fontWeight: 900 }}>{dashboard ? `${snapshot.aiConfidence}%` : "—"}</Typography>
-                                    </Stack>
-                                    <LinearProgress
-                                        variant="determinate"
-                                        value={dashboard ? snapshot.aiConfidence : 0}
-                                        sx={{ mt: 0.65, height: 7, "& .MuiLinearProgress-bar": { bgcolor: verdictColor } }}
-                                    />
+                        </Grid>
+
+                        <Grid size={{ xs: 12, md: 6, lg: 3 }}>
+                            <Stack
+                                direction="row"
+                                spacing={1.4}
+                                sx={{ height: "100%", alignItems: "center", p: 1.25, borderRadius: 2.5, border: "1px solid", borderColor: "divider" }}
+                            >
+                                <Box sx={{ position: "relative", width: 66, height: 66, flex: "0 0 auto" }}>
+                                    <CircularProgress variant="determinate" value={100} size={66} thickness={4.2} sx={{ color: "action.hover", position: "absolute", inset: 0 }} />
+                                    <CircularProgress variant="determinate" value={dashboard ? snapshot.aiConfidence : 0} size={66} thickness={4.2} sx={{ color: verdictColor, position: "absolute", inset: 0 }} />
+                                    <Box sx={{ position: "absolute", inset: 0, display: "grid", placeItems: "center" }}>
+                                        <Typography sx={{ fontSize: "0.9rem", fontWeight: 950 }}>{dashboard ? snapshot.aiConfidence : "—"}</Typography>
+                                    </Box>
                                 </Box>
-                                <Chip
-                                    label={dashboard ? `Today's Strategy: ${snapshot.todayStrategy}` : "Today's Strategy: Waiting for market data"}
-                                    variant="outlined"
-                                    sx={{ color: verdictColor, borderColor: alpha(verdictColor, 0.45), fontWeight: 800 }}
-                                />
+                                <Box sx={{ minWidth: 0 }}>
+                                    <Typography color="text.secondary" sx={{ fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.07em" }}>Confidence</Typography>
+                                    <Typography sx={{ mt: 0.2, fontWeight: 900 }}>{dashboard ? "Current market view" : "Waiting for data"}</Typography>
+                                    <Typography color="text.secondary" sx={{ mt: 0.7, fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.07em" }}>Today's Strategy</Typography>
+                                    <Typography sx={{ mt: 0.15, color: verdictColor, fontSize: "0.65rem", fontWeight: 850 }}>
+                                        {dashboard ? snapshot.todayStrategy : "Waiting for market data"}
+                                    </Typography>
+                                </Box>
                             </Stack>
                         </Grid>
 
-                        <Grid size={{ xs: 12, lg: 7 }}>
+                        <Grid size={{ xs: 12, lg: 5 }}>
+                            <Typography color="text.secondary" sx={{ mb: 0.55, fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.07em" }}>Market Summary</Typography>
                             <Stack
                                 direction="row"
                                 useFlexGap
-                                spacing={2}
+                                spacing={1.5}
                                 sx={{
-                                    p: 1.6,
+                                    p: 1.35,
                                     flexWrap: "wrap",
                                     borderRadius: 2.5,
                                     border: "1px solid",
@@ -140,15 +146,15 @@ export default function Dashboard() {
                                 {marketValue("India VIX", market ? market.india_vix.toFixed(2) : "—", market?.india_vix_change)}
                                 {marketValue("Market Breadth", dashboard ? `${snapshot.marketBreadth}%` : "—")}
                             </Stack>
-                            <Typography color="text.secondary" sx={{ mt: 0.8, textAlign: { lg: "right" }, fontSize: "0.61rem" }}>
+                            <Typography color="text.secondary" sx={{ mt: 0.55, textAlign: { lg: "right" }, fontSize: "0.58rem" }}>
                                 {lastUpdated
-                                    ? `Market updated ${lastUpdated.toLocaleTimeString("en-IN")} · research data may be delayed`
+                                    ? `Updated ${lastUpdated.toLocaleTimeString("en-IN")} · delayed research data`
                                     : marketMessage}
                             </Typography>
                         </Grid>
                     </Grid>
                     {!dashboard && !isLoading && (
-                        <Typography color="warning.main" sx={{ mt: 1.2, fontSize: "0.68rem" }}>
+                        <Typography color="warning.main" sx={{ mt: 1.05, fontSize: "0.65rem" }}>
                             {marketMessage} The Dashboard will update when the backend reconnects.
                         </Typography>
                     )}

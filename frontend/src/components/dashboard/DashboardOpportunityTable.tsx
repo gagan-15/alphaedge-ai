@@ -5,8 +5,8 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
 import LinearProgress from "@mui/material/LinearProgress";
+import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -54,41 +54,42 @@ export default function DashboardOpportunityTable({
     const Icon = demand ? TrendingUpRoundedIcon : TrendingDownRoundedIcon;
     const accent = demand ? "#31c77a" : "#ff5c67";
     const visible = opportunities.slice(0, Math.max(0, limit));
+    const skeletonRows = Array.from({ length: Math.max(1, limit) });
 
     return (
-        <Card sx={{ height: "100%", minHeight: { lg: 430 }, overflow: "hidden" }}>
+        <Card sx={{ height: "100%", minHeight: { lg: 430 }, overflow: "hidden", borderTop: `2px solid ${alpha(accent, 0.75)}` }}>
             <CardContent sx={{ height: "100%", display: "flex", flexDirection: "column", p: 0, "&:last-child": { pb: 0 } }}>
                 <Stack
                     direction="row"
                     spacing={1.25}
                     sx={{
                         px: 2,
-                        py: 1.75,
+                        py: 1.55,
                         alignItems: "center",
                         borderBottom: "1px solid",
                         borderColor: "divider",
-                        bgcolor: (theme) => alpha(accent, theme.palette.mode === "dark" ? 0.07 : 0.05),
+                        bgcolor: (theme) => alpha(accent, theme.palette.mode === "dark" ? 0.085 : 0.055),
                     }}
                 >
-                    <Box sx={{ width: 36, height: 36, display: "grid", placeItems: "center", borderRadius: 2, color: accent, bgcolor: alpha(accent, 0.12) }}>
+                    <Box sx={{ width: 36, height: 36, display: "grid", placeItems: "center", borderRadius: 2, color: accent, bgcolor: alpha(accent, 0.14) }}>
                         <Icon />
                     </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="h6">{title}</Typography>
-                        <Typography color="text.secondary" sx={{ mt: 0.2, fontSize: "0.67rem" }}>{subtitle}</Typography>
+                        <Typography variant="h6" sx={{ color: accent }}>{title}</Typography>
+                        <Typography color="text.secondary" sx={{ mt: 0.15, fontSize: "0.64rem" }}>{subtitle}</Typography>
                     </Box>
-                    <Button component={RouterLink} to="/scanner" size="small" endIcon={<ArrowForwardRoundedIcon />}>
+                    <Button component={RouterLink} to="/scanner" size="small" endIcon={<ArrowForwardRoundedIcon />} sx={{ color: accent }}>
                         View All
                     </Button>
                 </Stack>
 
                 <TableContainer sx={{ flex: 1 }}>
-                    <Table size="small" aria-label={title}>
+                    <Table size="small" aria-label={title} sx={{ minWidth: 650 }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell width={48}>Rank</TableCell>
+                                <TableCell width={46}>Rank</TableCell>
                                 <TableCell>Stock</TableCell>
-                                <TableCell align="right">AI Score</TableCell>
+                                <TableCell align="center">AI Score</TableCell>
                                 <TableCell>Zone</TableCell>
                                 <TableCell align="right">Distance</TableCell>
                                 <TableCell align="right">Trade Confidence</TableCell>
@@ -96,42 +97,62 @@ export default function DashboardOpportunityTable({
                         </TableHead>
                         <TableBody>
                             {!loading && visible.map(({ zone, tradeConfidence }, index) => (
-                                <TableRow key={`${zone.symbol}-${zone.timeframe}-${zone.base_index}-${zone.proximal_price}`} hover>
+                                <TableRow
+                                    key={`${zone.symbol}-${zone.timeframe}-${zone.base_index}-${zone.proximal_price}`}
+                                    hover
+                                    sx={{
+                                        "& td": { py: 1.2 },
+                                        "& td:first-of-type": { borderLeft: `3px solid ${alpha(accent, 0.72)}` },
+                                        "&:hover": { bgcolor: alpha(accent, 0.045) },
+                                    }}
+                                >
                                     <TableCell>
-                                        <Chip size="small" label={`#${index + 1}`} sx={{ minWidth: 34, color: accent, bgcolor: alpha(accent, 0.1), fontWeight: 900 }} />
+                                        <Typography sx={{ color: "text.secondary", fontSize: "0.68rem", fontWeight: 900 }}>#{index + 1}</Typography>
                                     </TableCell>
                                     <TableCell>
-                                        <Typography sx={{ fontWeight: 900 }}>{zone.symbol}</Typography>
-                                        <Typography color="text.secondary" sx={{ fontSize: "0.61rem" }}>{zone.timeframe} · {zone.status}</Typography>
+                                        <Typography sx={{ fontWeight: 950 }}>{zone.symbol}</Typography>
+                                        <Typography color="text.secondary" sx={{ fontSize: "0.58rem" }}>{zone.timeframe} · {zone.status}</Typography>
                                     </TableCell>
-                                    <TableCell align="right">
-                                        <Typography sx={{ color: accent, fontWeight: 900 }}>{zone.zone_score.toFixed(0)}</Typography>
+                                    <TableCell align="center">
+                                        <Box sx={{ display: "inline-grid", minWidth: 42, height: 34, px: 0.75, placeItems: "center", borderRadius: 1.7, color: accent, bgcolor: alpha(accent, 0.13), border: `1px solid ${alpha(accent, 0.3)}` }}>
+                                            <Typography sx={{ fontSize: "1rem", lineHeight: 1, fontWeight: 950 }}>{zone.zone_score.toFixed(0)}</Typography>
+                                        </Box>
                                     </TableCell>
                                     <TableCell>
-                                        <Typography sx={{ fontWeight: 750, whiteSpace: "nowrap" }}>
+                                        <Typography sx={{ fontSize: "0.7rem", fontWeight: 800, whiteSpace: "nowrap" }}>
                                             ₹{formatPrice(Math.min(zone.proximal_price, zone.distal_price))}
                                             {" – "}
                                             ₹{formatPrice(Math.max(zone.proximal_price, zone.distal_price))}
                                         </Typography>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <Typography sx={{ fontWeight: 800 }}>{zone.distance_percent.toFixed(2)}%</Typography>
+                                        <Typography sx={{ fontSize: "0.7rem", fontWeight: 850 }}>{zone.distance_percent.toFixed(2)}%</Typography>
                                     </TableCell>
                                     <TableCell align="right">
-                                        <Stack spacing={0.45} sx={{ minWidth: 82, alignItems: "flex-end" }}>
-                                            <Typography sx={{ fontWeight: 900 }}>{tradeConfidence}%</Typography>
+                                        <Stack spacing={0.4} sx={{ minWidth: 78, alignItems: "flex-end" }}>
+                                            <Typography sx={{ fontSize: "0.72rem", fontWeight: 900 }}>{tradeConfidence}%</Typography>
                                             <LinearProgress
                                                 variant="determinate"
                                                 value={tradeConfidence}
                                                 sx={{
-                                                    width: 72,
-                                                    height: 5,
+                                                    width: 66,
+                                                    height: 4,
                                                     bgcolor: "action.hover",
                                                     "& .MuiLinearProgress-bar": { bgcolor: accent },
                                                 }}
                                             />
                                         </Stack>
                                     </TableCell>
+                                </TableRow>
+                            ))}
+                            {loading && skeletonRows.map((_, index) => (
+                                <TableRow key={`skeleton-${index}`} sx={{ "& td": { py: 1.35 } }}>
+                                    <TableCell><Skeleton width={24} /></TableCell>
+                                    <TableCell><Skeleton width={72} /><Skeleton width={48} height={14} /></TableCell>
+                                    <TableCell align="center"><Skeleton variant="rounded" width={42} height={34} sx={{ mx: "auto" }} /></TableCell>
+                                    <TableCell><Skeleton width={116} /></TableCell>
+                                    <TableCell><Skeleton width={48} sx={{ ml: "auto" }} /></TableCell>
+                                    <TableCell><Skeleton width={66} sx={{ ml: "auto" }} /></TableCell>
                                 </TableRow>
                             ))}
                             {!loading && !error && visible.length === 0 && (
@@ -150,23 +171,13 @@ export default function DashboardOpportunityTable({
                                     </TableCell>
                                 </TableRow>
                             )}
-                            {loading && (
-                                <TableRow>
-                                    <TableCell colSpan={6} sx={{ py: 7, textAlign: "center" }}>
-                                        <Typography color="text.secondary">Loading zone opportunities...</Typography>
-                                    </TableCell>
-                                </TableRow>
-                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
 
-                <Stack direction="row" sx={{ px: 2, py: 1.1, alignItems: "center", justifyContent: "space-between", borderTop: "1px solid", borderColor: "divider" }}>
-                    <Typography color="text.secondary" sx={{ fontSize: "0.61rem" }}>
-                        Ranked by the existing Scanner service · delayed research data
-                    </Typography>
-                    <Typography sx={{ color: accent, fontSize: "0.61rem", fontWeight: 800 }}>
-                        {visible.length} shown
+                <Stack direction="row" sx={{ px: 2, py: 0.55, alignItems: "center", justifyContent: "flex-end", borderTop: "1px solid", borderColor: "divider" }}>
+                    <Typography color="text.secondary" sx={{ fontSize: "0.55rem", opacity: 0.68 }}>
+                        Delayed research data · {visible.length} shown
                     </Typography>
                 </Stack>
             </CardContent>
