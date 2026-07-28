@@ -511,3 +511,9 @@ uses the existing daily Scanner endpoint in the order returned by the backend an
 uses the existing Trade Confidence function. Watchlist, holdings, alerts, shortcuts,
 notifications and recent-research cards were removed from Dashboard only; their
 dedicated pages and routes were not changed.
+
+Dashboard API failures are isolated by section. If market data is loading or
+unavailable, the AI Market Verdict remains visible with clear placeholders and a
+small inline warning. Demand and Supply opportunities continue loading separately.
+If the Scanner zones request fails, each opportunity table shows its own error state
+without hiding the market verdict or replacing the complete page.

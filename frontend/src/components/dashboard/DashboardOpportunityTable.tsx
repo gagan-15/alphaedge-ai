@@ -32,6 +32,7 @@ interface DashboardOpportunityTableProps {
     opportunities: DashboardOpportunity[];
     limit: number;
     loading?: boolean;
+    error?: string;
 }
 
 function formatPrice(value: number) {
@@ -43,6 +44,7 @@ export default function DashboardOpportunityTable({
     opportunities,
     limit,
     loading = false,
+    error = "",
 }: DashboardOpportunityTableProps) {
     const demand = type === "demand";
     const title = demand ? "Top Demand Zone Opportunities" : "Top Supply Zone Opportunities";
@@ -132,11 +134,19 @@ export default function DashboardOpportunityTable({
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {!loading && visible.length === 0 && (
+                            {!loading && !error && visible.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={6} sx={{ py: 7, textAlign: "center" }}>
                                         <Typography sx={{ fontWeight: 800 }}>No {type} zones are ready to show.</Typography>
                                         <Typography color="text.secondary" sx={{ mt: 0.5 }}>Open the Scanner to check other timeframes or filters.</Typography>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                            {!loading && error && (
+                                <TableRow>
+                                    <TableCell colSpan={6} sx={{ py: 7, textAlign: "center" }}>
+                                        <Typography color="warning.main" sx={{ fontWeight: 800 }}>Zone data is unavailable right now.</Typography>
+                                        <Typography color="text.secondary" sx={{ mt: 0.5 }}>{error}</Typography>
                                     </TableCell>
                                 </TableRow>
                             )}

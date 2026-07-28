@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
-import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
 import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
@@ -72,31 +71,13 @@ export default function Dashboard() {
         [zones],
     );
 
-    if (isLoading && !dashboard) {
-        return (
-            <Box sx={{ minHeight: "60vh", display: "grid", placeItems: "center" }}>
-                <Stack spacing={2} sx={{ alignItems: "center" }}>
-                    <CircularProgress />
-                    <Typography color="text.secondary">Loading market intelligence...</Typography>
-                </Stack>
-            </Box>
-        );
-    }
-
-    if (!dashboard) {
-        return (
-            <Card>
-                <CardContent>
-                    <Typography variant="h6">Dashboard is unavailable</Typography>
-                    <Typography color="text.secondary">{error || "Market data could not be loaded."}</Typography>
-                </CardContent>
-            </Card>
-        );
-    }
-
     const bullish = snapshot.marketDirection === "Bullish";
     const bearish = snapshot.marketDirection === "Bearish";
     const verdictColor = bullish ? "#31c77a" : bearish ? "#ff5c67" : "#f5b942";
+    const market = dashboard?.market;
+    const marketMessage = isLoading
+        ? "Loading market data..."
+        : error || "Market data could not be loaded.";
 
     return (
         <Stack spacing={2}>
@@ -110,25 +91,33 @@ export default function Dashboard() {
                                 </Box>
                                 <Box>
                                     <Typography variant="overline" sx={{ color: verdictColor, fontWeight: 900 }}>AI Market Verdict</Typography>
-                                    <Typography variant="h4">{snapshot.marketDirection} Market · {snapshot.riskLevel}</Typography>
+                                    <Typography variant="h4">
+                                        {dashboard ? `${snapshot.marketDirection} Market · ${snapshot.riskLevel}` : "Market verdict pending"}
+                                    </Typography>
                                 </Box>
                             </Stack>
                             <Typography color="text.secondary" sx={{ mt: 1.15, maxWidth: 600 }}>
-                                {snapshot.marketHealth}. {snapshot.todayStrategy}
+                                {dashboard
+                                    ? `${snapshot.marketHealth}. ${snapshot.todayStrategy}`
+                                    : "Market data is unavailable right now. Zone research can still be reviewed below."}
                             </Typography>
                             <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 1.4, alignItems: { sm: "center" } }}>
                                 <Box sx={{ minWidth: 210 }}>
                                     <Stack direction="row" sx={{ justifyContent: "space-between" }}>
                                         <Typography color="text.secondary" sx={{ fontSize: "0.65rem" }}>Confidence Score</Typography>
-                                        <Typography sx={{ fontWeight: 900 }}>{snapshot.aiConfidence}%</Typography>
+                                        <Typography sx={{ fontWeight: 900 }}>{dashboard ? `${snapshot.aiConfidence}%` : "—"}</Typography>
                                     </Stack>
                                     <LinearProgress
                                         variant="determinate"
-                                        value={snapshot.aiConfidence}
+                                        value={dashboard ? snapshot.aiConfidence : 0}
                                         sx={{ mt: 0.65, height: 7, "& .MuiLinearProgress-bar": { bgcolor: verdictColor } }}
                                     />
                                 </Box>
-                                <Chip label={`Today's Strategy: ${snapshot.todayStrategy}`} variant="outlined" sx={{ color: verdictColor, borderColor: alpha(verdictColor, 0.45), fontWeight: 800 }} />
+                                <Chip
+                                    label={dashboard ? `Today's Strategy: ${snapshot.todayStrategy}` : "Today's Strategy: Waiting for market data"}
+                                    variant="outlined"
+                                    sx={{ color: verdictColor, borderColor: alpha(verdictColor, 0.45), fontWeight: 800 }}
+                                />
                             </Stack>
                         </Grid>
 
@@ -146,22 +135,25 @@ export default function Dashboard() {
                                     bgcolor: "action.hover",
                                 }}
                             >
-                                {marketValue("Nifty", dashboard.market.nifty50.toLocaleString("en-IN"), dashboard.market.nifty_change)}
-                                {marketValue("Bank Nifty", dashboard.market.bank_nifty.toLocaleString("en-IN"), dashboard.market.bank_nifty_change)}
-                                {marketValue("India VIX", dashboard.market.india_vix.toFixed(2), dashboard.market.india_vix_change)}
-                                {marketValue("Market Breadth", `${snapshot.marketBreadth}%`)}
+                                {marketValue("Nifty", market ? market.nifty50.toLocaleString("en-IN") : "—", market?.nifty_change)}
+                                {marketValue("Bank Nifty", market ? market.bank_nifty.toLocaleString("en-IN") : "—", market?.bank_nifty_change)}
+                                {marketValue("India VIX", market ? market.india_vix.toFixed(2) : "—", market?.india_vix_change)}
+                                {marketValue("Market Breadth", dashboard ? `${snapshot.marketBreadth}%` : "—")}
                             </Stack>
                             <Typography color="text.secondary" sx={{ mt: 0.8, textAlign: { lg: "right" }, fontSize: "0.61rem" }}>
-                                Market updated {lastUpdated?.toLocaleTimeString("en-IN") ?? "recently"} · research data may be delayed
+                                {lastUpdated
+                                    ? `Market updated ${lastUpdated.toLocaleTimeString("en-IN")} · research data may be delayed`
+                                    : marketMessage}
                             </Typography>
                         </Grid>
                     </Grid>
+                    {!dashboard && !isLoading && (
+                        <Typography color="warning.main" sx={{ mt: 1.2, fontSize: "0.68rem" }}>
+                            {marketMessage} The Dashboard will update when the backend reconnects.
+                        </Typography>
+                    )}
                 </CardContent>
             </Card>
-
-            {zonesError && (
-                <Typography color="warning.main" sx={{ px: 0.5, fontSize: "0.68rem" }}>{zonesError}</Typography>
-            )}
 
             <Grid container spacing={2} sx={{ alignItems: "stretch" }}>
                 <Grid size={{ xs: 12, lg: 6 }}>
@@ -170,6 +162,7 @@ export default function Dashboard() {
                         opportunities={demandOpportunities}
                         limit={5}
                         loading={zonesLoading}
+                        error={zonesError}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, lg: 6 }}>
@@ -178,6 +171,7 @@ export default function Dashboard() {
                         opportunities={supplyOpportunities}
                         limit={5}
                         loading={zonesLoading}
+                        error={zonesError}
                     />
                 </Grid>
             </Grid>
