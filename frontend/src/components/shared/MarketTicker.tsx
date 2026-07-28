@@ -2,7 +2,6 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import { alpha, keyframes } from "@mui/material/styles";
-import { useLocation } from "react-router-dom";
 
 const quotes = [
     { symbol: "RELIANCE", price: "2,978.45", change: "+0.83%" },
@@ -162,49 +161,8 @@ function DashboardTicker() {
     );
 }
 
-function ExistingTicker() {
-    return (
-        <Box
-            aria-label="Delayed demo market ticker"
-            sx={{
-                position: "fixed",
-                left: { xs: 64, lg: 224 },
-                right: 0,
-                bottom: 0,
-                zIndex: 1200,
-                height: 42,
-                display: "flex",
-                alignItems: "center",
-                gap: { xs: 2, lg: 4 },
-                px: 2,
-                overflow: "hidden",
-                borderTop: "1px solid",
-                borderColor: "divider",
-                bgcolor: (theme) => theme.palette.mode === "dark" ? "rgba(5,14,29,.97)" : "rgba(255,255,255,.97)",
-                color: "text.primary",
-                boxShadow: (theme) => theme.palette.mode === "light" ? "0 -5px 18px rgba(28,45,72,.08)" : "none",
-                backdropFilter: "blur(14px)",
-            }}
-        >
-            <Chip label="DELAYED DEMO" size="small" color="warning" />
-            {quotes.map(({ symbol, price, change }) => {
-                const positive = change.startsWith("+");
-                return (
-                    <Typography key={symbol} variant="caption" sx={{ whiteSpace: "nowrap" }}>
-                        {symbol}&nbsp;&nbsp;{price}&nbsp;
-                        <Box component="span" color={positive ? "success.main" : "error.main"} sx={{ fontWeight: 800 }}>
-                            {positive ? "▲" : "▼"} {change.replace(/^[+-]/, "")}
-                        </Box>
-                    </Typography>
-                );
-            })}
-        </Box>
-    );
-}
-
 function MarketTicker() {
-    const location = useLocation();
-    return location.pathname === "/dashboard" ? <DashboardTicker /> : <ExistingTicker />;
+    return <DashboardTicker />;
 }
 
 export default MarketTicker;
