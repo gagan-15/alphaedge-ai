@@ -16,7 +16,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import { alpha } from "@mui/material/styles";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 import type { ZoneResearchResult } from "../../types/scanner";
 
@@ -46,6 +46,7 @@ export default function DashboardOpportunityTable({
     loading = false,
     error = "",
 }: DashboardOpportunityTableProps) {
+    const navigate = useNavigate();
     const demand = type === "demand";
     const title = demand ? "Top Demand Zone Opportunities" : "Top Supply Zone Opportunities";
     const subtitle = demand
@@ -78,12 +79,19 @@ export default function DashboardOpportunityTable({
                         <Typography variant="h6" sx={{ color: accent }}>{title}</Typography>
                         <Typography color="text.secondary" sx={{ mt: 0.15, fontSize: "0.64rem" }}>{subtitle}</Typography>
                     </Box>
-                    <Button component={RouterLink} to="/scanner" size="small" endIcon={<ArrowForwardRoundedIcon />} sx={{ color: accent }}>
+                    <Button
+                        component={RouterLink}
+                        to="/scanner"
+                        size="small"
+                        variant="outlined"
+                        endIcon={<ArrowForwardRoundedIcon />}
+                        sx={{ color: accent, borderColor: alpha(accent, 0.42), "&:hover": { borderColor: accent, bgcolor: alpha(accent, 0.07) } }}
+                    >
                         View All
                     </Button>
                 </Stack>
 
-                <TableContainer sx={{ flex: 1 }}>
+                <TableContainer sx={{ flex: 1, height: 340, minHeight: 340 }}>
                     <Table size="small" aria-label={title} sx={{ minWidth: 650 }}>
                         <TableHead>
                             <TableRow>
@@ -100,10 +108,18 @@ export default function DashboardOpportunityTable({
                                 <TableRow
                                     key={`${zone.symbol}-${zone.timeframe}-${zone.base_index}-${zone.proximal_price}`}
                                     hover
+                                    tabIndex={0}
+                                    role="link"
+                                    onClick={() => navigate("/scanner")}
+                                    onKeyDown={(event) => {
+                                        if (event.key === "Enter" || event.key === " ") navigate("/scanner");
+                                    }}
                                     sx={{
-                                        "& td": { py: 1.2 },
+                                        cursor: "pointer",
+                                        transition: "background-color 160ms ease",
+                                        "& td": { py: 1.3 },
                                         "& td:first-of-type": { borderLeft: `3px solid ${alpha(accent, 0.72)}` },
-                                        "&:hover": { bgcolor: alpha(accent, 0.045) },
+                                        "&:hover, &:focus-visible": { bgcolor: alpha(accent, 0.065), outline: "none" },
                                     }}
                                 >
                                     <TableCell>
@@ -114,8 +130,8 @@ export default function DashboardOpportunityTable({
                                         <Typography color="text.secondary" sx={{ fontSize: "0.58rem" }}>{zone.timeframe} · {zone.status}</Typography>
                                     </TableCell>
                                     <TableCell align="center">
-                                        <Box sx={{ display: "inline-grid", minWidth: 42, height: 34, px: 0.75, placeItems: "center", borderRadius: 1.7, color: accent, bgcolor: alpha(accent, 0.13), border: `1px solid ${alpha(accent, 0.3)}` }}>
-                                            <Typography sx={{ fontSize: "1rem", lineHeight: 1, fontWeight: 950 }}>{zone.zone_score.toFixed(0)}</Typography>
+                                        <Box sx={{ display: "inline-grid", minWidth: 48, height: 38, px: 0.85, placeItems: "center", borderRadius: 1.8, color: accent, bgcolor: alpha(accent, 0.13), border: `1px solid ${alpha(accent, 0.3)}` }}>
+                                            <Typography sx={{ fontSize: "1.08rem", lineHeight: 1, fontWeight: 950 }}>{zone.zone_score.toFixed(0)}</Typography>
                                         </Box>
                                     </TableCell>
                                     <TableCell>
@@ -146,7 +162,7 @@ export default function DashboardOpportunityTable({
                                 </TableRow>
                             ))}
                             {loading && skeletonRows.map((_, index) => (
-                                <TableRow key={`skeleton-${index}`} sx={{ "& td": { py: 1.35 } }}>
+                                <TableRow key={`skeleton-${index}`} sx={{ height: 58, "& td": { py: 1.35 } }}>
                                     <TableCell><Skeleton width={24} /></TableCell>
                                     <TableCell><Skeleton width={72} /><Skeleton width={48} height={14} /></TableCell>
                                     <TableCell align="center"><Skeleton variant="rounded" width={42} height={34} sx={{ mx: "auto" }} /></TableCell>
@@ -155,11 +171,20 @@ export default function DashboardOpportunityTable({
                                     <TableCell><Skeleton width={66} sx={{ ml: "auto" }} /></TableCell>
                                 </TableRow>
                             ))}
-                            {!loading && !error && visible.length === 0 && (
+                            {!loading && !error && visible.length < limit && (
                                 <TableRow>
-                                    <TableCell colSpan={6} sx={{ py: 7, textAlign: "center" }}>
-                                        <Typography sx={{ fontWeight: 800 }}>No {type} zones are ready to show.</Typography>
-                                        <Typography color="text.secondary" sx={{ mt: 0.5 }}>Open the Scanner to check other timeframes or filters.</Typography>
+                                    <TableCell
+                                        colSpan={6}
+                                        sx={{
+                                            height: Math.max(72, (limit - visible.length) * 58),
+                                            px: 3,
+                                            textAlign: "center",
+                                            verticalAlign: "middle",
+                                        }}
+                                    >
+                                        <Typography color="text.secondary" sx={{ maxWidth: 430, mx: "auto", lineHeight: 1.6 }}>
+                                            Only the highest-quality opportunities matched today's filters. Click View All to explore additional scanner results.
+                                        </Typography>
                                     </TableCell>
                                 </TableRow>
                             )}
@@ -175,8 +200,8 @@ export default function DashboardOpportunityTable({
                     </Table>
                 </TableContainer>
 
-                <Stack direction="row" sx={{ px: 2, py: 0.55, alignItems: "center", justifyContent: "flex-end", borderTop: "1px solid", borderColor: "divider" }}>
-                    <Typography color="text.secondary" sx={{ fontSize: "0.55rem", opacity: 0.68 }}>
+                <Stack direction="row" sx={{ px: 2, py: 0.45, alignItems: "center", justifyContent: "flex-end", borderTop: "1px solid", borderColor: "divider" }}>
+                    <Typography color="text.secondary" sx={{ fontSize: "0.52rem", opacity: 0.52 }}>
                         Delayed research data · {visible.length} shown
                     </Typography>
                 </Stack>
