@@ -18,6 +18,9 @@ from backend.api.models.scanner_response import (
     ZoneExplanationResponse,
     ZoneResearchResponse,
     ZoneResearchResultResponse,
+    ZoneCandidateDiagnosticResponse,
+    ZoneDiagnosticsResponse,
+    ZoneRuleDiagnosticResponse,
 )
 from backend.config.scanner_config import ScannerConfig
 from backend.engines.demand_supply_engine.zone_detection_engine import (
@@ -431,6 +434,130 @@ def get_research_zones(
         total_zones=len(results),
         timeframe=_TIMEFRAME_LABELS[timeframe],
         results=tuple(results),
+    )
+
+
+@scanner_router.get(
+    "/zones/{symbol}/diagnostics",
+    response_model=ZoneDiagnosticsResponse,
+    include_in_schema=False,
+)
+def get_zone_diagnostics(
+    symbol: str,
+    timeframe: ZoneTimeframe = Query(default="DAILY"),
+) -> ZoneDiagnosticsResponse:
+    """Return developer-only candidate diagnostics for one symbol."""
+
+    normalized = symbol.strip().upper()
+    if normalized not in _zone_config.symbols:
+        raise HTTPException(
+            status_code=404, detail="Symbol is not in the scanner universe."
+        )
+    source_period, source_interval = _INTRADAY_SOURCE.get(
+        timeframe,
+        (
+            "10y" if timeframe != "DAILY" else _zone_config.period,
+            _zone_config.interval,
+        ),
+    )
+    data = _zone_market_data.get_stock_data(
+        symbol=normalized,
+        period=source_period,
+        interval=source_interval,
+    )
+    data = _timeframe_data(data, timeframe)
+    accepted, candidates = _zone_engine.detect_zones_with_diagnostics(data)
+    accepted_by_index = {zone.created_index: zone for zone in accepted}
+    response: list[ZoneCandidateDiagnosticResponse] = []
+    for candidate in candidates:
+        start = int(candidate["base_start_index"])
+        end = int(candidate["base_end_index"])
+        status = str(candidate["status"])
+        reasons = list(candidate["rejection_reasons"])
+        rules = list(candidate["rule_results"])
+        score = candidate["score"]
+        zone = accepted_by_index.get(end)
+        if zone is not None:
+            measured = _measure_zone(zone, data)
+            score = round(
+                _zone_scoring_engine.score([measured]).scored_zones[0].total_score,
+                1,
+            )
+            invalidated = _is_zone_invalidated(measured, data)
+            completed_test = _has_completed_test(measured, data)
+            rules.extend(
+                [
+                    {
+                        "key": "freshness",
+                        "label": "Zone remains fresh",
+                        "passed": measured.is_fresh,
+                        "actual": measured.touch_count,
+                        "required": 0,
+                    },
+                    {
+                        "key": "retest_count",
+                        "label": "Retest count",
+                        "passed": measured.touch_count == 0,
+                        "actual": measured.touch_count,
+                        "required": 0,
+                    },
+                    {
+                        "key": "invalidation",
+                        "label": "No close beyond distal boundary",
+                        "passed": not invalidated,
+                        "actual": "Invalidated" if invalidated else "Intact",
+                        "required": "Intact",
+                    },
+                    {
+                        "key": "completed_test",
+                        "label": "Zone has not already completed a test",
+                        "passed": not completed_test,
+                        "actual": "Tested" if completed_test else "Untested",
+                        "required": "Untested",
+                    },
+                ]
+            )
+            if invalidated:
+                status = "invalidated"
+                reasons.append("A later candle closed beyond the distal boundary.")
+            elif completed_test:
+                status = "rejected"
+                reasons.append(
+                    "The zone already completed a test before the current candle."
+                )
+        response.append(
+            ZoneCandidateDiagnosticResponse(
+                candidate_id=str(candidate["candidate_id"]),
+                symbol=normalized,
+                timeframe=_TIMEFRAME_LABELS[timeframe],
+                pattern=(
+                    str(candidate["pattern"])
+                    if candidate["pattern"] is not None
+                    else None
+                ),
+                base_start_index=start,
+                base_end_index=end,
+                base_start_date=data.index[start].date().isoformat(),
+                base_end_date=data.index[end].date().isoformat(),
+                proximal=float(candidate["proximal"]),
+                distal=float(candidate["distal"]),
+                zone_type=(
+                    str(candidate["zone_type"])
+                    if candidate["zone_type"] is not None
+                    else None
+                ),
+                status=status,
+                score=float(score) if score is not None else None,
+                rejection_reasons=tuple(reasons),
+                rule_results=tuple(
+                    ZoneRuleDiagnosticResponse(**rule) for rule in rules
+                ),
+            )
+        )
+    return ZoneDiagnosticsResponse(
+        symbol=normalized,
+        timeframe=_TIMEFRAME_LABELS[timeframe],
+        candidates=tuple(response),
     )
 
 

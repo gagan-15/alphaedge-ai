@@ -25,18 +25,18 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Typography from "@mui/material/Typography";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { ConfluenceChartOverlay, ZoneResearchResult } from "../../types/scanner";
+import type { ConfluenceChartOverlay, ZoneDiagnosticsResponse, ZoneResearchResult } from "../../types/scanner";
 import ZoneDetailChart from "./ZoneDetailChart";
 import ZoneExplanationPanel from "./ZoneExplanationPanel";
 import { zoneSequenceLabel } from "./zoneLabels";
 import { readOverlayTimeframes, saveOverlayTimeframes } from "../../services/overlayService";
 import { selectZoneById, zoneIdFor } from "../../services/zoneSelectionService";
 import { getMarketCandles } from "../../api/marketApi";
-import { getStockDetailsAnalysis } from "../../api/scannerApi";
+import { getStockDetailsAnalysis, getZoneDiagnostics } from "../../api/scannerApi";
 import { analyzeStockZone } from "./stockZoneAnalysis";
 import { buildTradeConfidence } from "./tradeConfidence";
 import DeveloperZoneInspector from "./DeveloperZoneInspector";
-import { acceptedDeveloperZones } from "./developerZones";
+import { acceptedDeveloperZones, diagnosticDeveloperZones } from "./developerZones";
 
 interface ScannerResultsTableProps {
     results: ZoneResearchResult[];
@@ -96,14 +96,29 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
     const [developerMode, setDeveloperMode] = useState(false);
     const [developerMenuAnchor, setDeveloperMenuAnchor] = useState<HTMLElement | null>(null);
+    const [developerDiagnostics, setDeveloperDiagnostics] = useState<ZoneDiagnosticsResponse | null>(null);
+    const [developerDiagnosticsError, setDeveloperDiagnosticsError] = useState("");
     const [confidenceScores, setConfidenceScores] = useState<Record<string, number>>({});
     const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>(initialZone ? initialZones : []);
     const [selectedZoneId, setSelectedZoneId] = useState(() =>
         initialZone ? zoneIdFor(initialZones, initialZone) : ""
     );
     const developerChartZones = useMemo(
-        () => developerMode ? acceptedDeveloperZones(selectedZones, selectedZoneId) : [],
-        [developerMode, selectedZoneId, selectedZones],
+        () => {
+            if (!developerMode) return [];
+            const selected = selectZoneById(selectedZones, selectedZoneId);
+            const diagnosticsMatch = Boolean(
+                selected
+                && developerDiagnostics
+                && developerDiagnostics.symbol === selected.symbol
+                && normalizedTimeframe(developerDiagnostics.timeframe)
+                    === normalizedTimeframe(selected.timeframe)
+            );
+            return diagnosticsMatch && developerDiagnostics
+                ? diagnosticDeveloperZones(developerDiagnostics.candidates, selected)
+                : acceptedDeveloperZones(selectedZones, selectedZoneId);
+        },
+        [developerDiagnostics, developerMode, selectedZoneId, selectedZones],
     );
     const [confluenceOverlays, setConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
     const [availableConfluenceOverlays, setAvailableConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
@@ -120,6 +135,28 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
         window.addEventListener("resize", updateHeight);
         return () => window.removeEventListener("resize", updateHeight);
     }, []);
+
+    useEffect(() => {
+        if (!developerMode || selectedZones.length === 0) {
+            return;
+        }
+        const selected = selectZoneById(selectedZones, selectedZoneId);
+        if (!selected) return;
+        let active = true;
+        void getZoneDiagnostics(selected.symbol, selected.timeframe)
+            .then((payload) => {
+                if (active) {
+                    setDeveloperDiagnostics(payload);
+                    setDeveloperDiagnosticsError("");
+                }
+            })
+            .catch(() => {
+                if (active) setDeveloperDiagnosticsError("Candidate diagnostics could not be loaded.");
+            });
+        return () => {
+            active = false;
+        };
+    }, [developerMode, selectedZoneId, selectedZones]);
 
     useEffect(() => {
         let active = true;
@@ -383,7 +420,14 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
                                         <BugReportOutlinedIcon />
                                     </IconButton>
                                     <Menu anchorEl={developerMenuAnchor} open={Boolean(developerMenuAnchor)} onClose={() => setDeveloperMenuAnchor(null)}>
-                                        <MenuItem onClick={() => setDeveloperMode((enabled) => !enabled)}>
+                                        <MenuItem onClick={() => {
+                                            const next = !developerMode;
+                                            setDeveloperMode(next);
+                                            if (!next) {
+                                                setDeveloperDiagnostics(null);
+                                                setDeveloperDiagnosticsError("");
+                                            }
+                                        }}>
                                             <Switch size="small" checked={developerMode} />
                                             Developer Mode
                                         </MenuItem>
@@ -419,7 +463,19 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
                             </Grid>
                             <Grid size={{ xs: 12, lg: 3.5 }}>
                                 <Box sx={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}>
-                                    {developerMode && <DeveloperZoneInspector zones={developerChartZones} />}
+                                    {developerMode && (
+                                        <>
+                                            {developerDiagnosticsError && (
+                                                <Typography color="error.light" sx={{ mb: 1 }}>
+                                                    {developerDiagnosticsError}
+                                                </Typography>
+                                            )}
+                                            <DeveloperZoneInspector
+                                                zones={developerChartZones}
+                                                unformedCandidates={developerDiagnostics?.candidates.filter((candidate) => candidate.zone_type === null)}
+                                            />
+                                        </>
+                                    )}
                                     <Card sx={{ mb: 1.25 }}><CardContent>
                                         <Typography variant="h6">All active zones</Typography>
                                         <Stack spacing={.75} sx={{ mt: 1 }}>

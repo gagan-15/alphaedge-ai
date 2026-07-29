@@ -107,6 +107,38 @@ export interface ZoneResearchResponse {
     results: ZoneResearchResult[];
 }
 
+export interface ZoneRuleDiagnostic {
+    key: string;
+    label: string;
+    passed: boolean;
+    actual: string | number | boolean | null;
+    required: string | number | boolean | null;
+}
+
+export interface ZoneCandidateDiagnostic {
+    candidate_id: string;
+    symbol: string;
+    timeframe: string;
+    pattern: string | null;
+    base_start_index: number;
+    base_end_index: number;
+    base_start_date: string;
+    base_end_date: string;
+    proximal: number;
+    distal: number;
+    zone_type: string | null;
+    status: "accepted" | "rejected" | "invalidated";
+    score: number | null;
+    rejection_reasons: string[];
+    rule_results: ZoneRuleDiagnostic[];
+}
+
+export interface ZoneDiagnosticsResponse {
+    symbol: string;
+    timeframe: string;
+    candidates: ZoneCandidateDiagnostic[];
+}
+
 export interface ConfluenceZone {
     zone_type: string;
     lower_price: number;

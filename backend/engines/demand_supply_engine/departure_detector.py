@@ -90,8 +90,7 @@ class DepartureDetector:
         strong_gap = gap_impulse >= average_base_range * 0.5
 
         if (
-            departure_range
-            < average_base_range * MIN_DEPARTURE_RANGE_MULTIPLIER
+            departure_range < average_base_range * MIN_DEPARTURE_RANGE_MULTIPLIER
             and not strong_gap
         ):
             logger.info("Departure rejected. " "Range too small.")
@@ -113,15 +112,12 @@ class DepartureDetector:
             return None
 
         if (
-            (
-                CandleUtils.is_bullish(
-                    open_price,
-                    close_price,
-                )
-                or gap_up_size > 0
+            CandleUtils.is_bullish(
+                open_price,
+                close_price,
             )
-            and close_price > base_high
-        ):
+            or gap_up_size > 0
+        ) and close_price > base_high:
             logger.info("Bullish departure detected.")
 
             return Departure(
@@ -130,15 +126,12 @@ class DepartureDetector:
             )
 
         if (
-            (
-                CandleUtils.is_bearish(
-                    open_price,
-                    close_price,
-                )
-                or gap_down_size > 0
+            CandleUtils.is_bearish(
+                open_price,
+                close_price,
             )
-            and close_price < base_low
-        ):
+            or gap_down_size > 0
+        ) and close_price < base_low:
             logger.info("Bearish departure detected.")
 
             return Departure(
@@ -149,6 +142,147 @@ class DepartureDetector:
         logger.info("No valid departure found.")
 
         return None
+
+    def diagnose(
+        self,
+        market_data: DataFrame,
+        base: BaseRegion,
+    ) -> tuple[Departure | None, list[dict[str, object]]]:
+        """Evaluate the production departure rules and return their evidence."""
+
+        self._validate_input(market_data, base)
+        rules: list[dict[str, object]] = []
+        departure_index = base.end_index + 1
+        if departure_index >= len(market_data):
+            return None, [
+                {
+                    "key": "departure_candle_exists",
+                    "label": "Departure candle exists",
+                    "passed": False,
+                    "actual": 0,
+                    "required": 1,
+                }
+            ]
+        departure_candle = market_data.iloc[departure_index]
+        base_data = market_data.iloc[base.start_index : base.end_index + 1]
+        base_high = float(base_data["High"].max())
+        base_low = float(base_data["Low"].min())
+        average_base_range = self._calculate_average_base_range(base_data)
+        departure_range = CandleUtils.calculate_range(
+            float(departure_candle["High"]),
+            float(departure_candle["Low"]),
+        )
+        previous = market_data.iloc[departure_index - 1]
+        gap_impulse = max(
+            max(0.0, float(departure_candle["Low"]) - float(previous["High"])),
+            max(0.0, float(previous["Low"]) - float(departure_candle["High"])),
+        )
+        range_required = average_base_range * MIN_DEPARTURE_RANGE_MULTIPLIER
+        range_passed = (
+            departure_range >= range_required or gap_impulse >= average_base_range * 0.5
+        )
+        rules.append(
+            {
+                "key": "departure_range",
+                "label": "Departure range versus base",
+                "passed": range_passed,
+                "actual": round(departure_range, 4),
+                "required": round(range_required, 4),
+            }
+        )
+
+        leg_in = (
+            market_data.iloc[base.start_index - 1] if base.start_index > 0 else None
+        )
+        leg_in_body = (
+            abs(float(leg_in["Close"]) - float(leg_in["Open"]))
+            if leg_in is not None
+            else 0.0
+        )
+        leg_out_body = abs(
+            float(departure_candle["Close"]) - float(departure_candle["Open"])
+        )
+        previous_close = float(previous["Close"])
+        effective_impulse = max(
+            leg_out_body,
+            abs(float(departure_candle["Open"]) - previous_close),
+            abs(float(departure_candle["Close"]) - previous_close),
+        )
+        impulse_passed = leg_in_body > 0 and effective_impulse >= leg_in_body * 1.1
+        rules.append(
+            {
+                "key": "leg_out_vs_leg_in",
+                "label": "Leg-out stronger than leg-in",
+                "passed": impulse_passed,
+                "actual": round(effective_impulse, 4),
+                "required": round(leg_in_body * 1.1, 4),
+            }
+        )
+
+        close = float(departure_candle["Close"])
+        direction = (
+            DepartureDirection.BULLISH
+            if close > base_high
+            else DepartureDirection.BEARISH if close < base_low else None
+        )
+        rules.append(
+            {
+                "key": "close_outside_base",
+                "label": "Departure closes outside base",
+                "passed": direction is not None,
+                "actual": round(close, 4),
+                "required": f"Above {base_high:.4f} or below {base_low:.4f}",
+            }
+        )
+
+        follow = market_data.iloc[
+            departure_index : min(departure_index + 3, len(market_data))
+        ]
+        zone_width = max(base_high - base_low, 1e-9)
+        if direction == DepartureDirection.BULLISH:
+            closes_outside = int((follow["Close"] > base_high).sum())
+            sustained_move = float(follow.iloc[-1]["Close"]) - base_high
+            directional_move = float(follow.iloc[-1]["Close"]) - float(
+                departure_candle["Open"]
+            )
+        elif direction == DepartureDirection.BEARISH:
+            closes_outside = int((follow["Close"] < base_low).sum())
+            sustained_move = base_low - float(follow.iloc[-1]["Close"])
+            directional_move = float(departure_candle["Open"]) - float(
+                follow.iloc[-1]["Close"]
+            )
+        else:
+            closes_outside = 0
+            sustained_move = 0.0
+            directional_move = 0.0
+        follow_passed = len(follow) >= 2 and closes_outside >= 2
+        rules.extend(
+            [
+                {
+                    "key": "follow_through",
+                    "label": "Follow-through closes outside base",
+                    "passed": follow_passed,
+                    "actual": closes_outside,
+                    "required": 2,
+                },
+                {
+                    "key": "departure_vs_zone_width",
+                    "label": "Departure versus zone width",
+                    "passed": sustained_move >= zone_width * 1.5,
+                    "actual": round(sustained_move / zone_width, 4),
+                    "required": 1.5,
+                },
+                {
+                    "key": "directional_follow_through",
+                    "label": "Directional move exceeds leg-in",
+                    "passed": directional_move > leg_in_body,
+                    "actual": round(directional_move, 4),
+                    "required": round(leg_in_body, 4),
+                },
+            ]
+        )
+        departure = self.detect(market_data, base)
+        return departure, rules
 
     @staticmethod
     def _leg_out_is_stronger(
@@ -191,9 +325,7 @@ class DepartureDetector:
             return False
 
         final_close = float(follow_through.iloc[-1]["Close"])
-        directional_move = direction * (
-            final_close - float(departure["Open"])
-        )
+        directional_move = direction * (final_close - float(departure["Open"]))
 
         zone_width = max(base_high - base_low, 1e-9)
 

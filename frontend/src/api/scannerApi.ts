@@ -13,6 +13,7 @@ import type {
     TimeframeConfluenceResponse,
     ZoneResearchResponse,
     ZoneResearchResult,
+    ZoneDiagnosticsResponse,
 } from "../types/scanner";
 
 const api = axios.create({
@@ -127,6 +128,34 @@ export async function getTimeframeConfluence(
                 refresh_key: result.base_date,
             },
         },
+    );
+    return response.data;
+}
+
+const diagnosticTimeframeNames: Record<string, string> = {
+    "5m": "MINUTE_5",
+    "15m": "MINUTE_15",
+    "75m": "MINUTE_75",
+    "125m": "MINUTE_125",
+    "1H": "HOUR_1",
+    "2H": "HOUR_2",
+    "4H": "HOUR_4",
+    "6H": "HOUR_6",
+    "1D": "DAILY",
+    "1W": "WEEKLY",
+    "1M": "MONTHLY",
+    "3M": "QUARTERLY",
+    "6M": "HALFYEARLY",
+    "1Y": "YEARLY",
+};
+
+export async function getZoneDiagnostics(
+    symbol: string,
+    timeframe: string,
+): Promise<ZoneDiagnosticsResponse> {
+    const response = await api.get<ZoneDiagnosticsResponse>(
+        `/scanner/zones/${encodeURIComponent(symbol)}/diagnostics`,
+        { params: { timeframe: diagnosticTimeframeNames[timeframe] ?? "DAILY" } },
     );
     return response.data;
 }

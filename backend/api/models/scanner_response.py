@@ -133,3 +133,41 @@ class ZoneResearchResponse(APIResponseModel):
     delayed: bool = True
     timeframe: str = "1D"
     results: tuple[ZoneResearchResultResponse, ...]
+
+
+class ZoneRuleDiagnosticResponse(APIResponseModel):
+    """One production-rule result for a developer candidate."""
+
+    key: str
+    label: str
+    passed: bool
+    actual: str | float | int | bool | None = None
+    required: str | float | int | bool | None = None
+
+
+class ZoneCandidateDiagnosticResponse(APIResponseModel):
+    """Developer-only lifecycle record for one evaluated candidate."""
+
+    candidate_id: str
+    symbol: str
+    timeframe: str
+    pattern: str | None = None
+    base_start_index: int
+    base_end_index: int
+    base_start_date: str
+    base_end_date: str
+    proximal: float
+    distal: float
+    zone_type: str | None = None
+    status: str
+    score: float | None = None
+    rejection_reasons: tuple[str, ...]
+    rule_results: tuple[ZoneRuleDiagnosticResponse, ...]
+
+
+class ZoneDiagnosticsResponse(APIResponseModel):
+    """Separate developer payload; never included in normal scanner results."""
+
+    symbol: str
+    timeframe: str
+    candidates: tuple[ZoneCandidateDiagnosticResponse, ...]

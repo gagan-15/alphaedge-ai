@@ -17,6 +17,8 @@ from backend.engines.demand_supply_engine.departure_detector import (
 from backend.engines.demand_supply_engine.pattern_detector import (
     PatternDetector,
 )
+from backend.config.settings import MAX_BASE_CANDLES, MIN_BASE_CANDLES
+from backend.models.departure import Departure, DepartureDirection
 from backend.models.zone import (
     Zone,
     ZoneType,
@@ -105,6 +107,148 @@ class ZoneDetectionEngine:
         )
 
         return detected_zones
+
+    def detect_zones_with_diagnostics(
+        self,
+        market_data: DataFrame,
+    ) -> tuple[list[Zone], list[dict[str, object]]]:
+        """Run the production detector and expose its candidate lifecycle."""
+
+        accepted = self.detect_zones(market_data)
+        accepted_by_index = {zone.created_index: zone for zone in accepted}
+        bases = self._base_detector.detect(market_data)
+        base_checks = self._base_detector.diagnose(market_data)
+        diagnostics: list[dict[str, object]] = []
+
+        # Candles rejected before a base could be formed.
+        for check in base_checks:
+            if check["passed"]:
+                continue
+            index = int(check["index"])
+            candle = market_data.iloc[index]
+            diagnostics.append(
+                {
+                    "candidate_id": f"NF-{index + 1}",
+                    "pattern": None,
+                    "base_start_index": index,
+                    "base_end_index": index,
+                    "proximal": float(candle["High"]),
+                    "distal": float(candle["Low"]),
+                    "zone_type": None,
+                    "status": "rejected",
+                    "score": None,
+                    "rejection_reasons": [
+                        "Candidate not formed: candle body is larger than "
+                        "the production base limit."
+                    ],
+                    "rule_results": [
+                        {
+                            "key": "valid_base",
+                            "label": "Valid base candle",
+                            "passed": False,
+                            "actual": round(float(check["body_percent"]), 2),
+                            "required": f"At most {check['maximum_body_percent']}%",
+                        }
+                    ],
+                }
+            )
+
+        for base in bases:
+            base_data = market_data.iloc[base.start_index : base.end_index + 1]
+            departure, departure_rules = self._departure_detector.diagnose(
+                market_data, base
+            )
+            zone = accepted_by_index.get(base.end_index)
+            rules = [
+                {
+                    "key": "base_candle_count",
+                    "label": "Base candle count",
+                    "passed": True,
+                    "actual": base.candle_count,
+                    "required": f"{MIN_BASE_CANDLES}-{MAX_BASE_CANDLES}",
+                },
+                *departure_rules,
+            ]
+            failed = [str(rule["label"]) for rule in rules if not rule["passed"]]
+            if departure is None or zone is None:
+                direction = None
+                attempted_pattern = None
+                if departure is not None:
+                    direction = (
+                        "DEMAND"
+                        if departure.direction == DepartureDirection.BULLISH
+                        else "SUPPLY"
+                    )
+                    attempted_pattern = self._pattern_detector.detect(
+                        self._is_leg_in_bullish(market_data, base.start_index),
+                        departure,
+                    ).pattern_type.value
+                elif base.end_index + 1 < len(market_data):
+                    next_close = float(market_data.iloc[base.end_index + 1]["Close"])
+                    base_high = float(base_data["High"].max())
+                    base_low = float(base_data["Low"].min())
+                    attempted_direction = (
+                        DepartureDirection.BULLISH
+                        if next_close > base_high
+                        else (
+                            DepartureDirection.BEARISH
+                            if next_close < base_low
+                            else None
+                        )
+                    )
+                    if attempted_direction is not None:
+                        direction = (
+                            "DEMAND"
+                            if attempted_direction == DepartureDirection.BULLISH
+                            else "SUPPLY"
+                        )
+                        attempted_pattern = self._pattern_detector.detect(
+                            self._is_leg_in_bullish(market_data, base.start_index),
+                            Departure(
+                                direction=attempted_direction,
+                                departure_index=base.end_index + 1,
+                            ),
+                        ).pattern_type.value
+                diagnostics.append(
+                    {
+                        "candidate_id": f"C-{base.start_index + 1}",
+                        "pattern": attempted_pattern,
+                        "base_start_index": base.start_index,
+                        "base_end_index": base.end_index,
+                        "proximal": float(base_data["High"].max()),
+                        "distal": float(base_data["Low"].min()),
+                        "zone_type": direction,
+                        "status": "rejected",
+                        "score": None,
+                        "rejection_reasons": failed or ["Candidate not formed"],
+                        "rule_results": rules,
+                    }
+                )
+                continue
+            diagnostics.append(
+                {
+                    "candidate_id": f"C-{base.start_index + 1}",
+                    "pattern": zone.pattern_type,
+                    "base_start_index": base.start_index,
+                    "base_end_index": base.end_index,
+                    "proximal": (
+                        zone.upper_price
+                        if zone.zone_type == ZoneType.DEMAND
+                        else zone.lower_price
+                    ),
+                    "distal": (
+                        zone.lower_price
+                        if zone.zone_type == ZoneType.DEMAND
+                        else zone.upper_price
+                    ),
+                    "zone_type": zone.zone_type.value,
+                    "status": "accepted",
+                    "score": None,
+                    "rejection_reasons": [],
+                    "rule_results": rules,
+                }
+            )
+        return accepted, diagnostics
 
     def _create_zone(
         self,

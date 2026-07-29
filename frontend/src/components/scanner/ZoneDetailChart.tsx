@@ -737,6 +737,11 @@ function ZoneDetailChart({
                         <Typography variant="caption" sx={{ display: "block" }}>Status: {developerTooltip.zone.zoneStatus}</Typography>
                         <Typography variant="caption" sx={{ display: "block" }}>Score: {developerTooltip.zone.zoneScore ?? "Unavailable"}</Typography>
                         <Typography variant="caption" sx={{ display: "block" }}>Reason: {developerTooltip.zone.rejectionReasons?.join("; ") || "No reason supplied"}</Typography>
+                        {developerTooltip.zone.ruleResults?.map((rule) => (
+                            <Typography key={rule.key} variant="caption" color={rule.passed ? "#77e0a8" : "#ff899d"} sx={{ display: "block" }}>
+                                {rule.passed ? "Pass" : "Fail"}: {rule.label} · {String(rule.actual ?? "Unavailable")} / {String(rule.required ?? "Unavailable")}
+                            </Typography>
+                        ))}
                     </Box>
                 )}
                 {measurementLabel && (

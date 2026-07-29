@@ -119,6 +119,30 @@ class BaseDetector:
 
         return detected_bases
 
+    def diagnose(self, market_data: DataFrame) -> list[dict[str, object]]:
+        """Return candle-level base checks without changing normal detection."""
+
+        self._validate_input(market_data)
+        self._validate_configuration()
+        checks: list[dict[str, object]] = []
+        for index in range(len(market_data)):
+            candle = market_data.iloc[index]
+            body_percent = CandleUtils.calculate_body_percentage(
+                float(candle["Open"]),
+                float(candle["High"]),
+                float(candle["Low"]),
+                float(candle["Close"]),
+            )
+            checks.append(
+                {
+                    "index": index,
+                    "body_percent": body_percent,
+                    "maximum_body_percent": MAX_BASE_BODY_PERCENT,
+                    "passed": body_percent <= MAX_BASE_BODY_PERCENT,
+                }
+            )
+        return checks
+
     def _append_region_if_valid(
         self,
         detected_bases: list[BaseRegion],
