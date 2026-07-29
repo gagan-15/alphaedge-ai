@@ -20,6 +20,17 @@ import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import { alpha } from "@mui/material/styles";
+
+export type ScannerQuickPreset =
+    | "fresh-demand"
+    | "fresh-supply"
+    | "near-entry"
+    | "high-confidence"
+    | "swing"
+    | "intraday"
+    | "todays-best"
+    | "reset";
 
 interface ScannerToolbarProps {
     isLoading: boolean;
@@ -43,6 +54,7 @@ interface ScannerToolbarProps {
     onPatternFilterChange: (value: string) => void;
     onStatusFilterChange: (value: string) => void;
     onProximityFilterChange: (value: number) => void;
+    onQuickPreset: (preset: ScannerQuickPreset) => void;
 }
 
 function ScannerToolbar({
@@ -67,16 +79,29 @@ function ScannerToolbar({
     onPatternFilterChange,
     onStatusFilterChange,
     onProximityFilterChange,
+    onQuickPreset,
 }: ScannerToolbarProps) {
+    const presets: Array<{ id: ScannerQuickPreset; label: string; color: string }> = [
+        { id: "fresh-demand", label: "Fresh Demand", color: "#31c77a" },
+        { id: "fresh-supply", label: "Fresh Supply", color: "#ff5c67" },
+        { id: "near-entry", label: "Near Entry (<5%)", color: "#f5b942" },
+        { id: "high-confidence", label: "High Confidence (≥90)", color: "#a78bfa" },
+        { id: "swing", label: "Swing Setups", color: "#60a5fa" },
+        { id: "intraday", label: "Intraday", color: "#22d3ee" },
+        { id: "todays-best", label: "Today's Best", color: "#f59e0b" },
+        { id: "reset", label: "Reset", color: "#94a3b8" },
+    ];
+
     return (
         <Card>
-            <CardContent>
-                <Stack spacing={2}>
+            <CardContent sx={{ p: { xs: 1.5, md: 2 }, "&:last-child": { pb: { xs: 1.5, md: 2 } } }}>
+                <Stack spacing={1.5}>
                     <Stack
                         sx={{
-                            flexDirection: "row",
+                            flexDirection: { xs: "column", sm: "row" },
                             justifyContent: "space-between",
-                            alignItems: "center",
+                            alignItems: { xs: "stretch", sm: "center" },
+                            gap: 1,
                         }}
                     >
                         <Box>
@@ -95,11 +120,14 @@ function ScannerToolbar({
                         <Stack
                             sx={{
                                 flexDirection: "row",
-                                gap: 2,
+                                gap: 1,
+                                flexWrap: "wrap",
+                                justifyContent: "flex-end",
                             }}
                         >
                             <Button
                                 variant="outlined"
+                                size="small"
                                 disabled={isLoading}
                                 onClick={onRefresh}
                                 startIcon={
@@ -111,6 +139,7 @@ function ScannerToolbar({
 
                             <Button
                                 variant="outlined"
+                                size="small"
                                 disabled={!canExport}
                                 onClick={onExport}
                                 startIcon={
@@ -122,6 +151,7 @@ function ScannerToolbar({
 
                             <Button
                                 variant="contained"
+                                size="small"
                                 disabled={isLoading}
                                 onClick={onRunScan}
                                 startIcon={
@@ -135,8 +165,39 @@ function ScannerToolbar({
                         </Stack>
                     </Stack>
 
+                    <Box>
+                        <Typography color="text.secondary" sx={{ mb: 0.75, fontSize: "0.66rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                            Quick Presets
+                        </Typography>
+                        <Stack direction="row" useFlexGap sx={{ gap: 0.75, flexWrap: "wrap" }}>
+                            {presets.map((preset) => (
+                                <Button
+                                    key={preset.id}
+                                    size="small"
+                                    variant="outlined"
+                                    onClick={() => onQuickPreset(preset.id)}
+                                    sx={{
+                                        minHeight: 30,
+                                        px: 1.2,
+                                        color: preset.color,
+                                        borderColor: alpha(preset.color, 0.48),
+                                        bgcolor: alpha(preset.color, 0.035),
+                                        fontSize: "0.66rem",
+                                        "&:hover": {
+                                            borderColor: preset.color,
+                                            bgcolor: alpha(preset.color, 0.09),
+                                        },
+                                    }}
+                                >
+                                    {preset.label}
+                                </Button>
+                            ))}
+                        </Stack>
+                    </Box>
+
                     <TextField
                         fullWidth
+                        size="small"
                         placeholder="Search symbol..."
                         value={searchQuery}
                         onChange={(event) => {
@@ -157,7 +218,7 @@ function ScannerToolbar({
 
                     <Grid
                         container
-                        spacing={2}
+                        spacing={1.25}
                     >
                         <Grid size={{ xs: 12, sm: 6, lg: 2 }}>
                             <Typography
@@ -170,6 +231,7 @@ function ScannerToolbar({
 
                             <Select
                                 fullWidth
+                                size="small"
                                 value={market}
                                 onChange={(event) => onMarketChange(event.target.value)}
                             >
@@ -194,6 +256,7 @@ function ScannerToolbar({
 
                             <Select
                                 fullWidth
+                                size="small"
                                 value={timeframe}
                                 onChange={(event) => onTimeframeChange(event.target.value)}
                             >
@@ -242,6 +305,7 @@ function ScannerToolbar({
 
                             <Select
                                 fullWidth
+                                size="small"
                                 value={minimumScore}
                                 onChange={(event) => onMinimumScoreChange(Number(event.target.value))}
                             >
@@ -264,6 +328,7 @@ function ScannerToolbar({
 
                             <Select
                                 fullWidth
+                                size="small"
                                 value={approvalFilter}
                                 onChange={(event) => onApprovalFilterChange(event.target.value)}
                             >
@@ -278,6 +343,7 @@ function ScannerToolbar({
                             </Typography>
                             <Select
                                 fullWidth
+                                size="small"
                                 value={patternFilter}
                                 onChange={(event) => onPatternFilterChange(event.target.value)}
                             >
@@ -295,6 +361,7 @@ function ScannerToolbar({
                             <Stack direction="row" spacing={1}>
                                 <Select
                                     fullWidth
+                                    size="small"
                                     value={statusFilter}
                                     onChange={(event) => onStatusFilterChange(event.target.value)}
                                 >
@@ -305,6 +372,7 @@ function ScannerToolbar({
                                 </Select>
                                 <Select
                                     fullWidth
+                                    size="small"
                                     value={proximityFilter}
                                     onChange={(event) => onProximityFilterChange(Number(event.target.value))}
                                 >

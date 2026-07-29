@@ -48,16 +48,16 @@ const patternLabels: Record<string, string> = {
     DROP_BASE_DROP: "DBD",
 };
 
-function valueOrDash(value: number | null, digits = 2) {
-    return value === null ? "—" : value.toLocaleString("en-IN", { maximumFractionDigits: digits });
+function scorePresentation(score: number | undefined) {
+    if (score === undefined) return { color: "#94a3b8", label: "Pending" };
+    if (score >= 75) return { color: "#31c77a", label: "High" };
+    if (score >= 50) return { color: "#f5b942", label: "Medium" };
+    return { color: "#ff5c67", label: "Low" };
 }
 
-function qualityLabel(score: number) {
-    if (score >= 90) return "Elite";
-    if (score >= 75) return "Strong";
-    if (score >= 60) return "Moderate";
-    if (score >= 40) return "Weak";
-    return "Rejected";
+function recommendation(zoneType: string, score: number | undefined) {
+    if (score === undefined || score < 60) return "WATCH";
+    return zoneType === "DEMAND" ? "BUY" : "AVOID";
 }
 
 function normalizedTimeframe(value: string) {
@@ -232,39 +232,82 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
                     </Box>
                 ) : (
                     <TableContainer>
-                        <Table size="small" sx={{ minWidth: 1080 }}>
+                        <Table size="small" sx={{ minWidth: 1320 }}>
                             <TableHead>
-                                <TableRow>
-                                    <TableCell width={34} />
-                                    <TableCell>{sortableLabel("symbol", "Symbol")}</TableCell>
+                                <TableRow sx={{ "& th": { color: "text.secondary", py: 1, fontSize: ".66rem", fontWeight: 600, whiteSpace: "nowrap" } }}>
+                                    <TableCell width={48}>Rank</TableCell>
+                                    <TableCell>{sortableLabel("symbol", "Stock")}</TableCell>
+                                    <TableCell align="center">Zones</TableCell>
+                                    <TableCell align="center">{sortableLabel("trade_confidence", "AI Score")}</TableCell>
+                                    <TableCell>Recommendation</TableCell>
                                     <TableCell>Type</TableCell>
                                     <TableCell>Pattern</TableCell>
                                     <TableCell>Status</TableCell>
-                                    <TableCell align="right">Proximal</TableCell>
-                                    <TableCell align="right">Distal</TableCell>
                                     <TableCell align="right">Distance</TableCell>
-                                    <TableCell align="right">{sortableLabel("trade_confidence", "Trade Confidence")}</TableCell>
-                                    <TableCell align="right">{sortableLabel("zone_score", "Zone Quality")}</TableCell>
                                     <TableCell align="right">LTP / Entry</TableCell>
                                     <TableCell>Base date</TableCell>
                                     <TableCell>Timeframe</TableCell>
+                                    <TableCell align="center">Actions</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {groupedResults.map(({ symbol, zones, primary: result }) => {
+                                {groupedResults.map(({ symbol, zones, primary: result }, index) => {
                                     const zoneKey = `${result.symbol}-${result.zone_type}-${result.base_date}-${result.proximal_price}`;
                                     const status = result.status;
+                                    const aiScore = confidenceScores[resultKey(result)];
+                                    const scoreStyle = scorePresentation(aiScore);
+                                    const recommendationLabel = recommendation(result.zone_type, aiScore);
+                                    const recommendationColor = recommendationLabel === "BUY"
+                                        ? "#31c77a"
+                                        : recommendationLabel === "AVOID"
+                                            ? "#ff5c67"
+                                            : "#f5b942";
                                     return (
-                                            <TableRow key={zoneKey} hover onClick={() => openStock(zones, result)} sx={{ cursor: "pointer" }}>
-                                                <TableCell>
-                                                    <IconButton size="small" aria-label={`Open ${result.symbol} full-screen chart`}>
-                                                        <KeyboardArrowRightRoundedIcon />
-                                                    </IconButton>
+                                            <TableRow
+                                                key={zoneKey}
+                                                hover
+                                                onClick={() => openStock(zones, result)}
+                                                sx={{
+                                                    cursor: "pointer",
+                                                    transition: "background-color 150ms ease",
+                                                    "& td": { py: 1.25, fontSize: ".72rem", fontWeight: 400 },
+                                                    "&:hover": { bgcolor: "rgba(99,102,241,.065)" },
+                                                    "&:active": { bgcolor: "rgba(99,102,241,.11)" },
+                                                }}
+                                            >
+                                                <TableCell sx={{ color: "text.secondary" }}>
+                                                    #{index + 1}
                                                 </TableCell>
-                                                <TableCell sx={{ fontWeight: 850 }}>
-                                                    <Stack direction="row" spacing={.75} sx={{ alignItems: "center" }}>
-                                                        <span>{symbol}</span><Chip size="small" label={`${zones.length} zone${zones.length === 1 ? "" : "s"}`} />
-                                                    </Stack>
+                                                <TableCell>
+                                                    <Typography sx={{ color: "text.primary", fontSize: ".76rem", fontWeight: 650 }}>{symbol}</Typography>
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Chip size="small" variant="outlined" label={zones.length} sx={{ minWidth: 30, fontWeight: 600 }} />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                    <Box sx={{ display: "inline-flex", minWidth: 62, flexDirection: "column", alignItems: "stretch", gap: .35 }}>
+                                                        <Stack direction="row" spacing={.5} sx={{ alignItems: "baseline", justifyContent: "center" }}>
+                                                            <Typography sx={{ color: scoreStyle.color, fontSize: "1.02rem", lineHeight: 1, fontWeight: 900 }}>{aiScore ?? "…"}</Typography>
+                                                            <Typography sx={{ color: "text.secondary", fontSize: ".54rem" }}>{scoreStyle.label}</Typography>
+                                                        </Stack>
+                                                        <Box sx={{ height: 3, overflow: "hidden", borderRadius: 5, bgcolor: "action.hover" }}>
+                                                            <Box sx={{ width: `${Math.min(100, aiScore ?? 0)}%`, height: "100%", bgcolor: scoreStyle.color }} />
+                                                        </Box>
+                                                    </Box>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        size="small"
+                                                        label={recommendationLabel}
+                                                        sx={{
+                                                            minWidth: 58,
+                                                            color: recommendationColor,
+                                                            bgcolor: `${recommendationColor}18`,
+                                                            border: `1px solid ${recommendationColor}55`,
+                                                            fontSize: ".61rem",
+                                                            fontWeight: 800,
+                                                        }}
+                                                    />
                                                 </TableCell>
                                                 <TableCell>
                                                     <Stack direction="row" spacing={.5}>
@@ -280,31 +323,26 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
                                                 <TableCell>
                                                     <Chip size="small" color={status === "IN ZONE" ? "warning" : status === "APPROACHING" ? "success" : "default"} label={status} />
                                                 </TableCell>
-                                                <TableCell align="right">{valueOrDash(result.proximal_price)}</TableCell>
-                                                <TableCell align="right">{valueOrDash(result.distal_price)}</TableCell>
                                                 <TableCell align="right" sx={{ color: (result.distance_percent ?? 99) <= 3 ? "success.main" : "text.secondary" }}>
                                                     {result.distance_percent === null ? "—" : `${result.distance_percent.toFixed(2)}%`}
                                                 </TableCell>
-                                                <TableCell align="right">
-                                                    <Typography sx={{ fontWeight: 900 }}>{confidenceScores[resultKey(result)] ?? "…"}</Typography>
-                                                    <Typography variant="caption" color="text.secondary">Today</Typography>
+                                                <TableCell align="right" sx={{ color: "text.primary", fontWeight: "600 !important" }}>
+                                                    ₹{result.current_price.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
                                                 </TableCell>
-                                                <TableCell align="right">
-                                                    <Box sx={{ display: "inline-flex", gap: .7, alignItems: "center" }}>
-                                                        <Box>
-                                                            <Typography sx={{ fontWeight: 850 }}>{result.zone_score.toFixed(0)}</Typography>
-                                                            <Typography variant="caption" color="text.secondary">
-                                                                {qualityLabel(result.zone_score)}
-                                                            </Typography>
-                                                        </Box>
-                                                        <Box sx={{ width: 36, height: 5, bgcolor: "rgba(143,161,184,.14)", borderRadius: 9, overflow: "hidden" }}>
-                                                            <Box sx={{ width: `${Math.min(100, result.zone_score)}%`, height: "100%", bgcolor: result.zone_score >= 75 ? "success.main" : "warning.main" }} />
-                                                        </Box>
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell align="right" sx={{ fontWeight: 800 }}>{result.current_price.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</TableCell>
                                                 <TableCell>{result.base_date}</TableCell>
                                                 <TableCell>{result.timeframe?.toUpperCase() ?? "1D"}</TableCell>
+                                                <TableCell align="center">
+                                                    <IconButton
+                                                        size="small"
+                                                        aria-label={`Open ${result.symbol} full-screen chart`}
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            openStock(zones, result);
+                                                        }}
+                                                    >
+                                                        <KeyboardArrowRightRoundedIcon fontSize="small" />
+                                                    </IconButton>
+                                                </TableCell>
                                             </TableRow>
                                     );
                                 })}

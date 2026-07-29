@@ -6,11 +6,16 @@
  */
 
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
+import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
+import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Tab from "@mui/material/Tab";
@@ -20,7 +25,7 @@ import Typography from "@mui/material/Typography";
 
 import { getResearchZones } from "../api/scannerApi";
 import ScannerResultsTable from "../components/scanner/ScannerResultsTable";
-import ScannerToolbar from "../components/scanner/ScannerToolbar";
+import ScannerToolbar, { type ScannerQuickPreset } from "../components/scanner/ScannerToolbar";
 
 import type { ZoneResearchResponse } from "../types/scanner";
 
@@ -55,6 +60,7 @@ function scannerPreference<T>(key: "defaultTimeframe" | "minimumQuality", fallba
 
 function Scanner() {
     const location = useLocation();
+    const navigate = useNavigate();
     const initialFilters = location.state as {
         zoneType?: "DEMAND" | "SUPPLY";
         timeframe?: string;
@@ -84,6 +90,7 @@ function Scanner() {
     const [patternFilter, setPatternFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
     const [proximityFilter, setProximityFilter] = useState(100);
+    const [insightVisible, setInsightVisible] = useState(true);
 
     function loadScanner(selectedTimeframe = timeframe) {
         void getResearchZones(selectedTimeframe)
@@ -126,6 +133,37 @@ function Scanner() {
         setIsLoading(true);
         setErrorMessage(null);
         setTimeframe(value);
+    }
+
+    function applyQuickPreset(preset: ScannerQuickPreset) {
+        if (preset === "fresh-demand") {
+            setApprovalFilter("approved");
+            setStatusFilter("APPROACHING");
+        } else if (preset === "fresh-supply") {
+            setApprovalFilter("rejected");
+            setStatusFilter("APPROACHING");
+        } else if (preset === "near-entry") {
+            setProximityFilter(5);
+        } else if (preset === "high-confidence") {
+            setMinimumScore(90);
+        } else if (preset === "swing") {
+            changeTimeframe("DAILY");
+        } else if (preset === "intraday") {
+            changeTimeframe("HOUR_1");
+        } else if (preset === "todays-best") {
+            setMinimumScore(75);
+            setStatusFilter("APPROACHING");
+            setProximityFilter(3);
+        } else {
+            setSearchQuery("");
+            setMinimumScore(scannerPreference("minimumQuality", 40));
+            setApprovalFilter("all");
+            setMarket("NSE");
+            setPatternFilter("all");
+            setStatusFilter("all");
+            setProximityFilter(100);
+            changeTimeframe(scannerPreference("defaultTimeframe", "DAILY"));
+        }
     }
 
     useEffect(() => {
@@ -198,7 +236,7 @@ function Scanner() {
     }
 
     return (
-        <Stack spacing={3}>
+        <Stack spacing={1.5}>
             <ScannerToolbar
                 isLoading={isLoading}
                 searchQuery={searchQuery}
@@ -221,6 +259,7 @@ function Scanner() {
                 onPatternFilterChange={setPatternFilter}
                 onStatusFilterChange={setStatusFilter}
                 onProximityFilterChange={setProximityFilter}
+                onQuickPreset={applyQuickPreset}
             />
 
             {market === "BSE" && (
@@ -232,7 +271,15 @@ function Scanner() {
             <Stack
                 direction="row"
                 spacing={1}
-                sx={{ alignItems: "center", borderBottom: "1px solid", borderColor: "divider" }}
+                sx={{
+                    px: 1,
+                    alignItems: "center",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 2,
+                    bgcolor: "background.paper",
+                    overflow: "hidden",
+                }}
             >
                 <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
                     DELAYED ZONES
@@ -271,6 +318,44 @@ function Scanner() {
                     ))}
                 </Tabs>
             </Stack>
+
+            {insightVisible && visibleResults[0] && (
+                <Alert
+                    icon={<AutoAwesomeRoundedIcon fontSize="small" />}
+                    severity="info"
+                    sx={{
+                        py: 0.25,
+                        alignItems: "center",
+                        "& .MuiAlert-message": { width: "100%", py: 0.45 },
+                    }}
+                    action={(
+                        <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+                            <Button
+                                size="small"
+                                onClick={() => navigate("/scanner", {
+                                    state: {
+                                        symbol: visibleResults[0].symbol,
+                                        timeframe,
+                                        selectedZone: visibleResults[0].zone_type === "DEMAND" ? "demand" : "supply",
+                                    },
+                                })}
+                            >
+                                Analyze {visibleResults[0].symbol} →
+                            </Button>
+                            <IconButton size="small" aria-label="Dismiss AI Insight" onClick={() => setInsightVisible(false)}>
+                                <CloseRoundedIcon fontSize="small" />
+                            </IconButton>
+                        </Stack>
+                    )}
+                >
+                    <Box sx={{ display: "flex", gap: 0.75, alignItems: "baseline", minWidth: 0 }}>
+                        <Typography sx={{ flex: "0 0 auto", fontSize: "0.72rem", fontWeight: 800 }}>AI Insight</Typography>
+                        <Typography color="text.secondary" noWrap sx={{ minWidth: 0, fontSize: "0.7rem" }}>
+                            {visibleResults[0].symbol} has the strongest matching {visibleResults[0].zone_type.toLowerCase()} zone in this scan, with {visibleResults[0].timeframe} context and {visibleResults[0].distance_percent.toFixed(2)}% distance from entry.
+                        </Typography>
+                    </Box>
+                </Alert>
+            )}
 
             {errorMessage && (
                 <Alert severity="error">
