@@ -29,6 +29,7 @@ import { getMarketCandles } from "../../api/marketApi";
 import type { ConfluenceChartOverlay, ZoneResearchResult } from "../../types/scanner";
 import { zoneSequenceLabel } from "./zoneLabels";
 import { overlayStyles } from "../../services/overlayService";
+import type { DeveloperChartZone } from "./developerZones";
 
 const patternLabels: Record<string, string> = {
     DROP_BASE_RALLY: "DBR",
@@ -78,6 +79,8 @@ interface ZoneDetailChartProps {
     onResetChart?: () => void;
     height?: number;
     showTools?: boolean;
+    developerMode?: boolean;
+    developerZones?: DeveloperChartZone[];
 }
 
 function ZoneDetailChart({
@@ -92,6 +95,8 @@ function ZoneDetailChart({
     onResetChart,
     height = 360,
     showTools = false,
+    developerMode = false,
+    developerZones = [],
 }: ZoneDetailChartProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<ReturnType<typeof createChart> | null>(null);
@@ -131,6 +136,7 @@ function ZoneDetailChart({
     const [zonesVisible, setZonesVisible] = useState(true);
     const [measurementLabel, setMeasurementLabel] = useState<{ left: number; top: number; text: string } | null>(null);
     const [selectedIndicators, setSelectedIndicators] = useState<string[]>(readIndicatorPreference);
+    const [developerTooltip, setDeveloperTooltip] = useState<{ left: number; top: number; zone: DeveloperChartZone } | null>(null);
     const executionIndex = confluenceTimeframes.findIndex((item) => item.timeframe === result.timeframe);
     const higherTimeframeButtons = executionIndex < 0 ? [] : confluenceTimeframes.slice(executionIndex + 1);
     const inspectedOverlay = availableConfluenceOverlays.find((overlay) => overlay.timeframe === inspectedConfluenceTimeframe);
@@ -320,34 +326,52 @@ function ZoneDetailChart({
                 });
                 chart.timeScale().subscribeVisibleLogicalRangeChange(updateMeasurementLabel);
 
-                zones.forEach((displayZone, zoneIndex) => {
-                if (displayZone.proximal_price !== null && displayZone.distal_price !== null) {
-                    const demand = displayZone.zone_type === "DEMAND";
+                const renderedZones: DeveloperChartZone[] = developerMode
+                    ? developerZones
+                    : zones.map((displayZone, zoneIndex) => ({
+                        zoneId: zoneSequenceLabel(zones, zoneIndex),
+                        zoneType: displayZone.zone_type === "DEMAND" ? "DEMAND" : "SUPPLY",
+                        proximalPrice: displayZone.proximal_price,
+                        distalPrice: displayZone.distal_price,
+                        baseIndex: displayZone.base_index,
+                        pattern: displayZone.pattern_type ?? undefined,
+                        zoneStatus: "Accepted",
+                        zoneScore: displayZone.zone_score,
+                        selected: !selectedZoneId || zoneSequenceLabel(zones, zoneIndex) === selectedZoneId,
+                    }));
+                renderedZones.forEach((displayZone) => {
+                if (displayZone.proximalPrice !== null && displayZone.distalPrice !== null) {
+                    const demand = displayZone.zoneType === "DEMAND";
                     const zoneColor = demand ? "#1d8cff" : "#ff2f68";
-                    const zoneLabel = zoneSequenceLabel(zones, zoneIndex);
-                    const selected = !selectedZoneId || zoneLabel === selectedZoneId;
+                    const zoneLabel = displayZone.zoneId;
+                    const selected = Boolean(displayZone.selected);
+                    const rejected = displayZone.zoneStatus === "Rejected";
+                    const invalidated = displayZone.zoneStatus === "Invalidated";
+                    const opacity = invalidated ? .06 : rejected ? .14 : selected ? .48 : .12;
+                    const borderStyle = invalidated ? LineStyle.Dotted : rejected ? LineStyle.Dashed : LineStyle.Solid;
                     const zone = chart.addSeries(BaselineSeries, {
-                        baseValue: { type: "price", price: displayZone.distal_price },
+                        baseValue: { type: "price", price: displayZone.distalPrice },
                         topLineColor: zoneColor,
-                        topFillColor1: demand ? `rgba(29,140,255,${selected ? .48 : .12})` : `rgba(255,47,104,${selected ? .48 : .12})`,
-                        topFillColor2: demand ? `rgba(29,140,255,${selected ? .22 : .06})` : `rgba(255,47,104,${selected ? .22 : .06})`,
+                        topFillColor1: demand ? `rgba(29,140,255,${opacity})` : `rgba(255,47,104,${opacity})`,
+                        topFillColor2: demand ? `rgba(29,140,255,${opacity / 2})` : `rgba(255,47,104,${opacity / 2})`,
                         bottomLineColor: zoneColor,
-                        bottomFillColor1: demand ? "rgba(29,140,255,.38)" : "rgba(255,47,104,.38)",
-                        bottomFillColor2: demand ? "rgba(29,140,255,.22)" : "rgba(255,47,104,.22)",
+                        bottomFillColor1: demand ? `rgba(29,140,255,${opacity})` : `rgba(255,47,104,${opacity})`,
+                        bottomFillColor2: demand ? `rgba(29,140,255,${opacity / 2})` : `rgba(255,47,104,${opacity / 2})`,
                         lineWidth: selected ? 3 : 1,
+                        lineStyle: borderStyle,
                         priceLineVisible: false,
                         lastValueVisible: false,
                     });
-                    const start = Math.max(0, Math.min(displayZone.base_index ?? data.length - 45, data.length - 1));
+                    const start = Math.max(0, Math.min(displayZone.baseIndex ?? data.length - 45, data.length - 1));
                     const zoneData = data.slice(start).map((candle) => ({
                         time: candle.time,
-                        value: displayZone.proximal_price as number,
+                        value: displayZone.proximalPrice,
                     }));
                     const latestTime = Number(data[data.length - 1].time);
                     for (let point = 1; point <= futureZonePoints; point += 1) {
                         zoneData.push({
                             time: (latestTime + candleStep * point) as UTCTimestamp,
-                            value: displayZone.proximal_price as number,
+                            value: displayZone.proximalPrice,
                         });
                     }
                     zone.setData(zoneData);
@@ -355,15 +379,15 @@ function ZoneDetailChart({
                     const proximalBoundary = chart.addSeries(LineSeries, {
                         color: zoneColor,
                         lineWidth: selected ? 3 : 1,
-                        lineStyle: LineStyle.Solid,
+                        lineStyle: borderStyle,
                         priceLineVisible: false,
                         lastValueVisible: true,
-                        title: `${zoneLabel} PROXIMAL`,
+                        title: invalidated ? `${zoneLabel} Invalidated` : rejected ? `${zoneLabel} Rejected Candidate` : `${zoneLabel} PROXIMAL`,
                     });
                     const distalBoundary = chart.addSeries(LineSeries, {
                         color: zoneColor,
                         lineWidth: selected ? 2 : 1,
-                        lineStyle: LineStyle.Dashed,
+                        lineStyle: invalidated ? LineStyle.Dotted : LineStyle.Dashed,
                         priceLineVisible: false,
                         lastValueVisible: true,
                         title: `${zoneLabel} DISTAL`,
@@ -371,7 +395,7 @@ function ZoneDetailChart({
                     proximalBoundary.setData(zoneData);
                     distalBoundary.setData(zoneData.map((point) => ({
                         time: point.time,
-                        value: displayZone.distal_price as number,
+                        value: displayZone.distalPrice,
                     })));
                     baseZoneBoundarySeriesRef.current.push(proximalBoundary, distalBoundary);
                 }
@@ -407,7 +431,7 @@ function ZoneDetailChart({
             candleDataRef.current = [];
             chart = null as never;
         };
-    }, [height, onInspectConfluenceOverlay, result, selectedZoneId, updateMeasurementLabel, zones]);
+    }, [developerMode, developerZones, height, onInspectConfluenceOverlay, result, selectedZoneId, updateMeasurementLabel, zones]);
 
     useEffect(() => {
         const chart = chartRef.current;
@@ -683,7 +707,36 @@ function ZoneDetailChart({
             {loading && <Box sx={{ height, display: "grid", placeItems: "center" }}><CircularProgress size={28} /></Box>}
             {error && <Alert severity="warning">{error}</Alert>}
             <Box sx={{ position: "relative" }}>
-                <Box ref={containerRef} sx={{ height: loading || error ? 0 : height }} />
+                <Box
+                    ref={containerRef}
+                    onMouseLeave={() => developerMode && setDeveloperTooltip(null)}
+                    onMouseMove={(event) => {
+                        if (!developerMode || !candleSeriesRef.current || !containerRef.current) return;
+                        const bounds = containerRef.current.getBoundingClientRect();
+                        const price = candleSeriesRef.current.coordinateToPrice(event.clientY - bounds.top);
+                        if (price === null) return;
+                        const hovered = developerZones.find((zone) => {
+                            const lower = Math.min(zone.proximalPrice, zone.distalPrice);
+                            const upper = Math.max(zone.proximalPrice, zone.distalPrice);
+                            return price >= lower && price <= upper;
+                        });
+                        setDeveloperTooltip(hovered ? {
+                            left: event.clientX - bounds.left + 12,
+                            top: event.clientY - bounds.top + 12,
+                            zone: hovered,
+                        } : null);
+                    }}
+                    sx={{ height: loading || error ? 0 : height }}
+                />
+                {developerMode && developerTooltip && (
+                    <Box sx={{ position: "absolute", left: developerTooltip.left, top: developerTooltip.top, zIndex: 30, pointerEvents: "none", minWidth: 190, p: 1.25, bgcolor: "#111c2c", border: "1px solid #52647c", borderRadius: 1.5, boxShadow: 6 }}>
+                        <Typography sx={{ fontWeight: 800 }}>{developerTooltip.zone.zoneId}</Typography>
+                        <Typography variant="caption" sx={{ display: "block" }}>Pattern: {developerTooltip.zone.pattern ?? "Unavailable"}</Typography>
+                        <Typography variant="caption" sx={{ display: "block" }}>Status: {developerTooltip.zone.zoneStatus}</Typography>
+                        <Typography variant="caption" sx={{ display: "block" }}>Score: {developerTooltip.zone.zoneScore ?? "Unavailable"}</Typography>
+                        <Typography variant="caption" sx={{ display: "block" }}>Reason: {developerTooltip.zone.rejectionReasons?.join("; ") || "No reason supplied"}</Typography>
+                    </Box>
+                )}
                 {measurementLabel && (
                     <Box
                         sx={{

@@ -1,6 +1,7 @@
 import KeyboardArrowRightRoundedIcon from "@mui/icons-material/KeyboardArrowRightRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import FullscreenRoundedIcon from "@mui/icons-material/FullscreenRounded";
+import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -10,6 +11,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Switch from "@mui/material/Switch";
 import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -31,6 +35,8 @@ import { getMarketCandles } from "../../api/marketApi";
 import { getStockDetailsAnalysis } from "../../api/scannerApi";
 import { analyzeStockZone } from "./stockZoneAnalysis";
 import { buildTradeConfidence } from "./tradeConfidence";
+import DeveloperZoneInspector from "./DeveloperZoneInspector";
+import { acceptedDeveloperZones } from "./developerZones";
 
 interface ScannerResultsTableProps {
     results: ZoneResearchResult[];
@@ -88,6 +94,8 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
         : undefined;
     const [sortField, setSortField] = useState<"symbol" | "trade_confidence" | "zone_score" | "distance_percent">("trade_confidence");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+    const [developerMode, setDeveloperMode] = useState(false);
+    const [developerMenuAnchor, setDeveloperMenuAnchor] = useState<HTMLElement | null>(null);
     const [confidenceScores, setConfidenceScores] = useState<Record<string, number>>({});
     const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>(initialZone ? initialZones : []);
     const [selectedZoneId, setSelectedZoneId] = useState(() =>
@@ -356,6 +364,7 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
                     const selectedZone = selectZoneById(selectedZones, selectedZoneId);
                     if (!selectedZone) return null;
                     const selectedConfidence = confidenceScores[resultKey(selectedZone)];
+                    const developerZones = developerMode ? acceptedDeveloperZones(selectedZones, selectedZoneId) : [];
                     return <>
                     <DialogTitle sx={{ py: 1.25, borderBottom: "1px solid", borderColor: "divider" }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
@@ -365,6 +374,19 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
                                 <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · Trade Confidence {selectedConfidence ?? "calculating"} · Zone Quality {selectedZone.zone_score.toFixed(0)} · delayed data · no order execution</Typography>
                             </Box>
                             <Chip sx={{ ml: "auto" }} color={selectedZone.zone_type === "DEMAND" ? "primary" : "error"} label={`${selectedConfidence ?? "…"} · Trade Confidence`} />
+                            {import.meta.env.DEV && (
+                                <>
+                                    <IconButton aria-label="Open developer settings" onClick={(event) => setDeveloperMenuAnchor(event.currentTarget)}>
+                                        <BugReportOutlinedIcon />
+                                    </IconButton>
+                                    <Menu anchorEl={developerMenuAnchor} open={Boolean(developerMenuAnchor)} onClose={() => setDeveloperMenuAnchor(null)}>
+                                        <MenuItem onClick={() => setDeveloperMode((enabled) => !enabled)}>
+                                            <Switch size="small" checked={developerMode} />
+                                            Developer Mode
+                                        </MenuItem>
+                                    </Menu>
+                                </>
+                            )}
                             <IconButton aria-label="Close full-screen chart" onClick={closeStock}><CloseRoundedIcon /></IconButton>
                         </Box>
                     </DialogTitle>
@@ -388,10 +410,13 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
                                     }}
                                     height={fullChartHeight}
                                     showTools
+                                    developerMode={developerMode}
+                                    developerZones={developerMode ? developerZones : undefined}
                                 />
                             </Grid>
                             <Grid size={{ xs: 12, lg: 3.5 }}>
                                 <Box sx={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}>
+                                    {developerMode && <DeveloperZoneInspector zones={developerZones} />}
                                     <Card sx={{ mb: 1.25 }}><CardContent>
                                         <Typography variant="h6">All active zones</Typography>
                                         <Stack spacing={.75} sx={{ mt: 1 }}>
