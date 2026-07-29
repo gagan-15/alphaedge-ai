@@ -101,6 +101,10 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
     const [selectedZoneId, setSelectedZoneId] = useState(() =>
         initialZone ? zoneIdFor(initialZones, initialZone) : ""
     );
+    const developerChartZones = useMemo(
+        () => developerMode ? acceptedDeveloperZones(selectedZones, selectedZoneId) : [],
+        [developerMode, selectedZoneId, selectedZones],
+    );
     const [confluenceOverlays, setConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
     const [availableConfluenceOverlays, setAvailableConfluenceOverlays] = useState<ConfluenceChartOverlay[]>([]);
     const [confluenceOverlaysHidden, setConfluenceOverlaysHidden] = useState(false);
@@ -364,7 +368,6 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
                     const selectedZone = selectZoneById(selectedZones, selectedZoneId);
                     if (!selectedZone) return null;
                     const selectedConfidence = confidenceScores[resultKey(selectedZone)];
-                    const developerZones = developerMode ? acceptedDeveloperZones(selectedZones, selectedZoneId) : [];
                     return <>
                     <DialogTitle sx={{ py: 1.25, borderBottom: "1px solid", borderColor: "divider" }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
@@ -411,12 +414,12 @@ function ScannerResultsTable({ results, initialSelection }: ScannerResultsTableP
                                     height={fullChartHeight}
                                     showTools
                                     developerMode={developerMode}
-                                    developerZones={developerMode ? developerZones : undefined}
+                                    developerZones={developerMode ? developerChartZones : undefined}
                                 />
                             </Grid>
                             <Grid size={{ xs: 12, lg: 3.5 }}>
                                 <Box sx={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}>
-                                    {developerMode && <DeveloperZoneInspector zones={developerZones} />}
+                                    {developerMode && <DeveloperZoneInspector zones={developerChartZones} />}
                                     <Card sx={{ mb: 1.25 }}><CardContent>
                                         <Typography variant="h6">All active zones</Typography>
                                         <Stack spacing={.75} sx={{ mt: 1 }}>

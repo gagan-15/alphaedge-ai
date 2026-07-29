@@ -31,6 +31,8 @@ import { zoneSequenceLabel } from "./zoneLabels";
 import { overlayStyles } from "../../services/overlayService";
 import type { DeveloperChartZone } from "./developerZones";
 
+const noDeveloperZones: DeveloperChartZone[] = [];
+
 const patternLabels: Record<string, string> = {
     DROP_BASE_RALLY: "DBR",
     RALLY_BASE_RALLY: "RBR",
@@ -96,7 +98,7 @@ function ZoneDetailChart({
     height = 360,
     showTools = false,
     developerMode = false,
-    developerZones = [],
+    developerZones = noDeveloperZones,
 }: ZoneDetailChartProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<ReturnType<typeof createChart> | null>(null);
