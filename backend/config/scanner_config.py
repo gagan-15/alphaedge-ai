@@ -14,13 +14,6 @@ class ScannerConfig:
     Configuration for the Scanner Engine.
     """
 
-    symbols: tuple[str, ...] = (
-        "INFY",
-        "TCS",
-        "HDFCBANK",
-        "RELIANCE",
-    )
-
     account_balance: float = 100000.0
 
     period: str = "1y"
@@ -38,3 +31,5 @@ class ScannerConfig:
     minimum_momentum: float = 50.0
 
     maximum_momentum: float = 70.0
+
+    scan_concurrency: int = 6

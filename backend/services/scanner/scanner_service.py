@@ -5,6 +5,8 @@ Sprint:
     2.64 - Scanner Results Foundation
 """
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 from backend.config.market_scanner_config import (
     MarketScannerConfig,
 )
@@ -32,6 +34,10 @@ from backend.services.scanner.market_opportunity_service import (
 from backend.validators.scanner_validator import (
     ScannerValidator,
 )
+from backend.services.scanner.universe_service import (
+    UniverseName,
+    UniverseService,
+)
 
 
 class ScannerService:
@@ -43,6 +49,7 @@ class ScannerService:
         self,
         config: ScannerConfig | None = None,
         opportunity_service: MarketOpportunityService | None = None,
+        universe_service: UniverseService | None = None,
     ) -> None:
         """
         Initialize the Scanner Service.
@@ -64,9 +71,12 @@ class ScannerService:
             market_data_service=MarketDataService(),
             config=self._config,
         )
+        self._universe_service = universe_service or UniverseService()
 
     def get_scanner(
         self,
+        universe: UniverseName = "nse500",
+        supplied_symbols: list[str] | None = None,
     ) -> MarketScannerResult:
         """
         Return the current scanner data.
@@ -77,28 +87,36 @@ class ScannerService:
 
         opportunities: list[ScreenedOpportunity] = []
 
-        for symbol in self._config.symbols:
+        symbols = self._universe_service.get_symbols(
+            universe,
+            supplied_symbols,
+        )
+
+        def analyze(symbol: str) -> ScreenedOpportunity | None:
             try:
-                opportunity = self._opportunity_service.analyze(
-                    symbol,
-                )
+                return self._opportunity_service.analyze(symbol)
             except Exception:
                 logger.exception(
                     "Scanner analysis failed for %s.",
                     symbol,
                 )
-                continue
+                return None
 
-            if opportunity is not None:
-                opportunities.append(
-                    opportunity,
-                )
+        with ThreadPoolExecutor(
+            max_workers=min(self._config.scan_concurrency, max(1, len(symbols))),
+            thread_name_prefix="alphaedge-scanner",
+        ) as executor:
+            futures = {executor.submit(analyze, symbol): symbol for symbol in symbols}
+            for future in as_completed(futures):
+                opportunity = future.result()
+                if opportunity is not None:
+                    opportunities.append(opportunity)
 
         screener_result = self._screener_engine.screen(
             opportunities,
         )
 
         return self._market_scanner_engine.scan(
-            symbols=list(self._config.symbols),
+            symbols=symbols,
             screener_result=screener_result,
         )

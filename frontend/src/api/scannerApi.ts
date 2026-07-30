@@ -15,6 +15,7 @@ import type {
     ZoneResearchResult,
     ZoneDiagnosticsResponse,
 } from "../types/scanner";
+import type { MarketUniverse } from "../market-universe/MarketUniverseState";
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -23,10 +24,14 @@ const api = axios.create({
 
 const researchZoneRequests = new Map<string, Promise<ZoneResearchResponse>>();
 
-export async function getScanner(): Promise<ScannerResponse> {
+export async function getScanner(
+    universe: MarketUniverse = "nse500",
+    symbols: string[] = [],
+): Promise<ScannerResponse> {
     try {
         const response = await api.get<ScannerResponse>(
             "/scanner/",
+            { params: { universe, symbols } },
         );
 
         return response.data;
@@ -40,15 +45,20 @@ export async function getScanner(): Promise<ScannerResponse> {
     }
 }
 
-export async function getResearchZones(timeframe = "DAILY"): Promise<ZoneResearchResponse> {
-    const active = researchZoneRequests.get(timeframe);
+export async function getResearchZones(
+    timeframe = "DAILY",
+    universe: MarketUniverse = "nse500",
+    symbols: string[] = [],
+): Promise<ZoneResearchResponse> {
+    const requestKey = `${timeframe}:${universe}:${symbols.join(",")}`;
+    const active = researchZoneRequests.get(requestKey);
     if (active) return active;
     const request = api.get<ZoneResearchResponse>("/scanner/zones", {
-        params: { timeframe },
+        params: { timeframe, universe, symbols },
     }).then((response) => response.data).finally(() => {
-        researchZoneRequests.delete(timeframe);
+        researchZoneRequests.delete(requestKey);
     });
-    researchZoneRequests.set(timeframe, request);
+    researchZoneRequests.set(requestKey, request);
     return request;
 }
 

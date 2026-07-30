@@ -12,6 +12,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { AuthProvider } from "./auth/AuthContext";
 import { MarketIntelligenceProvider } from "./market-intelligence/MarketIntelligenceContext";
+import { MarketUniverseProvider } from "./market-universe/MarketUniverseContext";
 import { AppThemeProvider } from "./theme/AppThemeProvider";
 import "./index.css";
 
@@ -22,9 +23,11 @@ createRoot(
         <BrowserRouter>
             <AppThemeProvider>
                 <AuthProvider>
-                    <MarketIntelligenceProvider>
-                        <App />
-                    </MarketIntelligenceProvider>
+                    <MarketUniverseProvider>
+                        <MarketIntelligenceProvider>
+                            <App />
+                        </MarketIntelligenceProvider>
+                    </MarketUniverseProvider>
                 </AuthProvider>
             </AppThemeProvider>
         </BrowserRouter>

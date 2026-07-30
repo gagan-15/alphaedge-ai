@@ -6,6 +6,7 @@ Sprint:
 """
 
 from dataclasses import replace
+from concurrent.futures import ThreadPoolExecutor
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Query
@@ -48,6 +49,10 @@ from backend.services.market_data.timeframe_service import (
     TIMEFRAME_RULES,
     aggregate_timeframe,
 )
+from backend.services.scanner.universe_service import (
+    UniverseName,
+    UniverseService,
+)
 
 scanner_router = APIRouter(
     prefix="/scanner",
@@ -61,6 +66,7 @@ _zone_scoring_engine = ZoneScoringEngine()
 _zone_config = ScannerConfig()
 _stock_details_analysis = StockDetailsAnalysisService()
 _timeframe_confluence = TimeframeConfluenceService()
+_universe_service = UniverseService()
 
 ZoneTimeframe = Literal[
     "MINUTE_5",
@@ -279,39 +285,62 @@ def build_scanner_response(
     "/",
     response_model=ScannerResponse,
 )
-def get_scanner() -> ScannerResponse:
+def get_scanner(
+    universe: UniverseName = Query(default="nse500"),
+    symbols: list[str] | None = Query(default=None),
+) -> ScannerResponse:
     """
     Return the current scanner data.
     """
 
     return build_scanner_response(
-        _scanner_service.get_scanner(),
+        _scanner_service.get_scanner(universe, symbols),
     )
 
 
 @scanner_router.get("/zones", response_model=ZoneResearchResponse)
 def get_research_zones(
     timeframe: ZoneTimeframe = Query(default="DAILY"),
+    universe: UniverseName = Query(default="nse500"),
+    symbols: list[str] | None = Query(default=None),
 ) -> ZoneResearchResponse:
     """Return recent demand and supply zones for research exploration."""
 
     results: list[ZoneResearchResultResponse] = []
     scanned = 0
-    for symbol in _zone_config.symbols:
+    universe_symbols = _universe_service.get_symbols(universe, symbols)
+    source_period, source_interval = _INTRADAY_SOURCE.get(
+        timeframe,
+        (
+            "10y" if timeframe != "DAILY" else _zone_config.period,
+            _zone_config.interval,
+        ),
+    )
+
+    def load_symbol(symbol: str) -> DataFrame | None:
         try:
-            source_period, source_interval = _INTRADAY_SOURCE.get(
-                timeframe,
-                (
-                    "10y" if timeframe != "DAILY" else _zone_config.period,
-                    _zone_config.interval,
-                ),
-            )
             data = _zone_market_data.get_stock_data(
                 symbol=symbol,
                 period=source_period,
                 interval=source_interval,
             )
-            data = _timeframe_data(data, timeframe)
+            return _timeframe_data(data, timeframe)
+        except Exception:
+            return None
+
+    with ThreadPoolExecutor(
+        max_workers=min(
+            _zone_config.scan_concurrency,
+            max(1, len(universe_symbols)),
+        ),
+        thread_name_prefix="alphaedge-zone-data",
+    ) as executor:
+        loaded_data = list(executor.map(load_symbol, universe_symbols))
+
+    for symbol, data in zip(universe_symbols, loaded_data, strict=True):
+        if data is None:
+            continue
+        try:
             scanned += 1
             current_price = float(data["Close"].iloc[-1])
             zones = _zone_engine.detect_zones(data)
@@ -449,7 +478,7 @@ def get_zone_diagnostics(
     """Return developer-only candidate diagnostics for one symbol."""
 
     normalized = symbol.strip().upper()
-    if normalized not in _zone_config.symbols:
+    if normalized not in _universe_service.get_symbols("allnse"):
         raise HTTPException(
             status_code=404, detail="Symbol is not in the scanner universe."
         )
@@ -572,7 +601,7 @@ def get_stock_details_analysis(
     """Return delayed-data benchmark, timeframe and trade-plan research."""
 
     normalized = symbol.strip().upper()
-    if normalized not in _zone_config.symbols:
+    if normalized not in _universe_service.get_symbols("allnse"):
         raise HTTPException(
             status_code=404, detail="Symbol is not in the scanner universe."
         )
@@ -604,7 +633,7 @@ def get_timeframe_confluence(
     """Return cached zones only from timeframes above the execution chart."""
 
     normalized = symbol.strip().upper()
-    if normalized not in _zone_config.symbols:
+    if normalized not in _universe_service.get_symbols("allnse"):
         raise HTTPException(
             status_code=404,
             detail="Symbol is not in the scanner universe.",

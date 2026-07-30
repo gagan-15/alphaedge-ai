@@ -28,6 +28,7 @@ import ScannerResultsTable from "../components/scanner/ScannerResultsTable";
 import ScannerToolbar, { type ScannerQuickPreset } from "../components/scanner/ScannerToolbar";
 
 import type { ZoneResearchResponse } from "../types/scanner";
+import { useMarketUniverse } from "../market-universe/MarketUniverseState";
 
 const timeframes = [
     { value: "DAILY", label: "Daily" },
@@ -59,6 +60,7 @@ function scannerPreference<T>(key: "defaultTimeframe" | "minimumQuality", fallba
 }
 
 function Scanner() {
+    const { marketUniverse, customSymbols } = useMarketUniverse();
     const location = useLocation();
     const navigate = useNavigate();
     const initialFilters = location.state as {
@@ -93,7 +95,17 @@ function Scanner() {
     const [insightVisible, setInsightVisible] = useState(true);
 
     function loadScanner(selectedTimeframe = timeframe) {
-        void getResearchZones(selectedTimeframe)
+        const watchlist = marketUniverse === "watchlist"
+            ? JSON.parse(localStorage.getItem("alphaedge.local.watchlist") ?? "[]")
+            : [];
+        const suppliedSymbols = marketUniverse === "custom"
+            ? customSymbols
+            : watchlist;
+        void getResearchZones(
+            selectedTimeframe,
+            marketUniverse,
+            suppliedSymbols,
+        )
             .then((data) => {
                 setScanner(data);
             })
@@ -173,7 +185,7 @@ function Scanner() {
         loadScanner(timeframe);
         // The selected timeframe is the request boundary.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [market, timeframe]);
+    }, [customSymbols, market, marketUniverse, timeframe]);
 
     const visibleResults = (
         market === "NSE" ? scanner?.results ?? [] : []

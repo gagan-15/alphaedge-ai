@@ -28,11 +28,6 @@ class ScannerValidator:
                 "config must be a ScannerConfig.",
             )
 
-        if not config.symbols:
-            raise ValueError(
-                "symbols cannot be empty.",
-            )
-
         if config.account_balance <= 0:
             raise ValueError(
                 "account_balance must be greater than zero.",
@@ -42,6 +37,9 @@ class ScannerValidator:
             raise ValueError(
                 "maximum_zone_distance_percent cannot be negative.",
             )
+
+        if config.scan_concurrency <= 0:
+            raise ValueError("scan_concurrency must be greater than zero.")
 
         periods = (
             config.volume_period,

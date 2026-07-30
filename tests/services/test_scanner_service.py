@@ -70,20 +70,20 @@ class StubOpportunityService:
         )
 
 
+class StubUniverseService:
+    def get_symbols(self, universe="nse500", supplied_symbols=None):
+        return ["INFY", "FAILED", "EMPTY"]
+
+
 def test_scanner_continues_after_symbol_failure() -> None:
     """
     One failed symbol does not stop the rest of the scan.
     """
 
     service = ScannerService(
-        config=ScannerConfig(
-            symbols=(
-                "INFY",
-                "FAILED",
-                "EMPTY",
-            ),
-        ),
+        config=ScannerConfig(),
         opportunity_service=StubOpportunityService(),
+        universe_service=StubUniverseService(),
     )
 
     result = service.get_scanner()

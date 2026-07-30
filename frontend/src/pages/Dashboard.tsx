@@ -4,6 +4,10 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Grid";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { type SelectChangeEvent } from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { alpha } from "@mui/material/styles";
@@ -16,6 +20,11 @@ import DashboardOpportunityTable, {
 import { buildTradeConfidence } from "../components/scanner/tradeConfidence";
 import { useMarketIntelligence } from "../market-intelligence/MarketIntelligenceState";
 import type { ZoneResearchResult } from "../types/scanner";
+import {
+    marketUniverseOptions,
+    type MarketUniverse,
+    useMarketUniverse,
+} from "../market-universe/MarketUniverseState";
 
 function marketValue(label: string, value: string, change?: number) {
     return (
@@ -42,13 +51,20 @@ function toOpportunity(zone: ZoneResearchResult): DashboardOpportunity {
 
 export default function Dashboard() {
     const { dashboard, snapshot, lastUpdated, isLoading, error } = useMarketIntelligence();
+    const { marketUniverse, setMarketUniverse, customSymbols } = useMarketUniverse();
     const [zones, setZones] = useState<ZoneResearchResult[]>([]);
     const [zonesLoading, setZonesLoading] = useState(true);
     const [zonesError, setZonesError] = useState("");
 
     useEffect(() => {
         let active = true;
-        void getResearchZones("DAILY")
+        const watchlist = marketUniverse === "watchlist"
+            ? JSON.parse(localStorage.getItem("alphaedge.local.watchlist") ?? "[]")
+            : [];
+        const suppliedSymbols = marketUniverse === "custom"
+            ? customSymbols
+            : watchlist;
+        void getResearchZones("DAILY", marketUniverse, suppliedSymbols)
             .then((response) => {
                 if (active) setZones(response.results);
             })
@@ -59,7 +75,7 @@ export default function Dashboard() {
                 if (active) setZonesLoading(false);
             });
         return () => { active = false; };
-    }, []);
+    }, [customSymbols, marketUniverse]);
 
     const demandOpportunities = useMemo(
         () => zones.filter((zone) => zone.zone_type === "DEMAND").map(toOpportunity),
@@ -80,6 +96,27 @@ export default function Dashboard() {
 
     return (
         <Stack spacing={2}>
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+                <FormControl size="small" sx={{ minWidth: 176 }}>
+                    <InputLabel id="dashboard-market-universe-label">
+                        Market Universe
+                    </InputLabel>
+                    <Select
+                        labelId="dashboard-market-universe-label"
+                        value={marketUniverse}
+                        label="Market Universe"
+                        onChange={(event: SelectChangeEvent) => {
+                            setMarketUniverse(event.target.value as MarketUniverse);
+                        }}
+                    >
+                        {marketUniverseOptions.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </Box>
             <Card sx={{ overflow: "hidden" }}>
                 <CardContent sx={{ p: { xs: 2, lg: 2.1 }, "&:last-child": { pb: { xs: 2, lg: 2.1 } } }}>
                     <Grid container spacing={{ xs: 2, lg: 2.2 }} sx={{ alignItems: "stretch" }}>

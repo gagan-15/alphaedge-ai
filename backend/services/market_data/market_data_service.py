@@ -1,4 +1,6 @@
 from pandas import DataFrame
+from threading import RLock
+from time import monotonic
 
 from backend.core.logger import logger
 from backend.data_providers.base_market_data_provider import BaseMarketDataProvider
@@ -40,6 +42,11 @@ class MarketDataService:
             "Downloading market data for %s.",
             symbol,
         )
+        cache_key = (symbol.strip().upper(), period, interval)
+        with self._cache_lock:
+            cached = self._cache.get(cache_key)
+            if cached and monotonic() - cached[0] < self._cache_ttl_seconds:
+                return cached[1].copy()
 
         data = self._provider.download_stock_data(
             symbol=symbol,
@@ -49,7 +56,13 @@ class MarketDataService:
 
         # Validate the downloaded market data.
         MarketDataValidator.validate(data)
+        with self._cache_lock:
+            self._cache[cache_key] = (monotonic(), data.copy())
 
         logger.info("Market data validation completed successfully.")
 
         return data
+
+    _cache: dict[tuple[str, str, str], tuple[float, DataFrame]] = {}
+    _cache_lock = RLock()
+    _cache_ttl_seconds = 300.0
