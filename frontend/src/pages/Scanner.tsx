@@ -5,7 +5,7 @@
  *     2.64 - Scanner Results Foundation
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
@@ -93,23 +93,31 @@ function Scanner() {
     const [statusFilter, setStatusFilter] = useState("all");
     const [proximityFilter, setProximityFilter] = useState(100);
     const [insightVisible, setInsightVisible] = useState(true);
+    const requestVersion = useRef(0);
 
     function loadScanner(selectedTimeframe = timeframe) {
+        const version = ++requestVersion.current;
         const watchlist = marketUniverse === "watchlist"
             ? JSON.parse(localStorage.getItem("alphaedge.local.watchlist") ?? "[]")
             : [];
         const suppliedSymbols = marketUniverse === "custom"
             ? customSymbols
             : watchlist;
-        void getResearchZones(
+        const poll = () => void getResearchZones(
             selectedTimeframe,
             marketUniverse,
             suppliedSymbols,
         )
             .then((data) => {
+                if (version !== requestVersion.current) return;
                 setScanner(data);
+                setIsLoading(data.status !== "completed");
+                if (data.status === "refreshing" || data.status === "queued") {
+                    window.setTimeout(poll, 5000);
+                }
             })
             .catch((error: unknown) => {
+                if (version !== requestVersion.current) return;
                 console.error(
                     "Failed to load scanner.",
                     error,
@@ -119,9 +127,8 @@ function Scanner() {
                     "Scanner data could not be loaded. Check that the backend is running.",
                 );
             })
-            .finally(() => {
-                setIsLoading(false);
-            });
+            .finally(() => undefined);
+        poll();
     }
 
     function reloadScanner() {
@@ -183,6 +190,9 @@ function Scanner() {
             return;
         }
         loadScanner(timeframe);
+        return () => {
+            requestVersion.current += 1;
+        };
         // The selected timeframe is the request boundary.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [customSymbols, market, marketUniverse, timeframe]);

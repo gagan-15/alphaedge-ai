@@ -21,3 +21,11 @@ class MarketOverviewResult(BaseModel):
 
     india_vix: float
     india_vix_change: float
+    advancing: int = 0
+    declining: int = 0
+    unchanged: int = 0
+    total_symbols: int = 0
+    processed_symbols: int = 0
+    source: str = ""
+    data_status: str = "delayed"
+    updated_at: str = ""

@@ -15,10 +15,14 @@ const api = axios.create({
     timeout: 10000,
 });
 
-export async function getDashboard(): Promise<DashboardResult> {
+export async function getDashboard(
+    universe = "nse500",
+    symbols: string[] = [],
+): Promise<DashboardResult> {
     try {
         const response = await api.get<DashboardResult>(
             "/dashboard/",
+            { params: { universe, symbols } },
         );
 
         return response.data;

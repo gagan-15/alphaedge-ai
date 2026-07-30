@@ -19,7 +19,7 @@ import DashboardOpportunityTable, {
 } from "../components/dashboard/DashboardOpportunityTable";
 import { buildTradeConfidence } from "../components/scanner/tradeConfidence";
 import { useMarketIntelligence } from "../market-intelligence/MarketIntelligenceState";
-import type { ZoneResearchResult } from "../types/scanner";
+import type { ZoneResearchResponse, ZoneResearchResult } from "../types/scanner";
 import {
     marketUniverseOptions,
     type MarketUniverse,
@@ -55,26 +55,44 @@ export default function Dashboard() {
     const [zones, setZones] = useState<ZoneResearchResult[]>([]);
     const [zonesLoading, setZonesLoading] = useState(true);
     const [zonesError, setZonesError] = useState("");
+    const [scanStatus, setScanStatus] = useState<ZoneResearchResponse | null>(null);
 
     useEffect(() => {
         let active = true;
+        let pollTimer: ReturnType<typeof setTimeout> | undefined;
+        queueMicrotask(() => {
+            if (active) {
+                setZonesLoading(true);
+                setZonesError("");
+            }
+        });
         const watchlist = marketUniverse === "watchlist"
             ? JSON.parse(localStorage.getItem("alphaedge.local.watchlist") ?? "[]")
             : [];
         const suppliedSymbols = marketUniverse === "custom"
             ? customSymbols
             : watchlist;
-        void getResearchZones("DAILY", marketUniverse, suppliedSymbols)
+        const loadZones = () => void getResearchZones("DAILY", marketUniverse, suppliedSymbols)
             .then((response) => {
-                if (active) setZones(response.results);
+                if (!active) return;
+                setScanStatus(response);
+                if (response.results.length) setZones(response.results);
+                setZonesLoading(response.status !== "completed");
+                if (response.status === "refreshing" || response.status === "queued") {
+                    pollTimer = setTimeout(loadZones, 5000);
+                }
             })
             .catch(() => {
                 if (active) setZonesError("Zone opportunities could not be loaded. Open the Scanner to try again.");
             })
             .finally(() => {
-                if (active) setZonesLoading(false);
+                if (active && !pollTimer) setZonesLoading(false);
             });
-        return () => { active = false; };
+        loadZones();
+        return () => {
+            active = false;
+            if (pollTimer) clearTimeout(pollTimer);
+        };
     }, [customSymbols, marketUniverse]);
 
     const demandOpportunities = useMemo(
@@ -96,7 +114,13 @@ export default function Dashboard() {
 
     return (
         <Stack spacing={2}>
-            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 1.5 }}>
+                {scanStatus && (
+                    <Typography color="text.secondary" sx={{ fontSize: "0.7rem" }}>
+                        {scanStatus.processed_symbols}/{scanStatus.total_symbols} symbols
+                        {" · "}{scanStatus.status === "completed" ? "Updated" : "Refreshing"}
+                    </Typography>
+                )}
                 <FormControl size="small" sx={{ minWidth: 176 }}>
                     <InputLabel id="dashboard-market-universe-label">
                         Market Universe

@@ -105,6 +105,13 @@ export interface ZoneResearchResponse {
     delayed: boolean;
     timeframe: string;
     results: ZoneResearchResult[];
+    universe: string;
+    status: "completed" | "refreshing" | "queued" | "failed";
+    total_symbols: number;
+    processed_symbols: number;
+    failed_symbols: number;
+    last_completed_at: string | null;
+    data_status: "delayed" | "cached" | "refreshing";
 }
 
 export interface ZoneRuleDiagnostic {

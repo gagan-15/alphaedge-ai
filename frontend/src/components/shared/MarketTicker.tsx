@@ -2,20 +2,20 @@ import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import { alpha, keyframes } from "@mui/material/styles";
+import { useMarketIntelligence } from "../../market-intelligence/MarketIntelligenceState";
 
-const quotes = [
-    { symbol: "RELIANCE", price: "2,978.45", change: "+0.83%" },
-    { symbol: "TCS", price: "3,584.75", change: "-0.41%" },
-    { symbol: "HDFC BANK", price: "1,654.20", change: "+1.12%" },
-    { symbol: "INFY", price: "1,512.10", change: "+0.35%" },
-];
+interface TickerQuote {
+    symbol: string;
+    price: string;
+    change: string;
+}
 
 const tickerScroll = keyframes`
     from { transform: translate3d(0, 0, 0); }
     to { transform: translate3d(-50%, 0, 0); }
 `;
 
-function QuoteGroup({ duplicate = false }: { duplicate?: boolean }) {
+function QuoteGroup({ quotes, duplicate = false }: { quotes: TickerQuote[]; duplicate?: boolean }) {
     return (
         <Box
             aria-hidden={duplicate || undefined}
@@ -83,6 +83,18 @@ function QuoteGroup({ duplicate = false }: { duplicate?: boolean }) {
 }
 
 function DashboardTicker() {
+    const { dashboard } = useMarketIntelligence();
+    const market = dashboard?.market;
+    const quotes: TickerQuote[] = market ? [
+        { symbol: "NIFTY 50", price: market.nifty50.toLocaleString("en-IN", { maximumFractionDigits: 2 }), change: `${market.nifty_change >= 0 ? "+" : ""}${market.nifty_change.toFixed(2)}%` },
+        { symbol: "SENSEX", price: market.sensex.toLocaleString("en-IN", { maximumFractionDigits: 2 }), change: `${market.sensex_change >= 0 ? "+" : ""}${market.sensex_change.toFixed(2)}%` },
+        { symbol: "BANK NIFTY", price: market.bank_nifty.toLocaleString("en-IN", { maximumFractionDigits: 2 }), change: `${market.bank_nifty_change >= 0 ? "+" : ""}${market.bank_nifty_change.toFixed(2)}%` },
+        { symbol: "INDIA VIX", price: market.india_vix.toLocaleString("en-IN", { maximumFractionDigits: 2 }), change: `${market.india_vix_change >= 0 ? "+" : ""}${market.india_vix_change.toFixed(2)}%` },
+    ].filter((quote) => quote.price !== "0") : [];
+    const displayQuotes = quotes.length ? quotes : [
+        { symbol: "MARKET DATA", price: "Refreshing", change: "0.00%" },
+    ];
+    const status = market?.data_status?.toUpperCase() ?? "REFRESHING";
     return (
         <Box
             aria-label="Delayed demo market ticker"
@@ -124,7 +136,7 @@ function DashboardTicker() {
                 }}
             >
                 <Chip
-                    label="DELAYED DEMO"
+                    label={status}
                     size="small"
                     sx={{
                         height: 25,
@@ -153,8 +165,8 @@ function DashboardTicker() {
                         },
                     }}
                 >
-                    <QuoteGroup />
-                    <QuoteGroup duplicate />
+                    <QuoteGroup quotes={displayQuotes} />
+                    <QuoteGroup quotes={displayQuotes} duplicate />
                 </Box>
             </Box>
         </Box>

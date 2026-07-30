@@ -133,6 +133,13 @@ class ZoneResearchResponse(APIResponseModel):
     delayed: bool = True
     timeframe: str = "1D"
     results: tuple[ZoneResearchResultResponse, ...]
+    universe: str = "nse500"
+    status: str = "completed"
+    total_symbols: int = 0
+    processed_symbols: int = 0
+    failed_symbols: int = 0
+    last_completed_at: str | None = None
+    data_status: str = "delayed"
 
 
 class ZoneRuleDiagnosticResponse(APIResponseModel):

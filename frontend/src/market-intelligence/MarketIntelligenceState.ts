@@ -9,12 +9,10 @@ export interface MarketIntelligenceContextValue {
     dashboard: DashboardResult | null;
     snapshot: MarketIntelligenceSnapshot;
     timeframe: MarketTimeframe;
-    universe: string;
     lastUpdated: Date | null;
     isLoading: boolean;
     error: string;
     setTimeframe: (value: MarketTimeframe) => void;
-    setUniverse: (value: string) => void;
     refresh: () => Promise<void>;
 }
 

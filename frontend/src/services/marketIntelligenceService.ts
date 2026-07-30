@@ -40,7 +40,10 @@ export function buildMarketIntelligence(data: DashboardResult): MarketIntelligen
         data.market.bank_nifty_change,
     ];
     const averageChange = indexChanges.reduce((sum, value) => sum + value, 0) / indexChanges.length;
-    const participation = Math.round(indexChanges.filter((value) => value > 0).length / indexChanges.length * 100);
+    const breadthTotal = data.market.advancing + data.market.declining + data.market.unchanged;
+    const participation = breadthTotal
+        ? Math.round(data.market.advancing / breadthTotal * 100)
+        : 0;
     const direction: MarketDirection = averageChange > .25 ? "Bullish" : averageChange < -.25 ? "Bearish" : "Neutral";
     const volatility = data.market.india_vix >= 20 ? "High" : data.market.india_vix >= 14 ? "Moderate" : "Low";
     const riskLevel: MarketRisk = volatility === "High" ? "High Risk" : volatility === "Moderate" ? "Moderate Risk" : "Low Risk";

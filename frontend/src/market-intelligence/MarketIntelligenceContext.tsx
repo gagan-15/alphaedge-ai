@@ -11,22 +11,37 @@ import {
     type MarketIntelligenceContextValue,
     type MarketTimeframe,
 } from "./MarketIntelligenceState";
+import { useMarketUniverse } from "../market-universe/MarketUniverseState";
 
 const timeframeKey = "alphaedge.market.timeframe";
-const universeKey = "alphaedge.market.universe";
-let sharedDashboardRequest: Promise<DashboardResult> | null = null;
+const sharedDashboardRequests = new Map<string, Promise<DashboardResult>>();
 
-function fetchDashboardOnce() {
-    sharedDashboardRequest ??= getDashboard().finally(() => {
-        sharedDashboardRequest = null;
+function fetchDashboardOnce(universe: string, symbols: string[]) {
+    const key = `${universe}:${symbols.join(",")}`;
+    const active = sharedDashboardRequests.get(key);
+    if (active) return active;
+    const request = getDashboard(universe, symbols).finally(() => {
+        sharedDashboardRequests.delete(key);
     });
-    return sharedDashboardRequest;
+    sharedDashboardRequests.set(key, request);
+    return request;
 }
 
 export function MarketIntelligenceProvider({ children }: { children: React.ReactNode }) {
+    const { marketUniverse, customSymbols } = useMarketUniverse();
+    const suppliedSymbols = useMemo(() => {
+        if (marketUniverse === "custom") return customSymbols;
+        if (marketUniverse !== "watchlist") return [];
+        try {
+            return JSON.parse(
+                localStorage.getItem("alphaedge.local.watchlist") ?? "[]",
+            ) as string[];
+        } catch {
+            return [];
+        }
+    }, [customSymbols, marketUniverse]);
     const [dashboard, setDashboard] = useState<DashboardResult | null>(null);
     const [timeframe, setTimeframeState] = useState<MarketTimeframe>(() => (localStorage.getItem(timeframeKey) as MarketTimeframe | null) ?? "1M");
-    const [universe, setUniverseState] = useState(() => localStorage.getItem(universeKey) ?? "nifty500");
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -35,7 +50,7 @@ export function MarketIntelligenceProvider({ children }: { children: React.React
         setIsLoading(true);
         setError("");
         try {
-            const result = await fetchDashboardOnce();
+            const result = await fetchDashboardOnce(marketUniverse, suppliedSymbols);
             setDashboard(result);
             setLastUpdated(new Date());
         } catch {
@@ -43,11 +58,11 @@ export function MarketIntelligenceProvider({ children }: { children: React.React
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [marketUniverse, suppliedSymbols]);
 
     useEffect(() => {
         let active = true;
-        void fetchDashboardOnce()
+        void fetchDashboardOnce(marketUniverse, suppliedSymbols)
             .then((result) => {
                 if (!active) return;
                 setDashboard(result);
@@ -60,13 +75,12 @@ export function MarketIntelligenceProvider({ children }: { children: React.React
                 if (active) setIsLoading(false);
             });
         return () => { active = false; };
-    }, []);
+    }, [marketUniverse, suppliedSymbols]);
 
     const value = useMemo<MarketIntelligenceContextValue>(() => ({
         dashboard,
         snapshot: dashboard ? buildMarketIntelligence(dashboard) : emptyMarketIntelligence,
         timeframe,
-        universe,
         lastUpdated,
         isLoading,
         error,
@@ -74,12 +88,8 @@ export function MarketIntelligenceProvider({ children }: { children: React.React
             localStorage.setItem(timeframeKey, next);
             setTimeframeState(next);
         },
-        setUniverse: (next) => {
-            localStorage.setItem(universeKey, next);
-            setUniverseState(next);
-        },
         refresh,
-    }), [dashboard, error, isLoading, lastUpdated, refresh, timeframe, universe]);
+    }), [dashboard, error, isLoading, lastUpdated, refresh, timeframe]);
 
     return <MarketIntelligenceContext.Provider value={value}>{children}</MarketIntelligenceContext.Provider>;
 }

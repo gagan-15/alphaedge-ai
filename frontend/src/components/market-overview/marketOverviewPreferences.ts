@@ -17,7 +17,6 @@ export const marketOverviewWidgetKeys = [
 export type MarketOverviewWidgetKey = typeof marketOverviewWidgetKeys[number];
 export type DashboardPreset = "beginner" | "swing" | "intraday" | "longTerm" | "custom";
 export type DashboardTimeframe = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y";
-export type MarketUniverse = "nseAll" | "nifty500" | "nifty200" | "nifty100" | "fo" | "watchlist" | "holdings";
 
 export interface MarketOverviewPreferences {
     version: 2;
@@ -45,7 +44,7 @@ export const defaultMarketOverviewPreferences: MarketOverviewPreferences = {
     preset: "beginner",
     visibleWidgets: allVisible,
     defaultTimeframe: "1M",
-    marketUniverse: "nifty500",
+    marketUniverse: "nse500",
     chart: {
         showNifty: true,
         showBankNifty: true,
@@ -86,11 +85,18 @@ function storageKey(userId: string) {
 export function loadMarketOverviewPreferences(userId: string): MarketOverviewPreferences {
     try {
         const saved = JSON.parse(localStorage.getItem(storageKey(userId)) ?? "{}") as Partial<MarketOverviewPreferences>;
+        const legacyUniverse = saved.marketUniverse as string | undefined;
+        const marketUniverse = legacyUniverse === "nifty500" ? "nse500"
+            : legacyUniverse === "nseAll" ? "allnse"
+                : legacyUniverse === "fo" ? "fno"
+                    : legacyUniverse === "holdings" ? "watchlist"
+                        : saved.marketUniverse;
         return {
             ...defaultMarketOverviewPreferences,
             ...saved,
             visibleWidgets: { ...defaultMarketOverviewPreferences.visibleWidgets, ...saved.visibleWidgets },
             chart: { ...defaultMarketOverviewPreferences.chart, ...saved.chart },
+            marketUniverse: marketUniverse ?? defaultMarketOverviewPreferences.marketUniverse,
         };
     } catch {
         return defaultMarketOverviewPreferences;
@@ -100,3 +106,4 @@ export function loadMarketOverviewPreferences(userId: string): MarketOverviewPre
 export function saveMarketOverviewPreferences(userId: string, preferences: MarketOverviewPreferences) {
     localStorage.setItem(storageKey(userId), JSON.stringify(preferences));
 }
+import type { MarketUniverse } from "../../market-universe/MarketUniverseState";

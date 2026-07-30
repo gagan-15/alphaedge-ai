@@ -1087,3 +1087,16 @@ Business vision.
 # Architecture Motto
 
 > Good architecture makes future features easier to build, not harder.
+## Shared Market Universe and Market Data
+
+The application uses the canonical universe IDs `nifty50`, `nifty100`,
+`nifty200`, `nse500`, `fno`, `allnse`, `watchlist`, and `custom`. The default
+is `nse500`. `MarketUniverseContext` is the only frontend owner and persists
+the selection in local storage. Universe-dependent API calls send that value
+as the `universe` query parameter.
+
+On the backend, `UniverseService` is the only symbol source. Dashboard market
+benchmarks and breadth use the shared delayed market snapshot service. Large
+zone scans are cached by universe and timeframe and refreshed with controlled
+background workers, allowing clients to display the last completed result and
+refresh progress without waiting for a full universe scan.

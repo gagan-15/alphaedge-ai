@@ -6,7 +6,10 @@ Sprint:
 """
 
 from dataclasses import replace
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
+from datetime import UTC, datetime
+from threading import RLock
+from time import monotonic, sleep
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Query
@@ -67,6 +70,12 @@ _zone_config = ScannerConfig()
 _stock_details_analysis = StockDetailsAnalysisService()
 _timeframe_confluence = TimeframeConfluenceService()
 _universe_service = UniverseService()
+_zone_scan_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="zone-scan")
+_zone_scan_cache: dict[str, tuple[float, ZoneResearchResponse]] = {}
+_zone_scan_jobs: dict[str, Future[ZoneResearchResponse]] = {}
+_zone_scan_progress: dict[str, tuple[int, int]] = {}
+_zone_scan_lock = RLock()
+_zone_scan_ttl_seconds = 300.0
 
 ZoneTimeframe = Literal[
     "MINUTE_5",
@@ -298,11 +307,11 @@ def get_scanner(
     )
 
 
-@scanner_router.get("/zones", response_model=ZoneResearchResponse)
-def get_research_zones(
-    timeframe: ZoneTimeframe = Query(default="DAILY"),
-    universe: UniverseName = Query(default="nse500"),
-    symbols: list[str] | None = Query(default=None),
+def _scan_research_zones(
+    timeframe: ZoneTimeframe,
+    universe: UniverseName,
+    symbols: list[str] | None,
+    progress_key: str | None = None,
 ) -> ZoneResearchResponse:
     """Return recent demand and supply zones for research exploration."""
 
@@ -318,15 +327,33 @@ def get_research_zones(
     )
 
     def load_symbol(symbol: str) -> DataFrame | None:
-        try:
-            data = _zone_market_data.get_stock_data(
-                symbol=symbol,
-                period=source_period,
-                interval=source_interval,
-            )
-            return _timeframe_data(data, timeframe)
-        except Exception:
-            return None
+        for attempt in range(2):
+            try:
+                data = _zone_market_data.get_stock_data(
+                    symbol=symbol,
+                    period=source_period,
+                    interval=source_interval,
+                )
+                result = _timeframe_data(data, timeframe)
+                if progress_key:
+                    with _zone_scan_lock:
+                        processed, failed = _zone_scan_progress.get(
+                            progress_key,
+                            (0, 0),
+                        )
+                        _zone_scan_progress[progress_key] = (
+                            processed + 1,
+                            failed,
+                        )
+                return result
+            except Exception:
+                if attempt == 0:
+                    sleep(0.25)
+        if progress_key:
+            with _zone_scan_lock:
+                processed, failed = _zone_scan_progress.get(progress_key, (0, 0))
+                _zone_scan_progress[progress_key] = (processed, failed + 1)
+        return None
 
     with ThreadPoolExecutor(
         max_workers=min(
@@ -463,6 +490,91 @@ def get_research_zones(
         total_zones=len(results),
         timeframe=_TIMEFRAME_LABELS[timeframe],
         results=tuple(results),
+        universe=universe,
+        status="completed",
+        total_symbols=len(universe_symbols),
+        processed_symbols=scanned,
+        failed_symbols=len(universe_symbols) - scanned,
+        last_completed_at=datetime.now(UTC).isoformat(),
+        data_status="delayed",
+    )
+
+
+def _zone_scan_key(
+    timeframe: str,
+    universe: str,
+    symbols: list[str] | None,
+) -> str:
+    return f"{timeframe}:{universe}:{','.join(sorted(symbols or []))}:v1"
+
+
+def _store_zone_scan(key: str, future: Future[ZoneResearchResponse]) -> None:
+    with _zone_scan_lock:
+        _zone_scan_jobs.pop(key, None)
+        _zone_scan_progress.pop(key, None)
+        try:
+            _zone_scan_cache[key] = (monotonic(), future.result())
+        except Exception:
+            return
+
+
+@scanner_router.get("/zones", response_model=ZoneResearchResponse)
+def get_research_zones(
+    timeframe: ZoneTimeframe = Query(default="DAILY"),
+    universe: UniverseName = Query(default="nse500"),
+    symbols: list[str] | None = Query(default=None),
+) -> ZoneResearchResponse:
+    """Return cached results immediately and refresh larger scans in background."""
+
+    universe_symbols = _universe_service.get_symbols(universe, symbols)
+    if len(universe_symbols) <= 50:
+        return _scan_research_zones(timeframe, universe, symbols)
+
+    key = _zone_scan_key(timeframe, universe, symbols)
+    with _zone_scan_lock:
+        cached_entry = _zone_scan_cache.get(key)
+        job = _zone_scan_jobs.get(key)
+        stale = (
+            not cached_entry
+            or monotonic() - cached_entry[0] >= _zone_scan_ttl_seconds
+        )
+        if stale and job is None:
+            _zone_scan_progress[key] = (0, 0)
+            job = _zone_scan_executor.submit(
+                _scan_research_zones,
+                timeframe,
+                universe,
+                symbols,
+                key,
+            )
+            _zone_scan_jobs[key] = job
+            job.add_done_callback(
+                lambda completed, cache_key=key: _store_zone_scan(
+                    cache_key,
+                    completed,
+                )
+            )
+        if cached_entry:
+            cached = cached_entry[1]
+            return cached.model_copy(
+                update={
+                    "status": "refreshing" if stale else "completed",
+                    "data_status": "cached" if stale else cached.data_status,
+                }
+            )
+        processed, failed = _zone_scan_progress.get(key, (0, 0))
+    return ZoneResearchResponse(
+        total_scanned=0,
+        total_zones=0,
+        timeframe=_TIMEFRAME_LABELS[timeframe],
+        results=(),
+        universe=universe,
+        status="refreshing",
+        total_symbols=len(universe_symbols),
+        processed_symbols=processed,
+        failed_symbols=failed,
+        last_completed_at=None,
+        data_status="refreshing",
     )
 
 

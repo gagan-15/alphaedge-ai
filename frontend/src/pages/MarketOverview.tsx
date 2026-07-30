@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import CachedOutlinedIcon from "@mui/icons-material/CachedOutlined";
 import DashboardCustomizeOutlinedIcon from "@mui/icons-material/DashboardCustomizeOutlined";
@@ -27,6 +27,7 @@ import {
     SmartAlertsWidget,
     TradingBiasWidget,
     VerdictWidget,
+    type ExecutiveSummaryData,
 } from "../components/market-overview/MarketOverviewWidgets";
 import MarketOverviewCustomizeDrawer from "../components/market-overview/MarketOverviewCustomizeDrawer";
 import OverviewPanel from "../components/market-overview/OverviewPanel";
@@ -36,6 +37,7 @@ import {
 } from "../components/market-overview/marketOverviewPreferences";
 import { useAuth } from "../auth/AuthState";
 import { useMarketIntelligence } from "../market-intelligence/MarketIntelligenceState";
+import { useMarketUniverse } from "../market-universe/MarketUniverseState";
 
 export default function MarketOverview() {
     const { user } = useAuth();
@@ -45,24 +47,50 @@ export default function MarketOverview() {
     const [customizeOpen, setCustomizeOpen] = useState(false);
     const [customizeSession, setCustomizeSession] = useState(0);
     const [market, setMarket] = useState("NSE");
+    const { marketUniverse, setMarketUniverse } = useMarketUniverse();
     const {
         snapshot,
         timeframe,
-        universe,
         lastUpdated,
         setTimeframe,
-        setUniverse,
         refresh,
     } = useMarketIntelligence();
     const visible = previewPreferences.visibleWidgets;
     const professional = previewPreferences.language === "professional";
+    const executiveSummary = useMemo<ExecutiveSummaryData>(() => ({
+        updatedAt: lastUpdated?.toLocaleTimeString("en-IN") ?? "Refreshing",
+        marketStatus: snapshot.marketStatus,
+        confidence: snapshot.aiConfidence,
+        participation: snapshot.participation,
+        leaders: snapshot.sectorLeadership,
+        laggards: [],
+        volatility: snapshot.volatility,
+        focus: [snapshot.todayStrategy],
+        avoid: snapshot.riskLevel === "High Risk"
+            ? "Taking large positions while price movement is high"
+            : "Buying stocks after unusually large price jumps",
+        metrics: [
+            { label: "Today's Market", value: snapshot.marketHealth, help: "Overall market health from real benchmark and breadth data.", tone: snapshot.marketDirection === "Bullish" ? "positive" : "caution" },
+            { label: "Most Stocks", value: `${snapshot.participation}% rising`, help: "The share of processed stocks that are advancing.", tone: snapshot.participation >= 50 ? "positive" : "caution" },
+            { label: "Market Strength", value: snapshot.marketDirection, help: "Direction across the main market benchmarks.", tone: snapshot.marketDirection === "Bullish" ? "positive" : "caution" },
+            { label: "Strongest Sectors", value: snapshot.sectorLeadership.join(" + ") || "Refreshing", help: "Leadership inferred from available benchmark data.", tone: "neutral" },
+            { label: "Price Movement", value: snapshot.volatility, help: "Current volatility based on India VIX.", tone: snapshot.volatility === "High" ? "caution" : "neutral" },
+            { label: "Big Investors", value: "Data unavailable", help: "An approved institutional-flow source is not connected yet.", tone: "neutral" },
+            { label: "Current Trend", value: snapshot.marketRegime, help: "The current market direction.", tone: snapshot.marketDirection === "Bullish" ? "positive" : "caution" },
+        ],
+        reasons: [
+            `${snapshot.participation}% of processed stocks are rising.`,
+            `The market direction is ${snapshot.marketDirection.toLowerCase()}.`,
+            `Current market risk is ${snapshot.riskLevel.toLowerCase()}.`,
+        ],
+    }), [lastUpdated, snapshot]);
 
     function saveCustomization(next: typeof savedPreferences) {
         saveMarketOverviewPreferences(userKey, next);
         setSavedPreferences(next);
         setPreviewPreferences(next);
         setTimeframe(next.defaultTimeframe);
-        setUniverse(next.marketUniverse);
+        setMarketUniverse(next.marketUniverse);
         setCustomizeOpen(false);
     }
 
@@ -114,7 +142,12 @@ export default function MarketOverview() {
                         >
                             Refresh
                         </Button>
-                        <Button variant="outlined" startIcon={<DashboardCustomizeOutlinedIcon />} onClick={() => { setPreviewPreferences(savedPreferences); setCustomizeSession((value) => value + 1); setCustomizeOpen(true); }}>
+                        <Button
+                            variant="contained"
+                            startIcon={<DashboardCustomizeOutlinedIcon />}
+                            onClick={() => { setPreviewPreferences(savedPreferences); setCustomizeSession((value) => value + 1); setCustomizeOpen(true); }}
+                            sx={{ color: "#fff", "&:hover": { color: "#fff" } }}
+                        >
                             Customize
                         </Button>
                     </Stack>
@@ -128,11 +161,11 @@ export default function MarketOverview() {
                     minHeight={190}
                     action={<Chip size="small" label="TRANSPARENT DEMO LOGIC" variant="outlined" />}
                 >
-                    <AIMarketSummaryWidget timeframe={timeframe} universe={universe} language={previewPreferences.language} showTooltips={previewPreferences.chart.showTooltips} />
+                    <AIMarketSummaryWidget data={executiveSummary} timeframe={timeframe} universe={marketUniverse} language={previewPreferences.language} showTooltips={previewPreferences.chart.showTooltips} />
                 </OverviewPanel>}
 
                 {(visible.marketHealth || visible.marketTrend || visible.researchFocus || visible.marketRisk) && <Grid container spacing={2.5}>
-                    {visible.marketHealth && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle={professional ? "Composite trend, breadth, momentum, volatility and risk reading." : "Are most stocks supporting today's market move?"} accent="#32d583" minHeight={310}><MarketHealthWidget timeframe={timeframe} universe={universe} score={snapshot.aiConfidence} health={snapshot.marketHealth} showTooltips={previewPreferences.chart.showTooltips} /></OverviewPanel></Grid>}
+                    {visible.marketHealth && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Health" subtitle={professional ? "Composite trend, breadth, momentum, volatility and risk reading." : "Are most stocks supporting today's market move?"} accent="#32d583" minHeight={310}><MarketHealthWidget timeframe={timeframe} universe={marketUniverse} score={snapshot.aiConfidence} health={snapshot.marketHealth} showTooltips={previewPreferences.chart.showTooltips} /></OverviewPanel></Grid>}
                     {visible.marketTrend && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title={professional ? "Market Regime" : "Market Direction"} subtitle={professional ? "Identifies whether conditions are trending, ranging or changing." : "Is the market rising, falling or moving sideways?"} accent="#6172f3" minHeight={310}><MarketRegimeWidget timeframe={timeframe} language={previewPreferences.language} regime={snapshot.marketRegime} confidence={snapshot.aiConfidence} /></OverviewPanel></Grid>}
                     {visible.researchFocus && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Today's Research Focus" subtitle="Should you mainly look for buying or selling opportunities?" accent="#22d3ee" minHeight={310}><TradingBiasWidget strategy={snapshot.todayStrategy} direction={snapshot.marketDirection} /></OverviewPanel></Grid>}
                     {visible.marketRisk && <Grid size={{ xs: 12, md: 6, lg: 3 }}><OverviewPanel title="Market Risk" subtitle="How careful should you be today?" accent="#fdb022" minHeight={310}><RiskMeterWidget riskLevel={snapshot.riskLevel} volatility={snapshot.volatility} /></OverviewPanel></Grid>}
@@ -190,7 +223,7 @@ export default function MarketOverview() {
                     minHeight={220}
                     action={<Chip size="small" color="warning" variant="outlined" label="DEMO VERDICT" />}
                 >
-                    <VerdictWidget timeframe={timeframe} universe={previewPreferences.marketUniverse} language={previewPreferences.language} />
+                    <VerdictWidget timeframe={timeframe} universe={marketUniverse} language={previewPreferences.language} />
                 </OverviewPanel>}
             </Stack>
             <MarketOverviewCustomizeDrawer
@@ -201,7 +234,7 @@ export default function MarketOverview() {
                 onPreview={(next) => {
                     setPreviewPreferences(next);
                     setTimeframe(next.defaultTimeframe);
-                    setUniverse(next.marketUniverse);
+                    setMarketUniverse(next.marketUniverse);
                 }}
                 onSave={saveCustomization}
             />

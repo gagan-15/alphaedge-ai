@@ -91,7 +91,7 @@ interface ExecutiveMetric {
     tone: "positive" | "neutral" | "caution";
 }
 
-interface ExecutiveSummaryData {
+export interface ExecutiveSummaryData {
     updatedAt: string;
     marketStatus: string;
     confidence: number;
@@ -165,7 +165,7 @@ export function AIMarketSummaryWidget({
     data = demoExecutiveSummary,
     loading = false,
     timeframe = "1M",
-    universe = "nifty500",
+    universe = "nse500",
     language = "simple",
     showTooltips = true,
 }: {
@@ -178,7 +178,7 @@ export function AIMarketSummaryWidget({
 }) {
     const [whyOpen, setWhyOpen] = useState(false);
     const timeframeScore: Record<string, number> = { "1D": -3, "1W": -1, "1M": 0, "3M": 1, "6M": 2, "1Y": 3 };
-    const universeScore: Record<string, number> = { nseAll: 1, nifty500: 0, nifty200: -1, nifty100: -2, fo: 1, watchlist: -3, holdings: -4 };
+    const universeScore: Record<string, number> = { allnse: 1, nse500: 0, nifty200: -1, nifty100: -2, nifty50: -3, fno: 1, watchlist: -3, custom: -4 };
     const marketScore = Math.max(0, Math.min(100, (data?.confidence ?? 0) + (timeframeScore[timeframe] ?? 0) + (universeScore[universe] ?? 0)));
     const animatedScore = useCountUp(marketScore);
     if (loading) return <WidgetLoading rows={5} />;
@@ -361,8 +361,8 @@ const axisLabels = {
     "1Y": ["Aug", "Oct", "Dec", "Feb", "Apr", "Jun", "Jul"],
 } as const;
 
-function buildParticipationData(range: keyof typeof participationNets, universe = "nifty500"): ParticipationPoint[] {
-    const universeAdjustment: Record<string, number> = { nseAll: 6, nifty500: 0, nifty200: -3, nifty100: -5, fo: 4, watchlist: -8, holdings: -10 };
+function buildParticipationData(range: keyof typeof participationNets, universe = "nse500"): ParticipationPoint[] {
+    const universeAdjustment: Record<string, number> = { allnse: 6, nse500: 0, nifty200: -3, nifty100: -5, nifty50: -6, fno: 4, watchlist: -8, custom: -10 };
     return participationNets[range].map((sourceNet, index, values) => {
         const net = sourceNet + (universeAdjustment[universe] ?? 0);
         return {
@@ -384,7 +384,7 @@ export function ParticipationChartWidget({
     loading = false,
     available = true,
     defaultRange = "1M",
-    universe = "nifty500",
+    universe = "nse500",
     initialNifty = true,
     initialBankNifty = true,
     showEvents = true,
@@ -583,11 +583,11 @@ export function SmartAlertsWidget() {
     return <Stack spacing={1}>{alerts.map(([message, severity, time, color]) => <Stack key={message} direction="row" spacing={1.1} sx={{ alignItems: "center", p: 1.1, borderRadius: 2, bgcolor: "action.hover", border: "1px solid", borderColor: "divider" }}><Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: color, boxShadow: `0 0 10px ${color}` }} /><Box sx={{ flex: 1 }}><Typography sx={{ fontSize: ".72rem", fontWeight: 800 }}>{message}</Typography><Typography color="text.secondary" sx={{ fontSize: ".57rem" }}>{severity} severity</Typography></Box><Typography color="text.secondary" sx={{ fontSize: ".6rem" }}>{time}</Typography></Stack>)}</Stack>;
 }
 
-export function VerdictWidget({ timeframe = "1M", universe = "nifty500", language = "simple" }: { timeframe?: string; universe?: string; language?: "simple" | "professional" }) {
+export function VerdictWidget({ timeframe = "1M", universe = "nse500", language = "simple" }: { timeframe?: string; universe?: string; language?: "simple" | "professional" }) {
     const professional = language === "professional";
     const items = professional
         ? [["Market Trend", "Bullish", colors.green], ["Breadth", "Healthy", colors.green], ["Momentum", "Positive", colors.cyan], ["Risk", "Moderate", colors.amber], ["Preferred Setup", "Buy pullbacks", colors.blue], ["Avoid", "Weak-sector breakouts", colors.red]]
         : [["Market Direction", "Going up", colors.green], ["Stocks Joining", "Healthy", colors.green], ["Recent Price Strength", "Positive", colors.cyan], ["Risk", "Medium", colors.amber], ["What to Research", timeframe === "1D" ? "Strong stocks after a small fall today" : "Strong stocks after a small fall", colors.blue], ["Avoid", "Buying breakouts in weak sectors", colors.red]];
-    const score = 89 + (timeframe === "1Y" ? 2 : timeframe === "1D" ? -2 : 0) + (universe === "holdings" ? -2 : 0);
+    const score = 89 + (timeframe === "1Y" ? 2 : timeframe === "1D" ? -2 : 0) + (universe === "watchlist" ? -2 : 0);
     return <Grid container spacing={2.5} sx={{ alignItems: "center" }}><Grid size={{ xs: 12, lg: 9 }}><Grid container spacing={1.1}>{items.map(([label, value, color]) => <Grid key={label} size={{ xs: 12, sm: 6, md: 4 }}><Box sx={{ p: 1.2, borderRadius: 2, bgcolor: `${color}09`, border: `1px solid ${color}25` }}><Typography color="text.secondary" sx={{ fontSize: ".58rem", textTransform: "uppercase" }}>{label}</Typography><Typography sx={{ mt: .3, color, fontWeight: 850 }}>{value}</Typography></Box></Grid>)}</Grid></Grid><Grid size={{ xs: 12, lg: 3 }}><CircularGauge value={score} label="Overall confidence" color={colors.violet} /></Grid></Grid>;
 }

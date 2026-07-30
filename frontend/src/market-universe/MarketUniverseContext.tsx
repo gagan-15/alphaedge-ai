@@ -4,13 +4,21 @@ import {
     type ReactNode,
 } from "react";
 import {
+    DEFAULT_MARKET_UNIVERSE,
+    MARKET_UNIVERSE_STORAGE_KEY,
     MarketUniverseContext,
+    normalizeMarketUniverse,
     type MarketUniverse,
 } from "./MarketUniverseState";
 
 export function MarketUniverseProvider({ children }: { children: ReactNode }) {
-    const [marketUniverse, setMarketUniverse] = useState<MarketUniverse>("nse500");
+    const [marketUniverse, setMarketUniverseState] = useState<MarketUniverse>(() =>
+        normalizeMarketUniverse(localStorage.getItem(MARKET_UNIVERSE_STORAGE_KEY) ?? DEFAULT_MARKET_UNIVERSE));
     const [customSymbols, setCustomSymbols] = useState<string[]>([]);
+    const setMarketUniverse = (next: MarketUniverse) => {
+        localStorage.setItem(MARKET_UNIVERSE_STORAGE_KEY, next);
+        setMarketUniverseState(next);
+    };
     const value = useMemo(
         () => ({
             marketUniverse,

@@ -14,10 +14,12 @@ import Typography from "@mui/material/Typography";
 
 import { getScanner } from "../api/scannerApi";
 import type { ScannerResult } from "../types/scanner";
+import { useMarketUniverse } from "../market-universe/MarketUniverseState";
 
 type SignalFilter = "all" | "approved" | "review";
 
 function Signals() {
+    const { marketUniverse, customSymbols } = useMarketUniverse();
     const [results, setResults] = useState<ScannerResult[]>([]);
     const [filter, setFilter] = useState<SignalFilter>("all");
     const [loading, setLoading] = useState(true);
@@ -26,18 +28,24 @@ function Signals() {
     function loadSignals() {
         setLoading(true);
         setError("");
-        void getScanner()
+        const symbols = marketUniverse === "watchlist"
+            ? JSON.parse(localStorage.getItem("alphaedge.local.watchlist") ?? "[]")
+            : marketUniverse === "custom" ? customSymbols : [];
+        void getScanner(marketUniverse, symbols)
             .then((response) => setResults(response.results))
             .catch(() => setError("Signals could not be loaded. Check that the backend is running."))
             .finally(() => setLoading(false));
     }
 
     useEffect(() => {
-        void getScanner()
+        const symbols = marketUniverse === "watchlist"
+            ? JSON.parse(localStorage.getItem("alphaedge.local.watchlist") ?? "[]")
+            : marketUniverse === "custom" ? customSymbols : [];
+        void getScanner(marketUniverse, symbols)
             .then((response) => setResults(response.results))
             .catch(() => setError("Signals could not be loaded. Check that the backend is running."))
             .finally(() => setLoading(false));
-    }, []);
+    }, [customSymbols, marketUniverse]);
 
     const visible = results.filter((result) =>
         filter === "all"

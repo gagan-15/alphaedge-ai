@@ -13,6 +13,23 @@ export const marketUniverseOptions = [
 
 export type MarketUniverse = typeof marketUniverseOptions[number]["value"];
 
+export const DEFAULT_MARKET_UNIVERSE: MarketUniverse = "nse500";
+export const MARKET_UNIVERSE_STORAGE_KEY = "alphaedge.market.universe";
+
+const legacyUniverseMap: Record<string, MarketUniverse> = {
+    nifty500: "nse500",
+    nseAll: "allnse",
+    fo: "fno",
+    holdings: "watchlist",
+};
+
+export function normalizeMarketUniverse(value: string | null | undefined): MarketUniverse {
+    const normalized = value ? (legacyUniverseMap[value] ?? value) : DEFAULT_MARKET_UNIVERSE;
+    return marketUniverseOptions.some((option) => option.value === normalized)
+        ? normalized as MarketUniverse
+        : DEFAULT_MARKET_UNIVERSE;
+}
+
 export interface MarketUniverseContextValue {
     marketUniverse: MarketUniverse;
     setMarketUniverse: (universe: MarketUniverse) => void;
@@ -32,4 +49,3 @@ export function useMarketUniverse() {
     }
     return context;
 }
-
