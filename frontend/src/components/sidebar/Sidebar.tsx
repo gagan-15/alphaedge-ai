@@ -4,7 +4,6 @@ import CandlestickChartOutlinedIcon from "@mui/icons-material/CandlestickChartOu
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
 import QueryStatsOutlinedIcon from "@mui/icons-material/QueryStatsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import ShowChartOutlinedIcon from "@mui/icons-material/ShowChartOutlined";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
@@ -31,12 +30,6 @@ const menuItems = [
         text: "Dashboard",
         icon: <DashboardOutlinedIcon />,
         path: "/dashboard",
-    },
-    {
-        section: "MARKET",
-        text: "Scanner",
-        icon: <ShowChartOutlinedIcon />,
-        path: "/scanner",
     },
     {
         section: "MARKET",

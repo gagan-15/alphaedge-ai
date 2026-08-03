@@ -26,11 +26,11 @@ from backend.services.indicator.indicator_service import IndicatorService
 from backend.config.settings import (
     APP_NAME,
     VERSION,
-    DEFAULT_SYMBOL,
     DEFAULT_PERIOD,
     DEFAULT_INTERVAL,
 )
 from backend.core.logger import logger
+from backend.services.scanner.universe_service import UniverseService
 
 
 def main():
@@ -48,10 +48,10 @@ def main():
 
         market_service = MarketDataService()
 
-        # Request one year of daily historical data
-        # for Tata Consultancy Services (TCS).
+        # Use the first symbol supplied by the default market universe.
+        default_symbol = UniverseService().get_symbols("nse500")[0]
         stock_data = market_service.get_stock_data(
-            symbol=DEFAULT_SYMBOL,
+            symbol=default_symbol,
             period=DEFAULT_PERIOD,
             interval=DEFAULT_INTERVAL,
         )

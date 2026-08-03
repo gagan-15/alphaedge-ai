@@ -27,14 +27,13 @@ interface WatchlistQuote {
 }
 
 const storageKey = "alphaedge.local.watchlist";
-const defaultSymbols = ["RELIANCE", "TCS", "HDFCBANK", "INFY"];
 
 function loadSymbols() {
     try {
         const stored = JSON.parse(localStorage.getItem(storageKey) ?? "[]");
-        return Array.isArray(stored) && stored.length > 0 ? stored as string[] : defaultSymbols;
+        return Array.isArray(stored) ? stored as string[] : [];
     } catch {
-        return defaultSymbols;
+        return [];
     }
 }
 

@@ -17,6 +17,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
+import LinearProgress from "@mui/material/LinearProgress";
 import Select from "@mui/material/Select";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
@@ -30,24 +31,18 @@ import ScannerToolbar, { type ScannerQuickPreset } from "../components/scanner/S
 import type { ZoneResearchResponse } from "../types/scanner";
 import { useMarketUniverse } from "../market-universe/MarketUniverseState";
 
-const timeframes = [
-    { value: "DAILY", label: "Daily" },
-    { value: "WEEKLY", label: "Weekly" },
-    { value: "MONTHLY", label: "Monthly" },
-    { value: "QUARTERLY", label: "Quarterly" },
-    { value: "HALFYEARLY", label: "Half-yearly" },
-    { value: "YEARLY", label: "Yearly" },
-] as const;
+const scannerResultCache = new Map<string, ZoneResearchResponse>();
 
+const timeframes = [
+    { value: "DAILY", label: "Daily" }, { value: "WEEKLY", label: "Weekly" },
+    { value: "MONTHLY", label: "Monthly" }, { value: "QUARTERLY", label: "Quarterly" },
+    { value: "HALFYEARLY", label: "Half-yearly" }, { value: "YEARLY", label: "Yearly" },
+] as const;
 const intradayTimeframes = [
-    { value: "MINUTE_5", label: "5m" },
-    { value: "MINUTE_15", label: "15m" },
-    { value: "MINUTE_75", label: "75m" },
-    { value: "MINUTE_125", label: "125m" },
-    { value: "HOUR_1", label: "1H" },
-    { value: "HOUR_2", label: "2H" },
-    { value: "HOUR_4", label: "4H" },
-    { value: "HOUR_6", label: "6H" },
+    { value: "MINUTE_5", label: "5m" }, { value: "MINUTE_15", label: "15m" },
+    { value: "MINUTE_75", label: "75m" }, { value: "MINUTE_125", label: "125m" },
+    { value: "HOUR_1", label: "1H" }, { value: "HOUR_2", label: "2H" },
+    { value: "HOUR_4", label: "4H" }, { value: "HOUR_6", label: "6H" },
 ] as const;
 
 function scannerPreference<T>(key: "defaultTimeframe" | "minimumQuality", fallback: T): T {
@@ -68,6 +63,9 @@ function Scanner() {
         timeframe?: string;
         symbol?: string;
         selectedZone?: "demand" | "supply";
+        proximalPrice?: number;
+        distalPrice?: number;
+        baseIndex?: number;
     } | null;
     const [scanner, setScanner] =
         useState<ZoneResearchResponse | null>(null);
@@ -83,7 +81,7 @@ function Scanner() {
             ? "approved"
             : initialFilters?.zoneType === "SUPPLY" || initialFilters?.selectedZone === "supply"
                 ? "rejected"
-                : "all",
+                : "approved",
     );
     const [timeframe, setTimeframe] = useState(
         () => initialFilters?.timeframe ?? scannerPreference("defaultTimeframe", "DAILY"),
@@ -92,6 +90,19 @@ function Scanner() {
     const [patternFilter, setPatternFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
     const [proximityFilter, setProximityFilter] = useState(100);
+    const [effectiveFilters, setEffectiveFilters] = useState(() => ({
+        searchQuery: "",
+        minimumScore: scannerPreference("minimumQuality", 40),
+        approvalFilter: initialFilters?.zoneType === "DEMAND" || initialFilters?.selectedZone === "demand"
+            ? "approved"
+            : initialFilters?.zoneType === "SUPPLY" || initialFilters?.selectedZone === "supply"
+                ? "rejected"
+                : "approved",
+        patternFilter: "all",
+        statusFilter: "all",
+        proximityFilter: 100,
+        market: "NSE",
+    }));
     const [insightVisible, setInsightVisible] = useState(true);
     const requestVersion = useRef(0);
 
@@ -103,6 +114,17 @@ function Scanner() {
         const suppliedSymbols = marketUniverse === "custom"
             ? customSymbols
             : watchlist;
+        const cacheKey = `${selectedTimeframe}:${marketUniverse}:${suppliedSymbols.join(",")}`;
+        const cached = scannerResultCache.get(cacheKey);
+        let receivedScannerResponse = Boolean(cached);
+        if (cached) {
+            queueMicrotask(() => {
+                if (version !== requestVersion.current) return;
+                setScanner(cached);
+                setIsLoading(false);
+                setErrorMessage(null);
+            });
+        }
         const poll = () => void getResearchZones(
             selectedTimeframe,
             marketUniverse,
@@ -110,8 +132,15 @@ function Scanner() {
         )
             .then((data) => {
                 if (version !== requestVersion.current) return;
+                receivedScannerResponse = true;
+                const hasCompletedSnapshot = Boolean(data.last_completed_at)
+                    || data.status === "completed";
+                if (hasCompletedSnapshot) {
+                    scannerResultCache.set(cacheKey, data);
+                }
                 setScanner(data);
-                setIsLoading(data.status !== "completed");
+                setIsLoading(!hasCompletedSnapshot);
+                setErrorMessage(null);
                 if (data.status === "refreshing" || data.status === "queued") {
                     window.setTimeout(poll, 5000);
                 }
@@ -123,9 +152,11 @@ function Scanner() {
                     error,
                 );
 
-                setErrorMessage(
-                    "Scanner data could not be loaded. Check that the backend is running.",
-                );
+                if (!receivedScannerResponse) {
+                    setErrorMessage(
+                        "Scanner data could not be loaded. Check that the backend is running.",
+                    );
+                }
             })
             .finally(() => undefined);
         poll();
@@ -176,7 +207,7 @@ function Scanner() {
         } else {
             setSearchQuery("");
             setMinimumScore(scannerPreference("minimumQuality", 40));
-            setApprovalFilter("all");
+            setApprovalFilter("approved");
             setMarket("NSE");
             setPatternFilter("all");
             setStatusFilter("all");
@@ -197,22 +228,43 @@ function Scanner() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [customSymbols, market, marketUniverse, timeframe]);
 
+    useEffect(() => {
+        const handleSearch = (event: Event) => setSearchQuery(String((event as CustomEvent).detail ?? ""));
+        window.addEventListener("alphaedge:global-search", handleSearch);
+        return () => window.removeEventListener("alphaedge:global-search", handleSearch);
+    }, []);
+
+    useEffect(() => {
+        const timeout = window.setTimeout(() => {
+            setEffectiveFilters({ searchQuery, minimumScore, approvalFilter, patternFilter, statusFilter, proximityFilter, market });
+        }, 350);
+        return () => window.clearTimeout(timeout);
+    }, [approvalFilter, market, minimumScore, patternFilter, proximityFilter, searchQuery, statusFilter]);
+
+    const filtersSettling = effectiveFilters.searchQuery !== searchQuery
+        || effectiveFilters.minimumScore !== minimumScore
+        || effectiveFilters.approvalFilter !== approvalFilter
+        || effectiveFilters.patternFilter !== patternFilter
+        || effectiveFilters.statusFilter !== statusFilter
+        || effectiveFilters.proximityFilter !== proximityFilter
+        || effectiveFilters.market !== market;
+
     const visibleResults = (
-        market === "NSE" ? scanner?.results ?? [] : []
+        effectiveFilters.market === "NSE" ? scanner?.results ?? [] : []
     ).filter((result) => {
         const matchesSymbol = result.symbol
             .toLowerCase()
-            .includes(searchQuery.toLowerCase());
-        const matchesScore = result.zone_score >= minimumScore;
+            .includes(effectiveFilters.searchQuery.toLowerCase());
+        const matchesScore = result.zone_score >= effectiveFilters.minimumScore;
         const matchesApproval =
-            approvalFilter === "all"
-            || (approvalFilter === "approved" && result.zone_type === "DEMAND")
-            || (approvalFilter === "rejected" && result.zone_type === "SUPPLY");
-        const matchesPattern = patternFilter === "all"
-            || result.pattern_type === patternFilter;
-        const matchesStatus = statusFilter === "all"
-            || result.status === statusFilter;
-        const matchesProximity = result.distance_percent <= proximityFilter;
+            effectiveFilters.approvalFilter === "all"
+            || (effectiveFilters.approvalFilter === "approved" && result.zone_type === "DEMAND")
+            || (effectiveFilters.approvalFilter === "rejected" && result.zone_type === "SUPPLY");
+        const matchesPattern = effectiveFilters.patternFilter === "all"
+            || result.pattern_type === effectiveFilters.patternFilter;
+        const matchesStatus = effectiveFilters.statusFilter === "all"
+            || result.status === effectiveFilters.statusFilter;
+        const matchesProximity = result.distance_percent <= effectiveFilters.proximityFilter;
         return matchesSymbol
             && matchesScore
             && matchesApproval
@@ -258,7 +310,7 @@ function Scanner() {
     }
 
     return (
-        <Stack spacing={1.5}>
+        <Stack spacing={0} sx={{ bgcolor: "#ffffff" }}>
             <ScannerToolbar
                 isLoading={isLoading}
                 searchQuery={searchQuery}
@@ -283,6 +335,9 @@ function Scanner() {
                 onProximityFilterChange={setProximityFilter}
                 onQuickPreset={applyQuickPreset}
             />
+            <Box sx={{ height: 2 }}>
+                {(filtersSettling || isLoading) && <LinearProgress sx={{ height: 2, borderRadius: 1 }} />}
+            </Box>
 
             {market === "BSE" && (
                 <Alert severity="info">
@@ -294,6 +349,7 @@ function Scanner() {
                 direction="row"
                 spacing={1}
                 sx={{
+                    display: "none",
                     px: 1,
                     alignItems: "center",
                     border: "1px solid",
@@ -346,15 +402,20 @@ function Scanner() {
                     icon={<AutoAwesomeRoundedIcon fontSize="small" />}
                     severity="info"
                     sx={{
+                        display: "none",
                         py: 0.25,
+                        px: 0.5,
+                        bgcolor: "transparent",
+                        border: 0,
                         alignItems: "center",
                         "& .MuiAlert-message": { width: "100%", py: 0.45 },
+                        "& .MuiAlert-action": { display: "none" },
                     }}
                     action={(
                         <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
                             <Button
                                 size="small"
-                                onClick={() => navigate("/scanner", {
+                                onClick={() => navigate(`/stock-details/${encodeURIComponent(visibleResults[0].symbol)}`, {
                                     state: {
                                         symbol: visibleResults[0].symbol,
                                         timeframe,
@@ -396,19 +457,29 @@ function Scanner() {
                 </Stack>
             )}
 
-            <ScannerResultsTable
-                key={initialFilters?.symbol && initialFilters.selectedZone
-                    ? `${initialFilters.symbol}:${initialFilters.timeframe ?? timeframe}:${initialFilters.selectedZone}:${visibleResults.length}`
+            <Box sx={{ mt: 2.5 }}>
+                <ScannerResultsTable
+                    key={initialFilters?.symbol && initialFilters.selectedZone
+                    ? `${initialFilters.symbol}:${initialFilters.timeframe ?? timeframe}:${initialFilters.selectedZone}:${scanner?.results.length ?? 0}`
                     : "scanner-results"}
-                results={visibleResults}
-                initialSelection={initialFilters?.symbol && initialFilters.selectedZone
+                    results={location.pathname.startsWith("/stock-details/")
+                    ? scanner?.results ?? []
+                    : visibleResults}
+                    initialSelection={initialFilters?.symbol && initialFilters.selectedZone
                     ? {
                         symbol: initialFilters.symbol,
                         timeframe: initialFilters.timeframe ?? timeframe,
                         selectedZone: initialFilters.selectedZone,
+                        proximalPrice: initialFilters.proximalPrice,
+                        distalPrice: initialFilters.distalPrice,
+                        baseIndex: initialFilters.baseIndex,
                     }
                     : undefined}
-            />
+                    onDetailsClose={location.pathname.startsWith("/stock-details/")
+                    ? () => navigate("/dashboard")
+                    : undefined}
+                />
+            </Box>
         </Stack>
     );
 }

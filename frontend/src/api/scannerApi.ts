@@ -112,7 +112,7 @@ export async function getStockDetailsAnalysis(result: {
     proximal_price: number;
     distal_price: number;
     timeframe: string;
-}): Promise<StockDetailsBackendAnalysis> {
+}, signal?: AbortSignal): Promise<StockDetailsBackendAnalysis> {
     const response = await api.get<StockDetailsBackendAnalysis>(`/scanner/zones/${encodeURIComponent(result.symbol)}/analysis`, {
         params: {
             zone_type: result.zone_type,
@@ -120,6 +120,7 @@ export async function getStockDetailsAnalysis(result: {
             distal_price: result.distal_price,
             timeframe: result.timeframe,
         },
+        signal,
     });
     return response.data;
 }

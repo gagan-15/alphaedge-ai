@@ -15,7 +15,7 @@ complete high-low range.
 
 from typing import Final
 
-from pandas import DataFrame, Series
+from pandas import DataFrame
 
 from backend.config.settings import (
     MAX_BASE_BODY_PERCENT,
@@ -24,7 +24,8 @@ from backend.config.settings import (
 )
 from backend.core.logger import logger
 from backend.models.base_region import BaseRegion
-from backend.core.candle_utils import CandleUtils
+from backend.engines.demand_supply_engine.candle_classifier import CandleClassifier
+from backend.models.candle_classification import CandleStructure
 
 
 class BaseDetector:
@@ -51,6 +52,10 @@ class BaseDetector:
         "Low",
         "Close",
     )
+    CONDITIONAL_MAX_BASE_CANDLES: Final[int] = 5
+
+    def __init__(self, classifier: CandleClassifier | None = None) -> None:
+        self._classifier = classifier or CandleClassifier()
 
     def detect(
         self,
@@ -87,9 +92,7 @@ class BaseDetector:
         current_start_index: int | None = None
 
         for positional_index in range(len(market_data)):
-            candle = market_data.iloc[positional_index]
-
-            if self._is_base_candle(candle):
+            if self._is_base_candle(market_data, positional_index):
                 if current_start_index is None:
                     current_start_index = positional_index
 
@@ -126,19 +129,15 @@ class BaseDetector:
         self._validate_configuration()
         checks: list[dict[str, object]] = []
         for index in range(len(market_data)):
-            candle = market_data.iloc[index]
-            body_percent = CandleUtils.calculate_body_percentage(
-                float(candle["Open"]),
-                float(candle["High"]),
-                float(candle["Low"]),
-                float(candle["Close"]),
-            )
+            classification = self._classifier.classify(market_data, index)
+            body_percent = classification.body_ratio * 100.0
             checks.append(
                 {
                     "index": index,
                     "body_percent": body_percent,
                     "maximum_body_percent": MAX_BASE_BODY_PERCENT,
-                    "passed": body_percent <= MAX_BASE_BODY_PERCENT,
+                    "passed": classification.structure == CandleStructure.BASE,
+                    "classification": classification.structure.value,
                 }
             )
         return checks
@@ -165,7 +164,7 @@ class BaseDetector:
 
         candle_count = end_index - start_index + 1
 
-        if MIN_BASE_CANDLES <= candle_count <= MAX_BASE_CANDLES:
+        if MIN_BASE_CANDLES <= candle_count <= self.CONDITIONAL_MAX_BASE_CANDLES:
             detected_bases.append(
                 BaseRegion(
                     start_index=start_index,
@@ -192,18 +191,17 @@ class BaseDetector:
 
     def _is_base_candle(
         self,
-        candle: Series,
+        market_data: DataFrame,
+        index: int,
     ) -> bool:
         """
         Determine whether one candle qualifies
         as a base candle.
         """
 
-        return CandleUtils.is_small_body(
-            open_price=float(candle["Open"]),
-            high_price=float(candle["High"]),
-            low_price=float(candle["Low"]),
-            close_price=float(candle["Close"]),
+        return (
+            self._classifier.classify(market_data, index).structure
+            == CandleStructure.BASE
         )
 
     @classmethod

@@ -106,3 +106,62 @@ def test_service_validates_provider_data() -> None:
         service.get_stock_data(
             symbol="INFY.NS",
         )
+
+
+def test_service_returns_valid_provider_data_unchanged() -> None:
+    """Canonical validation preserves existing valid service behaviour."""
+
+    data = build_market_data()
+    provider = StubMarketDataProvider(data)
+    service = MarketDataService(provider=provider)
+
+    result = service.get_stock_data(
+        symbol="VALIDATION-REGRESSION.NS",
+    )
+
+    pd.testing.assert_frame_equal(result, data)
+
+
+@pytest.mark.parametrize(
+    ("column", "value", "message"),
+    [
+        ("High", 98.0, "High is below Low"),
+        ("Open", 104.0, "Open is outside High-Low range"),
+        ("Close", 98.0, "Close is outside High-Low range"),
+    ],
+)
+def test_service_rejects_malformed_provider_ohlc(
+    column: str,
+    value: float,
+    message: str,
+) -> None:
+    """Malformed provider candles never reach analysis consumers."""
+
+    data = build_market_data()
+    data.loc[data.index[0], column] = value
+    provider = StubMarketDataProvider(data)
+    service = MarketDataService(provider=provider)
+
+    with pytest.raises(ValueError, match=message):
+        service.get_stock_data(
+            symbol=f"MALFORMED-{column}.NS",
+        )
+
+
+def test_service_rejects_zero_range_provider_candle() -> None:
+    """A zero-range provider candle is rejected at the service boundary."""
+
+    data = build_market_data()
+    data.loc[data.index[0], ["Open", "High", "Low", "Close"]] = [
+        100.0,
+        100.0,
+        100.0,
+        100.0,
+    ]
+    provider = StubMarketDataProvider(data)
+    service = MarketDataService(provider=provider)
+
+    with pytest.raises(ValueError, match="zero-range candle"):
+        service.get_stock_data(
+            symbol="ZERO-RANGE.NS",
+        )

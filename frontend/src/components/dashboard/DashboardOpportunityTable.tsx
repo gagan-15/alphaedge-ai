@@ -32,7 +32,7 @@ interface DashboardOpportunityTableProps {
     opportunities: DashboardOpportunity[];
     limit: number;
     timeframe?: string;
-    loading?: boolean;
+    initialLoading?: boolean;
     error?: string;
 }
 
@@ -45,7 +45,7 @@ export default function DashboardOpportunityTable({
     opportunities,
     limit,
     timeframe = "DAILY",
-    loading = false,
+    initialLoading = false,
     error = "",
 }: DashboardOpportunityTableProps) {
     const navigate = useNavigate();
@@ -83,7 +83,7 @@ export default function DashboardOpportunityTable({
                     </Box>
                     <Button
                         component={RouterLink}
-                        to="/scanner"
+                        to="/dashboard"
                         state={{
                             zoneType: demand ? "DEMAND" : "SUPPLY",
                             timeframe,
@@ -118,26 +118,32 @@ export default function DashboardOpportunityTable({
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {!loading && visible.map(({ zone, tradeConfidence }, index) => (
+                            {!initialLoading && visible.map(({ zone, tradeConfidence }, index) => (
                                 <TableRow
                                     key={`${zone.symbol}-${zone.timeframe}-${zone.base_index}-${zone.proximal_price}`}
                                     hover
                                     tabIndex={0}
                                     role="link"
-                                    onClick={() => navigate("/scanner", {
+                                    onClick={() => navigate(`/stock-details/${encodeURIComponent(zone.symbol)}`, {
                                         state: {
                                             symbol: zone.symbol,
                                             timeframe,
                                             selectedZone: type,
+                                            proximalPrice: zone.proximal_price,
+                                            distalPrice: zone.distal_price,
+                                            baseIndex: zone.base_index,
                                         },
                                     })}
                                     onKeyDown={(event) => {
                                         if (event.key === "Enter" || event.key === " ") {
-                                            navigate("/scanner", {
+                                            navigate(`/stock-details/${encodeURIComponent(zone.symbol)}`, {
                                                 state: {
                                                     symbol: zone.symbol,
                                                     timeframe,
                                                     selectedZone: type,
+                                                    proximalPrice: zone.proximal_price,
+                                                    distalPrice: zone.distal_price,
+                                                    baseIndex: zone.base_index,
                                                 },
                                             });
                                         }
@@ -189,7 +195,7 @@ export default function DashboardOpportunityTable({
                                     </TableCell>
                                 </TableRow>
                             ))}
-                            {loading && skeletonRows.map((_, index) => (
+                            {initialLoading && skeletonRows.map((_, index) => (
                                 <TableRow key={`skeleton-${index}`} sx={{ height: 58, "& td": { py: 1.35 } }}>
                                     <TableCell><Skeleton width={24} /></TableCell>
                                     <TableCell><Skeleton width={72} /><Skeleton width={48} height={14} /></TableCell>
@@ -199,7 +205,24 @@ export default function DashboardOpportunityTable({
                                     <TableCell><Skeleton width={66} sx={{ ml: "auto" }} /></TableCell>
                                 </TableRow>
                             ))}
-                            {!loading && !error && visible.length < limit && (
+                            {!initialLoading && !error && visible.length === 0 && (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={6}
+                                        sx={{
+                                            height: limit * 58,
+                                            px: 3,
+                                            textAlign: "center",
+                                            verticalAlign: "middle",
+                                        }}
+                                    >
+                                        <Typography color="text.secondary">
+                                            No matching opportunities found.
+                                        </Typography>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                            {!initialLoading && !error && visible.length > 0 && visible.length < limit && (
                                 <TableRow>
                                     <TableCell
                                         colSpan={6}
@@ -216,7 +239,7 @@ export default function DashboardOpportunityTable({
                                     </TableCell>
                                 </TableRow>
                             )}
-                            {!loading && error && (
+                            {!initialLoading && error && visible.length === 0 && (
                                 <TableRow>
                                     <TableCell colSpan={6} sx={{ py: 7, textAlign: "center" }}>
                                         <Typography color="warning.main" sx={{ fontWeight: 800 }}>Zone data is unavailable right now.</Typography>

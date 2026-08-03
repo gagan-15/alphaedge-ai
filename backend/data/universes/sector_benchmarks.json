@@ -1,0 +1,10 @@
+{
+  "source": "AlphaEdge maintained sector benchmark metadata",
+  "last_updated": "2026-07-30",
+  "symbols": {
+    "INFY": ["Technology", "^CNXIT"],
+    "TCS": ["Technology", "^CNXIT"],
+    "HDFCBANK": ["Banking", "^NSEBANK"],
+    "RELIANCE": ["Energy", "^CNXENERGY"]
+  }
+}

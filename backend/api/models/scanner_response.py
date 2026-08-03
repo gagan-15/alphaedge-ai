@@ -123,6 +123,10 @@ class ZoneResearchResultResponse(APIResponseModel):
     base_index: int
     base_date: str
     status: str
+    reaction_percent: float | None = None
+    reaction_started: str | None = None
+    reaction_ended: str | None = None
+    reaction_duration_candles: int | None = None
 
 
 class ZoneResearchResponse(APIResponseModel):

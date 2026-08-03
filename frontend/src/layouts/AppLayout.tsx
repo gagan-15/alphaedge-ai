@@ -4,7 +4,6 @@ import Header from "../components/header/Header";
 import MarketTicker from "../components/shared/MarketTicker";
 import ResearchDisclaimer from "../components/shared/ResearchDisclaimer";
 import RiskConsentDialog from "../components/shared/RiskConsentDialog";
-import Sidebar from "../components/sidebar/Sidebar";
 
 interface AppLayoutProps {
     children: React.ReactNode;
@@ -20,25 +19,21 @@ function AppLayout({ children }: AppLayoutProps) {
             }}
         >
             <Header />
-            <Sidebar />
             <RiskConsentDialog />
             <MarketTicker />
 
             <Box
                 component="main"
                 sx={{
-                    width: {
-                        xs: "calc(100% - 64px)",
-                        lg: "calc(100% - 224px)",
-                    },
+                    width: "100%",
                     pt: {
-                        xs: "72px",
-                        md: "82px",
+                        xs: "156px",
+                        md: "156px",
                     },
                     px: {
-                        xs: 1.5,
+                        xs: 1.25,
                         sm: 2,
-                        xl: 2,
+                        xl: 3,
                     },
                     pb: 7,
                     minHeight: "100vh",

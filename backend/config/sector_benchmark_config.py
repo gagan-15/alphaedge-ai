@@ -1,10 +1,24 @@
-"""Maintained sector benchmark mapping for the supported scanner universe."""
+"""Maintained sector benchmark metadata loaded outside scanner logic."""
 
-SECTOR_BENCHMARKS: dict[str, tuple[str, str]] = {
-    "INFY": ("Technology", "^CNXIT"),
-    "TCS": ("Technology", "^CNXIT"),
-    "HDFCBANK": ("Banking", "^NSEBANK"),
-    "RELIANCE": ("Energy", "^CNXENERGY"),
-}
+import json
+from pathlib import Path
+
+
+def _load_sector_benchmarks() -> dict[str, tuple[str, str]]:
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "data"
+        / "universes"
+        / "sector_benchmarks.json"
+    )
+    with path.open("r", encoding="utf-8") as source:
+        payload = json.load(source)
+    return {
+        symbol: (values[0], values[1])
+        for symbol, values in payload.get("symbols", {}).items()
+    }
+
+
+SECTOR_BENCHMARKS = _load_sector_benchmarks()
 
 NIFTY_BENCHMARK = "^NSEI"

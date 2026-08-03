@@ -244,7 +244,7 @@ export function AIMarketSummaryWidget({
         <Stack direction={{ xs: "column", lg: "row" }} spacing={1.5} sx={{ p: 1.25, alignItems: { lg: "center" }, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "action.hover" }}>
             <Box sx={{ minWidth: 190 }}><Typography color="text.secondary" sx={{ fontSize: ".56rem", textTransform: "uppercase", letterSpacing: ".08em" }}>Good Opportunities To Explore Today</Typography><Typography sx={{ mt: .2, fontSize: ".7rem", fontWeight: 850 }}>Look for careful buying opportunities</Typography></Box>
             <Stack direction="row" useFlexGap spacing={.7} sx={{ flex: 1, flexWrap: "wrap" }}>{data.focus.map((item) => <Chip key={item} size="small" label={item} variant="outlined" />)}<Chip size="small" label={`Avoid: ${data.avoid}`} sx={{ color: colors.red, borderColor: `${colors.red}55` }} variant="outlined" /></Stack>
-            <Button component={RouterLink} to="/scanner" size="small" variant="contained" endIcon={<ArrowForwardRoundedIcon />}>Find Matching Stocks</Button>
+            <Button component={RouterLink} to="/dashboard" size="small" variant="contained" endIcon={<ArrowForwardRoundedIcon />}>Find Matching Stocks</Button>
         </Stack>
         <Box sx={{ p: 1.5, borderRadius: 2, border: "1px solid", borderColor: "divider", bgcolor: "action.hover" }}>
             <Typography sx={{ fontWeight: 850, fontSize: ".78rem" }}>What should I do today?</Typography>

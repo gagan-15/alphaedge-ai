@@ -15,17 +15,13 @@ import TableRow from "@mui/material/TableRow";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
-const underlyingConfig: Record<string, { spot: number; step: number }> = {
-    NIFTY: { spot: 24731, step: 50 },
-    BANKNIFTY: { spot: 54372, step: 100 },
-    RELIANCE: { spot: 2978, step: 50 },
-};
+import { optionChainDemoUnderlyings } from "../demo/optionChainDemoData";
 
 export default function OptionChain() {
     const [symbol, setSymbol] = useState("NIFTY");
     const [expiry, setExpiry] = useState("30 Jul 2026");
     const [rows, setRows] = useState(9);
-    const config = underlyingConfig[symbol];
+    const config = optionChainDemoUnderlyings[symbol];
     const chain = useMemo(() => {
         const atm = Math.round(config.spot / config.step) * config.step;
         const expiryIndex = ["30 Jul 2026", "06 Aug 2026", "27 Aug 2026"].indexOf(expiry);
@@ -54,7 +50,7 @@ export default function OptionChain() {
         <Card><CardContent>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
                 <TextField select size="small" label="Underlying" value={symbol} onChange={(e) => setSymbol(e.target.value)} sx={{ minWidth: 180 }}>
-                    {Object.keys(underlyingConfig).map((x) => <MenuItem key={x} value={x}>{x}</MenuItem>)}
+                    {Object.keys(optionChainDemoUnderlyings).map((x) => <MenuItem key={x} value={x}>{x}</MenuItem>)}
                 </TextField>
                 <TextField select size="small" label="Expiry" value={expiry} onChange={(e) => setExpiry(e.target.value)} sx={{ minWidth: 180 }}>
                     {["30 Jul 2026", "06 Aug 2026", "27 Aug 2026"].map((x) => <MenuItem key={x} value={x}>{x}</MenuItem>)}

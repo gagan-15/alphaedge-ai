@@ -21,6 +21,7 @@ const featureCards = [
     [NotificationsActiveRoundedIcon, "Research Alerts", "Track conditions and price levels without placing broker orders."],
 ] as const;
 
+// Marketing-page examples only. Production dashboards never consume this data.
 const previewRows = [
     ["RELIANCE", "Demand", "Fresh", "2,940–2,967", "89", "+0.83%"],
     ["HDFCBANK", "Demand", "Tested", "1,628–1,654", "84", "+1.12%"],

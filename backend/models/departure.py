@@ -7,7 +7,20 @@ class DepartureDirection(Enum):
     BEARISH = "BEARISH"
 
 
+class DepartureStrength(Enum):
+    WEAK = "WEAK"
+    STRONG = "STRONG"
+    VERY_STRONG = "VERY_STRONG"
+
+
 @dataclass(frozen=True)
 class Departure:
     direction: DepartureDirection
     departure_index: int
+    end_index: int | None = None
+    strength: DepartureStrength | None = None
+    leg_in_direction: DepartureDirection | None = None
+    leg_in_start_index: int | None = None
+    leg_in_end_index: int | None = None
+    significant_gap: bool = False
+    good_closing: bool = False

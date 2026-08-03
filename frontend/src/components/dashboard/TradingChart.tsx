@@ -30,22 +30,15 @@ const ranges: Record<string, number> = {
     ALL: 260,
 };
 
-const fallbackCandleData = Array.from({ length: 260 }, (_, index) => {
-    const trend = 2480 + index * 1.9;
-    const wave = Math.sin(index * 0.21) * 55 + Math.sin(index * 0.053) * 70;
-    const open = trend + wave;
-    const close = open + Math.sin(index * 1.41) * 24;
-    const date = new Date(Date.UTC(2025, 6, 1 + index));
-    return {
-        time: Math.floor(date.getTime() / 1000) as UTCTimestamp,
-        open,
-        high: Math.max(open, close) + 11 + (index % 5) * 2,
-        low: Math.min(open, close) - 10 - (index % 4) * 2,
-        close,
-    };
-});
+type ChartCandle = {
+    time: UTCTimestamp;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+};
 
-function calculateMovingAverage(data: typeof fallbackCandleData) {
+function calculateMovingAverage(data: ChartCandle[]) {
     return data.map((candle, index) => {
     const start = Math.max(0, index - 19);
     const window = data.slice(start, index + 1);
@@ -56,16 +49,21 @@ function calculateMovingAverage(data: typeof fallbackCandleData) {
     });
 }
 
-function TradingChart() {
+interface TradingChartProps {
+    symbol: string;
+    displayName?: string;
+}
+
+function TradingChart({ symbol, displayName }: TradingChartProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
     const [activeRange, setActiveRange] = useState("6M");
     const [showIndicator, setShowIndicator] = useState(true);
-    const [chartData, setChartData] = useState(fallbackCandleData);
+    const [chartData, setChartData] = useState<ChartCandle[]>([]);
     const [dataLabel, setDataLabel] = useState("Loading delayed market data...");
 
     useEffect(() => {
-        void getMarketCandles("RELIANCE")
+        void getMarketCandles(symbol)
             .then((result) => {
                 if (result.candles.length === 0) {
                     throw new Error("No candles returned.");
@@ -82,9 +80,10 @@ function TradingChart() {
                 setDataLabel(`${result.source}${result.delayed ? " · delayed" : ""}`);
             })
             .catch(() => {
-                setDataLabel("Demo candles · backend feed unavailable");
+                setChartData([]);
+                setDataLabel("Market candles unavailable · no generated data shown");
             });
-    }, []);
+    }, [symbol]);
 
     useEffect(() => {
         const container = containerRef.current;
@@ -94,32 +93,42 @@ function TradingChart() {
             width: container.clientWidth,
             height: container.clientHeight,
             layout: {
-                background: { type: ColorType.Solid, color: "#07111e" },
-                textColor: "#91a3ba",
+                background: { type: ColorType.Solid, color: "#FFFFFF" },
+                textColor: "#64748b",
+                fontFamily: '"Inter", "Segoe UI", Arial, sans-serif',
+                fontSize: 11,
                 attributionLogo: false,
             },
             grid: {
-                vertLines: { color: "#132236" },
-                horzLines: { color: "#18273a" },
+                vertLines: { color: "rgba(148,163,184,.16)" },
+                horzLines: { color: "rgba(148,163,184,.16)" },
             },
-            crosshair: { mode: CrosshairMode.Normal },
-            rightPriceScale: { borderColor: "#24344a" },
+            crosshair: {
+                mode: CrosshairMode.Normal,
+                vertLine: { color: "#94a3b8", width: 1, style: 2, labelBackgroundColor: "#475569" },
+                horzLine: { color: "#94a3b8", width: 1, style: 2, labelBackgroundColor: "#475569" },
+            },
+            rightPriceScale: { borderColor: "#e2e8f0", scaleMargins: { top: 0.08, bottom: 0.08 } },
             timeScale: {
-                borderColor: "#24344a",
+                borderColor: "#e2e8f0",
                 timeVisible: true,
-                rightOffset: 4,
+                rightOffset: 5,
+                barSpacing: 7,
+                minBarSpacing: 1,
+                lockVisibleTimeRangeOnResize: true,
             },
             handleScroll: true,
             handleScale: true,
         });
 
         const candles = chart.addSeries(CandlestickSeries, {
-            upColor: "#16d784",
-            downColor: "#ff4d5e",
-            wickUpColor: "#16d784",
-            wickDownColor: "#ff4d5e",
+            upColor: "#089981",
+            downColor: "#f23645",
+            wickUpColor: "#089981",
+            wickDownColor: "#f23645",
             borderVisible: false,
-            priceLineColor: "#35d07f",
+            priceLineColor: "#64748b",
+            priceLineWidth: 1,
         });
         candles.setData(chartData);
 
@@ -160,11 +169,15 @@ function TradingChart() {
     }
 
     return (
-        <Card sx={{ height: 430, overflow: "hidden", bgcolor: "#07111e", color: "#f3f7fb" }}>
-            <Stack direction="row" sx={{ height: 42, px: 1.5, alignItems: "center", justifyContent: "space-between", bgcolor: "#091423" }}>
+        <Card sx={{ height: 430, overflow: "hidden", bgcolor: "#ffffff", color: "#172033", boxShadow: "none" }}>
+            <Stack direction="row" sx={{ height: 42, px: 1.5, alignItems: "center", justifyContent: "space-between", bgcolor: "#ffffff" }}>
                 <Box>
-                    <Typography sx={{ fontWeight: 800, fontSize: "0.78rem" }}>RELIANCE INDUSTRIES LTD · 1D · NSE</Typography>
-                    <Typography color="success.main" sx={{ fontSize: "0.68rem" }}>O 2,966.00&nbsp; H 2,979.50&nbsp; L 2,964.00&nbsp; C 2,978.45&nbsp; +0.83%</Typography>
+                    <Typography sx={{ fontWeight: 800, fontSize: "0.78rem" }}>
+                        {displayName ?? symbol} · 1D · NSE
+                    </Typography>
+                    <Typography color="text.secondary" sx={{ fontSize: "0.68rem" }}>
+                        Historical research chart
+                    </Typography>
                 </Box>
                 <Stack direction="row" spacing={0.25}>
                     {Object.keys(ranges).map((range) => (
@@ -195,8 +208,8 @@ function TradingChart() {
                 </Stack>
                 <Box ref={containerRef} sx={{ flex: 1, minWidth: 0, height: "100%" }} />
             </Box>
-            <Stack direction="row" sx={{ height: 40, px: 1.5, alignItems: "center", bgcolor: "#091423" }}>
-                <Typography sx={{ color: "#9fb0c5" }} variant="caption">
+            <Stack direction="row" sx={{ height: 40, px: 1.5, alignItems: "center", bgcolor: "#ffffff" }}>
+                <Typography sx={{ color: "#64748b" }} variant="caption">
                     Drag to pan · wheel to zoom · {dataLabel}
                 </Typography>
                 <Link

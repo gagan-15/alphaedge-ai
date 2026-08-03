@@ -1,3 +1,9 @@
+/**
+ * Development-only visual workspace examples.
+ *
+ * This module is not routed into the authenticated application. Its fixed
+ * values exist only to support design previews.
+ */
 import { useMemo, useState } from "react";
 
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";

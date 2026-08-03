@@ -18,7 +18,11 @@ from backend.engines.demand_supply_engine.pattern_detector import (
     PatternDetector,
 )
 from backend.config.settings import MAX_BASE_CANDLES, MIN_BASE_CANDLES
-from backend.models.departure import Departure, DepartureDirection
+from backend.models.departure import (
+    Departure,
+    DepartureDirection,
+    DepartureStrength,
+)
 from backend.models.zone import (
     Zone,
     ZoneType,
@@ -82,9 +86,17 @@ class ZoneDetectionEngine:
 
                 continue
 
-            leg_in_bullish = self._is_leg_in_bullish(
-                market_data,
-                base.start_index,
+            if (
+                base.candle_count > MAX_BASE_CANDLES
+                and departure.strength != DepartureStrength.VERY_STRONG
+            ):
+                logger.info(
+                    "Skipping extended base because departure is not very strong."
+                )
+                continue
+
+            leg_in_bullish = (
+                departure.leg_in_direction == DepartureDirection.BULLISH
             )
 
             pattern = self._pattern_detector.detect(
@@ -165,7 +177,10 @@ class ZoneDetectionEngine:
                     "label": "Base candle count",
                     "passed": True,
                     "actual": base.candle_count,
-                    "required": f"{MIN_BASE_CANDLES}-{MAX_BASE_CANDLES}",
+                    "required": (
+                        f"{MIN_BASE_CANDLES}-{MAX_BASE_CANDLES}, or up to 5 "
+                        "with Very Strong departure"
+                    ),
                 },
                 *departure_rules,
             ]
@@ -180,7 +195,7 @@ class ZoneDetectionEngine:
                         else "SUPPLY"
                     )
                     attempted_pattern = self._pattern_detector.detect(
-                        self._is_leg_in_bullish(market_data, base.start_index),
+                        departure.leg_in_direction == DepartureDirection.BULLISH,
                         departure,
                     ).pattern_type.value
                 elif base.end_index + 1 < len(market_data):

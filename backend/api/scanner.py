@@ -75,7 +75,10 @@ _zone_scan_cache: dict[str, tuple[float, ZoneResearchResponse]] = {}
 _zone_scan_jobs: dict[str, Future[ZoneResearchResponse]] = {}
 _zone_scan_progress: dict[str, tuple[int, int]] = {}
 _zone_scan_lock = RLock()
-_zone_scan_ttl_seconds = 300.0
+# A complete large-universe scan is expensive. Keep the last completed result
+# available long enough that normal page navigation does not continuously start
+# another NSE 500 scan.
+_zone_scan_ttl_seconds = 1800.0
 
 ZoneTimeframe = Literal[
     "MINUTE_5",
@@ -211,6 +214,121 @@ def _has_completed_test(zone: Zone, data: DataFrame) -> bool:
         prior_candles["High"] >= zone.lower_price
     )
     return bool(overlaps.any())
+
+
+def _reaction_state(
+    zone: Zone,
+    data: DataFrame,
+    completion_percent: float,
+) -> dict[str, object]:
+    """Describe a confirmed reaction without changing zone detection.
+
+    A reaction begins only after a post-departure candle has entered the zone
+    and a later close crosses back through the proximal boundary in the
+    expected direction. It ends at the configured move beyond proximal.
+    """
+
+    departure_end = min(zone.created_index + 4, len(data))
+    later = data.iloc[departure_end:]
+    if len(later) < 2:
+        return {"active": False}
+
+    demand = zone.zone_type == ZoneType.DEMAND
+    touched = False
+    start_position: int | None = None
+    previous_close: float | None = None
+    for position, (index, candle) in enumerate(later.iterrows()):
+        low = float(candle["Low"])
+        high = float(candle["High"])
+        close = float(candle["Close"])
+        entered_on_candle = low <= zone.upper_price and high >= zone.lower_price
+        touched = touched or entered_on_candle
+        crossed = (
+            touched
+            and (
+                (
+                    demand
+                    and close > zone.upper_price
+                    and (
+                        entered_on_candle
+                        or (
+                            previous_close is not None
+                            and previous_close <= zone.upper_price
+                        )
+                    )
+                )
+                or (
+                    not demand
+                    and close < zone.lower_price
+                    and (
+                        entered_on_candle
+                        or (
+                            previous_close is not None
+                            and previous_close >= zone.lower_price
+                        )
+                    )
+                )
+            )
+        )
+        if crossed:
+            start_position = position
+            started = index
+            break
+        previous_close = close
+
+    if start_position is None:
+        return {"active": False}
+
+    proximal = zone.upper_price if demand else zone.lower_price
+    latest = float(data["Close"].iloc[-1])
+    reaction_percent = (
+        (latest - proximal) / proximal * 100
+        if demand
+        else (proximal - latest) / proximal * 100
+    )
+    completion_price = proximal * (
+        1 + completion_percent / 100
+        if demand
+        else 1 - completion_percent / 100
+    )
+    reaction_candles = later.iloc[start_position:]
+    completed_mask = (
+        reaction_candles["Close"] >= completion_price
+        if demand
+        else reaction_candles["Close"] <= completion_price
+    )
+    completion_positions = [
+        position
+        for position, completed in enumerate(completed_mask.tolist())
+        if completed
+    ]
+    completed = bool(completion_positions)
+    end_position = completion_positions[0] if completed else None
+    ended_index = (
+        reaction_candles.index[end_position]
+        if end_position is not None
+        else None
+    )
+    duration = (
+        end_position + 1
+        if end_position is not None
+        else len(reaction_candles)
+    )
+    return {
+        "active": not completed and reaction_percent >= 0,
+        "percent": round(reaction_percent, 2),
+        "started": (
+            started.isoformat()
+            if hasattr(started, "isoformat")
+            else str(started)
+        ),
+        "ended": (
+            ended_index.isoformat()
+            if ended_index is not None and hasattr(ended_index, "isoformat")
+            else str(ended_index) if ended_index is not None else None
+        ),
+        "duration": duration,
+    }
 
 
 def _departure_gap(zone: Zone, data: DataFrame) -> str | None:
@@ -379,9 +497,24 @@ def _scan_research_zones(
                 zone = _measure_zone(detected_zone, data)
                 if _is_zone_invalidated(zone, data):
                     continue
-                if _has_completed_test(zone, data):
+                reaction = _reaction_state(
+                    zone,
+                    data,
+                    _zone_config.reaction_completion_percent,
+                )
+                # Tested zones remain excluded unless price is currently in a
+                # confirmed, incomplete reaction through the proximal line.
+                if not zone.is_fresh and not reaction["active"]:
                     continue
-                if zone.lower_price <= current_price <= zone.upper_price:
+                if reaction["active"]:
+                    status = "REACTING"
+                    proximal = (
+                        zone.upper_price
+                        if zone.zone_type == ZoneType.DEMAND
+                        else zone.lower_price
+                    )
+                    distance = abs(current_price - proximal) / current_price * 100
+                elif zone.lower_price <= current_price <= zone.upper_price:
                     distance = 0.0
                     status = "IN ZONE"
                 elif current_price > zone.upper_price:
@@ -479,6 +612,10 @@ def _scan_research_zones(
                         base_index=zone.created_index,
                         base_date=data.index[zone.created_index].date().isoformat(),
                         status=status,
+                        reaction_percent=reaction.get("percent"),
+                        reaction_started=reaction.get("started"),
+                        reaction_ended=reaction.get("ended"),
+                        reaction_duration_candles=reaction.get("duration"),
                     )
                 )
         except Exception:
@@ -505,7 +642,7 @@ def _zone_scan_key(
     universe: str,
     symbols: list[str] | None,
 ) -> str:
-    return f"{timeframe}:{universe}:{','.join(sorted(symbols or []))}:v1"
+    return f"{timeframe}:{universe}:{','.join(sorted(symbols or []))}:v2"
 
 
 def _store_zone_scan(key: str, future: Future[ZoneResearchResponse]) -> None:
@@ -524,12 +661,9 @@ def get_research_zones(
     universe: UniverseName = Query(default="nse500"),
     symbols: list[str] | None = Query(default=None),
 ) -> ZoneResearchResponse:
-    """Return cached results immediately and refresh larger scans in background."""
+    """Return cached results immediately and refresh scans in background."""
 
     universe_symbols = _universe_service.get_symbols(universe, symbols)
-    if len(universe_symbols) <= 50:
-        return _scan_research_zones(timeframe, universe, symbols)
-
     key = _zone_scan_key(timeframe, universe, symbols)
     with _zone_scan_lock:
         cached_entry = _zone_scan_cache.get(key)
@@ -556,10 +690,20 @@ def get_research_zones(
             )
         if cached_entry:
             cached = cached_entry[1]
+            processed, failed = (
+                _zone_scan_progress.get(
+                    key,
+                    (cached.processed_symbols, cached.failed_symbols),
+                )
+                if job is not None
+                else (cached.processed_symbols, cached.failed_symbols)
+            )
             return cached.model_copy(
                 update={
                     "status": "refreshing" if stale else "completed",
                     "data_status": "cached" if stale else cached.data_status,
+                    "processed_symbols": processed,
+                    "failed_symbols": failed,
                 }
             )
         processed, failed = _zone_scan_progress.get(key, (0, 0))

@@ -14,10 +14,12 @@ from backend.services.market_data.timeframe_service import (
     TIMEFRAME_RULES,
     aggregate_timeframe,
 )
+from backend.services.scanner.universe_service import UniverseService
 
 market_router = APIRouter(prefix="/market", tags=["Market Data"])
 
 _market_data_service = MarketDataService()
+_default_symbol = UniverseService().get_symbols("nse500")[0]
 _symbol_pattern = re.compile(r"^[A-Z0-9.^_-]{1,24}$")
 _allowed_periods = {"1mo", "3mo", "6mo", "1y", "2y", "5y", "10y"}
 _allowed_intervals = {"1d", "1h", "30m", "15m", "5m"}
@@ -25,7 +27,7 @@ _allowed_intervals = {"1d", "1h", "30m", "15m", "5m"}
 
 @market_router.get("/candles", response_model=CandleSeriesResponse)
 def get_candles(
-    symbol: str = Query("RELIANCE"),
+    symbol: str = Query(_default_symbol),
     period: str = Query("1y"),
     interval: str = Query("1d"),
     timeframe: str = Query("1D"),

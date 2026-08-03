@@ -65,7 +65,7 @@ export function buildTradeConfidence(
         { key: "sentiment", label: "Market sentiment", weight: 4, status: "UNAVAILABLE", explanation: "A validated market sentiment feed is not connected yet." },
         { key: "risk", label: "Risk and reward", weight: 8, status: ratio === null || ratio === undefined ? "UNAVAILABLE" : ratio >= 2 ? "PASS" : ratio >= 1 ? "MIXED" : "FAIL", explanation: ratio === null || ratio === undefined ? "No validated opposing target is available." : `The current illustration offers 1:${ratio.toFixed(2)} risk and reward.` },
         { key: "confirmation", label: "Confirmation status", weight: 6, status: confirmationStatus, explanation: confirmationStatus === "MIXED" ? "Price is close, but a confirmation candle is still required." : "There is no confirmation candle yet." },
-        { key: "position", label: "Current price position", weight: 6, status: positionStatus, explanation: result.status === "IN ZONE" ? "Price is currently inside the selected zone." : result.status === "APPROACHING" ? "Price is approaching the selected zone." : "Price is still far from the selected zone." },
+        { key: "position", label: "Current price position", weight: 6, status: positionStatus, explanation: result.status === "IN ZONE" ? "Price is currently inside the selected zone." : result.status === "REACTING" ? "Price has respected the zone and crossed back through its proximal boundary." : result.status === "APPROACHING" ? "Price is approaching the selected zone." : "Price is still far from the selected zone." },
     ];
     const score = Math.round(factors.reduce((sum, factor) => sum + points(factor.weight, factor.status), 0));
     const recommendation = score >= 75 ? "Ready to watch closely"

@@ -4,13 +4,38 @@ from backend.engines.demand_supply_engine.departure_detector import DepartureDet
 from backend.models.base_region import BaseRegion
 
 
-def _data(leg_in_close: float, departure_close: float, final_close: float) -> pd.DataFrame:
+def _data(
+    leg_in_close: float,
+    departure_close: float,
+    final_close: float,
+) -> pd.DataFrame:
     return pd.DataFrame(
         {
             "Open": [100.0, 110.0, 110.5, 111.0, departure_close, final_close - 1],
-            "High": [leg_in_close + 1, 111.0, 111.0, departure_close + 1, final_close + 1, final_close + 1],
-            "Low": [99.0, 109.5, 110.0, 110.5, departure_close - 1, final_close - 2],
-            "Close": [leg_in_close, 110.5, 110.7, departure_close, final_close, final_close],
+            "High": [
+                leg_in_close + 1,
+                111.0,
+                111.0,
+                departure_close + 1,
+                final_close + 1,
+                final_close + 1,
+            ],
+            "Low": [
+                99.0,
+                109.5,
+                110.0,
+                110.5,
+                departure_close - 1,
+                final_close - 2,
+            ],
+            "Close": [
+                leg_in_close,
+                110.5,
+                110.7,
+                departure_close,
+                final_close,
+                final_close,
+            ],
         }
     )
 
@@ -43,7 +68,7 @@ def test_overlapping_non_explosive_leg_out_is_rejected() -> None:
     assert DepartureDetector().detect(data, base) is None
 
 
-def test_gap_up_can_form_bullish_departure_with_follow_through() -> None:
+def test_gap_up_without_atr14_history_is_not_canonical_departure() -> None:
     data = pd.DataFrame(
         {
             "Open": [100.0, 104.0, 104.5, 111.0, 113.0, 116.0],
@@ -56,11 +81,10 @@ def test_gap_up_can_form_bullish_departure_with_follow_through() -> None:
 
     departure = DepartureDetector().detect(data, base)
 
-    assert departure is not None
-    assert departure.direction.value == "BULLISH"
+    assert departure is None
 
 
-def test_gap_down_can_form_bearish_departure_with_follow_through() -> None:
+def test_gap_down_without_atr14_history_is_not_canonical_departure() -> None:
     data = pd.DataFrame(
         {
             "Open": [110.0, 106.0, 105.5, 98.0, 96.0, 93.0],
@@ -73,5 +97,4 @@ def test_gap_down_can_form_bearish_departure_with_follow_through() -> None:
 
     departure = DepartureDetector().detect(data, base)
 
-    assert departure is not None
-    assert departure.direction.value == "BEARISH"
+    assert departure is None

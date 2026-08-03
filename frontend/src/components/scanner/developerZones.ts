@@ -17,6 +17,7 @@ export interface DeveloperChartZone {
     baseStartDate?: string;
     baseEndDate?: string;
     selected?: boolean;
+    reacting?: boolean;
 }
 
 export function diagnosticDeveloperZones(

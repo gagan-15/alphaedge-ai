@@ -155,7 +155,8 @@ def test_analyze_builds_confirmed_opportunity() -> None:
     assert opportunity.zone_type == "DEMAND"
     assert opportunity.proximal_price == 100.0
     assert opportunity.distal_price == 95.0
-    assert opportunity.zone_score == 86.0
+    # 30 freshness + 35 strength + 20 untouched-zone points.
+    assert opportunity.zone_score == 85.0
     assert opportunity.distance_percent == 2.0
     assert opportunity.zone_fresh is True
     assert opportunity.touch_count == 0

@@ -77,6 +77,10 @@ export interface ZoneResearchResult {
     base_index: number;
     base_date: string;
     status: string;
+    reaction_percent?: number | null;
+    reaction_started?: string | null;
+    reaction_ended?: string | null;
+    reaction_duration_candles?: number | null;
 }
 
 export interface ZoneExplanationFactor {

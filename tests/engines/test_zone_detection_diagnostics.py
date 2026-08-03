@@ -70,14 +70,18 @@ def test_diagnostics_preserve_accepted_rbr_output() -> None:
     )
 
 
-def test_diagnostics_capture_rejected_rbr() -> None:
+def test_diagnostics_capture_canonical_rbr_strength() -> None:
     data = _candidate_data(100.0, 105.0, strong=False)
 
     _, diagnostics = ZoneDetectionEngine().detect_zones_with_diagnostics(data)
-    rejected = [item for item in _formed(diagnostics) if item["status"] == "rejected"]
+    accepted = [item for item in _formed(diagnostics) if item["status"] == "accepted"]
 
-    assert any(item["pattern"] == "RALLY_BASE_RALLY" for item in rejected)
-    assert any(item["rejection_reasons"] for item in rejected)
+    assert any(item["pattern"] == "RALLY_BASE_RALLY" for item in accepted)
+    weak = next(item for item in accepted if item["pattern"] == "RALLY_BASE_RALLY")
+    strength = next(
+        rule for rule in weak["rule_results"] if rule["key"] == "departure_strength"
+    )
+    assert strength["actual"] == "STRONG"
 
 
 def test_diagnostics_capture_accepted_dbr() -> None:

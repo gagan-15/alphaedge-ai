@@ -1100,3 +1100,13 @@ benchmarks and breadth use the shared delayed market snapshot service. Large
 zone scans are cached by universe and timeframe and refreshed with controlled
 background workers, allowing clients to display the last completed result and
 refresh progress without waiting for a full universe scan.
+
+Production screens must not define fallback stock lists. User-owned collections,
+such as the watchlist and holdings, start from persisted user data and may be
+empty. A single-symbol API default is resolved through `UniverseService`.
+Maintained sector metadata lives beside universe constituent data rather than
+inside scanner logic.
+
+Fixed examples are allowed only in modules that are clearly marked as demo or
+development content. They must never feed the authenticated dashboard, scanner,
+signals, market overview, shared ticker, or production market calculations.

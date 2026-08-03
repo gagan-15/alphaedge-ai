@@ -2,8 +2,13 @@
 Tests for the Scanner API response mapping.
 """
 
+from concurrent.futures import Future
+from time import monotonic
+
 from pandas import DataFrame, date_range
 
+from backend.api import scanner as scanner_api
+from backend.api.models.scanner_response import ZoneResearchResponse
 from backend.api.scanner import (
     _departure_gap,
     _has_completed_test,
@@ -19,6 +24,88 @@ from backend.models.screener.screener_result import (
     ScreenerResult,
 )
 from backend.models.zone import Zone, ZoneType
+
+
+def _completed_zone_response(
+    *,
+    total_symbols: int = 50,
+) -> ZoneResearchResponse:
+    return ZoneResearchResponse(
+        total_scanned=total_symbols,
+        total_zones=0,
+        results=(),
+        universe="nifty50",
+        status="completed",
+        total_symbols=total_symbols,
+        processed_symbols=total_symbols,
+        failed_symbols=0,
+        last_completed_at="2026-07-30T12:00:00+00:00",
+        data_status="delayed",
+    )
+
+
+def test_nifty50_uses_background_cache_path(monkeypatch) -> None:
+    """Small predefined universes should use stale-while-refresh too."""
+
+    response = _completed_zone_response()
+    completed: Future[ZoneResearchResponse] = Future()
+    completed.set_result(response)
+    monkeypatch.setattr(
+        scanner_api._universe_service,
+        "get_symbols",
+        lambda universe, symbols: [f"TEST{index}" for index in range(50)],
+    )
+    monkeypatch.setattr(
+        scanner_api._zone_scan_executor,
+        "submit",
+        lambda *args, **kwargs: completed,
+    )
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+
+    first = scanner_api.get_research_zones("DAILY", "nifty50", None)
+    second = scanner_api.get_research_zones("DAILY", "nifty50", None)
+
+    assert first.status == "refreshing"
+    assert first.last_completed_at is None
+    assert second.status == "completed"
+    assert second.last_completed_at == response.last_completed_at
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+
+
+def test_cached_refresh_response_uses_active_progress(monkeypatch) -> None:
+    """Cached rows should report progress from the running refresh."""
+
+    response = _completed_zone_response(total_symbols=500)
+    key = scanner_api._zone_scan_key("DAILY", "nse500", None)
+    pending: Future[ZoneResearchResponse] = Future()
+    monkeypatch.setattr(
+        scanner_api._universe_service,
+        "get_symbols",
+        lambda universe, symbols: [f"TEST{index}" for index in range(500)],
+    )
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+    scanner_api._zone_scan_cache[key] = (
+        monotonic() - scanner_api._zone_scan_ttl_seconds,
+        response,
+    )
+    scanner_api._zone_scan_jobs[key] = pending
+    scanner_api._zone_scan_progress[key] = (485, 3)
+
+    observed = scanner_api.get_research_zones("DAILY", "nse500", None)
+
+    assert observed.status == "refreshing"
+    assert observed.processed_symbols == 485
+    assert observed.failed_symbols == 3
+    assert observed.last_completed_at == response.last_completed_at
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
 
 
 def test_build_empty_scanner_response() -> None:
@@ -64,6 +151,32 @@ def test_measure_zone_uses_departure_and_later_retests() -> None:
     )
 
     assert measured.strength > 0
+    assert measured.touch_count == 1
+    assert measured.is_fresh is False
+
+
+def test_measure_zone_counts_exact_proximal_wick_touch_as_tested() -> None:
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 103, "Low": 99, "Close": 101},
+            {"Open": 101, "High": 108, "Low": 101, "Close": 107},
+            {"Open": 107, "High": 112, "Low": 106, "Close": 111},
+            {"Open": 111, "High": 114, "Low": 109, "Close": 113},
+            # The body remains above the zone; only the wick tags proximal.
+            {"Open": 110, "High": 111, "Low": 103, "Close": 109},
+        ]
+    )
+
+    measured = _measure_zone(
+        Zone(
+            zone_type=ZoneType.DEMAND,
+            upper_price=103,
+            lower_price=99,
+            created_index=0,
+        ),
+        data,
+    )
+
     assert measured.touch_count == 1
     assert measured.is_fresh is False
 

@@ -57,7 +57,7 @@ function App() {
                 element={<PrivatePage><Dashboard /></PrivatePage>}
             />
             <Route
-                path="/scanner"
+                path="/stock-details/:symbol"
                 element={<PrivatePage><Scanner /></PrivatePage>}
             />
             <Route

@@ -1,47 +1,43 @@
 import { alpha, createTheme } from "@mui/material/styles";
 
-export type AppThemeMode = "dark" | "light";
+// The production Dashboard uses one fixed light visual language.
+export type AppThemeMode = "light";
 
-export function createAppTheme(mode: AppThemeMode) {
-    const dark = mode === "dark";
-    const colors = dark ? {
-        background: "#07101f", paper: "#0b1627", border: "#1d2b40",
-        primary: "#6366f1", text: "#f3f7fb", textMuted: "#8fa1b8",
-    } : {
-        background: "#f3f6fa", paper: "#ffffff", border: "#c8d4e3",
-        primary: "#4f46e5", text: "#142033", textMuted: "#607089",
-    };
+const colors = {
+    background: "#ffffff", paper: "#ffffff", border: "#e3e8ef",
+    primary: "#4f5bd5", text: "#172033", textMuted: "#69758a",
+};
+
+export function createAppTheme() {
 
     return createTheme({
         palette: {
-            mode,
+            mode: "light",
             primary: { main: colors.primary, contrastText: "#ffffff" },
-            success: { main: "#35a96f" },
-            error: { main: "#e54855" },
-            warning: { main: "#d99a22" },
+            success: { main: "#3b8d69" },
+            error: { main: "#c9606c" },
+            warning: { main: "#b98a38" },
             background: { default: colors.background, paper: colors.paper },
             divider: colors.border,
             text: { primary: colors.text, secondary: colors.textMuted },
         },
-        shape: { borderRadius: 10 },
+        shape: { borderRadius: 12 },
         typography: {
             fontFamily: '"Inter", "Segoe UI", Roboto, Arial, sans-serif',
             fontSize: 12,
             h4: { fontWeight: 750, letterSpacing: "-0.03em", fontSize: "1.35rem" },
             h6: { fontWeight: 700, fontSize: "0.9rem" },
             h5: { fontSize: "1.12rem" },
-            body1: { fontSize: "0.78rem" },
-            body2: { fontSize: "0.72rem" },
-            button: { fontWeight: 650, textTransform: "none" },
+            body1: { fontSize: "0.78rem", lineHeight: 1.5 },
+            body2: { fontSize: "0.72rem", lineHeight: 1.5 },
+            button: { fontWeight: 600, textTransform: "none", letterSpacing: 0 },
         },
         components: {
             MuiCssBaseline: {
                 styleOverrides: {
                     body: {
                         backgroundColor: colors.background,
-                        backgroundImage: dark
-                            ? "radial-gradient(circle at 50% -20%, #13243c 0%, #07101f 42%)"
-                            : "radial-gradient(circle at 50% -20%, #ffffff 0%, #f4f7fb 52%)",
+                        backgroundImage: "none",
                     },
                 },
             },
@@ -51,10 +47,11 @@ export function createAppTheme(mode: AppThemeMode) {
             MuiCard: {
                 styleOverrides: {
                     root: {
-                        backgroundImage: dark ? "linear-gradient(145deg, rgba(12,27,48,.98), rgba(7,18,34,.99))" : "none",
+                        borderRadius: 16,
+                        backgroundImage: "none",
                         backgroundColor: colors.paper,
                         border: `1px solid ${colors.border}`,
-                        boxShadow: dark ? "0 12px 34px rgba(0,0,0,.16)" : "0 10px 28px rgba(28,45,72,.08)",
+                        boxShadow: "0 6px 20px rgba(28,45,72,.045)",
                     },
                 },
             },
@@ -67,7 +64,6 @@ export function createAppTheme(mode: AppThemeMode) {
                         color: colors.text,
                         borderBottom: `1px solid ${colors.border}`,
                         boxShadow: "none",
-                        backdropFilter: "blur(14px)",
                     },
                 },
             },
@@ -75,7 +71,7 @@ export function createAppTheme(mode: AppThemeMode) {
                 styleOverrides: {
                     paper: {
                         backgroundImage: "none",
-                        backgroundColor: dark ? "#081322" : "#ffffff",
+                        backgroundColor: "#ffffff",
                         color: colors.text,
                         borderRight: `1px solid ${colors.border}`,
                     },
@@ -87,20 +83,53 @@ export function createAppTheme(mode: AppThemeMode) {
                         borderRadius: 6,
                         color: colors.textMuted,
                         "& .MuiListItemIcon-root": { color: "inherit" },
-                        "&:hover": { color: colors.text, backgroundColor: alpha(colors.primary, .08) },
+                        transition: "color 160ms ease, background-color 160ms ease",
+                        "&:hover": { color: colors.text, backgroundColor: alpha(colors.primary, .055) },
                         "&.Mui-selected": {
-                            color: "#ffffff",
-                            background: "linear-gradient(100deg, #2447dc, #3d5ef4)",
-                            boxShadow: "inset 3px 0 0 #8b9cff, 0 8px 22px rgba(37,99,235,.2)",
+                            color: colors.primary,
+                            backgroundColor: alpha(colors.primary, .08),
+                            boxShadow: `inset 2px 0 0 ${colors.primary}`,
                         },
-                        "&.Mui-selected:hover": { background: "linear-gradient(90deg, rgba(37,99,235,.82), rgba(124,58,237,.72))" },
+                        "&.Mui-selected:hover": { backgroundColor: alpha(colors.primary, .11) },
                     },
                 },
             },
-            MuiChip: { styleOverrides: { root: { fontWeight: 700 } } },
+            MuiButton: {
+                styleOverrides: {
+                    root: {
+                        borderRadius: 12,
+                        boxShadow: "none",
+                        transition: "background-color 160ms ease, border-color 160ms ease, color 160ms ease",
+                        "&:hover": { boxShadow: "none", backgroundColor: alpha(colors.primary, .045) },
+                        "&.Mui-focusVisible": { outline: `2px solid ${alpha(colors.primary, .28)}`, outlineOffset: 2 },
+                    },
+                },
+            },
+            MuiIconButton: {
+                styleOverrides: {
+                    root: {
+                        transition: "background-color 160ms ease, color 160ms ease",
+                        "&:hover": { backgroundColor: alpha(colors.primary, .06) },
+                        "&.Mui-focusVisible": { outline: `2px solid ${alpha(colors.primary, .28)}`, outlineOffset: 2 },
+                    },
+                },
+            },
+            MuiOutlinedInput: {
+                styleOverrides: {
+                    root: {
+                        borderRadius: 12,
+                        transition: "background-color 160ms ease, box-shadow 160ms ease",
+                        "& .MuiOutlinedInput-notchedOutline": { transition: "border-color 160ms ease" },
+                        "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#c8d0dc" },
+                        "&.Mui-focused": { boxShadow: `0 0 0 3px ${alpha(colors.primary, .09)}` },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.primary, borderWidth: 1 },
+                    },
+                },
+            },
+            MuiChip: { styleOverrides: { root: { borderRadius: 999, fontWeight: 600, letterSpacing: 0 } } },
             MuiLinearProgress: { styleOverrides: { root: { backgroundColor: alpha(colors.textMuted, .12) } } },
         },
     });
 }
 
-export default createAppTheme("dark");
+export default createAppTheme();

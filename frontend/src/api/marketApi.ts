@@ -31,8 +31,19 @@ export async function getMarketCandles(
     period = "1y",
     interval = "1d",
     timeframe = "1D",
+    signal?: AbortSignal,
 ): Promise<CandleSeriesResult> {
     const key = `${symbol}:${period}:${interval}:${timeframe}`;
+    // Background scanner enrichment is cancellable. Do not place those
+    // requests in the shared cache because an opened chart must never wait on
+    // an obsolete background request from a previous symbol or timeframe.
+    if (signal) {
+        const response = await marketApi.get<CandleSeriesResult>("/candles", {
+            params: { symbol, period, interval, timeframe },
+            signal,
+        });
+        return response.data;
+    }
     const cached = candleCache.get(key);
     if (cached) return cached;
     const request = marketApi.get<CandleSeriesResult>("/candles", {

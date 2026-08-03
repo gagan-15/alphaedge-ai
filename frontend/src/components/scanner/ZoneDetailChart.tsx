@@ -14,6 +14,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import ButtonBase from "@mui/material/ButtonBase";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import Checkbox from "@mui/material/Checkbox";
@@ -23,7 +24,10 @@ import ListItemText from "@mui/material/ListItemText";
 import MenuItem from "@mui/material/MenuItem";
 import Select, { type SelectChangeEvent } from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
+import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
+import ViewSidebarOutlinedIcon from "@mui/icons-material/ViewSidebarOutlined";
 
 import { getMarketCandles } from "../../api/marketApi";
 import type { ConfluenceChartOverlay, ZoneResearchResult } from "../../types/scanner";
@@ -83,6 +87,8 @@ interface ZoneDetailChartProps {
     showTools?: boolean;
     developerMode?: boolean;
     developerZones?: DeveloperChartZone[];
+    analysisPanelOpen?: boolean;
+    onToggleAnalysisPanel?: () => void;
 }
 
 function ZoneDetailChart({
@@ -99,12 +105,30 @@ function ZoneDetailChart({
     showTools = false,
     developerMode = false,
     developerZones = noDeveloperZones,
+    analysisPanelOpen = false,
+    onToggleAnalysisPanel,
 }: ZoneDetailChartProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<ReturnType<typeof createChart> | null>(null);
     const candleSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
     const baseZoneAreaSeriesRef = useRef<ISeriesApi<"Baseline">[]>([]);
     const baseZoneBoundarySeriesRef = useRef<ISeriesApi<"Line">[]>([]);
+    const zoneSeriesMapRef = useRef(new Map<string, {
+        area: ISeriesApi<"Baseline">;
+        proximal: ISeriesApi<"Line">;
+        distal: ISeriesApi<"Line">;
+        demand: boolean;
+        status: DeveloperChartZone["zoneStatus"];
+    }>());
+    const zoneBorderDefinitionsRef = useRef<Array<{
+        id: string;
+        from: UTCTimestamp;
+        to: UTCTimestamp;
+        proximal: number;
+        distal: number;
+        color: string;
+        status: DeveloperChartZone["zoneStatus"];
+    }>>([]);
     const confluenceSeriesRef = useRef<ISeriesApi<"Baseline">[]>([]);
     const confluenceBoundarySeriesRef = useRef<ISeriesApi<"Line">[]>([]);
     const confluenceSeriesMapRef = useRef(new Map<ISeriesApi<"Baseline">, ConfluenceChartOverlay>());
@@ -137,6 +161,15 @@ function ZoneDetailChart({
     const [chartReadyVersion, setChartReadyVersion] = useState(0);
     const [zonesVisible, setZonesVisible] = useState(true);
     const [measurementLabel, setMeasurementLabel] = useState<{ left: number; top: number; text: string } | null>(null);
+    const [zoneBorders, setZoneBorders] = useState<Array<{
+        id: string;
+        left: number;
+        top: number;
+        width: number;
+        height: number;
+        color: string;
+        status: DeveloperChartZone["zoneStatus"];
+    }>>([]);
     const [selectedIndicators, setSelectedIndicators] = useState<string[]>(readIndicatorPreference);
     const [developerTooltip, setDeveloperTooltip] = useState<{ left: number; top: number; zone: DeveloperChartZone } | null>(null);
     const executionIndex = confluenceTimeframes.findIndex((item) => item.timeframe === result.timeframe);
@@ -164,12 +197,38 @@ function ZoneDetailChart({
             text: selection.text,
         });
     }, []);
+    const updateZoneBorders = useCallback(() => {
+        const chart = chartRef.current;
+        const candles = candleSeriesRef.current;
+        if (!chart || !candles) {
+            setZoneBorders([]);
+            return;
+        }
+        const next = zoneBorderDefinitionsRef.current.flatMap((zone) => {
+            const fromX = chart.timeScale().timeToCoordinate(zone.from);
+            const toX = chart.timeScale().timeToCoordinate(zone.to);
+            const proximalY = candles.priceToCoordinate(zone.proximal);
+            const distalY = candles.priceToCoordinate(zone.distal);
+            if (fromX === null || toX === null || proximalY === null || distalY === null) return [];
+            return [{
+                id: zone.id,
+                left: Math.min(fromX, toX),
+                top: Math.min(proximalY, distalY),
+                width: Math.max(1, Math.abs(toX - fromX)),
+                height: Math.max(1, Math.abs(distalY - proximalY)),
+                color: zone.color,
+                status: zone.status,
+            }];
+        });
+        setZoneBorders(next);
+    }, []);
 
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
         let cancelled = false;
         const confluenceSeriesMap = confluenceSeriesMapRef.current;
+        const zoneSeriesMap = zoneSeriesMapRef.current;
         setLoading(true);
         setError("");
 
@@ -177,17 +236,23 @@ function ZoneDetailChart({
             width: container.clientWidth,
             height,
             layout: {
-                background: { type: ColorType.Solid, color: "#07111e" },
-                textColor: "#8fa1b8",
+                background: { type: ColorType.Solid, color: "#FFFFFF" },
+                textColor: "#64748b",
+                fontFamily: '"Inter", "Segoe UI", Arial, sans-serif',
+                fontSize: 11,
                 attributionLogo: false,
             },
             grid: {
-                vertLines: { color: "#132236" },
-                horzLines: { color: "#18273a" },
+                vertLines: { color: "rgba(148,163,184,.16)", style: LineStyle.Solid },
+                horzLines: { color: "rgba(148,163,184,.16)", style: LineStyle.Solid },
             },
-            crosshair: { mode: crosshairVisibleRef.current ? CrosshairMode.Normal : CrosshairMode.Hidden },
-            rightPriceScale: { borderColor: "#24344a" },
-            timeScale: { borderColor: "#24344a", timeVisible: true },
+            crosshair: {
+                mode: crosshairVisibleRef.current ? CrosshairMode.Normal : CrosshairMode.Hidden,
+                vertLine: { color: "#94a3b8", width: 1, style: LineStyle.Dashed, labelBackgroundColor: "#475569" },
+                horzLine: { color: "#94a3b8", width: 1, style: LineStyle.Dashed, labelBackgroundColor: "#475569" },
+            },
+            rightPriceScale: { borderColor: "#e2e8f0", scaleMargins: { top: 0.08, bottom: 0.08 } },
+            timeScale: { borderColor: "#e2e8f0", timeVisible: true, rightOffset: 5, barSpacing: 7, minBarSpacing: 1, lockVisibleTimeRangeOnResize: true },
             handleScroll: {
                 mouseWheel: true,
                 pressedMouseMove: true,
@@ -205,6 +270,7 @@ function ZoneDetailChart({
         const observer = new ResizeObserver(() => {
             chart.applyOptions({ width: container.clientWidth });
             updateMeasurementLabel();
+            updateZoneBorders();
         });
         observer.observe(container);
 
@@ -224,11 +290,13 @@ function ZoneDetailChart({
                 if (!data.length) throw new Error("No candle history is available.");
 
                 const candles = chart.addSeries(CandlestickSeries, {
-                    upColor: "#16d784",
-                    downColor: "#ff4d5e",
-                    wickUpColor: "#16d784",
-                    wickDownColor: "#ff4d5e",
+                    upColor: "#089981",
+                    downColor: "#f23645",
+                    wickUpColor: "#089981",
+                    wickDownColor: "#f23645",
                     borderVisible: false,
+                    priceLineColor: "#64748b",
+                    priceLineWidth: 1,
                 });
                 candleSeriesRef.current = candles;
                 candles.setData(data);
@@ -327,6 +395,7 @@ function ZoneDetailChart({
                     measureStartRef.current = null;
                 });
                 chart.timeScale().subscribeVisibleLogicalRangeChange(updateMeasurementLabel);
+                chart.timeScale().subscribeVisibleLogicalRangeChange(updateZoneBorders);
 
                 const renderedZones: DeveloperChartZone[] = developerMode
                     ? developerZones
@@ -339,27 +408,28 @@ function ZoneDetailChart({
                         pattern: displayZone.pattern_type ?? undefined,
                         zoneStatus: "Accepted",
                         zoneScore: displayZone.zone_score,
+                        reacting: displayZone.status === "REACTING",
                         selected: !selectedZoneId || zoneSequenceLabel(zones, zoneIndex) === selectedZoneId,
                     }));
                 renderedZones.forEach((displayZone) => {
                 if (displayZone.proximalPrice !== null && displayZone.distalPrice !== null) {
                     const demand = displayZone.zoneType === "DEMAND";
-                    const zoneColor = demand ? "#1d8cff" : "#ff2f68";
+                    const zoneColor = demand ? "#2f8f67" : "#c45f69";
                     const zoneLabel = displayZone.zoneId;
                     const selected = Boolean(displayZone.selected);
                     const rejected = displayZone.zoneStatus === "Rejected";
                     const invalidated = displayZone.zoneStatus === "Invalidated";
-                    const opacity = invalidated ? .06 : rejected ? .14 : selected ? .48 : .12;
+                    const opacity = invalidated ? .04 : rejected ? .08 : selected ? .18 : .12;
                     const borderStyle = invalidated ? LineStyle.Dotted : rejected ? LineStyle.Dashed : LineStyle.Solid;
                     const zone = chart.addSeries(BaselineSeries, {
                         baseValue: { type: "price", price: displayZone.distalPrice },
-                        topLineColor: zoneColor,
-                        topFillColor1: demand ? `rgba(29,140,255,${opacity})` : `rgba(255,47,104,${opacity})`,
-                        topFillColor2: demand ? `rgba(29,140,255,${opacity / 2})` : `rgba(255,47,104,${opacity / 2})`,
-                        bottomLineColor: zoneColor,
-                        bottomFillColor1: demand ? `rgba(29,140,255,${opacity})` : `rgba(255,47,104,${opacity})`,
-                        bottomFillColor2: demand ? `rgba(29,140,255,${opacity / 2})` : `rgba(255,47,104,${opacity / 2})`,
-                        lineWidth: selected ? 3 : 1,
+                        topLineColor: "rgba(0,0,0,0)",
+                        topFillColor1: demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
+                        topFillColor2: demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
+                        bottomLineColor: "rgba(0,0,0,0)",
+                        bottomFillColor1: demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
+                        bottomFillColor2: demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
+                        lineWidth: 1,
                         lineStyle: borderStyle,
                         priceLineVisible: false,
                         lastValueVisible: false,
@@ -380,31 +450,51 @@ function ZoneDetailChart({
                     baseZoneAreaSeriesRef.current.push(zone);
                     const proximalBoundary = chart.addSeries(LineSeries, {
                         color: zoneColor,
-                        lineWidth: selected ? 3 : 1,
+                        lineWidth: 1,
                         lineStyle: borderStyle,
+                        lineVisible: false,
+                        pointMarkersVisible: false,
+                        crosshairMarkerVisible: false,
                         priceLineVisible: false,
                         lastValueVisible: true,
-                        title: invalidated ? `${zoneLabel} Invalidated` : rejected ? `${zoneLabel} Rejected Candidate` : `${zoneLabel} PROXIMAL`,
+                        title: invalidated ? `${zoneLabel} Invalidated` : rejected ? `${zoneLabel} Rejected Candidate` : `${zoneLabel}${displayZone.reacting ? " REACTING" : ""} PROXIMAL`,
                     });
                     const distalBoundary = chart.addSeries(LineSeries, {
                         color: zoneColor,
-                        lineWidth: selected ? 2 : 1,
+                        lineWidth: 1,
                         lineStyle: invalidated ? LineStyle.Dotted : LineStyle.Dashed,
+                        lineVisible: false,
+                        pointMarkersVisible: false,
+                        crosshairMarkerVisible: false,
                         priceLineVisible: false,
                         lastValueVisible: true,
                         title: `${zoneLabel} DISTAL`,
                     });
-                    proximalBoundary.setData(zoneData);
-                    distalBoundary.setData(zoneData.map((point) => ({
-                        time: point.time,
-                        value: displayZone.distalPrice,
-                    })));
+                    const labelTime = zoneData[zoneData.length - 1].time;
+                    zoneBorderDefinitionsRef.current.push({
+                        id: zoneLabel,
+                        from: zoneData[0].time,
+                        to: labelTime,
+                        proximal: displayZone.proximalPrice,
+                        distal: displayZone.distalPrice,
+                        color: zoneColor,
+                        status: displayZone.zoneStatus,
+                    });
+                    // A single point keeps the price-axis label without drawing
+                    // another horizontal guide line across the zone rectangle.
+                    proximalBoundary.setData([{ time: labelTime, value: displayZone.proximalPrice }]);
+                    distalBoundary.setData([{ time: labelTime, value: displayZone.distalPrice }]);
                     baseZoneBoundarySeriesRef.current.push(proximalBoundary, distalBoundary);
+                    zoneSeriesMap.set(zoneLabel, { area: zone, proximal: proximalBoundary, distal: distalBoundary, demand, status: displayZone.zoneStatus });
                 }
                 });
 
-                chart.timeScale().fitContent();
-                chart.timeScale().applyOptions({ rightOffset: 3 });
+                const activeIndex = Math.max(0, Math.min(result.base_index ?? data.length - 1, data.length - 1));
+                chart.timeScale().setVisibleLogicalRange({
+                    from: Math.max(0, activeIndex - 60),
+                    to: Math.min(data.length + 5, activeIndex + 25),
+                });
+                updateZoneBorders();
                 setChartReadyVersion((version) => version + 1);
                 setLoading(false);
             })
@@ -422,6 +512,9 @@ function ZoneDetailChart({
             candleSeriesRef.current = null;
             baseZoneAreaSeriesRef.current = [];
             baseZoneBoundarySeriesRef.current = [];
+            zoneSeriesMap.clear();
+            zoneBorderDefinitionsRef.current = [];
+            setZoneBorders([]);
             confluenceSeriesRef.current = [];
             confluenceBoundarySeriesRef.current = [];
             confluenceSeriesMap.clear();
@@ -433,7 +526,38 @@ function ZoneDetailChart({
             candleDataRef.current = [];
             chart = null as never;
         };
-    }, [developerMode, developerZones, height, onInspectConfluenceOverlay, result, selectedZoneId, updateMeasurementLabel, zones]);
+        // Zone selection is handled separately so changing the active zone
+        // never destroys the chart or resets user drawings and indicators.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [developerMode, developerZones, height, onInspectConfluenceOverlay, result.symbol, result.timeframe, updateMeasurementLabel, updateZoneBorders]);
+
+    useEffect(() => {
+        if (!chartReadyVersion || !chartRef.current) return;
+        const activeZone = zones.find((_, index) =>
+            !selectedZoneId || zoneSequenceLabel(zones, index) === selectedZoneId
+        ) ?? result;
+        const activeIndex = Math.max(0, Math.min(activeZone.base_index ?? candleTimesRef.current.length - 1, candleTimesRef.current.length - 1));
+        chartRef.current.timeScale().setVisibleLogicalRange({
+            from: Math.max(0, activeIndex - 60),
+            to: Math.min(candleTimesRef.current.length + 5, activeIndex + 25),
+        });
+        zoneSeriesMapRef.current.forEach((series, zoneId) => {
+            const selected = !selectedZoneId || zoneId === selectedZoneId;
+            const rejected = series.status === "Rejected";
+            const invalidated = series.status === "Invalidated";
+            const opacity = invalidated ? .04 : rejected ? .08 : selected ? .18 : .12;
+            const fill = series.demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`;
+            series.area.applyOptions({
+                topFillColor1: fill,
+                topFillColor2: fill,
+                bottomFillColor1: fill,
+                bottomFillColor2: fill,
+                lineWidth: 1,
+            });
+            series.proximal.applyOptions({ lineWidth: 1 });
+            series.distal.applyOptions({ lineWidth: 1 });
+        });
+    }, [chartReadyVersion, result, selectedZoneId, zones]);
 
     useEffect(() => {
         const chart = chartRef.current;
@@ -617,15 +741,15 @@ function ZoneDetailChart({
 
     return (
         <Box sx={{
-            bgcolor: "#07111e",
-            color: "#f3f7fb",
-            border: "1px solid #2b3d55",
+            bgcolor: "#ffffff",
+            color: "#172033",
+            border: "1px solid #e2e8f0",
             borderRadius: 1.5,
             overflow: "hidden",
-            "& .MuiTypography-colorTextSecondary": { color: "#9fb0c5" },
-            "& .MuiInputLabel-root": { color: "#9fb0c5" },
-            "& .MuiSelect-select": { color: "#f3f7fb" },
-            "& .MuiOutlinedInput-notchedOutline": { borderColor: "#40536c" },
+            "& .MuiTypography-colorTextSecondary": { color: "#64748b" },
+            "& .MuiInputLabel-root": { color: "#64748b" },
+            "& .MuiSelect-select": { color: "#172033" },
+            "& .MuiOutlinedInput-notchedOutline": { borderColor: "#d8e0ea" },
             "& .MuiSvgIcon-root": { color: "inherit" },
         }}>
             <Stack direction="row" sx={{ px: 2, py: 1.2, alignItems: "center", gap: 1, borderBottom: "1px solid", borderColor: "divider" }}>
@@ -633,9 +757,51 @@ function ZoneDetailChart({
                 <Typography color={result.zone_type === "DEMAND" ? "#60a5fa" : "#ff6b8a"} sx={{ fontSize: ".68rem", fontWeight: 850 }}>
                     {result.zone_type} · {patternLabels[result.pattern_type ?? ""] ?? result.pattern_type ?? "Pattern pending"}
                 </Typography>
-                <Typography color="text.secondary" sx={{ ml: "auto", fontSize: ".68rem" }}>
+                <Stack direction="row" sx={{ ml: "auto", alignItems: "center", gap: 1.25 }}>
+                    {onToggleAnalysisPanel && (
+                        <Tooltip title={analysisPanelOpen ? "Hide analysis panel" : "Show analysis panel"}>
+                            <ButtonBase
+                                aria-label={analysisPanelOpen ? "Hide analysis panel" : "Show analysis panel"}
+                                aria-pressed={analysisPanelOpen}
+                                onClick={onToggleAnalysisPanel}
+                                sx={{
+                                    minHeight: 40,
+                                    px: 1.5,
+                                    gap: 1,
+                                    borderRadius: "999px",
+                                    border: "1px solid",
+                                    borderColor: analysisPanelOpen ? "#B8A6FF" : "#D8DCE8",
+                                    bgcolor: analysisPanelOpen ? "#F4F1FF" : "#FFFFFF",
+                                    color: analysisPanelOpen ? "#4F46E5" : "#344054",
+                                    transition: "background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease",
+                                    "&:hover": { boxShadow: "0 3px 10px rgba(15,23,42,.08)" },
+                                    "&:focus-visible": { outline: "2px solid #5B5CEB", outlineOffset: 2 },
+                                }}
+                            >
+                                <ViewSidebarOutlinedIcon sx={{ fontSize: 19, color: analysisPanelOpen ? "#4F46E5" : "#667085" }} />
+                                <Typography sx={{ fontSize: ".78rem", fontWeight: 600, whiteSpace: "nowrap" }}>
+                                    {analysisPanelOpen ? "Hide Analysis" : "Show Analysis"}
+                                </Typography>
+                                <Switch
+                                    checked={analysisPanelOpen}
+                                    size="small"
+                                    tabIndex={-1}
+                                    disableRipple
+                                    sx={{
+                                        pointerEvents: "none",
+                                        ml: .25,
+                                        "& .MuiSwitch-switchBase.Mui-checked": { color: "#5B5CEB" },
+                                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": { bgcolor: "#5B5CEB", opacity: 1 },
+                                        "& .MuiSwitch-track": { bgcolor: "#D0D5DD", opacity: 1 },
+                                    }}
+                                />
+                            </ButtonBase>
+                        </Tooltip>
+                    )}
+                    <Typography color="text.secondary" sx={{ fontSize: ".68rem", whiteSpace: "nowrap" }}>
                     Zone {result.distal_price?.toLocaleString("en-IN")}–{result.proximal_price?.toLocaleString("en-IN")} · {result.timeframe ?? "1D"}
-                </Typography>
+                    </Typography>
+                </Stack>
             </Stack>
             {showTools && <Stack direction="row" spacing={1} sx={{ px: 1.5, py: 1, alignItems: "center", flexWrap: "wrap", rowGap: 1, borderBottom: "1px solid", borderColor: "divider" }}>
                 <Button size="small" variant="outlined" onClick={() => chartRef.current?.timeScale().fitContent()}>Fit chart</Button>
@@ -682,7 +848,7 @@ function ZoneDetailChart({
                             variant={selected ? "contained" : "outlined"}
                             onClick={() => onToggleConfluenceOverlay(overlay)}
                             sx={{
-                                color: selected ? "#07111e" : overlayStyles[overlay.timeframe]?.color,
+                                color: selected ? "#ffffff" : overlayStyles[overlay.timeframe]?.color,
                                 bgcolor: selected ? overlayStyles[overlay.timeframe]?.color : undefined,
                                 borderColor: overlayStyles[overlay.timeframe]?.color,
                                 "&:hover": { bgcolor: selected ? overlayStyles[overlay.timeframe]?.color : undefined },
@@ -697,7 +863,7 @@ function ZoneDetailChart({
                 </Stack>
             )}
             {inspectedOverlay && (
-                <Box sx={{ px: 1.5, py: 1, bgcolor: "rgba(15,23,42,.96)", borderBottom: "1px solid", borderColor: overlayStyles[inspectedOverlay.timeframe]?.color ?? "divider" }}>
+                <Box sx={{ px: 1.5, py: 1, bgcolor: "#f8fafc", borderBottom: "1px solid", borderColor: overlayStyles[inspectedOverlay.timeframe]?.color ?? "divider" }}>
                     <Typography sx={{ fontWeight: 850 }}>
                         {inspectedOverlay.timeframeName} · {inspectedOverlay.zoneType === "DEMAND" ? "Demand" : "Supply"} · ₹{Math.min(inspectedOverlay.proximalPrice, inspectedOverlay.distalPrice).toLocaleString("en-IN")}–₹{Math.max(inspectedOverlay.proximalPrice, inspectedOverlay.distalPrice).toLocaleString("en-IN")}
                     </Typography>
@@ -730,8 +896,26 @@ function ZoneDetailChart({
                     }}
                     sx={{ height: loading || error ? 0 : height }}
                 />
+                {zonesVisible && zoneBorders.map((zone) => (
+                    <Box
+                        key={zone.id}
+                        aria-hidden="true"
+                        sx={{
+                            position: "absolute",
+                            pointerEvents: "none",
+                            boxSizing: "border-box",
+                            left: zone.left,
+                            top: zone.top,
+                            width: zone.width,
+                            height: zone.height,
+                            borderWidth: "1px",
+                            borderStyle: zone.status === "Invalidated" ? "dotted" : zone.status === "Rejected" ? "dashed" : "solid",
+                            borderColor: zone.color,
+                        }}
+                    />
+                ))}
                 {developerMode && developerTooltip && (
-                    <Box sx={{ position: "absolute", left: developerTooltip.left, top: developerTooltip.top, zIndex: 30, pointerEvents: "none", minWidth: 190, p: 1.25, bgcolor: "#111c2c", border: "1px solid #52647c", borderRadius: 1.5, boxShadow: 6 }}>
+                    <Box sx={{ position: "absolute", left: developerTooltip.left, top: developerTooltip.top, zIndex: 30, pointerEvents: "none", minWidth: 190, p: 1.25, bgcolor: "#ffffff", color: "#172033", border: "1px solid #d8e0ea", borderRadius: 1.5, boxShadow: "0 8px 24px rgba(15,23,42,.12)" }}>
                         <Typography sx={{ fontWeight: 800 }}>{developerTooltip.zone.zoneId}</Typography>
                         <Typography variant="caption" sx={{ display: "block" }}>Pattern: {developerTooltip.zone.pattern ?? "Unavailable"}</Typography>
                         <Typography variant="caption" sx={{ display: "block" }}>Status: {developerTooltip.zone.zoneStatus}</Typography>
@@ -753,10 +937,10 @@ function ZoneDetailChart({
                             transform: "translate(-50%, -50%)",
                             px: 1,
                             py: .5,
-                            bgcolor: "rgba(7,17,30,.9)",
+                            bgcolor: "rgba(255,255,255,.94)",
                             border: "1px solid #f5b942",
                             borderRadius: 1,
-                            color: "#ffd477",
+                            color: "#8a681d",
                             fontSize: ".72rem",
                             fontWeight: 850,
                             zIndex: 20,
