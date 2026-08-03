@@ -17,6 +17,9 @@ from backend.engines.demand_supply_engine.departure_detector import (
 from backend.engines.demand_supply_engine.pattern_detector import (
     PatternDetector,
 )
+from backend.engines.demand_supply_engine.zone_boundary_engine import (
+    ZoneBoundaryEngine,
+)
 from backend.config.settings import MAX_BASE_CANDLES, MIN_BASE_CANDLES
 from backend.models.departure import (
     Departure,
@@ -30,6 +33,7 @@ from backend.models.zone import (
 from backend.validators.zone_validator import (
     ZoneValidator,
 )
+from backend.validators.zone_boundary_validator import BoundaryValidationError
 
 
 class ZoneDetectionEngine:
@@ -55,6 +59,8 @@ class ZoneDetectionEngine:
         self._departure_detector = DepartureDetector()
 
         self._pattern_detector = PatternDetector()
+
+        self._boundary_engine = ZoneBoundaryEngine()
 
     def detect_zones(
         self,
@@ -104,11 +110,19 @@ class ZoneDetectionEngine:
                 departure,
             )
 
-            zone = self._create_zone(
-                market_data,
-                base,
-                pattern,
-            )
+            try:
+                zone = self._create_zone(
+                    market_data,
+                    base,
+                    pattern,
+                    departure,
+                )
+            except BoundaryValidationError as error:
+                logger.info(
+                    "Rejecting zone boundary: %s.",
+                    error.reason_code.value,
+                )
+                continue
 
             ZoneValidator.validate_zone(zone)
 
@@ -270,25 +284,26 @@ class ZoneDetectionEngine:
         market_data: DataFrame,
         base,
         pattern,
+        departure: Departure,
     ) -> Zone:
         """
         Create a Zone object from
         a detected BaseRegion.
         """
 
-        base_data = market_data.iloc[base.start_index : base.end_index + 1]
-
-        upper_price = float(base_data["High"].max())
-
-        lower_price = float(base_data["Low"].min())
-
-        if pattern.pattern_type.value in (
-            "DROP_BASE_RALLY",
-            "RALLY_BASE_RALLY",
-        ):
-            zone_type = ZoneType.DEMAND
+        boundary_result = self._boundary_engine.calculate(
+            market_data=market_data,
+            base=base,
+            pattern_type=pattern.pattern_type,
+            departure=departure,
+        )
+        zone_type = self._boundary_engine.zone_type_for(pattern.pattern_type)
+        if zone_type == ZoneType.DEMAND:
+            upper_price = boundary_result.selected.proximal
+            lower_price = boundary_result.selected.distal
         else:
-            zone_type = ZoneType.SUPPLY
+            upper_price = boundary_result.selected.distal
+            lower_price = boundary_result.selected.proximal
 
         logger.info(
             "Creating %s zone.",
@@ -301,6 +316,7 @@ class ZoneDetectionEngine:
             lower_price=lower_price,
             created_index=base.end_index,
             pattern_type=pattern.pattern_type.value,
+            boundary_result=boundary_result,
         )
 
     @staticmethod

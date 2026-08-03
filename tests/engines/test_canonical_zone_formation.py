@@ -104,13 +104,16 @@ def test_exact_boundary_candle_cannot_form_a_zone() -> None:
     )
 
 
-def test_zone_boundary_remains_wick_to_wick() -> None:
+def test_zone_boundary_uses_canonical_body_to_wick() -> None:
     data = FORMATION_CASES["dbr_strong"]
 
     zone = ZoneDetectionEngine().detect_zones(data)[0]
 
     assert zone.lower_price == 91.0
-    assert zone.upper_price == 94.0
+    assert zone.upper_price == 93.0
+    assert zone.boundary_result is not None
+    assert zone.boundary_result.standard.proximal == 93.0
+    assert zone.boundary_result.wick_to_wick.proximal == 94.0
 
 
 def test_leg_out_must_be_stronger_than_complete_leg_in() -> None:

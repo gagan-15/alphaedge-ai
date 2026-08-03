@@ -10,6 +10,8 @@ Sprint:
 from dataclasses import dataclass
 from enum import Enum
 
+from backend.models.zone_boundary import ZoneBoundaryResult
+
 
 class ZoneType(Enum):
     """
@@ -43,3 +45,5 @@ class Zone:
     merged_count: int = 1
 
     pattern_type: str | None = None
+
+    boundary_result: ZoneBoundaryResult | None = None
