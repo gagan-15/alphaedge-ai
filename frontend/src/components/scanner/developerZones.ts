@@ -18,6 +18,7 @@ export interface DeveloperChartZone {
     baseEndDate?: string;
     selected?: boolean;
     reacting?: boolean;
+    lifecycleStatus?: string | null;
 }
 
 export function diagnosticDeveloperZones(
@@ -70,11 +71,13 @@ export function acceptedDeveloperZones(
             proximalPrice: zone.proximal_price,
             distalPrice: zone.distal_price,
             baseIndex: zone.base_index,
+            baseStartDate: zone.base_date,
             pattern: zone.pattern_type ?? undefined,
             zoneStatus: "Accepted",
             zoneScore: zone.zone_score,
             rejectionReasons: [],
             selected: !selectedZoneId || zoneId === selectedZoneId,
+            lifecycleStatus: zone.lifecycle_status ?? null,
         };
     });
 }

@@ -172,6 +172,16 @@ class DepartureDetector:
         )
         if strength is None:
             return None, rules
+        closing_reference = (
+            leg_in.high
+            if leg_out.direction == DepartureDirection.BULLISH
+            else leg_in.low
+        )
+        acceptance_reason = (
+            f"Accepted {strength.value.lower()} departure: canonical Leg-In and "
+            "Leg-Out are valid, Leg-Out is stronger than Leg-In, and both "
+            "closing rules passed."
+        )
         return (
             Departure(
                 direction=leg_out.direction,
@@ -183,6 +193,10 @@ class DepartureDetector:
                 leg_in_end_index=leg_in.end_index,
                 significant_gap=significant_gap,
                 good_closing=good_closing,
+                gap_measurement=gap_ratio,
+                closing_comparison_reference=closing_reference,
+                qualifying_close=first_close,
+                acceptance_reason=acceptance_reason,
             ),
             rules,
         )

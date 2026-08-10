@@ -40,6 +40,10 @@ function overlayFrom(frame: ConfluenceTimeframe): ConfluenceChartOverlay | null 
         distancePercent: frame.zone.distance_percent,
         freshness: frame.zone.freshness,
         retests: frame.zone.retests,
+        relationship: frame.zone.relationship,
+        direction: frame.zone.direction,
+        reasonCode: frame.zone.reason_code,
+        zoneId: frame.zone.zone_id,
     };
 }
 

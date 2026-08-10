@@ -2,6 +2,7 @@
 
 import pandas as pd
 import pytest
+from dataclasses import FrozenInstanceError
 
 from backend.engines.demand_supply_engine.base_detector import BaseDetector
 from backend.engines.demand_supply_engine.departure_detector import DepartureDetector
@@ -164,3 +165,66 @@ def test_frozen_legacy_to_canonical_comparison() -> None:
     assert LEGACY_ACCEPTED - CANONICAL_ACCEPTED == {
         ("boundary_50_percent", "DROP_BASE_RALLY", 1)
     }
+
+
+@pytest.mark.parametrize(
+    ("case", "short_pattern", "direction"),
+    [
+        ("dbr_strong", "DBR", DepartureDirection.BEARISH),
+        ("rbr_strong", "RBR", DepartureDirection.BULLISH),
+        ("rbd_strong", "RBD", DepartureDirection.BULLISH),
+        ("dbd_strong", "DBD", DepartureDirection.BEARISH),
+    ],
+)
+def test_accepted_zone_preserves_complete_formation_evidence(
+    case: str, short_pattern: str, direction: DepartureDirection
+) -> None:
+    zone = ZoneDetectionEngine().detect_zones(FORMATION_CASES[case])[0]
+    evidence = zone.formation_evidence
+
+    assert evidence is not None
+    assert evidence.pattern == short_pattern
+    assert evidence.leg_in_direction == direction
+    assert evidence.base_candle_count == len(evidence.base_candles)
+    assert evidence.base_body_ratios == tuple(
+        candle.classification.body_ratio for candle in evidence.base_candles
+    )
+    assert evidence.first_leg_out_exciting is True
+    assert evidence.departure_strength in set(DepartureStrength)
+    assert evidence.closing_rule_passed is True
+    assert evidence.acceptance_reason.startswith("Accepted ")
+
+
+def test_single_candle_leg_out_preserves_absent_second_candle() -> None:
+    zone = ZoneDetectionEngine().detect_zones(
+        FORMATION_CASES["weak_single_departure"]
+    )[0]
+    evidence = zone.formation_evidence
+
+    assert evidence is not None
+    assert evidence.departure_strength == DepartureStrength.WEAK
+    assert evidence.second_leg_out_exciting is None
+    assert evidence.second_leg_out_explosive is None
+    assert evidence.significant_gap is False
+    assert evidence.gap_measurement is None
+
+
+def test_formation_evidence_is_immutable() -> None:
+    zone = ZoneDetectionEngine().detect_zones(FORMATION_CASES["dbr_strong"])[0]
+    evidence = zone.formation_evidence
+
+    assert evidence is not None
+    with pytest.raises(FrozenInstanceError):
+        evidence.pattern = "RBR"  # type: ignore[misc]
+
+
+def test_evidence_does_not_change_frozen_zone_output() -> None:
+    expected = {
+        "dbr_strong": ("DROP_BASE_RALLY", 93.0, 91.0),
+        "rbr_strong": ("RALLY_BASE_RALLY", 90.5, 89.0),
+        "rbd_strong": ("RALLY_BASE_DROP", 101.0, 99.5),
+        "dbd_strong": ("DROP_BASE_DROP", 95.0, 93.0),
+    }
+    for case, unchanged in expected.items():
+        zone = ZoneDetectionEngine().detect_zones(FORMATION_CASES[case])[0]
+        assert (zone.pattern_type, zone.upper_price, zone.lower_price) == unchanged

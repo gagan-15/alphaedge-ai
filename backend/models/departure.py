@@ -24,3 +24,7 @@ class Departure:
     leg_in_end_index: int | None = None
     significant_gap: bool = False
     good_closing: bool = False
+    gap_measurement: float | None = None
+    closing_comparison_reference: float | None = None
+    qualifying_close: float | None = None
+    acceptance_reason: str | None = None

@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from backend.models.zone_boundary import ZoneBoundaryResult
+from backend.models.formation_evidence import CanonicalFormationEvidence
 
 
 class ZoneType(Enum):
@@ -47,3 +48,5 @@ class Zone:
     pattern_type: str | None = None
 
     boundary_result: ZoneBoundaryResult | None = None
+
+    formation_evidence: CanonicalFormationEvidence | None = None

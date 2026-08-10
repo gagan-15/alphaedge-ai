@@ -165,3 +165,30 @@ def test_service_rejects_zero_range_provider_candle() -> None:
         service.get_stock_data(
             symbol="ZERO-RANGE.NS",
         )
+
+
+def test_segmented_service_skips_zero_range_and_preserves_data_break() -> None:
+    """Scanner consumers receive valid segments on both sides of D02."""
+
+    data = pd.DataFrame(
+        {
+            "Open": [100.0, 101.0, 102.0, 103.0, 104.0],
+            "High": [102.0, 103.0, 102.0, 105.0, 106.0],
+            "Low": [99.0, 100.0, 102.0, 102.0, 103.0],
+            "Close": [101.0, 102.0, 102.0, 104.0, 105.0],
+            "Volume": [1000, 1200, 0, 1300, 1400],
+        },
+        index=pd.date_range("2026-01-13", periods=5, freq="D"),
+    )
+    service = MarketDataService(provider=StubMarketDataProvider(data))
+
+    result = service.get_stock_data_segments(
+        symbol="CONTINUITY-ZERO-RANGE.NS",
+    )
+
+    assert result.skipped_zero_range_count == 1
+    assert result.zero_range_rows == (pd.Timestamp("2026-01-15"),)
+    assert len(result.segments) == 2
+    assert [len(segment) for segment in result.segments] == [2, 2]
+    assert result.segments[0].index.max() == pd.Timestamp("2026-01-14")
+    assert result.segments[1].index.min() == pd.Timestamp("2026-01-16")

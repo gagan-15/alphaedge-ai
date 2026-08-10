@@ -4,7 +4,7 @@ Stage 1 infrastructure only: this module is not imported by production flows.
 It deliberately does not replace the existing freshness implementation.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from typing import Iterable
 
@@ -17,6 +17,9 @@ from backend.models.zone_lifecycle import (
     ZoneLifecycleResult,
     ZoneLifecycleStatus,
     ZoneLifecycleType,
+    ZoneRemoval,
+    ZoneRemovalReason,
+    ProjectionEndReason,
     ZoneVisit,
 )
 
@@ -52,6 +55,8 @@ class _MutableVisit:
     interaction_types: list[ZoneInteractionType] | None = None
     rejection_confirmed: bool = False
     respected: bool | None = None
+    test_number: int = 1
+    test_candle: LifecycleCandle | None = None
 
     def __post_init__(self) -> None:
         if self.interaction_types is None:
@@ -68,11 +73,15 @@ class _MutableVisit:
             interaction_types=tuple(self.interaction_types or ()),
             rejection_confirmed=self.rejection_confirmed,
             respected=self.respected,
+            test_number=self.test_number,
+            test_candle=self.test_candle,
         )
 
 
 class ZoneLifecycleEngine:
     """Evaluate lifecycle facts without owning detection or scoring rules."""
+
+    REACTION_COMPLETION_PERCENT = 5.0
 
     def __init__(self, config: ZoneLifecycleConfig | None = None) -> None:
         self._config = config or ZoneLifecycleConfig()
@@ -83,6 +92,7 @@ class ZoneLifecycleEngine:
         candles: Iterable[LifecycleCandle],
         *,
         current_price: float | None = None,
+        removal: ZoneRemoval | None = None,
     ) -> ZoneLifecycleResult:
         """Evaluate candles from the explicit monitoring start onward."""
 
@@ -96,16 +106,36 @@ class ZoneLifecycleEngine:
             candle
             for candle in ordered
             if candle.index >= zone.activation.monitoring_start_index
+            and (removal is None or candle.timestamp <= removal.removed_at)
         ]
         if not monitored:
-            return self._empty_result(zone, ZoneLifecycleStatus.ACTIVATED)
+            result = self._empty_result(zone, ZoneLifecycleStatus.ACTIVATED)
+            if removal is None:
+                return result
+            return replace(
+                result,
+                lifecycle_status=ZoneLifecycleStatus.REMOVED,
+                structural_status=ZoneLifecycleStatus.REMOVED,
+                is_active=False,
+                is_removed=True,
+                removed_at=removal.removed_at,
+                removal_reason=removal.reason,
+                projection_start_timestamp=zone.activation.activation_time,
+                projection_end_timestamp=removal.removed_at,
+                projection_end_reason=ProjectionEndReason.REMOVED,
+            )
 
         interactions: list[ZoneInteraction] = []
         visits: list[_MutableVisit] = []
         active_visit: _MutableVisit | None = None
         invalidated_at: datetime | None = None
         invalidation_reason: ZoneInvalidationReason | None = None
+        failure_candle: LifecycleCandle | None = None
+        failure_price: float | None = None
         latest_penetration = 0.0
+        reaction_start_time: datetime | None = None
+        reaction_completion_time: datetime | None = None
+        reaction_distance = 0.0
 
         for candle in monitored:
             candle_types = self._interaction_types(zone, candle)
@@ -116,6 +146,8 @@ class ZoneLifecycleEngine:
                     visit_id=f"{zone.zone_id}:V{len(visits) + 1}",
                     start_index=candle.index,
                     start_time=candle.timestamp,
+                    test_number=len(visits) + 1,
+                    test_candle=candle,
                 )
                 visits.append(active_visit)
 
@@ -154,12 +186,15 @@ class ZoneLifecycleEngine:
                     )
                 )
 
-            if (
-                ZoneInteractionType.DISTAL_CLOSE_BREACH in candle_types
-                and candle.is_closed
-            ):
+            if ZoneInteractionType.DISTAL_WICK_BREACH in candle_types:
                 invalidated_at = candle.timestamp
                 invalidation_reason = self._invalidation_reason(zone)
+                failure_candle = candle
+                failure_price = (
+                    candle.low
+                    if zone.zone_type == ZoneLifecycleType.DEMAND
+                    else candle.high
+                )
                 if active_visit is not None:
                     active_visit.end_index = candle.index
                     active_visit.end_time = candle.timestamp
@@ -169,6 +204,22 @@ class ZoneLifecycleEngine:
 
             if active_visit is not None and self._rejected_from_zone(zone, candle):
                 active_visit.rejection_confirmed = True
+                if reaction_start_time is None:
+                    reaction_start_time = candle.timestamp
+
+            if (
+                reaction_start_time is not None
+                and reaction_completion_time is None
+            ):
+                reaction_distance = max(
+                    reaction_distance,
+                    self._reaction_distance(zone, candle),
+                )
+                if (
+                    reaction_distance / zone.width * 100.0
+                    >= self.REACTION_COMPLETION_PERCENT
+                ):
+                    reaction_completion_time = candle.timestamp
 
             if active_visit is not None and self._fully_exited(zone, candle):
                 active_visit.end_index = candle.index
@@ -189,6 +240,10 @@ class ZoneLifecycleEngine:
             active_visit=active_visit,
             max_penetration=max_penetration,
             invalidated=invalidated_at is not None,
+            reacting=(
+                reaction_start_time is not None
+                and reaction_completion_time is None
+            ),
         )
         is_fresh = len(interactions) == 0
         is_approaching = self._is_approaching(zone, current_price)
@@ -202,6 +257,32 @@ class ZoneLifecycleEngine:
             )
             else structural_status
         )
+        removed_at = invalidated_at or (
+            removal.removed_at if removal is not None else None
+        )
+        removal_reason = (
+            ZoneRemovalReason.INVALIDATED
+            if invalidated_at is not None
+            else (removal.reason if removal is not None else None)
+        )
+        is_removed = removed_at is not None
+        if removal is not None and invalidated_at is None:
+            lifecycle_status = ZoneLifecycleStatus.REMOVED
+            structural_status = ZoneLifecycleStatus.REMOVED
+        projection_end_timestamp = (
+            invalidated_at
+            or (removal.removed_at if removal is not None else monitored[-1].timestamp)
+        )
+        projection_end_reason = (
+            ProjectionEndReason.INVALIDATED
+            if invalidated_at is not None
+            else (
+                ProjectionEndReason.REMOVED
+                if removal is not None
+                else ProjectionEndReason.END_OF_DATA
+            )
+        )
+        reaction_percentage = reaction_distance / zone.width * 100.0
 
         return ZoneLifecycleResult(
             zone_id=zone.zone_id,
@@ -229,6 +310,29 @@ class ZoneLifecycleEngine:
             invalidation_reason=invalidation_reason,
             interactions=tuple(interactions),
             visits=frozen_visits,
+            freshness_timestamp=zone.activation.activation_time,
+            first_touch_timestamp=(
+                frozen_visits[0].start_time if frozen_visits else None
+            ),
+            failure_timestamp=invalidated_at,
+            failure_candle=failure_candle,
+            failure_price=failure_price,
+            is_active=not is_removed,
+            is_removed=is_removed,
+            removed_at=removed_at,
+            removal_reason=removal_reason,
+            projection_start_timestamp=zone.activation.activation_time,
+            projection_end_timestamp=projection_end_timestamp,
+            projection_end_reason=projection_end_reason,
+            is_reacting=(
+                reaction_start_time is not None
+                and reaction_completion_time is None
+                and not is_removed
+            ),
+            reaction_start_time=reaction_start_time,
+            reaction_completion_time=reaction_completion_time,
+            reaction_distance=reaction_distance,
+            reaction_percentage=reaction_percentage,
         )
 
     @staticmethod
@@ -242,7 +346,7 @@ class ZoneLifecycleEngine:
             depth = zone.proximal - min(candle.low, zone.proximal)
         else:
             depth = max(candle.high, zone.proximal) - zone.proximal
-        return max(0.0, (depth / zone.width) * 100.0)
+        return min(100.0, max(0.0, (depth / zone.width) * 100.0))
 
     @staticmethod
     def _validate_unique_indices(candles: list[LifecycleCandle]) -> None:
@@ -356,8 +460,19 @@ class ZoneLifecycleEngine:
         zone: ZoneLifecycleDefinition,
     ) -> ZoneInvalidationReason:
         if zone.zone_type == ZoneLifecycleType.DEMAND:
-            return ZoneInvalidationReason.DEMAND_CLOSE_BELOW_DISTAL
-        return ZoneInvalidationReason.SUPPLY_CLOSE_ABOVE_DISTAL
+            return ZoneInvalidationReason.DEMAND_TRADE_BELOW_DISTAL
+        return ZoneInvalidationReason.SUPPLY_TRADE_ABOVE_DISTAL
+
+    @staticmethod
+    def _reaction_distance(
+        zone: ZoneLifecycleDefinition,
+        candle: LifecycleCandle,
+    ) -> float:
+        """Return expected-direction travel beyond Proximal."""
+
+        if zone.zone_type == ZoneLifecycleType.DEMAND:
+            return max(0.0, candle.high - zone.proximal)
+        return max(0.0, zone.proximal - candle.low)
 
     def _structural_status(
         self,
@@ -366,9 +481,12 @@ class ZoneLifecycleEngine:
         active_visit: _MutableVisit | None,
         max_penetration: float,
         invalidated: bool,
+        reacting: bool,
     ) -> ZoneLifecycleStatus:
         if invalidated:
             return ZoneLifecycleStatus.INVALIDATED
+        if reacting:
+            return ZoneLifecycleStatus.REACTING
         if active_visit is not None:
             return ZoneLifecycleStatus.TESTING_NOW
         if not visits:
@@ -439,4 +557,14 @@ class ZoneLifecycleEngine:
             last_tested_at=None,
             invalidated_at=None,
             invalidation_reason=None,
+            freshness_timestamp=(
+                zone.activation.activation_time
+                if status == ZoneLifecycleStatus.ACTIVATED
+                else None
+            ),
+            projection_start_timestamp=(
+                zone.activation.activation_time
+                if status == ZoneLifecycleStatus.ACTIVATED
+                else None
+            ),
         )

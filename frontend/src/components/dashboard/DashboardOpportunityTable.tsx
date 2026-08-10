@@ -19,6 +19,7 @@ import { alpha } from "@mui/material/styles";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 import type { ZoneResearchResult } from "../../types/scanner";
+import { formatZoneQuality } from "../scanner/zoneQualityPresentation";
 
 export type DashboardOpportunityType = "demand" | "supply";
 
@@ -165,7 +166,7 @@ export default function DashboardOpportunityTable({
                                     </TableCell>
                                     <TableCell align="center">
                                         <Box sx={{ display: "inline-grid", minWidth: 48, height: 38, px: 0.85, placeItems: "center", borderRadius: 1.8, color: accent, bgcolor: alpha(accent, 0.13), border: `1px solid ${alpha(accent, 0.3)}` }}>
-                                            <Typography sx={{ fontSize: "1.12rem", lineHeight: 1, fontWeight: 900 }}>{zone.zone_score.toFixed(0)}</Typography>
+                                            <Typography sx={{ fontSize: "1.12rem", lineHeight: 1, fontWeight: 900 }}>{formatZoneQuality(zone.zone_score)}</Typography>
                                         </Box>
                                     </TableCell>
                                     <TableCell>

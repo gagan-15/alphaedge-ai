@@ -16,6 +16,9 @@ from backend.models.zone_lifecycle import (
     ZoneLifecycleDefinition,
     ZoneLifecycleStatus,
     ZoneLifecycleType,
+    ZoneRemoval,
+    ZoneRemovalReason,
+    ProjectionEndReason,
 )
 
 
@@ -110,6 +113,8 @@ class TestLifecycleStates:
         assert result.lifecycle_status == ZoneLifecycleStatus.FRESH
         assert result.is_fresh is True
         assert result.visit_count == 0
+        assert result.freshness_timestamp == BASE_TIME + timedelta(days=2)
+        assert result.first_touch_timestamp is None
 
     def test_current_visit_is_testing_now(self) -> None:
         result = ZoneLifecycleEngine().evaluate(
@@ -120,6 +125,10 @@ class TestLifecycleStates:
         assert result.lifecycle_status == ZoneLifecycleStatus.TESTING_NOW
         assert result.is_fresh is False
         assert result.visit_count == 1
+        assert result.first_touch_timestamp == BASE_TIME + timedelta(days=3)
+        assert result.visits[0].test_number == 1
+        assert result.visits[0].test_candle is not None
+        assert result.visits[0].test_candle.index == 3
 
     def test_completed_first_visit_is_tested_respected(self) -> None:
         result = ZoneLifecycleEngine().evaluate(
@@ -133,6 +142,7 @@ class TestLifecycleStates:
         assert result.lifecycle_status == ZoneLifecycleStatus.TESTED_RESPECTED
         assert result.visits[0].rejection_confirmed is True
         assert result.visits[0].respected is True
+        assert result.freshness_timestamp == BASE_TIME + timedelta(days=2)
 
     def test_two_separate_visits_are_retested(self) -> None:
         result = ZoneLifecycleEngine().evaluate(
@@ -150,6 +160,8 @@ class TestLifecycleStates:
         assert result.test_count == 2
         assert result.visits[0].visit_id.endswith(":V1")
         assert result.visits[1].visit_id.endswith(":V2")
+        assert result.visits[0].test_number == 1
+        assert result.visits[1].test_number == 2
 
     def test_deep_non_invalidating_visit_is_mitigated(self) -> None:
         result = ZoneLifecycleEngine().evaluate(
@@ -277,9 +289,109 @@ class TestInteractionsAndPenetration:
         assert result.lifecycle_status == ZoneLifecycleStatus.FRESH
         assert result.interactions == ()
 
+    def test_penetration_is_capped_at_one_hundred_percent(self) -> None:
+        observed = ZoneLifecycleEngine.penetration_percent(
+            demand_zone(),
+            candle(3, 105, 108, 90, 98),
+        )
+
+        assert observed == 100.0
+
+    def test_current_and_maximum_penetration_are_stored_separately(self) -> None:
+        result = ZoneLifecycleEngine().evaluate(
+            demand_zone(),
+            [
+                candle(3, 108, 112, 105, 106),
+                candle(4, 111, 115, 110.1, 114),
+            ],
+        )
+
+        assert result.penetration_percent == 0.0
+        assert result.max_penetration_percent == 50.0
+
+
+class TestReactingAndProjection:
+    def test_zone_enters_reacting_after_crossing_back_over_proximal(self) -> None:
+        result = ZoneLifecycleEngine().evaluate(
+            demand_zone(),
+            [
+                candle(3, 108, 109, 106, 107),
+                candle(4, 109, 110.3, 108, 110.2),
+            ],
+        )
+
+        assert result.lifecycle_status == ZoneLifecycleStatus.REACTING
+        assert result.is_reacting is True
+        assert result.reaction_start_time == BASE_TIME + timedelta(days=4)
+        assert result.reaction_completion_time is None
+        assert result.reaction_distance == pytest.approx(0.3)
+        assert result.reaction_percentage == pytest.approx(3.0)
+
+    def test_reaction_completes_after_five_percent_of_zone_width(self) -> None:
+        result = ZoneLifecycleEngine().evaluate(
+            demand_zone(),
+            [
+                candle(3, 108, 109, 106, 107),
+                candle(4, 109, 110.3, 108, 110.2),
+                candle(5, 110.2, 111, 110.1, 110.8),
+            ],
+        )
+
+        assert result.is_reacting is False
+        assert result.reaction_start_time == BASE_TIME + timedelta(days=4)
+        assert result.reaction_completion_time == BASE_TIME + timedelta(days=5)
+        assert result.reaction_distance == 1.0
+        assert result.reaction_percentage == 10.0
+        assert result.lifecycle_status == ZoneLifecycleStatus.TESTED_RESPECTED
+
+    def test_supply_reacting_uses_expected_downward_direction(self) -> None:
+        result = ZoneLifecycleEngine().evaluate(
+            supply_zone(),
+            [
+                candle(3, 102, 105, 101, 104),
+                candle(4, 101, 103, 99.7, 99.8),
+            ],
+        )
+
+        assert result.lifecycle_status == ZoneLifecycleStatus.REACTING
+        assert result.reaction_distance == pytest.approx(0.3)
+
+    def test_fresh_projection_reaches_end_of_available_data(self) -> None:
+        result = ZoneLifecycleEngine().evaluate(
+            demand_zone(),
+            [candle(3, 115, 120, 111, 118)],
+        )
+
+        assert result.projection_start_timestamp == BASE_TIME + timedelta(days=2)
+        assert result.projection_end_timestamp == BASE_TIME + timedelta(days=3)
+        assert result.projection_end_reason == ProjectionEndReason.END_OF_DATA
+
+    def test_manual_removal_keeps_history_and_ends_projection(self) -> None:
+        removal = ZoneRemoval(
+            removed_at=BASE_TIME + timedelta(days=5),
+            reason=ZoneRemovalReason.MANUAL,
+        )
+        result = ZoneLifecycleEngine().evaluate(
+            demand_zone(),
+            [
+                candle(3, 108, 112, 106, 108),
+                candle(4, 112, 116, 111, 115),
+                candle(6, 109, 112, 105, 106),
+            ],
+            removal=removal,
+        )
+
+        assert result.lifecycle_status == ZoneLifecycleStatus.REMOVED
+        assert result.is_active is False
+        assert result.is_removed is True
+        assert result.removed_at == removal.removed_at
+        assert result.removal_reason == ZoneRemovalReason.MANUAL
+        assert result.visit_count == 1
+        assert result.projection_end_reason == ProjectionEndReason.REMOVED
+
 
 class TestInvalidation:
-    def test_demand_distal_wick_breach_with_recovery_is_not_invalidated(
+    def test_demand_trade_beyond_distal_is_immediately_invalidated(
         self,
     ) -> None:
         result = ZoneLifecycleEngine().evaluate(
@@ -295,8 +407,14 @@ class TestInvalidation:
         }
 
         assert ZoneInteractionType.DISTAL_WICK_BREACH in types
-        assert result.lifecycle_status == ZoneLifecycleStatus.MITIGATED
-        assert result.invalidated_at is None
+        assert result.lifecycle_status == ZoneLifecycleStatus.INVALIDATED
+        assert result.invalidated_at == BASE_TIME + timedelta(days=3)
+        assert result.failure_candle is not None
+        assert result.failure_candle.index == 3
+        assert result.failure_price == 98
+        assert result.is_active is False
+        assert result.is_removed is True
+        assert result.removal_reason == ZoneRemovalReason.INVALIDATED
 
     def test_demand_closed_below_distal_is_invalidated(self) -> None:
         result = ZoneLifecycleEngine().evaluate(
@@ -307,7 +425,7 @@ class TestInvalidation:
         assert result.lifecycle_status == ZoneLifecycleStatus.INVALIDATED
         assert (
             result.invalidation_reason
-            == ZoneInvalidationReason.DEMAND_CLOSE_BELOW_DISTAL
+            == ZoneInvalidationReason.DEMAND_TRADE_BELOW_DISTAL
         )
         assert result.invalidated_at == BASE_TIME + timedelta(days=3)
 
@@ -320,10 +438,10 @@ class TestInvalidation:
         assert result.lifecycle_status == ZoneLifecycleStatus.INVALIDATED
         assert (
             result.invalidation_reason
-            == ZoneInvalidationReason.SUPPLY_CLOSE_ABOVE_DISTAL
+            == ZoneInvalidationReason.SUPPLY_TRADE_ABOVE_DISTAL
         )
 
-    def test_unfinished_distal_close_breach_is_pending(self) -> None:
+    def test_unfinished_trade_beyond_distal_is_immediately_invalidated(self) -> None:
         result = ZoneLifecycleEngine().evaluate(
             demand_zone(),
             [candle(3, 105, 108, 95, 98, is_closed=False)],
@@ -336,8 +454,8 @@ class TestInvalidation:
         )
 
         assert close_breach.is_confirmed is False
-        assert result.lifecycle_status == ZoneLifecycleStatus.TESTING_NOW
-        assert result.invalidated_at is None
+        assert result.lifecycle_status == ZoneLifecycleStatus.INVALIDATED
+        assert result.invalidated_at == BASE_TIME + timedelta(days=3)
 
 
 class TestValidation:
@@ -383,3 +501,59 @@ class TestValidation:
                 demand_zone(),
                 [duplicate, duplicate],
             )
+
+
+def test_frozen_lifecycle_comparison_corpus() -> None:
+    engine = ZoneLifecycleEngine()
+    results = [
+        engine.evaluate(
+            demand_zone(), [candle(3, 115, 120, 111, 118)]
+        ),
+        engine.evaluate(
+            demand_zone(),
+            [
+                candle(3, 112, 114, 108, 112),
+                candle(4, 113, 118, 111, 117),
+            ],
+        ),
+        engine.evaluate(
+            demand_zone(),
+            [
+                candle(3, 112, 114, 109, 112),
+                candle(4, 113, 116, 111, 115),
+                candle(5, 112, 114, 108, 112),
+                candle(6, 113, 117, 111, 116),
+            ],
+        ),
+        engine.evaluate(
+            demand_zone(),
+            [
+                candle(3, 108, 109, 106, 107),
+                candle(4, 109, 110.3, 108, 110.2),
+            ],
+        ),
+        engine.evaluate(
+            demand_zone(), [candle(3, 105, 108, 95, 98)]
+        ),
+        engine.evaluate(
+            demand_zone(),
+            [
+                candle(3, 108, 112, 106, 108),
+                candle(4, 112, 116, 111, 115),
+            ],
+            removal=ZoneRemoval(BASE_TIME + timedelta(days=5)),
+        ),
+    ]
+
+    assert len(results) == 6
+    assert sum(result.is_fresh for result in results) == 1
+    assert sum(result.test_count >= 1 for result in results) == 5
+    assert sum(result.test_count >= 2 for result in results) == 1
+    assert sum(result.is_reacting for result in results) == 1
+    assert sum(result.invalidated_at is not None for result in results) == 1
+    assert sum(result.is_removed for result in results) == 2
+    average = sum(result.max_penetration_percent for result in results) / len(
+        results
+    )
+    assert average == pytest.approx(36.6666667)
+    assert max(result.max_penetration_percent for result in results) == 100.0

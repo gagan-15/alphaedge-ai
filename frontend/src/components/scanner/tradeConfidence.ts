@@ -1,6 +1,7 @@
 import type { StockDetailsBackendAnalysis } from "../../api/scannerApi";
 import type { ZoneResearchResult } from "../../types/scanner";
 import type { StockZoneAnalysis } from "./stockZoneAnalysis";
+import { formatZoneQuality } from "./zoneQualityPresentation";
 
 export type ConfidenceStatus = "PASS" | "MIXED" | "FAIL" | "UNAVAILABLE";
 
@@ -52,7 +53,7 @@ export function buildTradeConfidence(
         ? "MIXED" : result.distance_percent <= 3 ? "MIXED" : "FAIL";
 
     const factors: TradeConfidenceFactor[] = [
-        { key: "zone", label: "Zone Quality", weight: 20, status: result.zone_score >= 75 ? "PASS" : result.zone_score >= 60 ? "MIXED" : "FAIL", explanation: `The zone itself scored ${result.zone_score.toFixed(0)} out of 100.` },
+        { key: "zone", label: "Zone Quality", weight: 20, status: result.zone_score >= 75 ? "PASS" : result.zone_score >= 60 ? "MIXED" : "FAIL", explanation: `The zone itself scored ${formatZoneQuality(result.zone_score)} out of 100.` },
         { key: "ema", label: "EMA alignment", weight: 7, status: checkStatus("EMA alignment"), explanation: checkReason("EMA alignment", "Moving-average data is not ready.") },
         { key: "trend", label: "Trend", weight: 7, status: checkStatus("Trend confirmation"), explanation: checkReason("Trend confirmation", "Trend data is not ready.") },
         { key: "rsi", label: "RSI", weight: 5, status: checkStatus("RSI condition"), explanation: checkReason("RSI condition", "Momentum data is not ready.") },

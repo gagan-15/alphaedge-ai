@@ -3,6 +3,7 @@
 import re
 
 from fastapi import APIRouter, HTTPException, Query
+from pandas import concat
 
 from backend.api.models.market_response import (
     CandleResponse,
@@ -20,7 +21,7 @@ market_router = APIRouter(prefix="/market", tags=["Market Data"])
 
 _market_data_service = MarketDataService()
 _default_symbol = UniverseService().get_symbols("nse500")[0]
-_symbol_pattern = re.compile(r"^[A-Z0-9.^_-]{1,24}$")
+_symbol_pattern = re.compile(r"^[A-Z0-9.&^_-]{1,24}$")
 _allowed_periods = {"1mo", "3mo", "6mo", "1y", "2y", "5y", "10y"}
 _allowed_intervals = {"1d", "1h", "30m", "15m", "5m"}
 
@@ -52,11 +53,14 @@ def get_candles(
     try:
         if timeframe in INTRADAY_SOURCES:
             period, interval = INTRADAY_SOURCES[timeframe]
-        data = _market_data_service.get_stock_data(
+        validated = _market_data_service.get_stock_data_segments(
             symbol=normalized_symbol,
             period=period,
             interval=interval,
         )
+        # Charting may display valid candles on both sides of a data break.
+        # Invalid rows remain excluded; no values are interpolated or created.
+        data = concat(validated.segments).sort_index()
         data = aggregate_timeframe(data, timeframe)
     except Exception as error:
         raise HTTPException(

@@ -5,6 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any
 
+from backend.config.timeframe_hierarchy import get_timeframe_hierarchy
 from backend.engines.demand_supply_engine.zone_detection_engine import (
     ZoneDetectionEngine,
 )
@@ -54,6 +55,29 @@ class TimeframeConfluenceService:
         return min(100.0, intersection / width * 100.0)
 
     @staticmethod
+    def overlap_relationship(
+        execution_lower: float,
+        execution_upper: float,
+        higher_lower: float,
+        higher_upper: float,
+        tick_size: float = 0.05,
+    ) -> str:
+        """Describe price-area geometry without changing a zone decision."""
+        tolerance = max(float(tick_size), 0.0)
+        if (
+            higher_lower <= execution_lower + tolerance
+            and higher_upper >= execution_upper - tolerance
+        ):
+            return "FULL_OVERLAP"
+        intersection = min(execution_upper, higher_upper) - max(
+            execution_lower, higher_lower
+        )
+        if intersection > tolerance:
+            return "PARTIAL_OVERLAP"
+        gap = max(higher_lower - execution_upper, execution_lower - higher_upper, 0.0)
+        return "TOUCHING" if gap <= tolerance else "NO_OVERLAP"
+
+    @staticmethod
     def distance_percent(
         execution_lower: float,
         execution_upper: float,
@@ -80,6 +104,20 @@ class TimeframeConfluenceService:
         if same_type and (overlap > 0 or distance <= 5):
             return "PARTIAL"
         return "NOT_CONFIRMED"
+
+    @staticmethod
+    def compatibility(zone_type: str, higher_zone_type: str | None) -> str:
+        if higher_zone_type is None:
+            return "NO_HTF_CONTEXT"
+        return "ALIGNED" if zone_type == higher_zone_type else "OPPOSING"
+
+    @staticmethod
+    def reason_code(relationship: str, compatibility: str) -> str:
+        if compatibility == "NO_HTF_CONTEXT":
+            return "HTF_CONTEXT_UNAVAILABLE"
+        if relationship == "NO_OVERLAP":
+            return "HTF_NO_OVERLAP"
+        return f"HTF_{relationship}_{compatibility}"
 
     @staticmethod
     def _explanation(
@@ -120,14 +158,21 @@ class TimeframeConfluenceService:
     ) -> dict[str, Any]:
         del refresh_key  # It intentionally remains part of the cache key.
         higher_frames = self.higher_timeframes(execution_timeframe)
+        hierarchy = get_timeframe_hierarchy(execution_timeframe)
         execution_lower = min(proximal_price, distal_price)
         execution_upper = max(proximal_price, distal_price)
-        data = self._market.get_stock_data(symbol, period="10y", interval="1d")
-        current_price = float(data["Close"].iloc[-1])
+        validated_data = self._market.get_stock_data_segments(
+            symbol, period="10y", interval="1d"
+        )
+        segments = validated_data.segments
+        current_price = float(segments[-1]["Close"].iloc[-1])
         results: list[dict[str, Any]] = []
         for timeframe in higher_frames:
-            framed = aggregate_timeframe(data, timeframe)
-            zones = self._detector.detect_zones(framed)
+            zones = []
+            for segment in segments:
+                framed = aggregate_timeframe(segment, timeframe)
+                if not framed.empty:
+                    zones.extend(self._detector.detect_zones(framed))
             if not zones:
                 results.append(
                     {
@@ -135,6 +180,12 @@ class TimeframeConfluenceService:
                         "timeframe_name": TIMEFRAME_NAMES[timeframe],
                         "status": "NOT_CONFIRMED",
                         "zone": None,
+                        "relationship": "NO_OVERLAP",
+                        "compatibility": "NO_HTF_CONTEXT",
+                        "reason_code": "HTF_CONTEXT_UNAVAILABLE",
+                        "selection_reason": (
+                            "No canonical zone exists on this timeframe."
+                        ),
                         "explanation": (
                             f"No validated {TIMEFRAME_NAMES[timeframe].lower()} "
                             "zone was found in the available history."
@@ -161,19 +212,40 @@ class TimeframeConfluenceService:
             selected, overlap, distance = max(
                 candidates,
                 key=lambda item: (
-                    item[0].zone_type.value == zone_type,
                     item[1],
                     -item[2],
+                    item[0].created_index,
+                    item[0].zone_type.value,
                 ),
             )
             score = self._scoring.score([selected]).scored_zones[0].total_score
             same_type = selected.zone_type.value == zone_type
+            compatibility = self.compatibility(zone_type, selected.zone_type.value)
+            relationship = self.overlap_relationship(
+                execution_lower,
+                execution_upper,
+                selected.lower_price,
+                selected.upper_price,
+            )
+            reason_code = self.reason_code(relationship, compatibility)
+            zone_id = (
+                f"{symbol}:{timeframe}:{selected.zone_type.value}:"
+                f"{selected.pattern_type or 'UNKNOWN'}:{selected.created_index}"
+            )
             results.append(
                 {
                     "timeframe": timeframe,
                     "timeframe_name": TIMEFRAME_NAMES[timeframe],
                     "status": self.status(same_type, overlap, distance),
+                    "relationship": relationship,
+                    "compatibility": compatibility,
+                    "reason_code": reason_code,
+                    "selection_reason": (
+                        "Selected by highest execution-zone overlap, then shortest "
+                        "distance, then newest canonical formation."
+                    ),
                     "zone": {
+                        "zone_id": zone_id,
                         "zone_type": selected.zone_type.value,
                         "lower_price": round(selected.lower_price, 2),
                         "upper_price": round(selected.upper_price, 2),
@@ -196,6 +268,9 @@ class TimeframeConfluenceService:
                             "Fresh" if selected.is_fresh else "Retested"
                         ),
                         "retests": selected.touch_count,
+                        "relationship": relationship,
+                        "direction": compatibility,
+                        "reason_code": reason_code,
                     },
                     "explanation": self._explanation(
                         timeframe,
@@ -248,6 +323,9 @@ class TimeframeConfluenceService:
         return {
             "symbol": symbol,
             "execution_timeframe": execution_timeframe,
+            "location_timeframe": hierarchy.location,
+            "trend_timeframe": hierarchy.trend,
+            "trend_state": "UNAVAILABLE",
             "execution_zone": {
                 "zone_type": zone_type,
                 "proximal_price": proximal_price,

@@ -19,8 +19,10 @@ class ZoneLifecycleStatus(str, Enum):
     TESTING_NOW = "TESTING_NOW"
     TESTED_RESPECTED = "TESTED_RESPECTED"
     RETESTED = "RETESTED"
+    REACTING = "REACTING"
     MITIGATED = "MITIGATED"
     INVALIDATED = "INVALIDATED"
+    REMOVED = "REMOVED"
 
 
 class ZoneLifecycleType(str, Enum):
@@ -46,6 +48,24 @@ class ZoneInvalidationReason(str, Enum):
 
     DEMAND_CLOSE_BELOW_DISTAL = "DEMAND_CLOSE_BELOW_DISTAL"
     SUPPLY_CLOSE_ABOVE_DISTAL = "SUPPLY_CLOSE_ABOVE_DISTAL"
+    DEMAND_TRADE_BELOW_DISTAL = "DEMAND_TRADE_BELOW_DISTAL"
+    SUPPLY_TRADE_ABOVE_DISTAL = "SUPPLY_TRADE_ABOVE_DISTAL"
+
+
+class ZoneRemovalReason(str, Enum):
+    """Reasons a zone leaves active recommendations but remains historical."""
+
+    INVALIDATED = "INVALIDATED"
+    MANUAL = "MANUAL"
+    EXPIRED = "EXPIRED"
+
+
+class ProjectionEndReason(str, Enum):
+    """Reason the recorded projection segment ended."""
+
+    INVALIDATED = "INVALIDATED"
+    REMOVED = "REMOVED"
+    END_OF_DATA = "END_OF_DATA"
 
 
 @dataclass(frozen=True)
@@ -172,6 +192,16 @@ class ZoneVisit:
     interaction_types: tuple[ZoneInteractionType, ...]
     rejection_confirmed: bool
     respected: bool | None
+    test_number: int = 1
+    test_candle: LifecycleCandle | None = None
+
+
+@dataclass(frozen=True)
+class ZoneRemoval:
+    """Explicit removal instruction supplied to lifecycle evaluation."""
+
+    removed_at: datetime
+    reason: ZoneRemovalReason = ZoneRemovalReason.MANUAL
 
 
 @dataclass(frozen=True)
@@ -196,3 +226,20 @@ class ZoneLifecycleResult:
     invalidation_reason: ZoneInvalidationReason | None
     interactions: tuple[ZoneInteraction, ...] = field(default_factory=tuple)
     visits: tuple[ZoneVisit, ...] = field(default_factory=tuple)
+    freshness_timestamp: datetime | None = None
+    first_touch_timestamp: datetime | None = None
+    failure_timestamp: datetime | None = None
+    failure_candle: LifecycleCandle | None = None
+    failure_price: float | None = None
+    is_active: bool = True
+    is_removed: bool = False
+    removed_at: datetime | None = None
+    removal_reason: ZoneRemovalReason | None = None
+    projection_start_timestamp: datetime | None = None
+    projection_end_timestamp: datetime | None = None
+    projection_end_reason: ProjectionEndReason | None = None
+    is_reacting: bool = False
+    reaction_start_time: datetime | None = None
+    reaction_completion_time: datetime | None = None
+    reaction_distance: float = 0.0
+    reaction_percentage: float = 0.0

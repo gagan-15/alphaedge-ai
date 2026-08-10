@@ -15,13 +15,17 @@ from typing import Literal
 from fastapi import APIRouter, HTTPException, Query
 from pandas import DataFrame
 
+from backend.core.logger import logger
 from backend.api.models.scanner_response import (
     ScannerResponse,
     ScannerResultResponse,
     ZoneExplanationFactorResponse,
     ZoneExplanationResponse,
+    ZoneQualityComponentResponse,
     ZoneResearchResponse,
     ZoneResearchResultResponse,
+    ZoneLifecycleSummaryResponse,
+    ZoneStateCountResponse,
     ZoneCandidateDiagnosticResponse,
     ZoneDiagnosticsResponse,
     ZoneRuleDiagnosticResponse,
@@ -37,14 +41,21 @@ from backend.models.market_scanner.market_scanner_result import (
     MarketScannerResult,
 )
 from backend.models.zone import Zone, ZoneType
+from backend.models.zone_scoring.canonical_zone_quality import ZoneQualityContext
 from backend.services.scanner.scanner_service import (
     ScannerService,
+)
+from backend.services.scanner.dashboard_zone_qualification_service import (
+    DashboardZoneQualificationService,
 )
 from backend.services.scanner.stock_details_analysis_service import (
     StockDetailsAnalysisService,
 )
 from backend.services.scanner.timeframe_confluence_service import (
     TimeframeConfluenceService,
+)
+from backend.services.scanner.zone_lifecycle_ui_service import (
+    ZoneLifecycleUiService,
 )
 from backend.services.zone_explanation_service import ZoneExplanationService
 from backend.services.market_data.market_data_service import MarketDataService
@@ -69,6 +80,8 @@ _zone_scoring_engine = ZoneScoringEngine()
 _zone_config = ScannerConfig()
 _stock_details_analysis = StockDetailsAnalysisService()
 _timeframe_confluence = TimeframeConfluenceService()
+_zone_lifecycle_ui = ZoneLifecycleUiService()
+_dashboard_qualification = DashboardZoneQualificationService()
 _universe_service = UniverseService()
 _zone_scan_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="zone-scan")
 _zone_scan_cache: dict[str, tuple[float, ZoneResearchResponse]] = {}
@@ -243,29 +256,26 @@ def _reaction_state(
         close = float(candle["Close"])
         entered_on_candle = low <= zone.upper_price and high >= zone.lower_price
         touched = touched or entered_on_candle
-        crossed = (
-            touched
-            and (
-                (
-                    demand
-                    and close > zone.upper_price
-                    and (
-                        entered_on_candle
-                        or (
-                            previous_close is not None
-                            and previous_close <= zone.upper_price
-                        )
+        crossed = touched and (
+            (
+                demand
+                and close > zone.upper_price
+                and (
+                    entered_on_candle
+                    or (
+                        previous_close is not None
+                        and previous_close <= zone.upper_price
                     )
                 )
-                or (
-                    not demand
-                    and close < zone.lower_price
-                    and (
-                        entered_on_candle
-                        or (
-                            previous_close is not None
-                            and previous_close >= zone.lower_price
-                        )
+            )
+            or (
+                not demand
+                and close < zone.lower_price
+                and (
+                    entered_on_candle
+                    or (
+                        previous_close is not None
+                        and previous_close >= zone.lower_price
                     )
                 )
             )
@@ -287,9 +297,7 @@ def _reaction_state(
         else (proximal - latest) / proximal * 100
     )
     completion_price = proximal * (
-        1 + completion_percent / 100
-        if demand
-        else 1 - completion_percent / 100
+        1 + completion_percent / 100 if demand else 1 - completion_percent / 100
     )
     reaction_candles = later.iloc[start_position:]
     completed_mask = (
@@ -305,22 +313,14 @@ def _reaction_state(
     completed = bool(completion_positions)
     end_position = completion_positions[0] if completed else None
     ended_index = (
-        reaction_candles.index[end_position]
-        if end_position is not None
-        else None
+        reaction_candles.index[end_position] if end_position is not None else None
     )
-    duration = (
-        end_position + 1
-        if end_position is not None
-        else len(reaction_candles)
-    )
+    duration = end_position + 1 if end_position is not None else len(reaction_candles)
     return {
         "active": not completed and reaction_percent >= 0,
         "percent": round(reaction_percent, 2),
         "started": (
-            started.isoformat()
-            if hasattr(started, "isoformat")
-            else str(started)
+            started.isoformat() if hasattr(started, "isoformat") else str(started)
         ),
         "ended": (
             ended_index.isoformat()
@@ -357,20 +357,16 @@ def build_scanner_response(
         ScannerResultResponse(
             symbol=opportunity.symbol,
             entry_price=(
-                opportunity.risk_management_result
-                .entry_confirmation.trade_setup.entry_price
+                opportunity.risk_management_result.entry_confirmation.trade_setup.entry_price  # noqa: E501
             ),
             stop_loss=(
-                opportunity.risk_management_result
-                .entry_confirmation.trade_setup.stop_loss
+                opportunity.risk_management_result.entry_confirmation.trade_setup.stop_loss  # noqa: E501
             ),
             target_price=(
-                opportunity.risk_management_result
-                .entry_confirmation.trade_setup.target_price
+                opportunity.risk_management_result.entry_confirmation.trade_setup.target_price  # noqa: E501
             ),
             risk_reward_ratio=(
-                opportunity.risk_management_result
-                .entry_confirmation.trade_setup.risk_reward_ratio
+                opportunity.risk_management_result.entry_confirmation.trade_setup.risk_reward_ratio  # noqa: E501
             ),
             confirmation_score=(
                 opportunity.risk_management_result.entry_confirmation.confirmation_score
@@ -434,7 +430,27 @@ def _scan_research_zones(
     """Return recent demand and supply zones for research exploration."""
 
     results: list[ZoneResearchResultResponse] = []
+    historical_results: list[ZoneResearchResultResponse] = []
+    dashboard_base_preferences: dict[tuple[str, int], int] = {}
+    summary_keys = (
+        "total",
+        "fresh",
+        "reacting",
+        "tested",
+        "retested",
+        "invalidated",
+        "authentic",
+        "non_authentic",
+    )
+    summary = {
+        "DEMAND": {key: 0 for key in summary_keys},
+        "SUPPLY": {key: 0 for key in summary_keys},
+    }
     scanned = 0
+    canonical_zone_count = 0
+    formation_qualified_count = 0
+    dashboard_qualified_count = 0
+    qualification_rejection_counts: dict[str, int] = {}
     universe_symbols = _universe_service.get_symbols(universe, symbols)
     source_period, source_interval = _INTRADAY_SOURCE.get(
         timeframe,
@@ -444,15 +460,26 @@ def _scan_research_zones(
         ),
     )
 
-    def load_symbol(symbol: str) -> DataFrame | None:
+    zero_range_skipped = 0
+    zones_ended_at_data_break = 0
+
+    def load_symbol(
+        symbol: str,
+    ) -> tuple[tuple[DataFrame, ...], int] | None:
         for attempt in range(2):
             try:
-                data = _zone_market_data.get_stock_data(
+                validated = _zone_market_data.get_stock_data_segments(
                     symbol=symbol,
                     period=source_period,
                     interval=source_interval,
                 )
-                result = _timeframe_data(data, timeframe)
+                segments = tuple(
+                    framed
+                    for segment in validated.segments
+                    if not (framed := _timeframe_data(segment, timeframe)).empty
+                )
+                if not segments:
+                    raise ValueError("No valid market-data segments remain.")
                 if progress_key:
                     with _zone_scan_lock:
                         processed, failed = _zone_scan_progress.get(
@@ -463,7 +490,7 @@ def _scan_research_zones(
                             processed + 1,
                             failed,
                         )
-                return result
+                return segments, validated.skipped_zero_range_count
             except Exception:
                 if attempt == 0:
                     sleep(0.25)
@@ -482,31 +509,124 @@ def _scan_research_zones(
     ) as executor:
         loaded_data = list(executor.map(load_symbol, universe_symbols))
 
-    for symbol, data in zip(universe_symbols, loaded_data, strict=True):
-        if data is None:
+    for symbol, loaded in zip(universe_symbols, loaded_data, strict=True):
+        if loaded is None:
             continue
         try:
             scanned += 1
+            segments, skipped_count = loaded
+            zero_range_skipped += skipped_count
+
+            # A data break terminates projection from older segments. We still
+            # evaluate them so valid formation can continue on both sides, but
+            # only zones from the latest continuous segment can be active.
+            for historical_segment in segments[:-1]:
+                zones_ended_at_data_break += len(
+                    _zone_engine.detect_zones(historical_segment)
+                )
+
+            data = segments[-1]
             current_price = float(data["Close"].iloc[-1])
             zones = _zone_engine.detect_zones(data)
-            for detected_zone in sorted(
-                zones,
-                key=lambda item: item.created_index,
-                reverse=True,
-            )[:4]:
-                zone = _measure_zone(detected_zone, data)
-                if _is_zone_invalidated(zone, data):
-                    continue
-                reaction = _reaction_state(
+            canonical_zone_count += len(zones)
+            qualifications = {
+                zone.created_index: _dashboard_qualification.qualify(
                     zone,
-                    data,
-                    _zone_config.reaction_completion_percent,
+                    _TIMEFRAME_LABELS[timeframe],
                 )
-                # Tested zones remain excluded unless price is currently in a
-                # confirmed, incomplete reaction through the proximal line.
-                if not zone.is_fresh and not reaction["active"]:
+                for zone in zones
+            }
+            formation_qualified_count += sum(
+                item.dashboard_qualified for item in qualifications.values()
+            )
+            for qualification in qualifications.values():
+                if qualification.dashboard_qualified:
                     continue
-                if reaction["active"]:
+                for reason in qualification.qualification_reason_codes:
+                    if reason in {
+                        "WEAK_DEPARTURE",
+                        "BASE_TOO_LONG_FOR_PRIMARY_DASHBOARD",
+                        "MULTI_BASE_EXECUTION_ZONE",
+                        "INSUFFICIENT_DISPLACEMENT",
+                        "POOR_DIRECTIONAL_CLOSE",
+                        "MALFORMED_OR_INCOMPLETE_EVIDENCE",
+                        "DRIFTING_DEPARTURE",
+                        "NO_EXPLOSIVE_OR_STRONG_SEQUENCE",
+                        "CLOSING_RULE_FAILED",
+                    }:
+                        qualification_rejection_counts[reason] = (
+                            qualification_rejection_counts.get(reason, 0) + 1
+                        )
+            canonical_metadata = _zone_lifecycle_ui.evaluate(
+                zones,
+                data,
+                symbol=symbol,
+                timeframe=_TIMEFRAME_LABELS[timeframe],
+                current_price=current_price,
+            )
+            for detected_zone in zones:
+                metadata = canonical_metadata.get(detected_zone.created_index)
+                if metadata is None:
+                    continue
+                counts = summary[detected_zone.zone_type.value]
+                counts["total"] += 1
+                if metadata.test_count == 0 and metadata.lifecycle_status not in (
+                    "INVALIDATED",
+                    "REMOVED",
+                ):
+                    counts["fresh"] += 1
+                if metadata.lifecycle_status == "REACTING":
+                    counts["reacting"] += 1
+                if metadata.test_count == 1:
+                    counts["tested"] += 1
+                if metadata.test_count >= 2:
+                    counts["retested"] += 1
+                if metadata.lifecycle_status in ("INVALIDATED", "REMOVED"):
+                    counts["invalidated"] += 1
+                if metadata.authenticity_status == "AUTHENTIC":
+                    counts["authentic"] += 1
+                else:
+                    counts["non_authentic"] += 1
+                qualification = qualifications[detected_zone.created_index]
+                if qualification.dashboard_qualified:
+                    if metadata.dashboard_lifecycle_eligible:
+                        dashboard_qualified_count += 1
+                    else:
+                        reason = metadata.dashboard_lifecycle_reason_code
+                        qualification_rejection_counts[reason] = (
+                            qualification_rejection_counts.get(reason, 0) + 1
+                        )
+            formation_dashboard_zones = [
+                item
+                for item in sorted(
+                    zones,
+                    key=lambda zone: zone.created_index,
+                    reverse=True,
+                )
+                if qualifications[item.created_index].dashboard_qualified
+            ]
+            dashboard_zones = [
+                item
+                for item in formation_dashboard_zones
+                if canonical_metadata[item.created_index].dashboard_lifecycle_eligible
+            ][:4]
+            historical_dashboard_zones = [
+                item
+                for item in formation_dashboard_zones[:4]
+                if canonical_metadata[item.created_index].is_invalidated
+                and item not in dashboard_zones
+            ]
+            for detected_zone in dashboard_zones + historical_dashboard_zones:
+                qualification = qualifications[detected_zone.created_index]
+                zone = _measure_zone(detected_zone, data)
+                metadata = canonical_metadata.get(detected_zone.created_index)
+                invalidated = bool(metadata and metadata.is_invalidated)
+                if invalidated:
+                    status = "INVALIDATED"
+                    distance = 0.0
+                elif metadata and metadata.dashboard_lifecycle_reason_code == (
+                    "LIFECYCLE_REACTING"
+                ):
                     status = "REACTING"
                     proximal = (
                         zone.upper_price
@@ -524,27 +644,46 @@ def _scan_research_zones(
                     distance = (zone.lower_price - current_price) / current_price * 100
                     status = "APPROACHING" if distance <= 5 else "WATCH"
 
-                zone_score = _zone_scoring_engine.score([zone]).scored_zones[0]
+                quality_context = ZoneQualityContext(
+                    lifecycle_status=(metadata.lifecycle_status if metadata else None),
+                    is_fresh=(metadata.is_fresh if metadata else None),
+                    penetration_percent=(
+                        metadata.current_penetration_percent if metadata else None
+                    ),
+                    max_penetration_percent=(
+                        metadata.max_penetration_percent if metadata else None
+                    ),
+                    authenticity_status=(
+                        metadata.authenticity_status if metadata else None
+                    ),
+                )
+                zone_score = _zone_scoring_engine.score(
+                    [zone], {zone.created_index: quality_context}
+                ).scored_zones[0]
                 explanation = ZoneExplanationService.build(zone, zone_score)
                 gap_type = _departure_gap(zone, data)
                 demand = zone.zone_type.value == "DEMAND"
                 evidence = (
                     (
                         "Fresh: price has not retested the zone after formation."
-                        if zone.is_fresh
+                        if metadata and metadata.is_fresh
                         else (
-                            f"Retested: {zone.touch_count} later touch(es) "
+                            f"Tested: {metadata.test_count if metadata else 0} "
+                            "distinct post-formation visit(s) "
                             "reduce quality."
                         )
                     ),
                     (
-                        "Departure strength contribution: "
-                        f"{zone_score.strength_score:.1f}/35."
+                        "Departure quality contribution: "
+                        f"{zone_score.departure_quality_score:.1f}/30."
                     ),
-                    f"Touch contribution: {zone_score.touch_score:.1f}/20.",
                     (
-                        "Confluence/merge contribution: "
-                        f"{zone_score.merge_bonus:.1f}/15."
+                        "Leg-Out dominance contribution: "
+                        f"{zone_score.legout_dominance_score:.1f}/15."
+                    ),
+                    (
+                        "Structural clearance contribution: "
+                        f"{zone_score.structural_clearance_score:.1f}/15."
                     ),
                     (
                         "This quality score is rule-based and is not a "
@@ -556,77 +695,174 @@ def _scan_research_zones(
                         else "No non-overlapping departure gap was detected."
                     ),
                 )
-                results.append(
-                    ZoneResearchResultResponse(
-                        symbol=symbol,
-                        zone_type=zone.zone_type.value,
-                        pattern_type=zone.pattern_type,
-                        gap_type=gap_type,
-                        proximal_price=zone.upper_price if demand else zone.lower_price,
-                        distal_price=zone.lower_price if demand else zone.upper_price,
-                        distance_percent=round(distance, 2),
-                        zone_score=round(zone_score.total_score, 1),
-                        freshness_score=round(zone_score.freshness_score, 1),
-                        strength_score=round(zone_score.strength_score, 1),
-                        touch_score=round(zone_score.touch_score, 1),
-                        merge_score=round(zone_score.merge_bonus, 1),
-                        raw_zone_score=round(zone_score.raw_score, 1),
-                        quality_cap=round(zone_score.quality_cap, 1),
-                        is_fresh=zone.is_fresh,
-                        touch_count=zone.touch_count,
-                        merged_count=zone.merged_count,
-                        evidence=evidence,
-                        explanation=ZoneExplanationResponse(
-                            overall_score=explanation.overall_score,
-                            rating=explanation.rating,
-                            label=explanation.label,
-                            summary=explanation.summary,
-                            positive_factors=tuple(
-                                ZoneExplanationFactorResponse(
-                                    key=factor.key,
-                                    title=factor.title,
-                                    score=factor.score,
-                                    sentiment=factor.sentiment,
-                                    summary=factor.summary,
-                                    recommendation=factor.recommendation,
-                                    weight=factor.weight,
-                                )
-                                for factor in explanation.positive_factors
-                            ),
-                            negative_factors=tuple(
-                                ZoneExplanationFactorResponse(
-                                    key=factor.key,
-                                    title=factor.title,
-                                    score=factor.score,
-                                    sentiment=factor.sentiment,
-                                    summary=factor.summary,
-                                    recommendation=factor.recommendation,
-                                    weight=factor.weight,
-                                )
-                                for factor in explanation.negative_factors
-                            ),
-                            educational_insight=(explanation.educational_insight),
+                response = ZoneResearchResultResponse(
+                    symbol=symbol,
+                    zone_type=zone.zone_type.value,
+                    pattern_type=zone.pattern_type,
+                    gap_type=gap_type,
+                    proximal_price=zone.upper_price if demand else zone.lower_price,
+                    distal_price=zone.lower_price if demand else zone.upper_price,
+                    distance_percent=round(distance, 2),
+                    zone_score=round(zone_score.total_score, 1),
+                    freshness_score=round(zone_score.freshness_score, 1),
+                    strength_score=round(zone_score.strength_score, 1),
+                    touch_score=round(zone_score.touch_score, 1),
+                    merge_score=round(zone_score.merge_bonus, 1),
+                    raw_zone_score=round(zone_score.raw_score, 1),
+                    quality_cap=round(zone_score.quality_cap, 1),
+                    zone_quality_label=zone_score.label,
+                    zone_quality_components={
+                        component.key: round(component.score, 2)
+                        for component in zone_score.components
+                    },
+                    zone_quality_component_details=tuple(
+                        ZoneQualityComponentResponse(
+                            key=component.key,
+                            score=round(component.score, 2),
+                            maximum_score=round(component.maximum_score, 2),
+                            evidence=component.evidence,
+                            reason_codes=component.reason_codes,
+                        )
+                        for component in zone_score.components
+                    ),
+                    zone_quality_reason_codes=zone_score.reason_codes,
+                    is_fresh=(metadata.is_fresh if metadata else False),
+                    touch_count=(metadata.test_count if metadata else 0),
+                    merged_count=zone.merged_count,
+                    evidence=evidence,
+                    explanation=ZoneExplanationResponse(
+                        overall_score=explanation.overall_score,
+                        rating=explanation.rating,
+                        label=explanation.label,
+                        summary=explanation.summary,
+                        positive_factors=tuple(
+                            ZoneExplanationFactorResponse(
+                                key=factor.key,
+                                title=factor.title,
+                                score=factor.score,
+                                sentiment=factor.sentiment,
+                                summary=factor.summary,
+                                recommendation=factor.recommendation,
+                                weight=factor.weight,
+                            )
+                            for factor in explanation.positive_factors
                         ),
-                        current_price=current_price,
-                        timeframe=_TIMEFRAME_LABELS[timeframe],
-                        base_index=zone.created_index,
-                        base_date=data.index[zone.created_index].date().isoformat(),
-                        status=status,
-                        reaction_percent=reaction.get("percent"),
-                        reaction_started=reaction.get("started"),
-                        reaction_ended=reaction.get("ended"),
-                        reaction_duration_candles=reaction.get("duration"),
-                    )
+                        negative_factors=tuple(
+                            ZoneExplanationFactorResponse(
+                                key=factor.key,
+                                title=factor.title,
+                                score=factor.score,
+                                sentiment=factor.sentiment,
+                                summary=factor.summary,
+                                recommendation=factor.recommendation,
+                                weight=factor.weight,
+                            )
+                            for factor in explanation.negative_factors
+                        ),
+                        educational_insight=(explanation.educational_insight),
+                    ),
+                    current_price=current_price,
+                    timeframe=_TIMEFRAME_LABELS[timeframe],
+                    base_index=zone.created_index,
+                    base_date=data.index[zone.created_index].date().isoformat(),
+                    status=status,
+                    reaction_percent=(
+                        metadata.reaction_percentage if metadata else None
+                    ),
+                    reaction_started=None,
+                    reaction_ended=None,
+                    reaction_duration_candles=None,
+                    zone_id=metadata.zone_id if metadata else None,
+                    lifecycle_status=(metadata.lifecycle_status if metadata else None),
+                    authenticity_status=(
+                        metadata.authenticity_status if metadata else None
+                    ),
+                    authenticity_reason_code=(
+                        metadata.authenticity_reason_code if metadata else None
+                    ),
+                    authenticity_reason=(
+                        metadata.authenticity_reason if metadata else None
+                    ),
+                    test_count=(metadata.test_count if metadata else zone.touch_count),
+                    reaction_status=(metadata.reaction_status if metadata else None),
+                    reaction_percentage=(
+                        metadata.reaction_percentage if metadata else None
+                    ),
+                    max_penetration_percent=(
+                        metadata.max_penetration_percent if metadata else None
+                    ),
+                    current_penetration_percent=(
+                        metadata.current_penetration_percent if metadata else None
+                    ),
+                    good_closing=(metadata.good_closing if metadata else None),
+                    parent_zone_id=(metadata.parent_zone_id if metadata else None),
+                    is_nested=(metadata.is_nested if metadata else False),
+                    is_duplicate=(metadata.is_duplicate if metadata else False),
+                    overlap_percent=(metadata.overlap_percent if metadata else None),
+                    dashboard_qualified=(
+                        metadata.dashboard_lifecycle_eligible
+                        if metadata
+                        else False
+                    ),
+                    qualification_reason_codes=(
+                        qualification.qualification_reason_codes
+                        + (
+                            metadata.dashboard_lifecycle_reason_code,
+                        )
+                        if metadata
+                        else qualification.qualification_reason_codes
+                    ),
+                    departure_quality=qualification.departure_quality,
+                    base_quality=qualification.base_quality,
+                    formation_quality=qualification.formation_quality,
+                    departure_displacement=(qualification.departure_displacement),
+                    departure_zone_width_ratio=(
+                        qualification.departure_zone_width_ratio
+                    ),
+                    base_candle_count=qualification.base_candle_count,
+                    base_compactness=qualification.base_compactness,
+                    base_compactness_reason=(
+                        qualification.base_compactness_reason
+                    ),
                 )
+                dashboard_base_preferences[(symbol, zone.created_index)] = (
+                    qualification.base_preference_rank
+                )
+                if invalidated:
+                    historical_results.append(response)
+                else:
+                    results.append(response)
         except Exception:
             continue
 
-    results.sort(key=lambda item: (item.distance_percent, -item.zone_score))
+    def dashboard_sort_key(
+        item: ZoneResearchResultResponse,
+    ) -> tuple[float, float, int]:
+        return (
+            item.distance_percent,
+            -item.zone_score,
+            dashboard_base_preferences.get((item.symbol, item.base_index), 99),
+        )
+
+    results.sort(key=dashboard_sort_key)
+    historical_results.sort(key=dashboard_sort_key)
+    logger.info(
+        "Zone scan continuity summary: symbols=%s scanned=%s failed=%s "
+        "zones=%s zero_range_skipped=%s zones_ended_at_data_break=%s "
+        "invalid_candle_candidates_evaluated=0.",
+        len(universe_symbols),
+        scanned,
+        len(universe_symbols) - scanned,
+        len(results),
+        zero_range_skipped,
+        zones_ended_at_data_break,
+    )
     return ZoneResearchResponse(
         total_scanned=scanned,
         total_zones=len(results),
         timeframe=_TIMEFRAME_LABELS[timeframe],
         results=tuple(results),
+        historical_results=tuple(historical_results),
         universe=universe,
         status="completed",
         total_symbols=len(universe_symbols),
@@ -634,6 +870,15 @@ def _scan_research_zones(
         failed_symbols=len(universe_symbols) - scanned,
         last_completed_at=datetime.now(UTC).isoformat(),
         data_status="delayed",
+        lifecycle_summary=ZoneLifecycleSummaryResponse(
+            demand=ZoneStateCountResponse(**summary["DEMAND"]),
+            supply=ZoneStateCountResponse(**summary["SUPPLY"]),
+        ),
+        canonical_zone_count=canonical_zone_count,
+        formation_qualified_count=formation_qualified_count,
+        dashboard_qualified_count=dashboard_qualified_count,
+        dashboard_rejected_count=(canonical_zone_count - dashboard_qualified_count),
+        qualification_rejection_counts=qualification_rejection_counts,
     )
 
 
@@ -642,7 +887,10 @@ def _zone_scan_key(
     universe: str,
     symbols: list[str] | None,
 ) -> str:
-    return f"{timeframe}:{universe}:{','.join(sorted(symbols or []))}:v2"
+    return (
+        f"{timeframe}:{universe}:{','.join(sorted(symbols or []))}:"
+        "v7-canonical-zone-quality"
+    )
 
 
 def _store_zone_scan(key: str, future: Future[ZoneResearchResponse]) -> None:
@@ -669,8 +917,7 @@ def get_research_zones(
         cached_entry = _zone_scan_cache.get(key)
         job = _zone_scan_jobs.get(key)
         stale = (
-            not cached_entry
-            or monotonic() - cached_entry[0] >= _zone_scan_ttl_seconds
+            not cached_entry or monotonic() - cached_entry[0] >= _zone_scan_ttl_seconds
         )
         if stale and job is None:
             _zone_scan_progress[key] = (0, 0)

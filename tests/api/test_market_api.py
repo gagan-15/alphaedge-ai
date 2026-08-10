@@ -5,16 +5,17 @@ from fastapi.testclient import TestClient
 
 from backend.api.app import app
 from backend.api import market
+from backend.validators.market_data_validator import ValidatedMarketDataSegments
 
 
 class StubMarketDataService:
     """Return deterministic candles without network access."""
 
-    def get_stock_data(self, symbol: str, period: str, interval: str):
+    def get_stock_data_segments(self, symbol: str, period: str, interval: str):
         assert symbol == "RELIANCE"
         assert period == "1y"
         assert interval == "1d"
-        return pd.DataFrame(
+        data = pd.DataFrame(
             {
                 "Open": [100.0],
                 "High": [110.0],
@@ -24,6 +25,7 @@ class StubMarketDataService:
             },
             index=pd.to_datetime(["2026-07-24"]),
         )
+        return ValidatedMarketDataSegments((data,), ())
 
 
 def test_get_candles(monkeypatch) -> None:
@@ -51,15 +53,36 @@ def test_rejects_invalid_market_symbol() -> None:
     assert response.status_code == 400
 
 
+def test_accepts_nse_symbol_with_ampersand(monkeypatch) -> None:
+    service = StubMarketDataService()
+    monkeypatch.setattr(market, "_market_data_service", service)
+
+    original = service.get_stock_data_segments
+
+    def get_segments(symbol: str, period: str, interval: str):
+        assert symbol == "M&MFIN"
+        return original("RELIANCE", period, interval)
+
+    service.get_stock_data_segments = get_segments
+    response = TestClient(app).get(
+        "/market/candles?symbol=M%26MFIN&period=1y&interval=1d",
+    )
+
+    assert response.status_code == 200
+    assert response.json()["symbol"] == "M&MFIN"
+
+
 def test_get_candles_uses_requested_chart_timeframe(monkeypatch) -> None:
     """A monthly zone chart must receive monthly candles, not daily candles."""
 
     class MonthlyMarketDataService:
-        def get_stock_data(self, symbol: str, period: str, interval: str):
+        def get_stock_data_segments(
+            self, symbol: str, period: str, interval: str
+        ):
             assert period == "10y"
             assert interval == "1d"
             index = pd.date_range("2026-01-01", periods=60, freq="D")
-            return pd.DataFrame(
+            data = pd.DataFrame(
                 {
                     "Open": range(100, 160),
                     "High": range(101, 161),
@@ -69,6 +92,7 @@ def test_get_candles_uses_requested_chart_timeframe(monkeypatch) -> None:
                 },
                 index=index,
             )
+            return ValidatedMarketDataSegments((data,), ())
 
     monkeypatch.setattr(
         market,

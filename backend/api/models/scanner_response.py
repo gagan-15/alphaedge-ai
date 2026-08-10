@@ -85,7 +85,7 @@ class ZoneExplanationFactorResponse(APIResponseModel):
 
 
 class ZoneExplanationResponse(APIResponseModel):
-    """Trader-readable explanation of rule-based zone quality."""
+    """Explanation of AlphaEdge Zone Quality from canonical evidence."""
 
     overall_score: float
     rating: int
@@ -94,6 +94,16 @@ class ZoneExplanationResponse(APIResponseModel):
     positive_factors: tuple[ZoneExplanationFactorResponse, ...]
     negative_factors: tuple[ZoneExplanationFactorResponse, ...]
     educational_insight: str
+
+
+class ZoneQualityComponentResponse(APIResponseModel):
+    """One serialized AlphaEdge Canonical Zone Quality component."""
+
+    key: str
+    score: float
+    maximum_score: float
+    evidence: tuple[str, ...] = ()
+    reason_codes: tuple[str, ...] = ()
 
 
 class ZoneResearchResultResponse(APIResponseModel):
@@ -113,6 +123,10 @@ class ZoneResearchResultResponse(APIResponseModel):
     merge_score: float
     raw_zone_score: float
     quality_cap: float
+    zone_quality_label: str | None = None
+    zone_quality_components: dict[str, float] = {}
+    zone_quality_component_details: tuple[ZoneQualityComponentResponse, ...] = ()
+    zone_quality_reason_codes: tuple[str, ...] = ()
     is_fresh: bool
     touch_count: int
     merged_count: int
@@ -127,6 +141,51 @@ class ZoneResearchResultResponse(APIResponseModel):
     reaction_started: str | None = None
     reaction_ended: str | None = None
     reaction_duration_candles: int | None = None
+    zone_id: str | None = None
+    lifecycle_status: str | None = None
+    authenticity_status: str | None = None
+    authenticity_reason_code: str | None = None
+    authenticity_reason: str | None = None
+    test_count: int | None = None
+    reaction_status: str | None = None
+    reaction_percentage: float | None = None
+    max_penetration_percent: float | None = None
+    current_penetration_percent: float | None = None
+    good_closing: bool | None = None
+    parent_zone_id: str | None = None
+    is_nested: bool = False
+    is_duplicate: bool = False
+    overlap_percent: float | None = None
+    dashboard_qualified: bool = False
+    qualification_reason_codes: tuple[str, ...] = ()
+    departure_quality: str | None = None
+    base_quality: str | None = None
+    formation_quality: str | None = None
+    departure_displacement: float | None = None
+    departure_zone_width_ratio: float | None = None
+    base_candle_count: int | None = None
+    base_compactness: str | None = None
+    base_compactness_reason: str | None = None
+
+
+class ZoneStateCountResponse(APIResponseModel):
+    """Lifecycle and authenticity counts for one zone direction."""
+
+    total: int = 0
+    fresh: int = 0
+    reacting: int = 0
+    tested: int = 0
+    retested: int = 0
+    invalidated: int = 0
+    authentic: int = 0
+    non_authentic: int = 0
+
+
+class ZoneLifecycleSummaryResponse(APIResponseModel):
+    """Dashboard-ready counts produced from canonical engine records."""
+
+    demand: ZoneStateCountResponse
+    supply: ZoneStateCountResponse
 
 
 class ZoneResearchResponse(APIResponseModel):
@@ -137,6 +196,7 @@ class ZoneResearchResponse(APIResponseModel):
     delayed: bool = True
     timeframe: str = "1D"
     results: tuple[ZoneResearchResultResponse, ...]
+    historical_results: tuple[ZoneResearchResultResponse, ...] = ()
     universe: str = "nse500"
     status: str = "completed"
     total_symbols: int = 0
@@ -144,6 +204,12 @@ class ZoneResearchResponse(APIResponseModel):
     failed_symbols: int = 0
     last_completed_at: str | None = None
     data_status: str = "delayed"
+    lifecycle_summary: ZoneLifecycleSummaryResponse | None = None
+    canonical_zone_count: int = 0
+    formation_qualified_count: int = 0
+    dashboard_qualified_count: int = 0
+    dashboard_rejected_count: int = 0
+    qualification_rejection_counts: dict[str, int] = {}
 
 
 class ZoneRuleDiagnosticResponse(APIResponseModel):

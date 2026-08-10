@@ -5,11 +5,14 @@ import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { Link as RouterLink, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../auth/AuthState";
 import BrandLogo from "../brand/BrandLogo";
@@ -26,7 +29,15 @@ const navigation = [
 
 export default function Header() {
     const { pathname } = useLocation();
-    const { user } = useAuth();
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const [profileAnchor, setProfileAnchor] = useState<HTMLElement | null>(null);
+
+    async function signOut() {
+        setProfileAnchor(null);
+        await logout();
+        navigate("/", { replace: true });
+    }
 
     return (
         <AppBar position="fixed" elevation={0} sx={{ left: 0, width: "100%", height: 72, zIndex: (theme) => theme.zIndex.drawer + 2, bgcolor: "#ffffff", color: "#111827", borderBottom: "1px solid #E5E7EB", boxShadow: "none" }}>
@@ -43,10 +54,22 @@ export default function Header() {
                 <Box sx={{ flex: 1 }} />
                 <TextField size="small" placeholder="Search stocks, indices..." aria-label="Search AlphaEdge AI" onChange={(event) => window.dispatchEvent(new CustomEvent("alphaedge:global-search", { detail: event.target.value }))} sx={{ display: { xs: "none", md: "block" }, width: { md: 340, lg: 370, xl: 400 }, minWidth: { md: 320, lg: 340, xl: 370 }, maxWidth: 400, flex: "0 0 auto", "& .MuiInputBase-root": { width: "100%" }, "& .MuiOutlinedInput-root": { height: 40, bgcolor: "#ffffff", fontSize: "0.74rem", borderRadius: "12px", "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#C9D0DB" }, "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "primary.main", borderWidth: 1 } }, "& .MuiOutlinedInput-notchedOutline": { borderColor: "#DFE5EE" }, "& input": { py: 0, height: 40, boxSizing: "border-box" }, "& input::placeholder": { color: "#667085", opacity: 1 }, "& .MuiInputAdornment-root": { color: "#748197", alignItems: "center" } }} slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchRoundedIcon sx={{ fontSize: 18 }} /></InputAdornment> } }} />
                 <IconButton size="small" aria-label="Notifications" sx={{ color: "#667085", transition: "color 160ms ease", "&:hover": { color: "primary.main", bgcolor: "#F4F1FF" } }}><NotificationsNoneOutlinedIcon fontSize="small" /></IconButton>
-                <Stack direction="row" spacing={0.8} sx={{ alignItems: "center" }}>
+                <Stack
+                    component="button"
+                    type="button"
+                    direction="row"
+                    spacing={0.8}
+                    onClick={(event) => setProfileAnchor(event.currentTarget)}
+                    aria-label="Open profile menu"
+                    sx={{ alignItems: "center", border: 0, bgcolor: "transparent", p: .5, borderRadius: 1.5, cursor: "pointer", color: "inherit", "&:hover": { bgcolor: "#F7F8FC" } }}
+                >
                     <Avatar sx={{ width: 30, height: 30, bgcolor: "primary.main", fontSize: "0.7rem", fontWeight: 700 }}>{user?.full_name?.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase() ?? "AE"}</Avatar>
                     <Box sx={{ display: { xs: "none", xl: "block" } }}><Typography sx={{ fontSize: "0.7rem", fontWeight: 700, lineHeight: 1.15 }}>{user?.full_name ?? "AlphaEdge User"}</Typography><Typography color="text.secondary" sx={{ fontSize: "0.58rem" }}>Research workspace</Typography></Box>
                 </Stack>
+                <Menu anchorEl={profileAnchor} open={Boolean(profileAnchor)} onClose={() => setProfileAnchor(null)} anchorOrigin={{ vertical: "bottom", horizontal: "right" }} transformOrigin={{ vertical: "top", horizontal: "right" }}>
+                    <MenuItem component={RouterLink} to="/settings" onClick={() => setProfileAnchor(null)}>Settings</MenuItem>
+                    <MenuItem onClick={signOut}>Log Out</MenuItem>
+                </Menu>
             </Toolbar>
         </AppBar>
     );

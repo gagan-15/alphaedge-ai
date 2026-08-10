@@ -34,6 +34,14 @@ import type { ConfluenceChartOverlay, ZoneResearchResult } from "../../types/sca
 import { zoneSequenceLabel } from "./zoneLabels";
 import { overlayStyles } from "../../services/overlayService";
 import type { DeveloperChartZone } from "./developerZones";
+import {
+    createUserChartRectangle,
+    clearUserChartRectangles,
+    formatAnnotationPrice,
+    removeUserChartRectangle,
+    type RectangleDraftPoint,
+    type UserChartRectangle,
+} from "./chartAnnotations";
 
 const noDeveloperZones: DeveloperChartZone[] = [];
 
@@ -63,6 +71,19 @@ const indicatorOptions = [
     { id: "SMA_200", label: "SMA 200", kind: "SMA", period: 200, color: "#ec4899" },
 ] as const;
 const indicatorPreferenceKey = "alphaedge.chart.indicators";
+
+const inactiveLifecycleStatuses = new Set([
+    "TESTED",
+    "TESTED_RESPECTED",
+    "RETESTED",
+    "MITIGATED",
+    "INVALIDATED",
+    "REMOVED",
+]);
+
+function isInactiveLifecycle(status?: string | null): boolean {
+    return inactiveLifecycleStatuses.has((status ?? "").trim().toUpperCase());
+}
 
 function readIndicatorPreference(): string[] {
     try {
@@ -119,6 +140,7 @@ function ZoneDetailChart({
         distal: ISeriesApi<"Line">;
         demand: boolean;
         status: DeveloperChartZone["zoneStatus"];
+        inactiveLifecycle: boolean;
     }>());
     const zoneBorderDefinitionsRef = useRef<Array<{
         id: string;
@@ -153,6 +175,11 @@ function ZoneDetailChart({
         pointX: number;
         pointY: number;
     } | null>(null);
+    const rectangleModeRef = useRef(false);
+    const rectangleDraftStartRef = useRef<RectangleDraftPoint | null>(null);
+    const rectanglesRef = useRef<UserChartRectangle[]>([]);
+    const rectangleSequenceRef = useRef(0);
+    const rectangleContextRef = useRef({ symbol: result.symbol, timeframe: result.timeframe });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [measuring, setMeasuring] = useState(false);
@@ -160,7 +187,19 @@ function ZoneDetailChart({
     const [measurement, setMeasurement] = useState("Measurement tool is off.");
     const [chartReadyVersion, setChartReadyVersion] = useState(0);
     const [zonesVisible, setZonesVisible] = useState(true);
+    const [htfLocationVisible, setHtfLocationVisible] = useState(true);
+    const [gridVisible, setGridVisible] = useState(false);
+    const [detailsVisible, setDetailsVisible] = useState(false);
     const [measurementLabel, setMeasurementLabel] = useState<{ left: number; top: number; text: string } | null>(null);
+    const [rectangleMode, setRectangleMode] = useState(false);
+    const [selectedRectangleId, setSelectedRectangleId] = useState<string | null>(null);
+    const [rectangleDraft, setRectangleDraft] = useState<UserChartRectangle | null>(null);
+    const [rectangleOverlays, setRectangleOverlays] = useState<Array<UserChartRectangle & {
+        left: number;
+        top: number;
+        width: number;
+        height: number;
+    }>>([]);
     const [zoneBorders, setZoneBorders] = useState<Array<{
         id: string;
         left: number;
@@ -175,6 +214,7 @@ function ZoneDetailChart({
     const executionIndex = confluenceTimeframes.findIndex((item) => item.timeframe === result.timeframe);
     const higherTimeframeButtons = executionIndex < 0 ? [] : confluenceTimeframes.slice(executionIndex + 1);
     const inspectedOverlay = availableConfluenceOverlays.find((overlay) => overlay.timeframe === inspectedConfluenceTimeframe);
+    const selectedLocation = confluenceOverlays[0];
     const updateMeasurementLabel = useCallback(() => {
         const chart = chartRef.current;
         const candles = candleSeriesRef.current;
@@ -222,6 +262,33 @@ function ZoneDetailChart({
         });
         setZoneBorders(next);
     }, []);
+    const updateRectangleOverlays = useCallback((draft?: UserChartRectangle | null) => {
+        const chart = chartRef.current;
+        const candles = candleSeriesRef.current;
+        if (!chart || !candles) {
+            setRectangleOverlays([]);
+            return;
+        }
+        const context = rectangleContextRef.current;
+        const saved = rectanglesRef.current.filter(
+            (rectangle) => rectangle.symbol === context.symbol && rectangle.timeframe === context.timeframe,
+        );
+        const source = draft ? [...saved, draft] : saved;
+        setRectangleOverlays(source.flatMap((rectangle) => {
+            const startX = chart.timeScale().timeToCoordinate(rectangle.startTime);
+            const endX = chart.timeScale().timeToCoordinate(rectangle.endTime);
+            const upperY = candles.priceToCoordinate(rectangle.upperPrice);
+            const lowerY = candles.priceToCoordinate(rectangle.lowerPrice);
+            if (startX === null || endX === null || upperY === null || lowerY === null) return [];
+            return [{
+                ...rectangle,
+                left: Math.min(startX, endX),
+                top: Math.min(upperY, lowerY),
+                width: Math.max(2, Math.abs(endX - startX)),
+                height: Math.max(2, Math.abs(lowerY - upperY)),
+            }];
+        }));
+    }, []);
 
     useEffect(() => {
         const container = containerRef.current;
@@ -243,8 +310,8 @@ function ZoneDetailChart({
                 attributionLogo: false,
             },
             grid: {
-                vertLines: { color: "rgba(148,163,184,.16)", style: LineStyle.Solid },
-                horzLines: { color: "rgba(148,163,184,.16)", style: LineStyle.Solid },
+                vertLines: { color: "rgba(148,163,184,0)", style: LineStyle.Solid },
+                horzLines: { color: "rgba(148,163,184,0)", style: LineStyle.Solid },
             },
             crosshair: {
                 mode: crosshairVisibleRef.current ? CrosshairMode.Normal : CrosshairMode.Hidden,
@@ -271,6 +338,7 @@ function ZoneDetailChart({
             chart.applyOptions({ width: container.clientWidth });
             updateMeasurementLabel();
             updateZoneBorders();
+            updateRectangleOverlays(rectangleDraft);
         });
         observer.observe(container);
 
@@ -308,7 +376,6 @@ function ZoneDetailChart({
                 candleTimesRef.current = data.map((candle) => candle.time);
                 candleDataRef.current = data.map((candle) => ({ time: candle.time, close: candle.close }));
                 candleStepRef.current = candleStep;
-                const futureZonePoints = 12;
                 chart.subscribeClick((param) => {
                     if (!measuringRef.current && onInspectConfluenceOverlay) {
                         for (const [series, overlay] of confluenceSeriesMap) {
@@ -396,6 +463,7 @@ function ZoneDetailChart({
                 });
                 chart.timeScale().subscribeVisibleLogicalRangeChange(updateMeasurementLabel);
                 chart.timeScale().subscribeVisibleLogicalRangeChange(updateZoneBorders);
+                chart.timeScale().subscribeVisibleLogicalRangeChange(() => updateRectangleOverlays());
 
                 const renderedZones: DeveloperChartZone[] = developerMode
                     ? developerZones
@@ -405,42 +473,62 @@ function ZoneDetailChart({
                         proximalPrice: displayZone.proximal_price,
                         distalPrice: displayZone.distal_price,
                         baseIndex: displayZone.base_index,
+                        baseStartDate: displayZone.base_date,
                         pattern: displayZone.pattern_type ?? undefined,
                         zoneStatus: "Accepted",
                         zoneScore: displayZone.zone_score,
                         reacting: displayZone.status === "REACTING",
+                        lifecycleStatus: displayZone.lifecycle_status ?? null,
                         selected: !selectedZoneId || zoneSequenceLabel(zones, zoneIndex) === selectedZoneId,
                     }));
                 renderedZones.forEach((displayZone) => {
                 if (displayZone.proximalPrice !== null && displayZone.distalPrice !== null) {
                     const demand = displayZone.zoneType === "DEMAND";
-                    const zoneColor = demand ? "#2f8f67" : "#c45f69";
+                    const inactiveLifecycle = isInactiveLifecycle(displayZone.lifecycleStatus);
+                    const zoneColor = inactiveLifecycle ? "#94a3b8" : demand ? "#2f8f67" : "#c45f69";
                     const zoneLabel = displayZone.zoneId;
+                    const lifecycleLabel = inactiveLifecycle
+                        ? ` ${(displayZone.lifecycleStatus ?? "TESTED").replaceAll("_", " ")}`
+                        : displayZone.reacting ? " REACTING" : "";
                     const selected = Boolean(displayZone.selected);
                     const rejected = displayZone.zoneStatus === "Rejected";
                     const invalidated = displayZone.zoneStatus === "Invalidated";
-                    const opacity = invalidated ? .04 : rejected ? .08 : selected ? .18 : .12;
+                    const opacity = invalidated ? .04 : rejected ? .08 : inactiveLifecycle ? (selected ? .10 : .06) : selected ? .18 : .12;
                     const borderStyle = invalidated ? LineStyle.Dotted : rejected ? LineStyle.Dashed : LineStyle.Solid;
                     const zone = chart.addSeries(BaselineSeries, {
                         baseValue: { type: "price", price: displayZone.distalPrice },
                         topLineColor: "rgba(0,0,0,0)",
-                        topFillColor1: demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
-                        topFillColor2: demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
+                        topFillColor1: inactiveLifecycle ? `rgba(148,163,184,${opacity})` : demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
+                        topFillColor2: inactiveLifecycle ? `rgba(148,163,184,${opacity})` : demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
                         bottomLineColor: "rgba(0,0,0,0)",
-                        bottomFillColor1: demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
-                        bottomFillColor2: demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
+                        bottomFillColor1: inactiveLifecycle ? `rgba(148,163,184,${opacity})` : demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
+                        bottomFillColor2: inactiveLifecycle ? `rgba(148,163,184,${opacity})` : demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`,
                         lineWidth: 1,
                         lineStyle: borderStyle,
                         priceLineVisible: false,
                         lastValueVisible: false,
                     });
-                    const start = Math.max(0, Math.min(displayZone.baseIndex ?? data.length - 45, data.length - 1));
+                    const requestedBaseTime = displayZone.baseStartDate
+                        ? new Date(displayZone.baseStartDate).getTime() / 1000
+                        : Number.NaN;
+                    const datedBaseIndex = Number.isFinite(requestedBaseTime)
+                        ? data.reduce((closest, candle, index) =>
+                            Math.abs(Number(candle.time) - requestedBaseTime)
+                                < Math.abs(Number(data[closest].time) - requestedBaseTime)
+                                ? index
+                                : closest, 0)
+                        : -1;
+                    const baseIndex = Math.min(
+                        datedBaseIndex >= 0 ? datedBaseIndex : displayZone.baseIndex ?? data.length - 45,
+                        data.length - 1,
+                    );
+                    const start = Math.max(0, baseIndex - 3);
                     const zoneData = data.slice(start).map((candle) => ({
                         time: candle.time,
                         value: displayZone.proximalPrice,
                     }));
                     const latestTime = Number(data[data.length - 1].time);
-                    for (let point = 1; point <= futureZonePoints; point += 1) {
+                    for (let point = 1; point <= 3; point += 1) {
                         zoneData.push({
                             time: (latestTime + candleStep * point) as UTCTimestamp,
                             value: displayZone.proximalPrice,
@@ -457,7 +545,7 @@ function ZoneDetailChart({
                         crosshairMarkerVisible: false,
                         priceLineVisible: false,
                         lastValueVisible: true,
-                        title: invalidated ? `${zoneLabel} Invalidated` : rejected ? `${zoneLabel} Rejected Candidate` : `${zoneLabel}${displayZone.reacting ? " REACTING" : ""} PROXIMAL`,
+                        title: invalidated ? `${zoneLabel} Invalidated` : rejected ? `${zoneLabel} Rejected Candidate` : `${zoneLabel}${lifecycleLabel} PROXIMAL`,
                     });
                     const distalBoundary = chart.addSeries(LineSeries, {
                         color: zoneColor,
@@ -485,16 +573,17 @@ function ZoneDetailChart({
                     proximalBoundary.setData([{ time: labelTime, value: displayZone.proximalPrice }]);
                     distalBoundary.setData([{ time: labelTime, value: displayZone.distalPrice }]);
                     baseZoneBoundarySeriesRef.current.push(proximalBoundary, distalBoundary);
-                    zoneSeriesMap.set(zoneLabel, { area: zone, proximal: proximalBoundary, distal: distalBoundary, demand, status: displayZone.zoneStatus });
+                    zoneSeriesMap.set(zoneLabel, { area: zone, proximal: proximalBoundary, distal: distalBoundary, demand, status: displayZone.zoneStatus, inactiveLifecycle });
                 }
                 });
 
                 const activeIndex = Math.max(0, Math.min(result.base_index ?? data.length - 1, data.length - 1));
                 chart.timeScale().setVisibleLogicalRange({
-                    from: Math.max(0, activeIndex - 60),
-                    to: Math.min(data.length + 5, activeIndex + 25),
+                    from: Math.max(0, activeIndex - 6),
+                    to: data.length + 3,
                 });
                 updateZoneBorders();
+                updateRectangleOverlays();
                 setChartReadyVersion((version) => version + 1);
                 setLoading(false);
             })
@@ -529,7 +618,38 @@ function ZoneDetailChart({
         // Zone selection is handled separately so changing the active zone
         // never destroys the chart or resets user drawings and indicators.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [developerMode, developerZones, height, onInspectConfluenceOverlay, result.symbol, result.timeframe, updateMeasurementLabel, updateZoneBorders]);
+    }, [developerMode, developerZones, height, onInspectConfluenceOverlay, result.symbol, result.timeframe, updateMeasurementLabel, updateRectangleOverlays, updateZoneBorders]);
+
+    useEffect(() => {
+        rectangleContextRef.current = { symbol: result.symbol, timeframe: result.timeframe };
+        rectangleDraftStartRef.current = null;
+        const frame = window.requestAnimationFrame(() => {
+            setSelectedRectangleId(null);
+            setRectangleDraft(null);
+            updateRectangleOverlays();
+        });
+        return () => window.cancelAnimationFrame(frame);
+    }, [result.symbol, result.timeframe, updateRectangleOverlays]);
+
+    useEffect(() => {
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape" && rectangleDraftStartRef.current) {
+                rectangleDraftStartRef.current = null;
+                setRectangleDraft(null);
+                updateRectangleOverlays();
+                return;
+            }
+            if ((event.key === "Delete" || event.key === "Backspace") && selectedRectangleId) {
+                const target = event.target as HTMLElement | null;
+                if (target?.matches("input, textarea, [contenteditable='true']")) return;
+                rectanglesRef.current = removeUserChartRectangle(rectanglesRef.current, selectedRectangleId);
+                setSelectedRectangleId(null);
+                updateRectangleOverlays();
+            }
+        };
+        window.addEventListener("keydown", onKeyDown);
+        return () => window.removeEventListener("keydown", onKeyDown);
+    }, [selectedRectangleId, updateRectangleOverlays]);
 
     useEffect(() => {
         if (!chartReadyVersion || !chartRef.current) return;
@@ -538,15 +658,17 @@ function ZoneDetailChart({
         ) ?? result;
         const activeIndex = Math.max(0, Math.min(activeZone.base_index ?? candleTimesRef.current.length - 1, candleTimesRef.current.length - 1));
         chartRef.current.timeScale().setVisibleLogicalRange({
-            from: Math.max(0, activeIndex - 60),
-            to: Math.min(candleTimesRef.current.length + 5, activeIndex + 25),
+            from: Math.max(0, activeIndex - 6),
+            to: candleTimesRef.current.length + 3,
         });
         zoneSeriesMapRef.current.forEach((series, zoneId) => {
             const selected = !selectedZoneId || zoneId === selectedZoneId;
             const rejected = series.status === "Rejected";
             const invalidated = series.status === "Invalidated";
-            const opacity = invalidated ? .04 : rejected ? .08 : selected ? .18 : .12;
-            const fill = series.demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`;
+            const opacity = invalidated ? .04 : rejected ? .08 : series.inactiveLifecycle ? (selected ? .10 : .06) : selected ? .18 : .12;
+            const fill = series.inactiveLifecycle
+                ? `rgba(148,163,184,${opacity})`
+                : series.demand ? `rgba(47,143,103,${opacity})` : `rgba(196,95,105,${opacity})`;
             series.area.applyOptions({
                 topFillColor1: fill,
                 topFillColor2: fill,
@@ -597,13 +719,6 @@ function ZoneDetailChart({
                 time,
                 value: upper,
             }));
-            const latestTime = Number(times[times.length - 1]);
-            for (let point = 1; point <= 12; point += 1) {
-                overlayData.push({
-                    time: (latestTime + candleStepRef.current * point) as UTCTimestamp,
-                    value: upper,
-                });
-            }
             series.setData(overlayData);
             confluenceSeriesRef.current.push(series);
             confluenceSeriesMapRef.current.set(series, overlay);
@@ -628,7 +743,19 @@ function ZoneDetailChart({
             lowerBoundary.setData(overlayData.map((point) => ({ ...point, value: lower })));
             confluenceBoundarySeriesRef.current.push(upperBoundary, lowerBoundary);
         });
-    }, [chartReadyVersion, confluenceOverlays]);
+    }, [chartReadyVersion, confluenceOverlays, htfLocationVisible]);
+
+    useEffect(() => {
+        const chart = chartRef.current;
+        if (!chart) return;
+        const color = gridVisible ? "rgba(148,163,184,.16)" : "rgba(148,163,184,0)";
+        chart.applyOptions({ grid: { vertLines: { color }, horzLines: { color } } });
+    }, [chartReadyVersion, gridVisible]);
+
+    useEffect(() => {
+        confluenceSeriesRef.current.forEach((series) => series.applyOptions({ visible: htfLocationVisible }));
+        confluenceBoundarySeriesRef.current.forEach((series) => series.applyOptions({ visible: htfLocationVisible }));
+    }, [chartReadyVersion, confluenceOverlays, htfLocationVisible]);
 
     useEffect(() => {
         const chart = chartRef.current;
@@ -676,13 +803,21 @@ function ZoneDetailChart({
         localStorage.setItem(indicatorPreferenceKey, JSON.stringify(next));
     }
 
+    function toggleEmas() {
+        const defaults = ["EMA_20", "EMA_50", "EMA_200"];
+        const enabled = defaults.some((id) => selectedIndicators.includes(id));
+        const next = enabled
+            ? selectedIndicators.filter((id) => !id.startsWith("EMA_"))
+            : [...selectedIndicators.filter((id) => !id.startsWith("EMA_")), ...defaults];
+        setSelectedIndicators(next);
+        localStorage.setItem(indicatorPreferenceKey, JSON.stringify(next));
+    }
+
     function toggleZones() {
         const next = !zonesVisible;
         setZonesVisible(next);
         baseZoneAreaSeriesRef.current.forEach((series) => series.applyOptions({ visible: next }));
         baseZoneBoundarySeriesRef.current.forEach((series) => series.applyOptions({ visible: next }));
-        confluenceSeriesRef.current.forEach((series) => series.applyOptions({ visible: next }));
-        confluenceBoundarySeriesRef.current.forEach((series) => series.applyOptions({ visible: next }));
     }
 
     function toggleMeasure() {
@@ -691,6 +826,90 @@ function ZoneDetailChart({
         measuringRef.current = next;
         measureStartRef.current = null;
         setMeasurement(next ? "Select two chart points to measure price change." : "Measurement tool is off.");
+    }
+
+    function toggleRectangleMode() {
+        const next = !rectangleMode;
+        setRectangleMode(next);
+        rectangleModeRef.current = next;
+        rectangleDraftStartRef.current = null;
+        setRectangleDraft(null);
+        setSelectedRectangleId(null);
+        if (next && measuringRef.current) {
+            setMeasuring(false);
+            measuringRef.current = false;
+            measureStartRef.current = null;
+            setMeasurement("Measurement tool is off.");
+        }
+        chartRef.current?.applyOptions({ handleScroll: { pressedMouseMove: !next } });
+    }
+
+    function clearDrawings() {
+        rectanglesRef.current = clearUserChartRectangles(rectanglesRef.current, result.symbol, result.timeframe);
+        rectangleDraftStartRef.current = null;
+        setRectangleDraft(null);
+        setSelectedRectangleId(null);
+        updateRectangleOverlays();
+    }
+
+    function chartPointFromPointer(event: React.PointerEvent<HTMLDivElement>): RectangleDraftPoint | null {
+        const chart = chartRef.current;
+        const candles = candleSeriesRef.current;
+        const container = containerRef.current;
+        if (!chart || !candles || !container) return null;
+        const bounds = container.getBoundingClientRect();
+        const x = event.clientX - bounds.left;
+        const y = event.clientY - bounds.top;
+        const time = chart.timeScale().coordinateToTime(x);
+        const price = candles.coordinateToPrice(y);
+        if (time === null || price === null || typeof time !== "number") return null;
+        return { time: Number(time) as UTCTimestamp, price };
+    }
+
+    function startRectangle(event: React.PointerEvent<HTMLDivElement>) {
+        if (!rectangleModeRef.current || event.button !== 0) return;
+        const point = chartPointFromPointer(event);
+        if (!point) return;
+        event.currentTarget.setPointerCapture(event.pointerId);
+        rectangleDraftStartRef.current = point;
+        setSelectedRectangleId(null);
+        event.preventDefault();
+    }
+
+    function moveRectangle(event: React.PointerEvent<HTMLDivElement>) {
+        const start = rectangleDraftStartRef.current;
+        if (!rectangleModeRef.current || !start) return;
+        const point = chartPointFromPointer(event);
+        if (!point) return;
+        const draft = createUserChartRectangle("rectangle-draft", result.symbol, result.timeframe, start, point);
+        setRectangleDraft(draft);
+        updateRectangleOverlays(draft);
+        event.preventDefault();
+    }
+
+    function finishRectangle(event: React.PointerEvent<HTMLDivElement>) {
+        const start = rectangleDraftStartRef.current;
+        if (!rectangleModeRef.current || !start) return;
+        const point = chartPointFromPointer(event);
+        rectangleDraftStartRef.current = null;
+        if (point && (point.time !== start.time || point.price !== start.price)) {
+            rectangleSequenceRef.current += 1;
+            const rectangle = createUserChartRectangle(
+                `rectangle-${rectangleSequenceRef.current}`,
+                result.symbol,
+                result.timeframe,
+                start,
+                point,
+            );
+            rectanglesRef.current = [...rectanglesRef.current, rectangle];
+            setSelectedRectangleId(rectangle.id);
+        }
+        setRectangleDraft(null);
+        setRectangleMode(false);
+        rectangleModeRef.current = false;
+        chartRef.current?.applyOptions({ handleScroll: { pressedMouseMove: true } });
+        window.requestAnimationFrame(() => updateRectangleOverlays());
+        event.preventDefault();
     }
 
     function clearMeasurement() {
@@ -720,8 +939,9 @@ function ZoneDetailChart({
         setZonesVisible(true);
         baseZoneAreaSeriesRef.current.forEach((series) => series.applyOptions({ visible: true }));
         baseZoneBoundarySeriesRef.current.forEach((series) => series.applyOptions({ visible: true }));
-        confluenceSeriesRef.current.forEach((series) => series.applyOptions({ visible: true }));
-        confluenceBoundarySeriesRef.current.forEach((series) => series.applyOptions({ visible: true }));
+        setHtfLocationVisible(true);
+        setGridVisible(false);
+        setDetailsVisible(false);
         setSelectedIndicators([]);
         localStorage.removeItem(indicatorPreferenceKey);
         chartRef.current?.timeScale().fitContent();
@@ -807,9 +1027,16 @@ function ZoneDetailChart({
                 <Button size="small" variant="outlined" onClick={() => chartRef.current?.timeScale().fitContent()}>Fit chart</Button>
                 <Button size="small" variant="outlined" color="warning" onClick={resetChart}>Reset chart</Button>
                 <Button size="small" variant={measuring ? "contained" : "outlined"} onClick={toggleMeasure}>Measure range</Button>
+                <Button size="small" variant={rectangleMode ? "contained" : "outlined"} onClick={toggleRectangleMode}>Rectangle</Button>
                 <Button size="small" variant="outlined" onClick={clearMeasurement}>Clear measurement</Button>
+                <Button size="small" variant="outlined" onClick={clearDrawings} disabled={!rectangleOverlays.length}>Clear drawings</Button>
                 <Button size="small" variant={crosshairVisible ? "contained" : "outlined"} onClick={toggleCrosshair}>Crosshair {crosshairVisible ? "On" : "Off"}</Button>
-                <Button size="small" variant={zonesVisible ? "outlined" : "contained"} onClick={toggleZones}>{zonesVisible ? "Hide all zones" : "Show zones"}</Button>
+                <Button size="small" variant={zonesVisible ? "contained" : "outlined"} onClick={toggleZones}>Zones {zonesVisible ? "On" : "Off"}</Button>
+                <Button size="small" variant={htfLocationVisible ? "contained" : "outlined"} disabled={!availableConfluenceOverlays.length} onClick={() => setHtfLocationVisible((value) => !value)}>HTF Location {htfLocationVisible ? "On" : "Off"}</Button>
+                <Tooltip title="No validated target is available in this chart payload"><span><Button size="small" variant="outlined" disabled>Targets</Button></span></Tooltip>
+                <Button size="small" variant={selectedIndicators.some((id) => id.startsWith("EMA_")) ? "contained" : "outlined"} onClick={toggleEmas}>EMAs</Button>
+                <Button size="small" variant={gridVisible ? "contained" : "outlined"} onClick={() => setGridVisible((value) => !value)}>Grid</Button>
+                <Button size="small" variant={detailsVisible ? "contained" : "outlined"} onClick={() => setDetailsVisible((value) => !value)}>Details</Button>
                 <FormControl size="small" sx={{ minWidth: 150 }}>
                     <InputLabel id="chart-indicators-label">Indicators</InputLabel>
                     <Select<string[]>
@@ -835,7 +1062,7 @@ function ZoneDetailChart({
             </Stack>}
             {higherTimeframeButtons.length > 0 && onToggleConfluenceOverlay && (
                 <Stack direction="row" sx={{ px: 1.5, py: .75, alignItems: "center", gap: .75, borderBottom: "1px solid", borderColor: "divider", flexWrap: "wrap" }}>
-                    <Typography variant="caption" sx={{ fontWeight: 850 }}>Higher timeframe zones:</Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700 }}>Higher timeframes:</Typography>
                     {higherTimeframeButtons.map((timeframe) => {
                         const overlay = availableConfluenceOverlays.find((item) => item.timeframe === timeframe.timeframe);
                         if (!overlay) {
@@ -858,10 +1085,34 @@ function ZoneDetailChart({
                         </Button>;
                     })}
                     <Typography variant="caption" color="text.secondary">
-                        No higher timeframe is selected by default.
+                        Select a timeframe to show its validated zone.
                     </Typography>
                 </Stack>
             )}
+            <Box sx={{ px: 1.5, py: .8, bgcolor: "#f8fafc", borderBottom: "1px solid", borderColor: "divider" }}>
+                <Stack direction="row" sx={{ gap: 2.5, flexWrap: "wrap", alignItems: "center" }}>
+                    <Typography variant="caption"><strong>LOCATION</strong> {selectedLocation ? `${selectedLocation.timeframeName} ${selectedLocation.zoneType}` : "No HTF selected"}</Typography>
+                    <Typography variant="caption"><strong>TREND</strong> Unavailable</Typography>
+                    <Typography variant="caption"><strong>EXECUTION</strong> {result.timeframe} {result.zone_type} · {patternLabels[result.pattern_type ?? ""] ?? result.pattern_type ?? "Pattern unavailable"}</Typography>
+                    <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                        <strong>ALIGNMENT</strong>{" "}
+                        {!selectedLocation
+                            ? "Select a higher timeframe to view its validated zone."
+                            : selectedLocation.relationship === "NO_OVERLAP"
+                                ? "No HTF zone overlap"
+                                : selectedLocation.direction === "OPPOSING"
+                                    ? `Opposing: ${result.timeframe} ${result.zone_type.toLowerCase()} lies in ${selectedLocation.timeframeName} ${selectedLocation.zoneType.toLowerCase()}`
+                                    : selectedLocation.relationship === "FULL_OVERLAP"
+                                        ? `Fully inside ${selectedLocation.timeframeName} ${selectedLocation.zoneType.toLowerCase()}`
+                                        : `${selectedLocation.relationship === "PARTIAL_OVERLAP" ? "Partial overlap" : "Touching"} with ${selectedLocation.timeframeName} ${selectedLocation.zoneType.toLowerCase()}`}
+                    </Typography>
+                </Stack>
+                {detailsVisible && (
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: .35 }}>
+                        {patternLabels[result.pattern_type ?? ""] ?? result.pattern_type ?? "Pattern unavailable"} · {result.zone_type} · proximal ₹{result.proximal_price.toLocaleString("en-IN")} · distal ₹{result.distal_price.toLocaleString("en-IN")} · {result.timeframe}
+                    </Typography>
+                )}
+            </Box>
             {inspectedOverlay && (
                 <Box sx={{ px: 1.5, py: 1, bgcolor: "#f8fafc", borderBottom: "1px solid", borderColor: overlayStyles[inspectedOverlay.timeframe]?.color ?? "divider" }}>
                     <Typography sx={{ fontWeight: 850 }}>
@@ -896,6 +1147,64 @@ function ZoneDetailChart({
                     }}
                     sx={{ height: loading || error ? 0 : height }}
                 />
+                <Box
+                    aria-label="Manual chart drawing layer"
+                    onPointerDown={startRectangle}
+                    onPointerMove={moveRectangle}
+                    onPointerUp={finishRectangle}
+                    sx={{
+                        position: "absolute",
+                        inset: 0,
+                        zIndex: 24,
+                        pointerEvents: rectangleMode ? "auto" : "none",
+                        cursor: rectangleMode ? "crosshair" : "default",
+                        touchAction: rectangleMode ? "none" : "auto",
+                    }}
+                />
+                {rectangleOverlays.map((rectangle) => {
+                    const selected = rectangle.id === selectedRectangleId;
+                    return (
+                        <Box
+                            key={rectangle.id}
+                            role="button"
+                            tabIndex={rectangle.id === "rectangle-draft" ? -1 : 0}
+                            aria-label={`Manual rectangle from ₹${formatAnnotationPrice(rectangle.lowerPrice)} to ₹${formatAnnotationPrice(rectangle.upperPrice)}`}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                if (rectangle.id !== "rectangle-draft") setSelectedRectangleId(rectangle.id);
+                            }}
+                            onKeyDown={(event) => {
+                                if ((event.key === "Delete" || event.key === "Backspace") && rectangle.id !== "rectangle-draft") {
+                                    rectanglesRef.current = removeUserChartRectangle(rectanglesRef.current, rectangle.id);
+                                    setSelectedRectangleId(null);
+                                    updateRectangleOverlays();
+                                }
+                            }}
+                            sx={{
+                                position: "absolute",
+                                left: rectangle.left,
+                                top: rectangle.top,
+                                width: rectangle.width,
+                                height: rectangle.height,
+                                zIndex: 23,
+                                boxSizing: "border-box",
+                                bgcolor: "rgba(79,70,229,.10)",
+                                border: `${selected ? 2 : 1}px solid ${selected ? "#4f46e5" : "#7c83a8"}`,
+                                pointerEvents: rectangleMode || rectangle.id === "rectangle-draft" ? "none" : "auto",
+                                cursor: "pointer",
+                                outline: "none",
+                                "&:focus-visible": { borderColor: "#4f46e5", boxShadow: "0 0 0 2px rgba(79,70,229,.18)" },
+                            }}
+                        >
+                            <Box sx={{ position: "absolute", right: -1, top: 0, transform: "translate(100%,-50%)", px: .65, py: .2, bgcolor: "#667085", color: "#fff", fontSize: ".68rem", fontWeight: 700, whiteSpace: "nowrap", borderRadius: "0 3px 3px 0" }}>
+                                ₹{formatAnnotationPrice(rectangle.upperPrice)}
+                            </Box>
+                            <Box sx={{ position: "absolute", right: -1, bottom: 0, transform: "translate(100%,50%)", px: .65, py: .2, bgcolor: "#667085", color: "#fff", fontSize: ".68rem", fontWeight: 700, whiteSpace: "nowrap", borderRadius: "0 3px 3px 0" }}>
+                                ₹{formatAnnotationPrice(rectangle.lowerPrice)}
+                            </Box>
+                        </Box>
+                    );
+                })}
                 {zonesVisible && zoneBorders.map((zone) => (
                     <Box
                         key={zone.id}

@@ -38,6 +38,7 @@ import { selectZoneById, zoneIdFor } from "../../services/zoneSelectionService";
 import { getMarketCandles } from "../../api/marketApi";
 import { getStockDetailsAnalysis, getZoneDiagnostics } from "../../api/scannerApi";
 import { analyzeStockZone } from "./stockZoneAnalysis";
+import { formatZoneQuality, formatZoneQualityLabel } from "./zoneQualityPresentation";
 import { buildTradeConfidence } from "./tradeConfidence";
 import DeveloperZoneInspector from "./DeveloperZoneInspector";
 import { acceptedDeveloperZones, diagnosticDeveloperZones } from "./developerZones";
@@ -484,8 +485,8 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                                                 </TableCell>
                                                 <TableCell align="center">
                                                     <Box sx={{ display: "inline-flex", height: 24, minWidth: 68, justifyContent: "center", alignItems: "center", gap: .6, px: 1, borderRadius: 1.25, border: "1px solid", borderColor: `${qualityStyle.border}CC`, bgcolor: qualityStyle.background }}>
-                                                        <Typography sx={{ color: qualityStyle.color, fontSize: ".7rem", lineHeight: 1, fontWeight: 800 }}>{result.zone_score.toFixed(0)}</Typography>
-                                                        <Typography sx={{ color: qualityStyle.color, fontSize: ".56rem", lineHeight: 1, fontWeight: 700 }}>{qualityStyle.label}</Typography>
+                                                        <Typography sx={{ color: qualityStyle.color, fontSize: ".7rem", lineHeight: 1, fontWeight: 800 }}>{formatZoneQuality(result.zone_score)}</Typography>
+                                                        <Typography sx={{ color: qualityStyle.color, fontSize: ".56rem", lineHeight: 1, fontWeight: 700 }}>{formatZoneQualityLabel(result.zone_quality_label ?? qualityStyle.label)}</Typography>
                                                     </Box>
                                                 </TableCell>
                                                 <TableCell sx={{ whiteSpace: "nowrap", color: result.zone_type === "DEMAND" ? "#2f7d5b" : "#b45863", fontWeight: "500 !important" }}>
@@ -567,11 +568,11 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                             <FullscreenRoundedIcon color="primary" />
                             <Box>
                                 <Typography variant="h6">{selectedZone.symbol} · Selected Zone {selectedZoneId} · {selectedZone.zone_type} · {patternLabels[selectedZone.pattern_type ?? ""]}</Typography>
-                                <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · Trade Confidence {selectedConfidence ?? "calculating"} · Zone Quality {selectedZone.zone_score.toFixed(0)} · delayed data · no order execution</Typography>
+                                <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · Trade Confidence {selectedConfidence ?? "calculating"} · Zone Quality {formatZoneQuality(selectedZone.zone_score)} · delayed data · no order execution</Typography>
                             </Box>
                             <Stack direction="row" spacing={.75} sx={{ ml: "auto", alignItems: "center" }}>
                                 <Chip size="small" label={`AI Score ${selectedConfidence ?? "…"}`} sx={{ fontWeight: 700 }} />
-                                <Chip size="small" label={`Zone Quality ${selectedZone.zone_score.toFixed(0)} · ${selectedQuality.label}`} sx={{ color: selectedQuality.color, bgcolor: selectedQuality.background, border: "1px solid", borderColor: selectedQuality.border, fontWeight: 700 }} />
+                                <Chip size="small" label={`Zone Quality ${formatZoneQuality(selectedZone.zone_score)} · ${formatZoneQualityLabel(selectedZone.zone_quality_label ?? selectedQuality.label)}`} sx={{ color: selectedQuality.color, bgcolor: selectedQuality.background, border: "1px solid", borderColor: selectedQuality.border, fontWeight: 700 }} />
                                 <Chip size="small" label={selectedZone.status === "WATCH" ? "NEARBY" : selectedZone.status} sx={{ color: selectedStatus.color, bgcolor: selectedStatus.background, border: "1px solid", borderColor: selectedStatus.border, fontWeight: 700 }} />
                             </Stack>
                             {import.meta.env.DEV && (
@@ -671,7 +672,7 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                                                 >
                                                     <Stack direction="row" sx={{ justifyContent: "space-between", gap: 1 }}>
                                                         <Typography sx={{ fontWeight: 800 }}>{selected ? "✓ " : ""}{zoneId} · {zone.zone_type} · {patternLabels[zone.pattern_type ?? ""]}</Typography>
-                                                        <Chip size="small" label={`Confidence ${confidenceScores[resultKey(zone)] ?? "…"} · Quality ${zone.zone_score.toFixed(0)}`} />
+                                                        <Chip size="small" label={`Confidence ${confidenceScores[resultKey(zone)] ?? "…"} · Quality ${formatZoneQuality(zone.zone_score)}`} />
                                                     </Stack>
                                                     <Typography variant="caption" color="text.secondary">Status {zone.status} · Base {zone.base_date}{selected ? " · Selected" : " · Click to analyze"}</Typography>
                                                     {zone.status === "REACTING" && (

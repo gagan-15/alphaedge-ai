@@ -20,6 +20,7 @@ from backend.engines.demand_supply_engine.pattern_detector import (
 from backend.engines.demand_supply_engine.zone_boundary_engine import (
     ZoneBoundaryEngine,
 )
+from backend.engines.demand_supply_engine.candle_classifier import CandleClassifier
 from backend.config.settings import MAX_BASE_CANDLES, MIN_BASE_CANDLES
 from backend.models.departure import (
     Departure,
@@ -32,6 +33,11 @@ from backend.models.zone import (
 )
 from backend.validators.zone_validator import (
     ZoneValidator,
+)
+from backend.models.candle_classification import CandleStructure
+from backend.models.formation_evidence import (
+    CanonicalFormationEvidence,
+    FormationCandleEvidence,
 )
 from backend.validators.zone_boundary_validator import BoundaryValidationError
 
@@ -61,6 +67,8 @@ class ZoneDetectionEngine:
         self._pattern_detector = PatternDetector()
 
         self._boundary_engine = ZoneBoundaryEngine()
+
+        self._candle_classifier = CandleClassifier()
 
     def detect_zones(
         self,
@@ -317,7 +325,103 @@ class ZoneDetectionEngine:
             created_index=base.end_index,
             pattern_type=pattern.pattern_type.value,
             boundary_result=boundary_result,
+            formation_evidence=self._build_formation_evidence(
+                market_data, base, pattern, departure
+            ),
         )
+
+    def _build_formation_evidence(
+        self, market_data: DataFrame, base, pattern, departure: Departure
+    ) -> CanonicalFormationEvidence:
+        """Freeze evidence established during canonical formation."""
+        if any(
+            value is None
+            for value in (
+                departure.leg_in_start_index,
+                departure.leg_in_end_index,
+                departure.end_index,
+                departure.leg_in_direction,
+                departure.strength,
+                departure.closing_comparison_reference,
+                departure.qualifying_close,
+                departure.acceptance_reason,
+            )
+        ):
+            raise ValueError("Accepted departure is missing canonical evidence.")
+
+        leg_in = self._candle_evidence(
+            market_data, departure.leg_in_start_index, departure.leg_in_end_index
+        )
+        base_candles = self._candle_evidence(
+            market_data, base.start_index, base.end_index
+        )
+        leg_out = self._candle_evidence(
+            market_data, departure.departure_index, departure.end_index
+        )
+        second = leg_out[1] if len(leg_out) > 1 else None
+        names = {
+            "DROP_BASE_RALLY": "DBR",
+            "RALLY_BASE_RALLY": "RBR",
+            "RALLY_BASE_DROP": "RBD",
+            "DROP_BASE_DROP": "DBD",
+        }
+        return CanonicalFormationEvidence(
+            pattern=names[pattern.pattern_type.value],
+            leg_in_start_index=departure.leg_in_start_index,
+            leg_in_end_index=departure.leg_in_end_index,
+            leg_in_timestamps=tuple(item.timestamp for item in leg_in),
+            leg_in_candles=leg_in,
+            leg_in_direction=departure.leg_in_direction,
+            base_start_index=base.start_index,
+            base_end_index=base.end_index,
+            base_timestamps=tuple(item.timestamp for item in base_candles),
+            base_candles=base_candles,
+            base_body_ratios=tuple(
+                item.classification.body_ratio for item in base_candles
+            ),
+            base_candle_count=base.candle_count,
+            leg_out_start_index=departure.departure_index,
+            leg_out_end_index=departure.end_index,
+            leg_out_timestamps=tuple(item.timestamp for item in leg_out),
+            leg_out_candles=leg_out,
+            first_leg_out_exciting=(
+                leg_out[0].classification.structure == CandleStructure.EXCITING
+            ),
+            first_leg_out_explosive=leg_out[0].classification.explosive,
+            second_leg_out_exciting=(
+                None
+                if second is None
+                else second.classification.structure == CandleStructure.EXCITING
+            ),
+            second_leg_out_explosive=(
+                None if second is None else second.classification.explosive
+            ),
+            significant_gap=departure.significant_gap,
+            gap_measurement=departure.gap_measurement,
+            departure_strength=departure.strength,
+            closing_rule_passed=departure.good_closing,
+            closing_comparison_reference=departure.closing_comparison_reference,
+            qualifying_close=departure.qualifying_close,
+            acceptance_reason=departure.acceptance_reason,
+        )
+
+    def _candle_evidence(
+        self, market_data: DataFrame, start_index: int, end_index: int
+    ) -> tuple[FormationCandleEvidence, ...]:
+        evidence = []
+        for index in range(start_index, end_index + 1):
+            timestamp = market_data.index[index]
+            isoformat = getattr(timestamp, "isoformat", None)
+            evidence.append(
+                FormationCandleEvidence(
+                    index=index,
+                    timestamp=isoformat() if callable(isoformat) else str(timestamp),
+                    classification=self._candle_classifier.classify(
+                        market_data, index
+                    ),
+                )
+            )
+        return tuple(evidence)
 
     @staticmethod
     def _is_leg_in_bullish(

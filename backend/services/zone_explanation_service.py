@@ -38,10 +38,17 @@ class ZoneExplanationService:
     @staticmethod
     def build(zone: Zone, score: ZoneScore) -> ZoneExplanation:
         factors = (
-            ZoneExplanationService._freshness(zone),
-            ZoneExplanationService._departure(score),
-            ZoneExplanationService._touches(zone, score),
-            ZoneExplanationService._confluence(zone, score),
+            tuple(
+                ZoneExplanationService._canonical_factor(component)
+                for component in score.components
+            )
+            if score.components
+            else (
+                ZoneExplanationService._freshness(zone),
+                ZoneExplanationService._departure(score),
+                ZoneExplanationService._touches(zone, score),
+                ZoneExplanationService._confluence(zone, score),
+            )
         )
         positive = tuple(factor for factor in factors if factor.sentiment == "POSITIVE")
         negative = tuple(factor for factor in factors if factor.sentiment == "NEGATIVE")
@@ -71,6 +78,37 @@ class ZoneExplanationService:
                 "decisively and returns fewer times. Always review market "
                 "structure, invalidation and risk before using a zone."
             ),
+        )
+
+    @staticmethod
+    def _canonical_factor(component) -> ZoneExplanationFactor:
+        titles = {
+            "base_quality": "Compact base",
+            "departure_quality": "Price departure",
+            "legout_dominance": "Departure versus arrival",
+            "structural_clearance": "Structural clearance",
+            "lifecycle_quality": "Zone lifecycle",
+            "authenticity_quality": "Formation authenticity",
+        }
+        normalized = (
+            component.score / component.maximum_score * 100.0
+            if component.maximum_score
+            else 0.0
+        )
+        positive = normalized >= 60
+        evidence = "; ".join(component.evidence)
+        return ZoneExplanationFactor(
+            key=component.key,
+            title=titles.get(component.key, component.key.replace("_", " ").title()),
+            score=round(normalized, 1),
+            sentiment="POSITIVE" if positive else "NEGATIVE",
+            summary=evidence or "Canonical evidence was evaluated.",
+            recommendation=(
+                "This factor supports the zone's quality."
+                if positive
+                else "This factor reduces the zone's quality."
+            ),
+            weight=component.maximum_score,
         )
 
     @staticmethod
@@ -160,11 +198,11 @@ class ZoneExplanationService:
     @staticmethod
     def _label(score: float) -> str:
         if score >= 90:
-            return "Elite"
-        if score >= 75:
+            return "Excellent"
+        if score >= 80:
             return "Strong"
+        if score >= 70:
+            return "Good"
         if score >= 60:
-            return "Moderate"
-        if score >= 40:
-            return "Weak"
-        return "Rejected"
+            return "Average"
+        return "Weak"

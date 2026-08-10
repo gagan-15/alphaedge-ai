@@ -17,6 +17,7 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { loginAccount } from "../api/authApi";
 import { LOCAL_DEMO_MODE, useAuth } from "../auth/AuthState";
 import BrandLogo from "../components/brand/BrandLogo";
+import PublicHeader from "../components/public/PublicHeader";
 
 const features = [
     [GridViewRoundedIcon, "Market Scanner", "Transparent filters and ranked research setups."],
@@ -33,18 +34,10 @@ function Login() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (user) {
-            navigate("/dashboard", { replace: true });
-        }
-    }, [navigate, user]);
+    useEffect(() => { if (user) navigate("/dashboard", { replace: true }); }, [navigate, user]);
 
     function enterLocalDemo() {
-        setAuthentication("local-demo-token", {
-            id: "local-demo",
-            full_name: "Local Demo",
-            email: "demo@localhost",
-        });
+        setAuthentication("local-demo-token", { id: "local-demo", full_name: "Local Demo", email: "demo@localhost" });
         navigate("/dashboard", { replace: true });
     }
 
@@ -52,132 +45,47 @@ function Login() {
         event.preventDefault();
         setLoading(true);
         setError("");
-
         try {
-            const result = await loginAccount({
-                email,
-                password,
-                device_name: "Web browser",
-            });
+            const result = await loginAccount({ email, password, device_name: "Web browser" });
             setAuthentication(result.access_token, result.user);
             navigate("/dashboard", { replace: true });
         } catch {
             setError("Login failed. Check your details and email verification.");
-        } finally {
-            setLoading(false);
-        }
+        } finally { setLoading(false); }
     }
 
     return (
-        <Box className="auth-page">
-            <Card
-                sx={{
-                    width: "100%",
-                    maxWidth: 980,
-                    overflow: "hidden",
-                    borderColor: "rgba(99,102,241,.28)",
-                    boxShadow: "0 32px 90px rgba(0,0,0,.48), 0 0 80px rgba(79,70,229,.08)",
-                }}
-            >
-                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1.15fr .85fr" }, minHeight: 610 }}>
-                    <CardContent
-                        sx={{
-                            p: { xs: 3, sm: 5 },
-                            display: { xs: "none", md: "block" },
-                            borderRight: "1px solid rgba(99,102,241,.18)",
-                            background:
-                                "radial-gradient(circle at 15% 0%,rgba(124,58,237,.22),transparent 42%), linear-gradient(145deg,rgba(30,20,67,.82),rgba(9,18,34,.96))",
-                        }}
-                    >
-                        <BrandLogo />
-                        <Typography variant="h4" sx={{ mt: 5, maxWidth: 430, fontSize: "1.75rem", lineHeight: 1.18 }}>
-                            Research the market with{" "}
-                            <Box component="span" sx={{ color: "#9b7cff" }}>
-                                clarity and discipline.
-                            </Box>
-                        </Typography>
-                        <Typography color="text.secondary" sx={{ mt: 1.5, mb: 4, maxWidth: 440 }}>
-                            Scan Indian equities, study supply and demand zones,
-                            validate rules and manage risk from one workspace.
-                        </Typography>
-
-                        <Stack spacing={2}>
-                            {features.map(([Icon, title, description]) => (
-                                <Box key={title} sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
-                                    <Box
-                                        sx={{
-                                            width: 36,
-                                            height: 36,
-                                            flexShrink: 0,
-                                            borderRadius: 1.5,
-                                            display: "grid",
-                                            placeItems: "center",
-                                            bgcolor: "rgba(99,102,241,.12)",
-                                            color: "#9b8cff",
-                                            border: "1px solid rgba(129,140,248,.16)",
-                                        }}
-                                    >
-                                        <Icon sx={{ fontSize: 18 }} />
-                                    </Box>
-                                    <Box>
-                                        <Typography sx={{ fontWeight: 800 }}>{title}</Typography>
-                                        <Typography variant="caption" color="text.secondary">{description}</Typography>
-                                    </Box>
-                                </Box>
-                            ))}
-                        </Stack>
-
-                        <Box sx={{ mt: 5, px: 2, py: 1.4, borderRadius: 1.5, border: "1px solid rgba(74,222,128,.14)", bgcolor: "rgba(74,222,128,.035)" }}>
-                            <Typography variant="caption" color="success.main" sx={{ fontWeight: 750 }}>
-                                Secure · Research-only · No broker execution
-                            </Typography>
-                        </Box>
-                    </CardContent>
-
-                    <CardContent sx={{ p: { xs: 3, sm: 5 }, alignSelf: "center", width: "100%" }}>
-                        <Box sx={{ display: { xs: "block", md: "none" }, mb: 4 }}><BrandLogo /></Box>
-                        <Typography variant="h4">Welcome back</Typography>
-                        <Typography color="text.secondary" sx={{ mt: 1, mb: 4 }}>
-                            Log in to your AlphaEdge AI research workspace.
-                        </Typography>
-
-                        <Stack component="form" spacing={2.25} onSubmit={submit}>
-                            {error && <Alert severity="error">{error}</Alert>}
-                            {LOCAL_DEMO_MODE && (
-                                <Alert severity="info">
-                                    Account service is optional in local demo mode.
-                                </Alert>
-                            )}
-                            <TextField label="Email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
-                            <TextField label="Password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
-                            <Button type="submit" variant="contained" size="large" disabled={loading}>
-                                {loading ? "Logging in..." : "Log In"}
-                            </Button>
-                            {LOCAL_DEMO_MODE && (
-                                <Button type="button" variant="outlined" size="large" onClick={enterLocalDemo}>
-                                    Enter Local Demo
-                                </Button>
-                            )}
-                        </Stack>
-
-                        <Typography color="text.secondary" sx={{ mt: 3 }}>
-                            New to AlphaEdge AI?{" "}
-                            <Link component={RouterLink} to="/register">Create an account</Link>
-                        </Typography>
-                        <Link
-                            component={RouterLink}
-                            to="/"
-                            sx={{ display: "inline-block", mt: 2, fontSize: ".74rem" }}
-                        >
-                            ← Back to complete product overview
-                        </Link>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 4, lineHeight: 1.55 }}>
-                            Educational and analytical use only. Market outcomes are uncertain,
-                            and historical results do not guarantee future performance.
-                        </Typography>
-                    </CardContent>
-                </Box>
-            </Card>
+        <Box sx={{ minHeight: "100vh", bgcolor: "#F8FAFF" }}>
+            <PublicHeader />
+            <Box className="auth-page" sx={{ minHeight: "calc(100vh - 68px)", py: 2 }}>
+                <Card sx={{ width: "100%", maxWidth: 1160, overflow: "hidden", borderColor: "#E0E5EE", boxShadow: "0 24px 70px rgba(16,24,40,.09)", bgcolor: "white" }}>
+                    <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1.05fr .95fr" }, minHeight: 530 }}>
+                        <CardContent sx={{ p: { xs: 3, sm: 4.5 }, display: { xs: "none", md: "block" }, borderRight: "1px solid #E4E7EC", background: "radial-gradient(circle at 20% 10%,#F0EEFF,transparent 50%),linear-gradient(145deg,#FBFAFF,#F3F6FF)" }}>
+                            <Typography sx={{ color: "#4338CA", fontSize: ".68rem", fontWeight: 800, letterSpacing: ".08em" }}>AI-POWERED MARKET RESEARCH</Typography>
+                            <Typography variant="h4" sx={{ mt: 3, maxWidth: 430, fontSize: "2rem", lineHeight: 1.18 }}>Indian market research, <Box component="span" sx={{ color: "#5B5CEB" }}>explained clearly.</Box></Typography>
+                            <Typography color="text.secondary" sx={{ mt: 1.5, mb: 3.5, maxWidth: 440 }}>Scan Indian equities, study supply and demand zones, validate rules and manage risk from one workspace.</Typography>
+                            <Stack spacing={1.6}>{features.map(([Icon, title, description]) => <Box key={title} sx={{ display: "flex", gap: 1.5, alignItems: "center" }}><Box sx={{ width: 36, height: 36, flexShrink: 0, borderRadius: 1.5, display: "grid", placeItems: "center", bgcolor: "#EFEDFF", color: "#5B5CEB", border: "1px solid #DDD8FF" }}><Icon sx={{ fontSize: 18 }} /></Box><Box><Typography sx={{ fontWeight: 750 }}>{title}</Typography><Typography variant="caption" color="text.secondary">{description}</Typography></Box></Box>)}</Stack>
+                            <Box sx={{ mt: 4, px: 2, py: 1.4, borderRadius: 1.5, border: "1px solid #BFE8DD", bgcolor: "#F0FBF8" }}><Typography variant="caption" sx={{ color: "#147D68", fontWeight: 750 }}>Secure · Research-only · No broker execution</Typography></Box>
+                        </CardContent>
+                        <CardContent sx={{ p: { xs: 3, sm: 4.5 }, alignSelf: "center", width: "100%" }}>
+                            <Box sx={{ display: { xs: "block", md: "none" }, mb: 3 }}><BrandLogo /></Box>
+                            <Typography variant="h4">Welcome back</Typography>
+                            <Typography color="text.secondary" sx={{ mt: 1, mb: 3 }}>Sign in to your AlphaEdge AI workspace.</Typography>
+                            <Stack component="form" spacing={2} onSubmit={submit}>
+                                {error && <Alert severity="error">{error}</Alert>}
+                                {LOCAL_DEMO_MODE && <Alert severity="info">Account service is optional in local demo mode.</Alert>}
+                                <TextField label="Email address" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+                                <TextField label="Password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+                                <Button type="submit" variant="contained" size="large" disabled={loading}>{loading ? "Signing in..." : "Sign In"}</Button>
+                                {LOCAL_DEMO_MODE && <Button type="button" variant="outlined" size="large" onClick={enterLocalDemo}>Enter Local Demo</Button>}
+                            </Stack>
+                            <Typography color="text.secondary" sx={{ mt: 2.5 }}>New to AlphaEdge AI? <Link component={RouterLink} to="/register">Create your free workspace</Link></Typography>
+                            <Link component={RouterLink} to="/" sx={{ display: "inline-block", mt: 1.5, fontSize: ".74rem" }}>Back to product overview</Link>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 3, lineHeight: 1.55 }}>Research and educational use only. Market outcomes are uncertain, and historical results do not guarantee future performance.</Typography>
+                        </CardContent>
+                    </Box>
+                </Card>
+            </Box>
         </Box>
     );
 }

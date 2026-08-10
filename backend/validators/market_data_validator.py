@@ -17,6 +17,7 @@ Project:
     AlphaEdge AI
 """
 
+from dataclasses import dataclass
 from typing import Final
 
 import numpy as np
@@ -36,6 +37,18 @@ class MarketDataValidationError(ValueError):
         super().__init__(message)
         self.reason_code = reason_code
         self.row_label = row_label
+
+
+@dataclass(frozen=True)
+class ValidatedMarketDataSegments:
+    """Strictly valid OHLCV segments separated by invalid candles."""
+
+    segments: tuple[pd.DataFrame, ...]
+    zero_range_rows: tuple[object, ...]
+
+    @property
+    def skipped_zero_range_count(self) -> int:
+        return len(self.zero_range_rows)
 
 
 class MarketDataValidator:
@@ -193,6 +206,52 @@ class MarketDataValidator:
         MarketDataValidator.validate_ohlc_integrity(data)
         MarketDataValidator.validate_duplicate_dates(data)
         MarketDataValidator.validate_sorted_dates(data)
+
+    @classmethod
+    def validate_segments(cls, data: pd.DataFrame) -> ValidatedMarketDataSegments:
+        """Validate data while treating zero-range rows as continuity breaks.
+
+        D02 remains strict: a zero-range row is never returned inside a valid
+        segment. Other malformed data still rejects the complete provider
+        response because it cannot be safely classified as a continuity break.
+        """
+
+        cls.validate_not_empty(data)
+        cls.validate_required_columns(data)
+        cls.validate_missing_values(data)
+        cls.validate_duplicate_dates(data)
+        cls.validate_sorted_dates(data)
+
+        ohlc = data.loc[:, cls.OHLC_COLUMNS]
+        numeric_ohlc = ohlc.apply(pd.to_numeric, errors="coerce")
+        zero_range = numeric_ohlc["High"] == numeric_ohlc["Low"]
+        zero_range_rows = tuple(data.index[zero_range])
+
+        segments: list[pd.DataFrame] = []
+        start = 0
+        for break_position in np.flatnonzero(zero_range.to_numpy()):
+            segment = data.iloc[start:int(break_position)]
+            if not segment.empty:
+                cls.validate(segment)
+                segments.append(segment.copy())
+            start = int(break_position) + 1
+
+        trailing = data.iloc[start:]
+        if not trailing.empty:
+            cls.validate(trailing)
+            segments.append(trailing.copy())
+
+        if not segments:
+            raise MarketDataValidationError(
+                "MARKET_DATA_NO_VALID_SEGMENTS",
+                "Market data contains no valid candles after continuity validation.",
+                row_label=zero_range_rows[0] if zero_range_rows else None,
+            )
+
+        return ValidatedMarketDataSegments(
+            segments=tuple(segments),
+            zero_range_rows=zero_range_rows,
+        )
     OHLC_COLUMNS: Final[tuple[str, ...]] = (
         "Open",
         "High",

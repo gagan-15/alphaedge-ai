@@ -37,8 +37,6 @@ export interface StockZoneAnalysis {
     distanceFromZone: number;
     positionExplanation: string;
     pressureConfidence: "High" | "Medium" | "Low";
-    zoneQualityScore: number;
-    zoneQualityFactors: Array<{ factor: string; weight: number; points: number; reason: string }>;
     checks: AnalysisCheck[];
 }
 
@@ -138,27 +136,6 @@ export function analyzeStockZone(result: ZoneResearchResult, candles: MarketCand
     const volumeConfirmation = relativeVolume === null ? null : relativeVolume >= 1.2;
     const pressureDifference = upVolume + downVolume > 0 ? Math.abs(upVolume - downVolume) / (upVolume + downVolume) : 0;
     const pressureConfidence = volumeValues.length < 20 ? "Low" : pressureDifference >= .25 ? "High" : pressureDifference >= .10 ? "Medium" : "Low";
-    const baseCandle = valid[result.base_index];
-    const baseRange = baseCandle ? baseCandle.high - baseCandle.low : 0;
-    const baseBodyRatio = baseCandle && baseRange > 0 ? Math.abs(baseCandle.close - baseCandle.open) / baseRange : null;
-    const basePoints = baseBodyRatio === null ? 0 : baseBodyRatio <= .5 ? 15 : baseBodyRatio <= .7 ? 8 : 0;
-    const departurePoints = Math.min(25, result.strength_score / 35 * 25);
-    const freshnessPoints = result.is_fresh && touches.length === 0 ? 20 : 0;
-    const retestPoints = touches.length === 0 ? 15 : touches.length === 1 ? 8 : 0;
-    const overlapPoints = Math.min(10, result.merge_score / 15 * 10);
-    const widthAtrRatio = atr14 && atr14 > 0 ? width / atr14 : null;
-    const widthPoints = widthAtrRatio === null ? 0 : widthAtrRatio >= .2 && widthAtrRatio <= 2 ? 5 : 1.5;
-    const structurePoints = broken ? 0 : result.pattern_type ? 10 : 4;
-    const zoneQualityFactors = [
-        { factor: "Freshness", weight: 20, points: freshnessPoints, reason: touches.length === 0 ? "No later wick retest was found." : `${touches.length} later wick retest(s) were found.` },
-        { factor: "Base quality", weight: 15, points: basePoints, reason: baseBodyRatio === null ? "The base candle could not be measured." : `Base body is ${(baseBodyRatio * 100).toFixed(1)}% of its full candle range.` },
-        { factor: "Departure strength", weight: 25, points: departurePoints, reason: `Departure engine measured ${result.strength_score.toFixed(1)} out of 35.` },
-        { factor: "Retests", weight: 15, points: retestPoints, reason: `${touches.length} later wick intersection(s) were counted.` },
-        { factor: "Zone overlap", weight: 10, points: overlapPoints, reason: overlapPoints > 0 ? "Another detected zone supports this area." : "No additional overlapping zone was confirmed." },
-        { factor: "Zone width", weight: 5, points: widthPoints, reason: widthAtrRatio === null ? "ATR history is insufficient for a width check." : `Zone width is ${widthAtrRatio.toFixed(2)} times ATR.` },
-        { factor: "Zone structure", weight: 10, points: structurePoints, reason: broken ? "Price closed beyond the distal line." : result.pattern_type ? `A valid ${result.pattern_type} structure was detected.` : "The pattern type is unavailable." },
-    ];
-    const zoneQualityScore = Math.min(100, zoneQualityFactors.reduce((sum, factor) => sum + factor.points, 0));
     const checks: AnalysisCheck[] = [
         check("Fresh zone", result.is_fresh && touches.length === 0 ? "PASS" : "FAIL", `${touches.length} later wick intersection(s)`, "No later candle wick may enter the zone", touches.length ? "Quality reduced" : "Supports quality"),
         check("Strong departure", result.strength_score >= 24.5 ? "PASS" : "FAIL", `${result.strength_score.toFixed(1)} / 35`, "At least 24.5 / 35", result.strength_score >= 24.5 ? "Supports quality" : "Quality reduced"),
@@ -184,6 +161,6 @@ export function analyzeStockZone(result: ZoneResearchResult, candles: MarketCand
         latestRetest: touches.at(-1)?.time ?? null,
         maximumPenetration: penetrations.length ? Math.max(...penetrations) : 0,
         broken, position, distanceFromZone: distance, positionExplanation, pressureConfidence,
-        zoneQualityScore, zoneQualityFactors, checks,
+        checks,
     };
 }

@@ -139,7 +139,9 @@ function Scanner() {
                     scannerResultCache.set(cacheKey, data);
                 }
                 setScanner(data);
-                setIsLoading(!hasCompletedSnapshot);
+                // The request itself has completed. A queued/background scan is
+                // refresh progress, not a reason to block the whole Dashboard.
+                setIsLoading(false);
                 setErrorMessage(null);
                 if (data.status === "refreshing" || data.status === "queued") {
                     window.setTimeout(poll, 5000);
@@ -153,6 +155,7 @@ function Scanner() {
                 );
 
                 if (!receivedScannerResponse) {
+                    setIsLoading(false);
                     setErrorMessage(
                         "Scanner data could not be loaded. Check that the backend is running.",
                     );
@@ -336,7 +339,7 @@ function Scanner() {
                 onQuickPreset={applyQuickPreset}
             />
             <Box sx={{ height: 2 }}>
-                {(filtersSettling || isLoading) && <LinearProgress sx={{ height: 2, borderRadius: 1 }} />}
+                {(filtersSettling || isLoading || scanner?.status === "refreshing" || scanner?.status === "queued") && <LinearProgress sx={{ height: 2, borderRadius: 1 }} />}
             </Box>
 
             {market === "BSE" && (
@@ -443,6 +446,14 @@ function Scanner() {
             {errorMessage && (
                 <Alert severity="error">
                     {errorMessage}
+                </Alert>
+            )}
+
+            {!isLoading && !errorMessage && scanner
+                && (scanner.status === "refreshing" || scanner.status === "queued")
+                && scanner.results.length === 0 && (
+                <Alert severity="info">
+                    Scanning this market for the first time: {scanner.processed_symbols} / {scanner.total_symbols} stocks checked. Results will appear automatically.
                 </Alert>
             )}
 

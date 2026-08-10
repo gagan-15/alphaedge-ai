@@ -28,6 +28,8 @@ import {
     type StockDetailsVisibility,
 } from "./stockDetailsPreferences";
 import { buildTradeConfidence, explainScoreDifference } from "./tradeConfidence";
+import ZoneQualityBreakdown from "./ZoneQualityBreakdown";
+import { formatZoneQuality } from "./zoneQualityPresentation";
 
 const watchlistKey = "alphaedge.local.watchlist";
 const watchlistZonesKey = "alphaedge.local.watchlist.zones";
@@ -286,7 +288,7 @@ function ZoneExplanationPanel({
 
     async function share() {
         setActionBusy("share");
-        const text = `${result.symbol} ${result.zone_type} zone ${currentZone}. Quality ${result.zone_score.toFixed(0)}/100. Research only.`;
+        const text = `${result.symbol} ${result.zone_type} zone ${currentZone}. Quality ${formatZoneQuality(result.zone_score)}/100. Research only.`;
         try {
             if (navigator.share) await navigator.share({ title: "AlphaEdge AI zone research", text });
             else await navigator.clipboard.writeText(text);
@@ -321,12 +323,7 @@ function ZoneExplanationPanel({
                                 <Typography sx={{ mt: 1, fontWeight: 700 }}>This is the main score to use when deciding whether today's setup is worth considering.</Typography>
                             </Grid>
                             <Grid size={{ xs: 12 }}>
-                                <Typography color="text.secondary" variant="overline">Zone Quality</Typography>
-                                <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
-                                    <Typography variant="h3">{result.zone_score.toFixed(0)}</Typography>
-                                    <Typography color="text.secondary">/ 100</Typography>
-                                </Stack>
-                                <Typography variant="caption" color="text.secondary">This score measures only how well the Demand/Supply zone was formed.</Typography>
+                                <ZoneQualityBreakdown result={result} />
                             </Grid>
                             <Grid size={{ xs: 12 }}>
                                 <Typography sx={{ mt: 1, fontWeight: 800 }}>Data connected for {confidence.calculatedWeight} of {confidence.totalWeight} confidence points</Typography>
@@ -347,8 +344,6 @@ function ZoneExplanationPanel({
                             </Box>)}
                             <Typography sx={{ fontWeight: 800 }}>Final recommendation: {confidence.recommendation}.</Typography>
                             <Typography variant="caption" color="text.secondary">Data connected for {confidence.calculatedWeight} of {confidence.totalWeight} possible points. Missing inputs receive no points and are never guessed.</Typography>
-                            <Typography sx={{ fontWeight: 800, mt: 1 }}>Zone Quality inputs</Typography>
-                            {analysis?.zoneQualityFactors.map((factor) => <Typography key={factor.factor} variant="caption" color="text.secondary">{factor.factor}: {factor.reason}</Typography>)}
                             <Typography variant="caption" color="text.secondary">Previous backend zone score: {rawZoneScore.toFixed(1)} raw, capped at {qualityCap.toFixed(1)}. It is kept only for API compatibility.</Typography>
                         </Stack>}
                     </Section>}
@@ -399,7 +394,7 @@ function ZoneExplanationPanel({
                             <Grid size={{ xs: 6 }}><Field label="Maximum penetration" value={analysis ? `${analysis.maximumPenetration.toFixed(1)}%` : "Calculating…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Current status" value={analysis?.positionExplanation ?? "Calculating…"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Distance from zone" value={analysis ? `${analysis.distanceFromZone.toFixed(2)}%` : "Calculating…"} /></Grid>
-                            <Grid size={{ xs: 6 }}><Field label="Zone quality" value={`${result.zone_score.toFixed(0)} / 100`} /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Zone quality" value={`${formatZoneQuality(result.zone_score)} / 100`} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Departure" value={result.strength_score >= 70 ? "Strong" : "Needs caution"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Nearest demand" value={result.zone_type === "DEMAND" ? currentZone : "Not available"} /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Nearest supply" value={result.zone_type === "SUPPLY" ? currentZone : "Not available"} /></Grid>
