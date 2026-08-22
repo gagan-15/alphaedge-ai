@@ -67,11 +67,16 @@ class RiskManagementEngine:
 
         risk_reward_ratio = reward / risk_per_share
 
-        approved = risk_reward_ratio >= self._config.minimum_risk_reward_ratio
+        approved = (
+            entry_confirmation.confirmed
+            and risk_reward_ratio >= self._config.minimum_risk_reward_ratio
+        )
 
         rejection_reason = None
 
-        if not approved:
+        if not entry_confirmation.confirmed:
+            rejection_reason = "Entry confirmation requirements were not met."
+        elif not approved:
             rejection_reason = "Risk reward ratio below minimum threshold."
 
         position_size = PositionSize(

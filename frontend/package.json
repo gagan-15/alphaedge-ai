@@ -7,6 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test:chart": "node --test --experimental-strip-types tests/chartAnnotations.test.ts",
+    "test:ranking": "node --test --experimental-strip-types tests/tradeConfidenceRanking.test.ts",
+    "test:evidence": "node --test --experimental-strip-types tests/historicalEvidence.test.ts",
+    "test:evidence-comparable": "node --test --experimental-strip-types tests/comparableHistoricalEvidence.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -15,6 +19,7 @@
     "@mui/icons-material": "^9.2.0",
     "@mui/material": "^9.2.0",
     "axios": "^1.18.1",
+    "lightweight-charts": "^5.2.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1"

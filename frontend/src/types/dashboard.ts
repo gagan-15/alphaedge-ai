@@ -17,6 +17,14 @@ export interface MarketOverviewResult {
 
     india_vix: number;
     india_vix_change: number;
+    advancing: number;
+    declining: number;
+    unchanged: number;
+    total_symbols: number;
+    processed_symbols: number;
+    source: string;
+    data_status: "live" | "delayed" | "cached" | "refreshing";
+    updated_at: string;
 }
 
 export interface PortfolioResult {

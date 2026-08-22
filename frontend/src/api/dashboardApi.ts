@@ -6,18 +6,23 @@
  */
 
 import axios from "axios";
+import { API_BASE_URL } from "./config";
 
 import type { DashboardResult } from "../types/dashboard";
 
 const api = axios.create({
-    baseURL: "http://127.0.0.1:8000",
+    baseURL: API_BASE_URL,
     timeout: 10000,
 });
 
-export async function getDashboard(): Promise<DashboardResult> {
+export async function getDashboard(
+    universe = "nse500",
+    symbols: string[] = [],
+): Promise<DashboardResult> {
     try {
         const response = await api.get<DashboardResult>(
             "/dashboard/",
+            { params: { universe, symbols } },
         );
 
         return response.data;

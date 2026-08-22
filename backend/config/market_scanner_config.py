@@ -14,6 +14,6 @@ class MarketScannerConfig:
     Configuration for the Market Scanner Engine.
     """
 
-    maximum_symbols: int = 500
+    maximum_symbols: int = 5000
 
     continue_on_error: bool = True

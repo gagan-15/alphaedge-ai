@@ -1,0 +1,414 @@
+"""
+Tests for the Scanner API response mapping.
+"""
+
+from concurrent.futures import Future
+from time import monotonic
+
+from pandas import DataFrame, date_range
+
+from backend.api import scanner as scanner_api
+from backend.api.models.scanner_response import ZoneResearchResponse
+from backend.api.scanner import (
+    _departure_gap,
+    _has_completed_test,
+    _is_zone_invalidated,
+    _measure_zone,
+    _timeframe_data,
+    build_scanner_response,
+)
+from backend.config.canonical_methodology import SCANNER_METHODOLOGY_CACHE_VERSION
+from backend.models.market_scanner.market_scanner_result import (
+    MarketScannerResult,
+)
+from backend.models.screener.screener_result import (
+    ScreenerResult,
+)
+from backend.models.zone import Zone, ZoneType
+
+
+def _completed_zone_response(
+    *,
+    total_symbols: int = 50,
+) -> ZoneResearchResponse:
+    return ZoneResearchResponse(
+        total_scanned=total_symbols,
+        total_zones=0,
+        results=(),
+        universe="nifty50",
+        status="completed",
+        total_symbols=total_symbols,
+        processed_symbols=total_symbols,
+        failed_symbols=0,
+        last_completed_at="2026-07-30T12:00:00+00:00",
+        data_status="delayed",
+    )
+
+
+def test_nifty50_uses_background_cache_path(monkeypatch) -> None:
+    """Small predefined universes should use stale-while-refresh too."""
+
+    response = _completed_zone_response()
+    completed: Future[ZoneResearchResponse] = Future()
+    completed.set_result(response)
+    monkeypatch.setattr(
+        scanner_api._universe_service,
+        "get_symbols",
+        lambda universe, symbols: [f"TEST{index}" for index in range(50)],
+    )
+    monkeypatch.setattr(
+        scanner_api._zone_scan_executor,
+        "submit",
+        lambda *args, **kwargs: completed,
+    )
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+
+    first = scanner_api.get_research_zones("DAILY", "nifty50", None)
+    second = scanner_api.get_research_zones("DAILY", "nifty50", None)
+
+    assert first.status == "refreshing"
+    assert first.last_completed_at is None
+    assert second.status == "completed"
+    assert second.last_completed_at == response.last_completed_at
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+
+
+def test_zone_scan_cache_key_contains_canonical_methodology_version() -> None:
+    """Pre-Formation-V1 scan results must not share the active cache key."""
+
+    key = scanner_api._zone_scan_key("DAILY", "nse500", None)
+
+    assert SCANNER_METHODOLOGY_CACHE_VERSION in key
+    assert "formation-1.1" in key
+
+
+def test_cached_refresh_response_uses_active_progress(monkeypatch) -> None:
+    """Cached rows should report progress from the running refresh."""
+
+    response = _completed_zone_response(total_symbols=500)
+    key = scanner_api._zone_scan_key("DAILY", "nse500", None)
+    pending: Future[ZoneResearchResponse] = Future()
+    monkeypatch.setattr(
+        scanner_api._universe_service,
+        "get_symbols",
+        lambda universe, symbols: [f"TEST{index}" for index in range(500)],
+    )
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+    scanner_api._zone_scan_cache[key] = (
+        monotonic() - scanner_api._zone_scan_ttl_seconds,
+        response,
+    )
+    scanner_api._zone_scan_jobs[key] = pending
+    scanner_api._zone_scan_progress[key] = (485, 3)
+
+    observed = scanner_api.get_research_zones("DAILY", "nse500", None)
+
+    assert observed.status == "refreshing"
+    assert observed.processed_symbols == 485
+    assert observed.failed_symbols == 3
+    assert observed.last_completed_at == response.last_completed_at
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+
+
+def test_refresh_never_reports_all_symbols_processed_before_publication(
+    monkeypatch,
+) -> None:
+    """500/500 is reserved for the completed, published scanner snapshot."""
+
+    response = _completed_zone_response(total_symbols=500)
+    key = scanner_api._zone_scan_key("DAILY", "nse500", None)
+    pending: Future[ZoneResearchResponse] = Future()
+    monkeypatch.setattr(
+        scanner_api._universe_service,
+        "get_symbols",
+        lambda universe, symbols: [f"TEST{index}" for index in range(500)],
+    )
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+    scanner_api._zone_scan_cache[key] = (
+        monotonic() - scanner_api._zone_scan_ttl_seconds,
+        response,
+    )
+    scanner_api._zone_scan_jobs[key] = pending
+    scanner_api._zone_scan_progress[key] = (500, 0)
+
+    observed = scanner_api.get_research_zones("DAILY", "nse500", None)
+
+    assert observed.status == "refreshing"
+    assert observed.processed_symbols == 499
+    assert observed.failed_symbols == 0
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+
+
+def test_build_empty_scanner_response() -> None:
+    """
+    Empty scanner results map to a valid API response.
+    """
+
+    scanner = MarketScannerResult(
+        scanned_symbols=4,
+        screener_result=ScreenerResult(
+            opportunities=[],
+        ),
+    )
+
+    response = build_scanner_response(scanner)
+
+    assert response.total_scanned == 4
+    assert response.total_matches == 0
+    assert response.results == ()
+
+
+def test_measure_zone_uses_departure_and_later_retests() -> None:
+    """Zone quality inputs must come from observable candles."""
+
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 102, "Low": 99, "Close": 101},
+            {"Open": 101, "High": 103, "Low": 100, "Close": 102},
+            {"Open": 102, "High": 108, "Low": 102, "Close": 107},
+            {"Open": 107, "High": 112, "Low": 106, "Close": 111},
+            {"Open": 111, "High": 114, "Low": 109, "Close": 113},
+            {"Open": 113, "High": 115, "Low": 101, "Close": 104},
+        ]
+    )
+    measured = _measure_zone(
+        Zone(
+            zone_type=ZoneType.DEMAND,
+            upper_price=103,
+            lower_price=100,
+            created_index=1,
+        ),
+        data,
+    )
+
+    assert measured.strength > 0
+    assert measured.touch_count == 1
+    assert measured.is_fresh is False
+
+
+def test_measure_zone_counts_exact_proximal_wick_touch_as_tested() -> None:
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 103, "Low": 99, "Close": 101},
+            {"Open": 101, "High": 108, "Low": 101, "Close": 107},
+            {"Open": 107, "High": 112, "Low": 106, "Close": 111},
+            {"Open": 111, "High": 114, "Low": 109, "Close": 113},
+            # The body remains above the zone; only the wick tags proximal.
+            {"Open": 110, "High": 111, "Low": 103, "Close": 109},
+        ]
+    )
+
+    measured = _measure_zone(
+        Zone(
+            zone_type=ZoneType.DEMAND,
+            upper_price=103,
+            lower_price=99,
+            created_index=0,
+        ),
+        data,
+    )
+
+    assert measured.touch_count == 1
+    assert measured.is_fresh is False
+
+
+def test_timeframe_data_aggregates_daily_candles() -> None:
+    """Weekly zones must use true aggregated OHLCV candles."""
+
+    data = DataFrame(
+        {
+            "Open": [100, 101, 102, 103, 104],
+            "High": [102, 103, 104, 105, 106],
+            "Low": [99, 100, 101, 102, 103],
+            "Close": [101, 102, 103, 104, 105],
+            "Volume": [10, 20, 30, 40, 50],
+        },
+        index=date_range("2026-07-20", periods=5, freq="D"),
+    )
+
+    weekly = _timeframe_data(data, "WEEKLY")
+
+    assert len(weekly) == 1
+    assert weekly.iloc[0]["Open"] == 100
+    assert weekly.iloc[0]["High"] == 106
+    assert weekly.iloc[0]["Low"] == 99
+    assert weekly.iloc[0]["Close"] == 105
+    assert weekly.iloc[0]["Volume"] == 150
+
+
+def test_timeframe_data_builds_75_minute_candles_from_intraday_data() -> None:
+    data = DataFrame(
+        {
+            "Open": [100, 101, 102, 103, 104],
+            "High": [102, 103, 104, 105, 106],
+            "Low": [99, 100, 101, 102, 103],
+            "Close": [101, 102, 103, 104, 105],
+            "Volume": [10, 20, 30, 40, 50],
+        },
+        index=date_range("2026-07-20 09:15", periods=5, freq="15min"),
+    )
+
+    result = _timeframe_data(data, "MINUTE_75")
+
+    assert len(result) == 1
+    assert result.iloc[0]["Open"] == 100
+    assert result.iloc[0]["High"] == 106
+    assert result.iloc[0]["Close"] == 105
+    assert result.iloc[0]["Volume"] == 150
+
+
+def test_measure_zone_penalizes_departure_without_follow_through() -> None:
+    """A short move followed by immediate reversal must not score as explosive."""
+
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 103, "Low": 99, "Close": 102},
+            {"Open": 102, "High": 103, "Low": 100, "Close": 101},
+            {"Open": 101, "High": 110, "Low": 101, "Close": 108},
+            {"Open": 108, "High": 109, "Low": 99, "Close": 100},
+            {"Open": 100, "High": 102, "Low": 96, "Close": 98},
+        ]
+    )
+    measured = _measure_zone(
+        Zone(
+            zone_type=ZoneType.DEMAND,
+            upper_price=103,
+            lower_price=100,
+            created_index=1,
+        ),
+        data,
+    )
+
+    assert measured.strength < 10
+
+
+def test_demand_zone_is_invalid_after_close_below_distal() -> None:
+    data = DataFrame(
+        [
+            {"Open": 101, "High": 103, "Low": 100, "Close": 102},
+            {"Open": 102, "High": 106, "Low": 101, "Close": 105},
+            {"Open": 105, "High": 106, "Low": 99, "Close": 100},
+            {"Open": 100, "High": 101, "Low": 96, "Close": 97},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.DEMAND,
+        upper_price=102,
+        lower_price=98,
+        created_index=0,
+    )
+
+    assert _is_zone_invalidated(zone, data) is True
+
+
+def test_supply_zone_is_invalid_after_close_above_distal() -> None:
+    data = DataFrame(
+        [
+            {"Open": 101, "High": 103, "Low": 100, "Close": 102},
+            {"Open": 102, "High": 103, "Low": 95, "Close": 96},
+            {"Open": 96, "High": 103, "Low": 95, "Close": 102},
+            {"Open": 102, "High": 106, "Low": 101, "Close": 105},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.SUPPLY,
+        upper_price=104,
+        lower_price=100,
+        created_index=0,
+    )
+
+    assert _is_zone_invalidated(zone, data) is True
+
+
+def test_zone_with_completed_reaction_is_not_active() -> None:
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 102, "Low": 99, "Close": 101},
+            {"Open": 101, "High": 106, "Low": 101, "Close": 105},
+            {"Open": 105, "High": 110, "Low": 104, "Close": 109},
+            {"Open": 109, "High": 111, "Low": 106, "Close": 108},
+            {"Open": 108, "High": 109, "Low": 100, "Close": 104},
+            {"Open": 104, "High": 112, "Low": 103, "Close": 111},
+            {"Open": 111, "High": 114, "Low": 110, "Close": 113},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.DEMAND,
+        upper_price=103,
+        lower_price=99,
+        created_index=0,
+    )
+
+    assert _has_completed_test(zone, data) is True
+
+
+def test_current_first_touch_remains_active() -> None:
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 102, "Low": 99, "Close": 101},
+            {"Open": 101, "High": 106, "Low": 101, "Close": 105},
+            {"Open": 105, "High": 110, "Low": 104, "Close": 109},
+            {"Open": 109, "High": 111, "Low": 106, "Close": 108},
+            {"Open": 108, "High": 110, "Low": 107, "Close": 109},
+            {"Open": 109, "High": 110, "Low": 101, "Close": 103},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.DEMAND,
+        upper_price=103,
+        lower_price=99,
+        created_index=0,
+    )
+
+    assert _has_completed_test(zone, data) is False
+
+
+def test_completed_supply_reaction_is_not_active() -> None:
+    data = DataFrame(
+        [
+            {"Open": 105, "High": 106, "Low": 103, "Close": 104},
+            {"Open": 104, "High": 105, "Low": 98, "Close": 99},
+            {"Open": 99, "High": 100, "Low": 94, "Close": 95},
+            {"Open": 95, "High": 98, "Low": 93, "Close": 96},
+            {"Open": 96, "High": 104, "Low": 95, "Close": 101},
+            {"Open": 101, "High": 102, "Low": 92, "Close": 94},
+            {"Open": 94, "High": 95, "Low": 90, "Close": 91},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.SUPPLY,
+        upper_price=105,
+        lower_price=101,
+        created_index=0,
+    )
+
+    assert _has_completed_test(zone, data) is True
+
+
+def test_departure_gap_is_marked_for_scanner_result() -> None:
+    data = DataFrame(
+        [
+            {"Open": 100, "High": 102, "Low": 99, "Close": 101},
+            {"Open": 110, "High": 112, "Low": 109, "Close": 111},
+        ]
+    )
+    zone = Zone(
+        zone_type=ZoneType.DEMAND,
+        upper_price=102,
+        lower_price=99,
+        created_index=0,
+    )
+
+    assert _departure_gap(zone, data) == "GAP UP"

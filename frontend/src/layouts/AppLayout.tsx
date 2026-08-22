@@ -1,7 +1,9 @@
 import Box from "@mui/material/Box";
 
 import Header from "../components/header/Header";
-import Sidebar from "../components/sidebar/Sidebar";
+import MarketTicker from "../components/shared/MarketTicker";
+import ResearchDisclaimer from "../components/shared/ResearchDisclaimer";
+import RiskConsentDialog from "../components/shared/RiskConsentDialog";
 
 interface AppLayoutProps {
     children: React.ReactNode;
@@ -9,24 +11,45 @@ interface AppLayoutProps {
 
 function AppLayout({ children }: AppLayoutProps) {
     return (
-        <Box sx={{ display: "flex" }}>
+        <Box
+            sx={{
+                display: "flex",
+                minHeight: "100vh",
+                backgroundColor: "background.default",
+            }}
+        >
             <Header />
-            <Sidebar />
+            <RiskConsentDialog />
+            <MarketTicker />
 
             <Box
                 component="main"
                 sx={{
-                        flexGrow: 1,
-                        p: 3,
-                        pt: 10,
-                        pl: "240px",
-                        pr: 3,
-                        pb: 3,
-                        minHeight: "100vh",
-                        backgroundColor: "background.default",
-                    }}
+                    width: "100%",
+                    pt: {
+                        xs: "156px",
+                        md: "156px",
+                    },
+                    px: {
+                        xs: 1.25,
+                        sm: 2,
+                        xl: 3,
+                    },
+                    pb: 7,
+                    minHeight: "100vh",
+                    overflow: "hidden",
+                }}
             >
-                {children}
+                <Box
+                    sx={{
+                        width: "100%",
+                        maxWidth: "none",
+                    }}
+                >
+                    {children}
+
+                    <ResearchDisclaimer />
+                </Box>
             </Box>
         </Box>
     );

@@ -1,21 +1,79 @@
 :root {
-    font-family: Inter, Roboto, Arial, sans-serif;
+    font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+    color-scheme: dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+}
+
+:root[data-theme="light"] {
+    background: #f4f7fb;
 }
 
 * {
-    margin: 0;
-    padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    background: #07101f;
 }
 
 html,
 body,
 #root {
     width: 100%;
+    min-width: 320px;
     min-height: 100vh;
+    margin: 0;
 }
 
 body {
-    margin: 0;
-    background: #f5f7fb;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #081322;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #26364d;
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #344861;
+}
+
+:root[data-theme="light"] ::-webkit-scrollbar-track {
+    background: #edf2f7;
+}
+
+:root[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: #b7c3d2;
+}
+
+.auth-page {
+    width: 100%;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 16px 24px;
+    background:
+        radial-gradient(circle at 20% 10%, rgba(91, 92, 235, 0.09), transparent 35%),
+        radial-gradient(circle at 85% 80%, rgba(96, 165, 250, 0.07), transparent 35%),
+        #f8faff;
 }

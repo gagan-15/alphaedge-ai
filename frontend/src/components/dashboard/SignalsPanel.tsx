@@ -16,6 +16,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 
 import type { SignalResult } from "../../types/dashboard";
+import { getResearchLabel } from "../../utils/researchLanguage";
 
 interface SignalsPanelProps {
     signals: SignalResult[];
@@ -115,7 +116,9 @@ function SignalsPanel({
                                             </Typography>
 
                                             <Chip
-                                                label={signal.action}
+                                                label={getResearchLabel(
+                                                    signal.action,
+                                                )}
                                                 color={getSignalColor(
                                                     signal.action,
                                                 )}
@@ -162,7 +165,7 @@ function SignalsPanel({
                                                     variant="body2"
                                                     color="text.secondary"
                                                 >
-                                                    Confidence
+                                                    Conditions matched
                                                 </Typography>
 
                                                 <Typography

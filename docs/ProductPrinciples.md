@@ -39,7 +39,9 @@ Every AI recommendation must be explainable.
 
 ## 3. Explain Every Decision
 
-Every BUY, SELL, HOLD, or WAIT recommendation must clearly explain why it was generated.
+Every internal BUY, SELL, HOLD, or WAIT engine result must clearly explain why
+it was generated. User-facing screens translate these values into Bullish
+Setup, Bearish Setup, or Watch.
 
 Examples:
 
@@ -219,3 +221,19 @@ AlphaEdge AI should become known for:
 # Product Motto
 
 > "Trust is earned through evidence."
+
+# Research and Safety Boundary
+
+AlphaEdge AI provides market research and educational analytics.
+
+- It does not execute trades.
+- It does not connect to brokers in the current product scope.
+- It does not manage user money.
+- It does not provide guaranteed returns.
+- It does not present historical performance as a promise.
+- It uses Bullish Setup, Bearish Setup, and Watch in user-facing screens.
+- It shows possible scenarios and invalidation levels, not commands.
+- It tells users that market investments may cause loss of capital.
+- It requires legal and compliance review before regulated services launch.
+
+---

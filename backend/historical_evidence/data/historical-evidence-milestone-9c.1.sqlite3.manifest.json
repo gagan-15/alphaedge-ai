@@ -1,0 +1,20 @@
+{
+  "artifact_sha256": "e04c43b95cf1f9c2b0ee2f29d1a3c04a86a0c50ed39f5d86fe894b59179f567e",
+  "methodology_fingerprint": "034ebdd6c52e0c161fda7cde9be4157e9ad250786fe98c3b0f02bfbc5030d015",
+  "output": "backend\\historical_evidence\\data\\historical-evidence-milestone-9c.1.sqlite3",
+  "records": 37725,
+  "source_sha256": {
+    "shard-0.json": "8c59886db2c96dfb082d7f1f06bb3e71d824699fb9a85b9b46e9732d0c64ba35",
+    "shard-1.json": "5e3338e64fdd17f482515adda21e123c47d2b84be5041228f96e8cfd0ae4f8ff",
+    "shard-2.json": "8f5e17882443fc0f99c4d11a0b1b882a4c634ccd677b5d76ac6c470f002be185",
+    "shard-3.json": "9374fe63972fd0f9489717f851ea08efbda92292e93684531f94aaadd5142bd9"
+  },
+  "tc_counts": {
+    "CONFLICTED": 2653,
+    "HIGH": 270,
+    "INSUFFICIENT_CONTEXT": 22424,
+    "LOW": 5141,
+    "MODERATE": 7237,
+    "VERY_HIGH": 0
+  }
+}

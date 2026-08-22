@@ -1,0 +1,2682 @@
+{
+  "audit_only": true,
+  "production_gate_active": false,
+  "timeframe": "WEEKLY",
+  "universe": "nifty100",
+  "symbols_requested": 100,
+  "symbols_processed": 100,
+  "failures": [],
+  "canonical_zones": 21,
+  "dashboard_qualified": 0,
+  "dashboard_visible": 0,
+  "patterns": {
+    "RBD": 4,
+    "DBD": 4,
+    "DBR": 4,
+    "RBR": 9
+  },
+  "zone_types": {
+    "SUPPLY": 8,
+    "DEMAND": 13
+  },
+  "one_candle_leg_ins": 19,
+  "multi_candle_leg_ins": 2,
+  "structural_states": {
+    "INSUFFICIENT_EVIDENCE": 7,
+    "CONGESTED": 8,
+    "CLEAN": 3,
+    "ACCEPTABLE": 2,
+    "BORDERLINE": 1
+  },
+  "reason_codes": {
+    "LEG_IN_DISPLACEMENT_WEAK": 13,
+    "APPROACH_HIGH_OCCUPANCY": 13,
+    "APPROACH_OVERLAP_ACCEPTABLE": 15,
+    "APPROACH_DIRECTIONAL": 14,
+    "APPROACH_INSUFFICIENT_HISTORY": 7,
+    "APPROACH_HIGH_OVERLAP": 6,
+    "APPROACH_DIRECTION_CHANGES": 7,
+    "LEG_IN_DISPLACEMENT_STRONG": 8,
+    "APPROACH_LOW_OCCUPANCY": 8
+  },
+  "metric_distributions": {
+    "directional_displacement": {
+      "min": 0.0,
+      "p10": 4.0,
+      "p25": 11.599991,
+      "median": 31.099976,
+      "p75": 221.183608,
+      "p90": 460.0,
+      "max": 1033.202857
+    },
+    "displacement_zone_width_ratio": {
+      "min": 0.0,
+      "p10": 0.234604,
+      "p25": 0.451808,
+      "median": 0.933715,
+      "p75": 1.470224,
+      "p90": 1.559933,
+      "max": 6.441968
+    },
+    "displacement_volatility_ratio": {
+      "min": 0.0,
+      "p10": 0.069065,
+      "p25": 0.158573,
+      "median": 0.33987,
+      "p75": 0.631801,
+      "p90": 1.253426,
+      "max": 1.687957
+    },
+    "approach_overlap_ratio": {
+      "min": 0.0,
+      "p10": 0.0,
+      "p25": 0.0,
+      "median": 0.648495,
+      "p75": 0.819209,
+      "p90": 0.912087,
+      "max": 0.991804
+    },
+    "prior_zone_occupancy_ratio": {
+      "min": 0.0,
+      "p10": 0.333333,
+      "p25": 0.5,
+      "median": 1.0,
+      "p75": 1.0,
+      "p90": 1.0,
+      "max": 1.0
+    },
+    "directional_efficiency": {
+      "min": 0.0,
+      "p10": 0.172413,
+      "p25": 0.505495,
+      "median": 1.0,
+      "p75": 1.0,
+      "p90": 1.0,
+      "max": 1.0
+    },
+    "approach_direction_changes": {
+      "min": 0.0,
+      "p10": 0.0,
+      "p25": 0.0,
+      "median": 0.0,
+      "p75": 1.0,
+      "p90": 1.0,
+      "max": 1.0
+    },
+    "approach_candle_count": {
+      "min": 1.0,
+      "p10": 1.0,
+      "p25": 1.0,
+      "median": 2.0,
+      "p75": 2.0,
+      "p90": 2.0,
+      "max": 3.0
+    }
+  },
+  "threshold_study": [
+    {
+      "rule": "WIDTH_050",
+      "retained": 13,
+      "rejected": 8,
+      "dashboard_retained": 0,
+      "dashboard_rejected": 0,
+      "one_candle_retained": 11,
+      "one_candle_rejected": 8,
+      "multi_candle_retained": 2,
+      "multi_candle_rejected": 0,
+      "patterns_retained": {
+        "DBR": 3,
+        "RBR": 6,
+        "RBD": 2,
+        "DBD": 2
+      },
+      "patterns_rejected": {
+        "DBR": 1,
+        "RBR": 3,
+        "RBD": 2,
+        "DBD": 2
+      },
+      "types_retained": {
+        "DEMAND": 9,
+        "SUPPLY": 4
+      },
+      "types_rejected": {
+        "DEMAND": 4,
+        "SUPPLY": 4
+      }
+    },
+    {
+      "rule": "WIDTH_100",
+      "retained": 8,
+      "rejected": 13,
+      "dashboard_retained": 0,
+      "dashboard_rejected": 0,
+      "one_candle_retained": 6,
+      "one_candle_rejected": 13,
+      "multi_candle_retained": 2,
+      "multi_candle_rejected": 0,
+      "patterns_retained": {
+        "DBR": 1,
+        "RBR": 6,
+        "RBD": 1,
+        "DBD": 0
+      },
+      "patterns_rejected": {
+        "DBR": 3,
+        "RBR": 3,
+        "RBD": 3,
+        "DBD": 4
+      },
+      "types_retained": {
+        "DEMAND": 7,
+        "SUPPLY": 1
+      },
+      "types_rejected": {
+        "DEMAND": 6,
+        "SUPPLY": 7
+      }
+    },
+    {
+      "rule": "VOL_075",
+      "retained": 2,
+      "rejected": 19,
+      "dashboard_retained": 0,
+      "dashboard_rejected": 0,
+      "one_candle_retained": 1,
+      "one_candle_rejected": 18,
+      "multi_candle_retained": 1,
+      "multi_candle_rejected": 1,
+      "patterns_retained": {
+        "DBR": 0,
+        "RBR": 1,
+        "RBD": 1,
+        "DBD": 0
+      },
+      "patterns_rejected": {
+        "DBR": 4,
+        "RBR": 8,
+        "RBD": 3,
+        "DBD": 4
+      },
+      "types_retained": {
+        "DEMAND": 1,
+        "SUPPLY": 1
+      },
+      "types_rejected": {
+        "DEMAND": 12,
+        "SUPPLY": 7
+      }
+    },
+    {
+      "rule": "VOL_100",
+      "retained": 2,
+      "rejected": 19,
+      "dashboard_retained": 0,
+      "dashboard_rejected": 0,
+      "one_candle_retained": 1,
+      "one_candle_rejected": 18,
+      "multi_candle_retained": 1,
+      "multi_candle_rejected": 1,
+      "patterns_retained": {
+        "DBR": 0,
+        "RBR": 1,
+        "RBD": 1,
+        "DBD": 0
+      },
+      "patterns_rejected": {
+        "DBR": 4,
+        "RBR": 8,
+        "RBD": 3,
+        "DBD": 4
+      },
+      "types_retained": {
+        "DEMAND": 1,
+        "SUPPLY": 1
+      },
+      "types_rejected": {
+        "DEMAND": 12,
+        "SUPPLY": 7
+      }
+    },
+    {
+      "rule": "OCC_080",
+      "retained": 8,
+      "rejected": 13,
+      "dashboard_retained": 0,
+      "dashboard_rejected": 0,
+      "one_candle_retained": 6,
+      "one_candle_rejected": 13,
+      "multi_candle_retained": 2,
+      "multi_candle_rejected": 0,
+      "patterns_retained": {
+        "DBR": 2,
+        "RBR": 3,
+        "RBD": 2,
+        "DBD": 1
+      },
+      "patterns_rejected": {
+        "DBR": 2,
+        "RBR": 6,
+        "RBD": 2,
+        "DBD": 3
+      },
+      "types_retained": {
+        "DEMAND": 5,
+        "SUPPLY": 3
+      },
+      "types_rejected": {
+        "DEMAND": 8,
+        "SUPPLY": 5
+      }
+    },
+    {
+      "rule": "OCC_065",
+      "retained": 8,
+      "rejected": 13,
+      "dashboard_retained": 0,
+      "dashboard_rejected": 0,
+      "one_candle_retained": 6,
+      "one_candle_rejected": 13,
+      "multi_candle_retained": 2,
+      "multi_candle_rejected": 0,
+      "patterns_retained": {
+        "DBR": 2,
+        "RBR": 3,
+        "RBD": 2,
+        "DBD": 1
+      },
+      "patterns_rejected": {
+        "DBR": 2,
+        "RBR": 6,
+        "RBD": 2,
+        "DBD": 3
+      },
+      "types_retained": {
+        "DEMAND": 5,
+        "SUPPLY": 3
+      },
+      "types_rejected": {
+        "DEMAND": 8,
+        "SUPPLY": 5
+      }
+    },
+    {
+      "rule": "OVERLAP_080",
+      "retained": 15,
+      "rejected": 6,
+      "dashboard_retained": 0,
+      "dashboard_rejected": 0,
+      "one_candle_retained": 13,
+      "one_candle_rejected": 6,
+      "multi_candle_retained": 2,
+      "multi_candle_rejected": 0,
+      "patterns_retained": {
+        "DBR": 3,
+        "RBR": 5,
+        "RBD": 4,
+        "DBD": 3
+      },
+      "patterns_rejected": {
+        "DBR": 1,
+        "RBR": 4,
+        "RBD": 0,
+        "DBD": 1
+      },
+      "types_retained": {
+        "DEMAND": 8,
+        "SUPPLY": 7
+      },
+      "types_rejected": {
+        "DEMAND": 5,
+        "SUPPLY": 1
+      }
+    },
+    {
+      "rule": "COMBINED_LENIENT",
+      "retained": 12,
+      "rejected": 9,
+      "dashboard_retained": 0,
+      "dashboard_rejected": 0,
+      "one_candle_retained": 10,
+      "one_candle_rejected": 9,
+      "multi_candle_retained": 2,
+      "multi_candle_rejected": 0,
+      "patterns_retained": {
+        "DBR": 2,
+        "RBR": 6,
+        "RBD": 2,
+        "DBD": 2
+      },
+      "patterns_rejected": {
+        "DBR": 2,
+        "RBR": 3,
+        "RBD": 2,
+        "DBD": 2
+      },
+      "types_retained": {
+        "DEMAND": 8,
+        "SUPPLY": 4
+      },
+      "types_rejected": {
+        "DEMAND": 5,
+        "SUPPLY": 4
+      }
+    },
+    {
+      "rule": "COMBINED_BALANCED",
+      "retained": 12,
+      "rejected": 9,
+      "dashboard_retained": 0,
+      "dashboard_rejected": 0,
+      "one_candle_retained": 10,
+      "one_candle_rejected": 9,
+      "multi_candle_retained": 2,
+      "multi_candle_rejected": 0,
+      "patterns_retained": {
+        "DBR": 2,
+        "RBR": 6,
+        "RBD": 2,
+        "DBD": 2
+      },
+      "patterns_rejected": {
+        "DBR": 2,
+        "RBR": 3,
+        "RBD": 2,
+        "DBD": 2
+      },
+      "types_retained": {
+        "DEMAND": 8,
+        "SUPPLY": 4
+      },
+      "types_rejected": {
+        "DEMAND": 5,
+        "SUPPLY": 4
+      }
+    },
+    {
+      "rule": "TIERED_MINIMUM",
+      "retained": 6,
+      "rejected": 15,
+      "dashboard_retained": 0,
+      "dashboard_rejected": 0,
+      "one_candle_retained": 4,
+      "one_candle_rejected": 15,
+      "multi_candle_retained": 2,
+      "multi_candle_rejected": 0,
+      "patterns_retained": {
+        "DBR": 2,
+        "RBR": 2,
+        "RBD": 1,
+        "DBD": 1
+      },
+      "patterns_rejected": {
+        "DBR": 2,
+        "RBR": 7,
+        "RBD": 3,
+        "DBD": 3
+      },
+      "types_retained": {
+        "DEMAND": 4,
+        "SUPPLY": 2
+      },
+      "types_rejected": {
+        "DEMAND": 9,
+        "SUPPLY": 6
+      }
+    }
+  ],
+  "performance": {
+    "data_load_seconds": 6.270546,
+    "detection_seconds": 0.374484,
+    "detection_ms_per_zone": 17.832567
+  },
+  "records": [
+    {
+      "symbol": "ADANIGREEN",
+      "timeframe": "1W",
+      "zone_id": "ZONE-9B01689964C1048912A0",
+      "pattern": "RBD",
+      "zone_type": "SUPPLY",
+      "proximal": 1513.9000244140625,
+      "distal": 1631.5,
+      "created_index": 2,
+      "formation_timestamp": "2026-07-17 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 0,
+      "leg_in_end_index": 0,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 0,
+      "broader_approach_end_index": 0,
+      "approach_candle_count": 1,
+      "pause_candle_count": 0,
+      "backward_walk_stop_reason": "START_OF_VALIDATED_SEGMENT",
+      "directional_displacement": 49.299927,
+      "total_approach_travel": 49.299927,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 0.419217,
+      "displacement_volatility_ratio": null,
+      "approach_overlap_ratio": 0.0,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": null,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 0.0,
+      "approach_direction_changes": 0,
+      "structural_state": "INSUFFICIENT_EVIDENCE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL",
+        "APPROACH_INSUFFICIENT_HISTORY"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03 00:00:00",
+          "open": 1506.9000244140625,
+          "high": 1566.5999755859375,
+          "low": 1469.300048828125,
+          "close": 1556.199951171875,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 49.2999267578125,
+          "range": 97.2999267578125,
+          "body_ratio": 0.5066799986450562,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 28.300048828125,
+          "range": 107.9000244140625,
+          "body_ratio": 0.2622802819721761,
+          "explosive": false
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 11.5,
+          "range": 124.199951171875,
+          "body_ratio": 0.09259262899456089,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 128.5999755859375,
+          "range": 206.699951171875,
+          "body_ratio": 0.6221577453542992,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "AXISBANK",
+      "timeframe": "1W",
+      "zone_id": "ZONE-F7815B23DDD374A8AB55",
+      "pattern": "DBD",
+      "zone_type": "SUPPLY",
+      "proximal": 1315.9000244140625,
+      "distal": 1369.9434532686023,
+      "created_index": 2,
+      "formation_timestamp": "2026-07-17 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 0,
+      "leg_in_end_index": 0,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 0,
+      "broader_approach_end_index": 0,
+      "approach_candle_count": 1,
+      "pause_candle_count": 0,
+      "backward_walk_stop_reason": "START_OF_VALIDATED_SEGMENT",
+      "directional_displacement": 50.461183,
+      "total_approach_travel": 50.461183,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 0.933715,
+      "displacement_volatility_ratio": null,
+      "approach_overlap_ratio": 0.0,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": null,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 0.0,
+      "approach_direction_changes": 0,
+      "structural_state": "INSUFFICIENT_EVIDENCE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL",
+        "APPROACH_INSUFFICIENT_HISTORY"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03 00:00:00",
+          "open": 1391.5268564078813,
+          "high": 1391.5268564078813,
+          "low": 1337.3685740578373,
+          "close": 1341.065673828125,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 50.4611825797563,
+          "range": 54.158282350044,
+          "body_ratio": 0.931735283877874,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 30.9552440903233,
+          "range": 78.7393405488576,
+          "body_ratio": 0.3931356787413737,
+          "explosive": false
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 12.5999755859375,
+          "range": 49.4000244140625,
+          "body_ratio": 0.2550601084794346,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 47.699951171875,
+          "range": 73.4000244140625,
+          "body_ratio": 0.6498628788294558,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "BAJAJFINSV",
+      "timeframe": "1W",
+      "zone_id": "ZONE-856531037B3BAC68F7FF",
+      "pattern": "DBR",
+      "zone_type": "DEMAND",
+      "proximal": 1876.699951171875,
+      "distal": 1822.0,
+      "created_index": 3,
+      "formation_timestamp": "2026-07-24 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 2,
+      "leg_in_end_index": 2,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 1,
+      "broader_approach_end_index": 2,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "OPPOSITE_EXCITING_IMPULSE",
+      "directional_displacement": 31.099976,
+      "total_approach_travel": 92.900024,
+      "directional_efficiency": 0.334768,
+      "displacement_zone_width_ratio": 0.568556,
+      "displacement_volatility_ratio": 0.178223,
+      "approach_overlap_ratio": 0.892405,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 0.5,
+      "adjacent_body_overlap_ratio": 0.482201,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_HIGH_OVERLAP",
+        "APPROACH_DIRECTION_CHANGES"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10 00:00:00",
+          "open": 1885.0999755859375,
+          "high": 1920.5,
+          "low": 1841.5,
+          "close": 1916.0,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 1900.0,
+          "high": 1912.0,
+          "low": 1822.0,
+          "close": 1854.0,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 46.0,
+          "range": 90.0,
+          "body_ratio": 0.5111111111111111,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 24.5999755859375,
+          "range": 66.0,
+          "body_ratio": 0.37272690281723486,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 144.0999755859375,
+          "range": 151.5999755859375,
+          "body_ratio": 0.9505276965183383,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "BEL",
+      "timeframe": "1W",
+      "zone_id": "ZONE-DBB0F7FBB20F158255A9",
+      "pattern": "RBD",
+      "zone_type": "SUPPLY",
+      "proximal": 404.450927734375,
+      "distal": 429.31716160808884,
+      "created_index": 3,
+      "formation_timestamp": "2026-07-24 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 0,
+      "leg_in_end_index": 0,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 0,
+      "broader_approach_end_index": 0,
+      "approach_candle_count": 1,
+      "pause_candle_count": 0,
+      "backward_walk_stop_reason": "START_OF_VALIDATED_SEGMENT",
+      "directional_displacement": 11.234764,
+      "total_approach_travel": 11.234764,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 0.451808,
+      "displacement_volatility_ratio": null,
+      "approach_overlap_ratio": 0.0,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": null,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 0.0,
+      "approach_direction_changes": 0,
+      "structural_state": "INSUFFICIENT_EVIDENCE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL",
+        "APPROACH_INSUFFICIENT_HISTORY"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03 00:00:00",
+          "open": 406.24848135259623,
+          "high": 423.92451390508063,
+          "low": 403.00288743908834,
+          "close": 417.4832458496094,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 11.23476449701317,
+          "range": 20.92162646599229,
+          "body_ratio": 0.5369928822348047,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 7.1402803870278,
+          "range": 25.81494870131214,
+          "body_ratio": 0.2765947927940244,
+          "explosive": false
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 2.4966098747398,
+          "range": 9.18749819013543,
+          "body_ratio": 0.271739903842419,
+          "explosive": false
+        },
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 3.5451730448413,
+          "range": 10.3359682189004,
+          "body_ratio": 0.3429938027826537,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 20.1226879825379,
+          "range": 26.21440394889055,
+          "body_ratio": 0.7676195126072869,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "BHARTIARTL",
+      "timeframe": "1W",
+      "zone_id": "ZONE-C7878AE7EA9B37CA81B7",
+      "pattern": "RBR",
+      "zone_type": "DEMAND",
+      "proximal": 1898.199951171875,
+      "distal": 1851.7947529725336,
+      "created_index": 3,
+      "formation_timestamp": "2026-07-24 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 0,
+      "leg_in_end_index": 0,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 0,
+      "broader_approach_end_index": 0,
+      "approach_candle_count": 1,
+      "pause_candle_count": 0,
+      "backward_walk_stop_reason": "START_OF_VALIDATED_SEGMENT",
+      "directional_displacement": 72.389005,
+      "total_approach_travel": 72.389005,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 1.559933,
+      "displacement_volatility_ratio": null,
+      "approach_overlap_ratio": 0.0,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": null,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 0.0,
+      "approach_direction_changes": 0,
+      "structural_state": "INSUFFICIENT_EVIDENCE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL",
+        "APPROACH_INSUFFICIENT_HISTORY"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03 00:00:00",
+          "open": 1814.2670004150261,
+          "high": 1889.2236668160383,
+          "low": 1810.316715673802,
+          "close": 1886.656005859375,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 72.3890054443489,
+          "range": 78.9069511422363,
+          "body_ratio": 0.9173970657396423,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 3.5552781501174,
+          "range": 89.7701372511014,
+          "body_ratio": 0.039604240998013844,
+          "explosive": false
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 5.1353565995846,
+          "range": 67.8460863533323,
+          "body_ratio": 0.0756912723431154,
+          "explosive": false
+        },
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 20.629677661934,
+          "range": 54.1189699221877,
+          "body_ratio": 0.3811912475716993,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 80.0,
+          "range": 86.4000244140625,
+          "body_ratio": 0.9259256642869556,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "BOSCHLTD",
+      "timeframe": "1W",
+      "zone_id": "ZONE-76F50EB394A7E916D563",
+      "pattern": "DBR",
+      "zone_type": "DEMAND",
+      "proximal": 41631.042094223485,
+      "distal": 39445.42623594074,
+      "created_index": 4,
+      "formation_timestamp": "2026-07-31 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 2,
+      "leg_in_end_index": 2,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 1,
+      "broader_approach_end_index": 2,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 1033.202857,
+      "total_approach_travel": 1033.202857,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 0.472728,
+      "displacement_volatility_ratio": 0.33987,
+      "approach_overlap_ratio": 0.611571,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 0,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10 00:00:00",
+          "open": 41621.10910654673,
+          "high": 42242.02318692619,
+          "low": 41039.9339204443,
+          "close": 41541.6328125,
+          "structure": "BASE",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 41427.38528113383,
+          "high": 41775.097148001856,
+          "low": 40493.527322237176,
+          "close": 40587.90625,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 839.47903113383,
+          "range": 1281.56982576468,
+          "body_ratio": 0.6550396351856477,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 948.75477600098,
+          "range": 2568.1013472586,
+          "body_ratio": 0.36943821434997415,
+          "explosive": false
+        },
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 814.635844223485,
+          "range": 2443.91608366153,
+          "body_ratio": 0.3333321670370037,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 1895.16343825666,
+          "range": 2813.72518159806,
+          "body_ratio": 0.6735424804992145,
+          "explosive": false
+        },
+        {
+          "index": 6,
+          "timestamp": "2026-08-14T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 3700.0,
+          "range": 4665.0,
+          "body_ratio": 0.7931404072883173,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "DIVISLAB",
+      "timeframe": "1W",
+      "zone_id": "ZONE-619A6C2C307EC374DA33",
+      "pattern": "RBR",
+      "zone_type": "DEMAND",
+      "proximal": 7248.5,
+      "distal": 7177.0,
+      "created_index": 3,
+      "formation_timestamp": "2026-07-24 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 2,
+      "leg_in_end_index": 2,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 1,
+      "broader_approach_end_index": 2,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 460.600697,
+      "total_approach_travel": 460.600697,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 6.441968,
+      "displacement_volatility_ratio": 1.687957,
+      "approach_overlap_ratio": 0.648495,
+      "prior_zone_occupancy_ratio": 0.0,
+      "pre_leg_in_occupancy_ratio": 0.0,
+      "weighted_full_approach_occupancy_ratio": 0.0,
+      "material_zone_width_occupancy_ratio": 0.5,
+      "body_occupancy_ratio": 0.0,
+      "adjacent_body_overlap_ratio": 0.117646,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 0,
+      "structural_state": "CLEAN",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10 00:00:00",
+          "open": 6757.1356307532815,
+          "high": 6930.420896130035,
+          "low": 6665.513408615146,
+          "close": 6807.92626953125,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 6801.950952593545,
+          "high": 7359.651179243268,
+          "low": 6758.6295958676565,
+          "close": 7217.736328125,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 415.785375531455,
+          "range": 601.0215833756115,
+          "body_ratio": 0.6917977440946705,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 18.315030948944,
+          "range": 230.951913538055,
+          "body_ratio": 0.0793023563579444,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 834.0,
+          "range": 869.5,
+          "body_ratio": 0.9591719378953422,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "EICHERMOT",
+      "timeframe": "1W",
+      "zone_id": "ZONE-F4D8F8DEC8B40D9DCDFC",
+      "pattern": "RBR",
+      "zone_type": "DEMAND",
+      "proximal": 7548.9482421875,
+      "distal": 7400.502766808728,
+      "created_index": 3,
+      "formation_timestamp": "2026-07-24 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 2,
+      "leg_in_end_index": 2,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 1,
+      "broader_approach_end_index": 2,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 221.183608,
+      "total_approach_travel": 221.183608,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 1.489999,
+      "displacement_volatility_ratio": 0.336596,
+      "approach_overlap_ratio": 0.912087,
+      "prior_zone_occupancy_ratio": 0.5,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 0.8,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 0.5,
+      "adjacent_body_overlap_ratio": 1.0,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 0,
+      "structural_state": "ACCEPTABLE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_HIGH_OVERLAP",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10 00:00:00",
+          "open": 7263.9330915813425,
+          "high": 7524.207511561691,
+          "low": 7209.008256897042,
+          "close": 7289.1689453125,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 7249.088433479451,
+          "high": 7496.497520537057,
+          "low": 7066.005744674686,
+          "close": 7485.11669921875,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 236.028265739299,
+          "range": 430.491775862371,
+          "body_ratio": 0.5482758997346273,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 58.38854146869,
+          "range": 307.77720012107,
+          "body_ratio": 0.18971041859410562,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 233.090546367205,
+          "range": 330.258919090675,
+          "body_ratio": 0.7057812307052586,
+          "explosive": false
+        },
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 120.0,
+          "range": 215.5,
+          "body_ratio": 0.5568445475638051,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "ENRIN",
+      "timeframe": "1W",
+      "zone_id": "ZONE-810F0F376476F16ABE50",
+      "pattern": "DBR",
+      "zone_type": "DEMAND",
+      "proximal": 3260.10009765625,
+      "distal": 3075.0,
+      "created_index": 4,
+      "formation_timestamp": "2026-07-31 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 2,
+      "leg_in_end_index": 3,
+      "leg_in_candle_count": 2,
+      "broader_approach_start_index": 2,
+      "broader_approach_end_index": 3,
+      "approach_candle_count": 2,
+      "pause_candle_count": 0,
+      "backward_walk_stop_reason": "OPPOSITE_EXCITING_IMPULSE",
+      "directional_displacement": 254.900146,
+      "total_approach_travel": 254.900146,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 1.377094,
+      "displacement_volatility_ratio": 0.631801,
+      "approach_overlap_ratio": 0.420029,
+      "prior_zone_occupancy_ratio": 0.0,
+      "pre_leg_in_occupancy_ratio": null,
+      "weighted_full_approach_occupancy_ratio": 0.0,
+      "material_zone_width_occupancy_ratio": 0.0,
+      "body_occupancy_ratio": 0.0,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 0,
+      "structural_state": "CLEAN",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 3495.10009765625,
+          "high": 3551.0,
+          "low": 3344.300048828125,
+          "close": 3385.5,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 3,
+          "timestamp": "2026-07-24 00:00:00",
+          "open": 3379.0,
+          "high": 3430.699951171875,
+          "low": 3225.0,
+          "close": 3240.199951171875,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 109.60009765625,
+          "range": 206.699951171875,
+          "body_ratio": 0.5302376562494463,
+          "explosive": false
+        },
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 138.800048828125,
+          "range": 205.699951171875,
+          "body_ratio": 0.6747694787353109,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 29.300048828125,
+          "range": 200.0,
+          "body_ratio": 0.146500244140625,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 412.800048828125,
+          "range": 554.0,
+          "body_ratio": 0.7451264419280235,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "ETERNAL",
+      "timeframe": "1W",
+      "zone_id": "ZONE-F1A1BAD2FAFE4C0F4DE0",
+      "pattern": "RBR",
+      "zone_type": "DEMAND",
+      "proximal": 289.6499938964844,
+      "distal": 275.54998779296875,
+      "created_index": 3,
+      "formation_timestamp": "2026-07-24 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 0,
+      "leg_in_end_index": 0,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 0,
+      "broader_approach_end_index": 0,
+      "approach_candle_count": 1,
+      "pause_candle_count": 0,
+      "backward_walk_stop_reason": "START_OF_VALIDATED_SEGMENT",
+      "directional_displacement": 21.649994,
+      "total_approach_travel": 21.649994,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 1.53546,
+      "displacement_volatility_ratio": null,
+      "approach_overlap_ratio": 0.0,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": null,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 0.0,
+      "approach_direction_changes": 0,
+      "structural_state": "INSUFFICIENT_EVIDENCE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL",
+        "APPROACH_INSUFFICIENT_HISTORY"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03 00:00:00",
+          "open": 260.0,
+          "high": 287.79998779296875,
+          "low": 257.04998779296875,
+          "close": 281.6499938964844,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 21.6499938964844,
+          "range": 30.75,
+          "body_ratio": 0.7040648421620943,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 5.85000610351565,
+          "range": 20.5,
+          "body_ratio": 0.2853661513910073,
+          "explosive": false
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 0.5,
+          "range": 20.45001220703125,
+          "body_ratio": 0.02444986315597831,
+          "explosive": false
+        },
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 4.6499938964844,
+          "range": 20.60000610351565,
+          "body_ratio": 0.2257277921723926,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 20.95001220703125,
+          "range": 34.89999389648435,
+          "body_ratio": 0.6002869877046497,
+          "explosive": false
+        },
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 11.5,
+          "range": 19.6500244140625,
+          "body_ratio": 0.5852410031495965,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "GRASIM",
+      "timeframe": "1W",
+      "zone_id": "ZONE-0FD37ADBFE6AF777F075",
+      "pattern": "DBR",
+      "zone_type": "DEMAND",
+      "proximal": 3125.2639018156783,
+      "distal": 3050.49684910887,
+      "created_index": 4,
+      "formation_timestamp": "2026-07-31 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 2,
+      "leg_in_end_index": 2,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 1,
+      "broader_approach_end_index": 2,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 72.274852,
+      "total_approach_travel": 134.880422,
+      "directional_efficiency": 0.535844,
+      "displacement_zone_width_ratio": 0.966667,
+      "displacement_volatility_ratio": 0.493197,
+      "approach_overlap_ratio": 0.761637,
+      "prior_zone_occupancy_ratio": 0.5,
+      "pre_leg_in_occupancy_ratio": 0.0,
+      "weighted_full_approach_occupancy_ratio": 0.2,
+      "material_zone_width_occupancy_ratio": 0.5,
+      "body_occupancy_ratio": 0.5,
+      "adjacent_body_overlap_ratio": 0.643305,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "ACCEPTABLE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTION_CHANGES"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10 00:00:00",
+          "open": 3172.317332114808,
+          "high": 3235.9194001689293,
+          "low": 3111.7061659193714,
+          "close": 3203.6201171875,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 3192.4545757041246,
+          "high": 3206.3115540954004,
+          "low": 3050.49684910887,
+          "close": 3100.04248046875,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 92.4120952353746,
+          "range": 155.8147049865304,
+          "body_ratio": 0.5930896910106352,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 45.4584818938033,
+          "range": 128.3004883740055,
+          "body_ratio": 0.35431261774537,
+          "explosive": false
+        },
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 0.797428752331,
+          "range": 63.3026265988887,
+          "body_ratio": 0.012597087912067761,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 212.6894830809047,
+          "range": 256.136998684165,
+          "body_ratio": 0.8303739177609629,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "HDFCBANK",
+      "timeframe": "1W",
+      "zone_id": "ZONE-3CD32B06C0E34DE0A540",
+      "pattern": "RBD",
+      "zone_type": "SUPPLY",
+      "proximal": 817.0,
+      "distal": 843.0,
+      "created_index": 2,
+      "formation_timestamp": "2026-07-17 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 1,
+      "leg_in_end_index": 1,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 0,
+      "broader_approach_end_index": 1,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "START_OF_VALIDATED_SEGMENT",
+      "directional_displacement": 24.950012,
+      "total_approach_travel": 24.950012,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 0.959616,
+      "displacement_volatility_ratio": null,
+      "approach_overlap_ratio": 0.140351,
+      "prior_zone_occupancy_ratio": 0.5,
+      "pre_leg_in_occupancy_ratio": 0.0,
+      "weighted_full_approach_occupancy_ratio": 0.2,
+      "material_zone_width_occupancy_ratio": 0.5,
+      "body_occupancy_ratio": 0.5,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 0.0,
+      "approach_direction_changes": 0,
+      "structural_state": "INSUFFICIENT_EVIDENCE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL",
+        "APPROACH_INSUFFICIENT_HISTORY"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03 00:00:00",
+          "open": 800.0,
+          "high": 807.0,
+          "low": 792.75,
+          "close": 801.0499877929688,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 1,
+          "timestamp": "2026-07-10 00:00:00",
+          "open": 805.0,
+          "high": 843.0,
+          "low": 805.0,
+          "close": 824.9500122070312,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 19.9500122070312,
+          "range": 38.0,
+          "body_ratio": 0.5250003212376632,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 2.5999755859375,
+          "range": 17.2000122070312,
+          "body_ratio": 0.15116126399460664,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 47.2000122070312,
+          "range": 52.75,
+          "body_ratio": 0.8947869612707336,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "HDFCLIFE",
+      "timeframe": "1W",
+      "zone_id": "ZONE-B1E49FBEAED2AC141F76",
+      "pattern": "DBD",
+      "zone_type": "SUPPLY",
+      "proximal": 548.5,
+      "distal": 561.9500122070312,
+      "created_index": 4,
+      "formation_timestamp": "2026-07-31 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 3,
+      "leg_in_end_index": 3,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 2,
+      "broader_approach_end_index": 3,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 7.950012,
+      "total_approach_travel": 9.250061,
+      "directional_efficiency": 0.859455,
+      "displacement_zone_width_ratio": 0.591078,
+      "displacement_volatility_ratio": 0.349835,
+      "approach_overlap_ratio": 0.699005,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 0.5,
+      "adjacent_body_overlap_ratio": 1.0,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 563.0,
+          "high": 588.0,
+          "low": 553.25,
+          "close": 563.6500244140625,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 3,
+          "timestamp": "2026-07-24 00:00:00",
+          "open": 567.2999877929688,
+          "high": 567.2999877929688,
+          "low": 547.2000122070312,
+          "close": 555.0499877929688,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 12.25,
+          "range": 20.0999755859376,
+          "body_ratio": 0.6094534765788661,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 7.4500122070312,
+          "range": 17.9000244140624,
+          "body_ratio": 0.41620123161275757,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 13.7000122070312,
+          "range": 23.5,
+          "body_ratio": 0.5829792428523914,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "HINDZINC",
+      "timeframe": "1W",
+      "zone_id": "ZONE-55BCDE3377CB434DBDBB",
+      "pattern": "RBR",
+      "zone_type": "DEMAND",
+      "proximal": 541.0499877929688,
+      "distal": 524.0,
+      "created_index": 4,
+      "formation_timestamp": "2026-07-31 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 3,
+      "leg_in_end_index": 3,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 2,
+      "broader_approach_end_index": 3,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 4.0,
+      "total_approach_travel": 23.200073,
+      "directional_efficiency": 0.172413,
+      "displacement_zone_width_ratio": 0.234604,
+      "displacement_volatility_ratio": 0.158573,
+      "approach_overlap_ratio": 0.842229,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 0.932289,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_HIGH_OVERLAP",
+        "APPROACH_DIRECTION_CHANGES"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 527.9500122070312,
+          "high": 536.5,
+          "low": 514.9500122070312,
+          "close": 518.3499755859375,
+          "structure": "BASE",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 3,
+          "timestamp": "2026-07-24 00:00:00",
+          "open": 519.0,
+          "high": 541.2999877929688,
+          "low": 518.3499755859375,
+          "close": 531.9500122070312,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 12.9500122070312,
+          "range": 22.9500122070313,
+          "body_ratio": 0.5642703842686256,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 1.8499755859376,
+          "range": 19.9000244140625,
+          "body_ratio": 0.09296348323222664,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 59.4000244140625,
+          "range": 64.75,
+          "body_ratio": 0.9173748944256757,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "ITC",
+      "timeframe": "1W",
+      "zone_id": "ZONE-5E01832211A26DA16BAD",
+      "pattern": "DBD",
+      "zone_type": "SUPPLY",
+      "proximal": 284.45001220703125,
+      "distal": 292.54998779296875,
+      "created_index": 5,
+      "formation_timestamp": "2026-08-07 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 4,
+      "leg_in_end_index": 4,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 3,
+      "broader_approach_end_index": 4,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 0.0,
+      "total_approach_travel": 5.200012,
+      "directional_efficiency": 0.0,
+      "displacement_zone_width_ratio": 0.0,
+      "displacement_volatility_ratio": 0.0,
+      "approach_overlap_ratio": 0.755908,
+      "prior_zone_occupancy_ratio": 0.5,
+      "pre_leg_in_occupancy_ratio": 0.0,
+      "weighted_full_approach_occupancy_ratio": 0.2,
+      "material_zone_width_occupancy_ratio": 0.5,
+      "body_occupancy_ratio": 0.5,
+      "adjacent_body_overlap_ratio": 0.890914,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "BORDERLINE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTION_CHANGES"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24 00:00:00",
+          "open": 280.70001220703125,
+          "high": 284.8500061035156,
+          "low": 278.5,
+          "close": 283.45001220703125,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 4,
+          "timestamp": "2026-07-31 00:00:00",
+          "open": 287.75,
+          "high": 289.04998779296875,
+          "low": 280.04998779296875,
+          "close": 281.0,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 6.75,
+          "range": 9.0,
+          "body_ratio": 0.75,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 1.64999389648435,
+          "range": 9.54998779296875,
+          "body_ratio": 0.17277445084266707,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 6,
+          "timestamp": "2026-08-14T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 8.64999389648435,
+          "range": 10.7000122070312,
+          "body_ratio": 0.8084097222618363,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "LTM",
+      "timeframe": "1W",
+      "zone_id": "ZONE-D70B0FFED423E7C29340",
+      "pattern": "RBR",
+      "zone_type": "DEMAND",
+      "proximal": 4091.800048828125,
+      "distal": 3913.800048828125,
+      "created_index": 3,
+      "formation_timestamp": "2026-07-24 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 1,
+      "leg_in_end_index": 1,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 0,
+      "broader_approach_end_index": 1,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "START_OF_VALIDATED_SEGMENT",
+      "directional_displacement": 261.699951,
+      "total_approach_travel": 297.099854,
+      "directional_efficiency": 0.880848,
+      "displacement_zone_width_ratio": 1.470224,
+      "displacement_volatility_ratio": null,
+      "approach_overlap_ratio": 0.285551,
+      "prior_zone_occupancy_ratio": 0.5,
+      "pre_leg_in_occupancy_ratio": 0.0,
+      "weighted_full_approach_occupancy_ratio": 0.2,
+      "material_zone_width_occupancy_ratio": 0.5,
+      "body_occupancy_ratio": 0.5,
+      "adjacent_body_overlap_ratio": 1.0,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "INSUFFICIENT_EVIDENCE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL",
+        "APPROACH_INSUFFICIENT_HISTORY"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 0,
+          "timestamp": "2026-07-03 00:00:00",
+          "open": 3775.5,
+          "high": 3790.300048828125,
+          "low": 3528.0,
+          "close": 3757.800048828125,
+          "structure": "BASE",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 1,
+          "timestamp": "2026-07-10 00:00:00",
+          "open": 3757.800048828125,
+          "high": 4083.199951171875,
+          "low": 3715.39990234375,
+          "close": 4037.199951171875,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 279.39990234375,
+          "range": 367.800048828125,
+          "body_ratio": 0.7596516184105107,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 18.10009765625,
+          "range": 268.599853515625,
+          "body_ratio": 0.06738684857546685,
+          "explosive": false
+        },
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 16.199951171875,
+          "range": 234.199951171875,
+          "body_ratio": 0.06917145409644494,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 242.60009765625,
+          "range": 403.7001953125,
+          "body_ratio": 0.6009412442034017,
+          "explosive": false
+        },
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 259.10009765625,
+          "range": 334.2998046875,
+          "body_ratio": 0.7750530931313409,
+          "explosive": false
+        },
+        {
+          "index": 6,
+          "timestamp": "2026-08-14T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 101.0,
+          "range": 167.5,
+          "body_ratio": 0.6029850746268657,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "M&M",
+      "timeframe": "1W",
+      "zone_id": "ZONE-3C8D7B25754FF00045B4",
+      "pattern": "RBR",
+      "zone_type": "DEMAND",
+      "proximal": 3179.199951171875,
+      "distal": 3135.10009765625,
+      "created_index": 3,
+      "formation_timestamp": "2026-07-24 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 2,
+      "leg_in_end_index": 2,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 1,
+      "broader_approach_end_index": 2,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 21.300049,
+      "total_approach_travel": 78.300049,
+      "directional_efficiency": 0.272031,
+      "displacement_zone_width_ratio": 0.482996,
+      "displacement_volatility_ratio": 0.12753,
+      "approach_overlap_ratio": 0.991328,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 1.0,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_HIGH_OVERLAP",
+        "APPROACH_DIRECTION_CHANGES"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10 00:00:00",
+          "open": 3157.89990234375,
+          "high": 3217.10009765625,
+          "low": 3080.300048828125,
+          "close": 3129.39990234375,
+          "structure": "BASE",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 3088.800048828125,
+          "high": 3183.199951171875,
+          "low": 3079.39990234375,
+          "close": 3179.199951171875,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 90.39990234375,
+          "range": 103.800048828125,
+          "body_ratio": 0.8709042371785072,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 17.800048828125,
+          "range": 114.89990234375,
+          "body_ratio": 0.15491787603850157,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 215.5,
+          "range": 278.0,
+          "body_ratio": 0.7751798561151079,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "PFC",
+      "timeframe": "1W",
+      "zone_id": "ZONE-57F44E961A4DE521A396",
+      "pattern": "RBD",
+      "zone_type": "SUPPLY",
+      "proximal": 420.0,
+      "distal": 429.25,
+      "created_index": 5,
+      "formation_timestamp": "2026-08-07 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 3,
+      "leg_in_end_index": 4,
+      "leg_in_candle_count": 2,
+      "broader_approach_start_index": 2,
+      "broader_approach_end_index": 4,
+      "approach_candle_count": 3,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "OPPOSITE_EXCITING_IMPULSE",
+      "directional_displacement": 25.084543,
+      "total_approach_travel": 25.084543,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 2.711843,
+      "displacement_volatility_ratio": 1.253426,
+      "approach_overlap_ratio": 0.65257,
+      "prior_zone_occupancy_ratio": 0.333333,
+      "pre_leg_in_occupancy_ratio": 0.0,
+      "weighted_full_approach_occupancy_ratio": 0.166667,
+      "material_zone_width_occupancy_ratio": 0.333333,
+      "body_occupancy_ratio": 0.333333,
+      "adjacent_body_overlap_ratio": 0.432433,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 0,
+      "structural_state": "CLEAN",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 399.2654626222954,
+          "high": 409.02419049259726,
+          "low": 396.0455824515448,
+          "close": 401.09832763671875,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 3,
+          "timestamp": "2026-07-24 00:00:00",
+          "open": 399.5131455839255,
+          "high": 414.47321171306555,
+          "low": 397.7298379951304,
+          "close": 408.0829772949219,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 4,
+          "timestamp": "2026-07-31 00:00:00",
+          "open": 408.38021492502054,
+          "high": 427.4022606709577,
+          "low": 407.19132305576477,
+          "close": 424.3500061035156,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 8.5698317109964,
+          "range": 16.74337371793515,
+          "body_ratio": 0.5118342250114489,
+          "explosive": false
+        },
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 15.96979117849506,
+          "range": 20.21093761519293,
+          "body_ratio": 0.7901558790864941,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 5.5,
+          "range": 16.29998779296875,
+          "body_ratio": 0.3374235655791417,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 6,
+          "timestamp": "2026-08-14T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 33.80001831054685,
+          "range": 40.6499938964844,
+          "body_ratio": 0.8314888901734874,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "SBIN",
+      "timeframe": "1W",
+      "zone_id": "ZONE-0F314F36194D00F31389",
+      "pattern": "RBR",
+      "zone_type": "DEMAND",
+      "proximal": 1041.5999755859375,
+      "distal": 1000.7999877929688,
+      "created_index": 4,
+      "formation_timestamp": "2026-07-31 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 2,
+      "leg_in_end_index": 2,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 1,
+      "broader_approach_end_index": 2,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 2.400024,
+      "total_approach_travel": 14.200073,
+      "directional_efficiency": 0.169015,
+      "displacement_zone_width_ratio": 0.058824,
+      "displacement_volatility_ratio": 0.069065,
+      "approach_overlap_ratio": 0.991804,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 1.0,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_HIGH_OVERLAP",
+        "APPROACH_DIRECTION_CHANGES"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 1,
+          "timestamp": "2026-07-10 00:00:00",
+          "open": 1041.9000244140625,
+          "high": 1049.5999755859375,
+          "low": 1011.7000122070312,
+          "close": 1036.0,
+          "structure": "BASE",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 2,
+          "timestamp": "2026-07-17 00:00:00",
+          "open": 1023.5,
+          "high": 1048.0,
+          "low": 1011.4000244140625,
+          "close": 1044.300048828125,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 2,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 20.800048828125,
+          "range": 36.5999755859375,
+          "body_ratio": 0.5683077241209097,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 26.5999755859375,
+          "range": 66.2000122070312,
+          "body_ratio": 0.40181224593659937,
+          "explosive": false
+        },
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 7.1000366210937,
+          "range": 26.7000732421875,
+          "body_ratio": 0.265918245118342,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 62.199951171875,
+          "range": 93.5999755859375,
+          "body_ratio": 0.664529566193818,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "SHREECEM",
+      "timeframe": "1W",
+      "zone_id": "ZONE-B2BAAB294EA05B22CD6D",
+      "pattern": "DBD",
+      "zone_type": "SUPPLY",
+      "proximal": 26010.0,
+      "distal": 27550.0,
+      "created_index": 5,
+      "formation_timestamp": "2026-08-07 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 4,
+      "leg_in_end_index": 4,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 3,
+      "broader_approach_end_index": 4,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 460.0,
+      "total_approach_travel": 910.0,
+      "directional_efficiency": 0.505495,
+      "displacement_zone_width_ratio": 0.298701,
+      "displacement_volatility_ratio": 0.370438,
+      "approach_overlap_ratio": 0.819209,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 1.0,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_HIGH_OVERLAP",
+        "APPROACH_DIRECTION_CHANGES"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24 00:00:00",
+          "open": 26515.0,
+          "high": 27285.0,
+          "low": 26400.0,
+          "close": 26740.0,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 4,
+          "timestamp": "2026-07-31 00:00:00",
+          "open": 26960.0,
+          "high": 27125.0,
+          "low": 25500.0,
+          "close": 26055.0,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 905.0,
+          "range": 1625.0,
+          "body_ratio": 0.556923076923077,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 140.0,
+          "range": 1540.0,
+          "body_ratio": 0.09090909090909091,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 6,
+          "timestamp": "2026-08-14T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 1100.0,
+          "range": 1305.0,
+          "body_ratio": 0.842911877394636,
+          "explosive": false
+        }
+      ]
+    },
+    {
+      "symbol": "VEDL",
+      "timeframe": "1W",
+      "zone_id": "ZONE-760242EC1A32EA355C79",
+      "pattern": "RBR",
+      "zone_type": "DEMAND",
+      "proximal": 267.04998779296875,
+      "distal": 259.0,
+      "created_index": 4,
+      "formation_timestamp": "2026-07-31 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 3,
+      "leg_in_end_index": 3,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 3,
+      "broader_approach_end_index": 3,
+      "approach_candle_count": 1,
+      "pause_candle_count": 0,
+      "backward_walk_stop_reason": "OPPOSITE_EXCITING_IMPULSE",
+      "directional_displacement": 11.599991,
+      "total_approach_travel": 11.599991,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 1.440995,
+      "displacement_volatility_ratio": 0.68639,
+      "approach_overlap_ratio": 0.0,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": null,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 0.0,
+      "approach_direction_changes": 0,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24 00:00:00",
+          "open": 253.0500030517578,
+          "high": 268.29998779296875,
+          "low": 252.8000030517578,
+          "close": 264.6499938964844,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 3,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 11.5999908447266,
+          "range": 15.49998474121095,
+          "body_ratio": 0.7483872428522366,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 4,
+          "timestamp": "2026-07-31T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 2.79998779296875,
+          "range": 10.70001220703125,
+          "body_ratio": 0.2616808036096264,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 5,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 10.9500122070312,
+          "range": 17.8500061035156,
+          "body_ratio": 0.6134458522607771,
+          "explosive": false
+        }
+      ]
+    }
+  ]
+}

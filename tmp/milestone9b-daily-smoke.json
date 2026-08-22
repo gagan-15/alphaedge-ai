@@ -1,0 +1,426 @@
+{
+  "audit": {
+    "name": "MILESTONE_9B_HISTORICAL_CONTEXT_RECONSTRUCTION",
+    "production_activation": false,
+    "duration_seconds": 6.768
+  },
+  "dataset": {
+    "historical_zones": 5,
+    "source_inputs": [
+      "tmp\\milestone9\\daily_replay.json"
+    ],
+    "cached_symbol_timeframes": 3
+  },
+  "records": [
+    {
+      "zone_id": "ZONE-5688ACA0DE0B4DA0D978",
+      "symbol": "RELIANCE",
+      "timeframe": "1D",
+      "planning_timestamp": "2021-08-26 00:00:00",
+      "zone_quality": {
+        "status": "AVAILABLE",
+        "score": 44.1,
+        "label": "WEAK",
+        "components": [
+          {
+            "key": "base_quality",
+            "score": 3.43,
+            "maximum_score": 15.0,
+            "evidence": [
+              "base_count=1",
+              "mean_body_ratio=0.4311"
+            ],
+            "reason_codes": [
+              "HIGHER_BASE_BODY_RATIO"
+            ]
+          },
+          {
+            "key": "departure_quality",
+            "score": 13.62,
+            "maximum_score": 30.0,
+            "evidence": [
+              "explosive_ratio=0.0000",
+              "exciting_ratio=1.0000",
+              "body_ratio=0.5627",
+              "departure_zone_width_ratio=1.2378"
+            ],
+            "reason_codes": [
+              "WEAK_DEPARTURE"
+            ]
+          },
+          {
+            "key": "legout_dominance",
+            "score": 4.22,
+            "maximum_score": 15.0,
+            "evidence": [
+              "legout_legin_body_ratio=1.2037"
+            ],
+            "reason_codes": [
+              "LIMITED_LEG_OUT_DOMINANCE"
+            ]
+          },
+          {
+            "key": "structural_clearance",
+            "score": 12.82,
+            "maximum_score": 15.0,
+            "evidence": [
+              "clearance_zone_width_ratio=1.7089",
+              "closing_rule_passed=True"
+            ],
+            "reason_codes": [
+              "DECISIVE_STRUCTURAL_CLEARANCE"
+            ]
+          },
+          {
+            "key": "lifecycle_quality",
+            "score": 0.0,
+            "maximum_score": 15.0,
+            "evidence": [
+              "lifecycle_status=FORMING",
+              "max_penetration_percent=0.00"
+            ],
+            "reason_codes": [
+              "LIFECYCLE_FORMING"
+            ]
+          },
+          {
+            "key": "authenticity_quality",
+            "score": 10.0,
+            "maximum_score": 10.0,
+            "evidence": [
+              "authenticity_status=AUTHENTIC"
+            ],
+            "reason_codes": [
+              "AUTHENTIC_FORMATION"
+            ]
+          }
+        ],
+        "unavailable_components": []
+      },
+      "htf": {
+        "available": true,
+        "timeframe": "1M",
+        "relationship": "NO_OVERLAP",
+        "compatibility": "ALIGNED",
+        "reason_codes": [
+          "HTF_NO_OVERLAP"
+        ],
+        "zone_id": "ZONE-8D05652C4B3404488C4A",
+        "overlap_percent": 0.0,
+        "distance_percent": 32.18129425464702
+      },
+      "trend": {
+        "symbol": "RELIANCE",
+        "trend_timeframe": "1W",
+        "trend_state": "SIDEWAYS",
+        "sma50_current": 930.4133471679687,
+        "sma50_seven_bars_ago": 930.4745593261719,
+        "sma_colour": "RED",
+        "atr14": 45.505917977653006,
+        "normalized_slope": -0.00019216388587777505,
+        "trend_angle_degrees": -0.011010179500105965,
+        "evaluation_timestamp": "2021-08-23T00:00:00",
+        "data_sufficient": true,
+        "reason_codes": [
+          "CANONICAL_GTF_TREND"
+        ]
+      },
+      "trade_confidence": {
+        "status": "AVAILABLE",
+        "score": 47.64,
+        "label": "LOW",
+        "zone_quality_contribution": 17.64,
+        "htf_contribution": 17.5,
+        "trend_contribution": 12.5,
+        "htf_relationship": "NO_OVERLAP",
+        "htf_compatibility": "ALIGNED",
+        "trend_alignment": "NEUTRAL",
+        "data_sufficiency": "AVAILABLE",
+        "conflicted": false
+      }
+    },
+    {
+      "zone_id": "ZONE-ADDB4C6C9B1213D8ABBE",
+      "symbol": "RELIANCE",
+      "timeframe": "1D",
+      "planning_timestamp": "2021-12-30 00:00:00",
+      "zone_quality": {
+        "status": "AVAILABLE",
+        "score": 35.5,
+        "label": "WEAK",
+        "components": [
+          {
+            "key": "base_quality",
+            "score": 6.06,
+            "maximum_score": 15.0,
+            "evidence": [
+              "base_count=1",
+              "mean_body_ratio=0.3117"
+            ],
+            "reason_codes": [
+              "HIGHER_BASE_BODY_RATIO"
+            ]
+          },
+          {
+            "key": "departure_quality",
+            "score": 14.97,
+            "maximum_score": 30.0,
+            "evidence": [
+              "explosive_ratio=0.0000",
+              "exciting_ratio=1.0000",
+              "body_ratio=0.6891",
+              "departure_zone_width_ratio=1.1393"
+            ],
+            "reason_codes": [
+              "WEAK_DEPARTURE"
+            ]
+          },
+          {
+            "key": "legout_dominance",
+            "score": 7.76,
+            "maximum_score": 15.0,
+            "evidence": [
+              "legout_legin_body_ratio=1.7939"
+            ],
+            "reason_codes": [
+              "LEG_OUT_DOMINATES"
+            ]
+          },
+          {
+            "key": "structural_clearance",
+            "score": 3.74,
+            "maximum_score": 15.0,
+            "evidence": [
+              "clearance_zone_width_ratio=0.4982",
+              "closing_rule_passed=True"
+            ],
+            "reason_codes": [
+              "MARGINAL_STRUCTURAL_CLEARANCE"
+            ]
+          },
+          {
+            "key": "lifecycle_quality",
+            "score": 0.0,
+            "maximum_score": 15.0,
+            "evidence": [
+              "lifecycle_status=FORMING",
+              "max_penetration_percent=0.00"
+            ],
+            "reason_codes": [
+              "LIFECYCLE_FORMING"
+            ]
+          },
+          {
+            "key": "authenticity_quality",
+            "score": 3.0,
+            "maximum_score": 10.0,
+            "evidence": [
+              "authenticity_status=NON_AUTHENTIC"
+            ],
+            "reason_codes": [
+              "NON_AUTHENTIC_FORMATION"
+            ]
+          }
+        ],
+        "unavailable_components": []
+      },
+      "htf": {
+        "available": true,
+        "timeframe": "1M",
+        "relationship": "NO_OVERLAP",
+        "compatibility": "OPPOSING",
+        "reason_codes": [
+          "HTF_NO_OVERLAP"
+        ],
+        "zone_id": "ZONE-8D05652C4B3404488C4A",
+        "overlap_percent": 0.0,
+        "distance_percent": 39.59216768315493
+      },
+      "trend": {
+        "symbol": "RELIANCE",
+        "trend_timeframe": "1W",
+        "trend_state": "SIDEWAYS",
+        "sma50_current": 1001.377685546875,
+        "sma50_seven_bars_ago": 973.4278308105469,
+        "sma_colour": "GREEN",
+        "atr14": 55.27290700140126,
+        "normalized_slope": 0.07223858138676861,
+        "trend_angle_degrees": 4.131788679573587,
+        "evaluation_timestamp": "2021-12-27T00:00:00",
+        "data_sufficient": true,
+        "reason_codes": [
+          "CANONICAL_GTF_TREND"
+        ]
+      },
+      "trade_confidence": {
+        "status": "AVAILABLE",
+        "score": 44.2,
+        "label": "LOW",
+        "zone_quality_contribution": 14.2,
+        "htf_contribution": 17.5,
+        "trend_contribution": 12.5,
+        "htf_relationship": "NO_OVERLAP",
+        "htf_compatibility": "OPPOSING",
+        "trend_alignment": "NEUTRAL",
+        "data_sufficiency": "AVAILABLE",
+        "conflicted": false
+      }
+    },
+    {
+      "zone_id": "ZONE-0145267DE26022A3DB41",
+      "symbol": "RELIANCE",
+      "timeframe": "1D",
+      "planning_timestamp": "2022-07-25 00:00:00",
+      "zone_quality": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      },
+      "trade_confidence": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      }
+    },
+    {
+      "zone_id": "ZONE-4AFAD91783B4B5197F19",
+      "symbol": "RELIANCE",
+      "timeframe": "1D",
+      "planning_timestamp": "2023-01-04 00:00:00",
+      "zone_quality": {
+        "status": "AVAILABLE",
+        "score": 41.8,
+        "label": "WEAK",
+        "components": [
+          {
+            "key": "base_quality",
+            "score": 6.18,
+            "maximum_score": 15.0,
+            "evidence": [
+              "base_count=1",
+              "mean_body_ratio=0.3175"
+            ],
+            "reason_codes": [
+              "HIGHER_BASE_BODY_RATIO"
+            ]
+          },
+          {
+            "key": "departure_quality",
+            "score": 16.61,
+            "maximum_score": 30.0,
+            "evidence": [
+              "explosive_ratio=0.0000",
+              "exciting_ratio=1.0000",
+              "body_ratio=0.8172",
+              "departure_zone_width_ratio=1.7540"
+            ],
+            "reason_codes": [
+              "WEAK_DEPARTURE"
+            ]
+          },
+          {
+            "key": "legout_dominance",
+            "score": 5.91,
+            "maximum_score": 15.0,
+            "evidence": [
+              "legout_legin_body_ratio=1.4845"
+            ],
+            "reason_codes": [
+              "LIMITED_LEG_OUT_DOMINANCE"
+            ]
+          },
+          {
+            "key": "structural_clearance",
+            "score": 10.13,
+            "maximum_score": 15.0,
+            "evidence": [
+              "clearance_zone_width_ratio=1.3508",
+              "closing_rule_passed=True"
+            ],
+            "reason_codes": [
+              "DECISIVE_STRUCTURAL_CLEARANCE"
+            ]
+          },
+          {
+            "key": "lifecycle_quality",
+            "score": 0.0,
+            "maximum_score": 15.0,
+            "evidence": [
+              "lifecycle_status=FORMING",
+              "max_penetration_percent=0.00"
+            ],
+            "reason_codes": [
+              "LIFECYCLE_FORMING"
+            ]
+          },
+          {
+            "key": "authenticity_quality",
+            "score": 3.0,
+            "maximum_score": 10.0,
+            "evidence": [
+              "authenticity_status=NON_AUTHENTIC"
+            ],
+            "reason_codes": [
+              "NON_AUTHENTIC_FORMATION"
+            ]
+          }
+        ],
+        "unavailable_components": []
+      },
+      "htf": {
+        "available": true,
+        "timeframe": "1M",
+        "relationship": "NO_OVERLAP",
+        "compatibility": "OPPOSING",
+        "reason_codes": [
+          "HTF_NO_OVERLAP"
+        ],
+        "zone_id": "ZONE-8D05652C4B3404488C4A",
+        "overlap_percent": 0.0,
+        "distance_percent": 47.08789997892032
+      },
+      "trend": {
+        "symbol": "RELIANCE",
+        "trend_timeframe": "1W",
+        "trend_state": "SIDEWAYS",
+        "sma50_current": 1147.5525903320313,
+        "sma50_seven_bars_ago": 1136.9850439453126,
+        "sma_colour": "GREEN",
+        "atr14": 53.3129954251523,
+        "normalized_slope": 0.028316726002319704,
+        "trend_angle_degrees": 1.6219954569118127,
+        "evaluation_timestamp": "2023-01-02T00:00:00",
+        "data_sufficient": true,
+        "reason_codes": [
+          "CANONICAL_GTF_TREND"
+        ]
+      },
+      "trade_confidence": {
+        "status": "AVAILABLE",
+        "score": 46.72,
+        "label": "LOW",
+        "zone_quality_contribution": 16.72,
+        "htf_contribution": 17.5,
+        "trend_contribution": 12.5,
+        "htf_relationship": "NO_OVERLAP",
+        "htf_compatibility": "OPPOSING",
+        "trend_alignment": "NEUTRAL",
+        "data_sufficiency": "AVAILABLE",
+        "conflicted": false
+      }
+    },
+    {
+      "zone_id": "ZONE-FD64C437CA0DEBBC92B8",
+      "symbol": "RELIANCE",
+      "timeframe": "1D",
+      "planning_timestamp": "2023-05-08 00:00:00",
+      "zone_quality": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      },
+      "trade_confidence": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      }
+    }
+  ],
+  "failures": []
+}

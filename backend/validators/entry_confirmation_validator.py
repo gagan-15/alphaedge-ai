@@ -19,6 +19,30 @@ class EntryConfirmationValidator:
     """
 
     @staticmethod
+    def validate_config(
+        config: EntryConfirmationConfig,
+    ) -> None:
+        """
+        Validate Entry Confirmation configuration.
+        """
+
+        if not isinstance(
+            config,
+            EntryConfirmationConfig,
+        ):
+            raise TypeError(
+                "config must be an EntryConfirmationConfig.",
+            )
+
+        if (
+            config.minimum_confirmation_score < 0
+            or config.minimum_confirmation_score > 100
+        ):
+            raise ValueError(
+                "minimum_confirmation_score must be between 0 and 100.",
+            )
+
+    @staticmethod
     def validate(
         trade_setups: list[TradeSetup],
         config: EntryConfirmationConfig,
@@ -27,8 +51,6 @@ class EntryConfirmationValidator:
         if not trade_setups:
             raise ValueError("trade_setups cannot be empty.")
 
-        if (
-            config.minimum_confirmation_score < 0
-            or config.minimum_confirmation_score > 100
-        ):
-            raise ValueError("minimum_confirmation_score must be between 0 and 100.")
+        EntryConfirmationValidator.validate_config(
+            config,
+        )
