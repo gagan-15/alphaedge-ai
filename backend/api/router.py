@@ -20,6 +20,7 @@ from backend.api.scanner import (
     scanner_router,
 )
 from backend.api.market import market_router
+from backend.api.historical_evidence import historical_evidence_router
 
 api_router = APIRouter()
 
@@ -41,4 +42,8 @@ api_router.include_router(
 
 api_router.include_router(
     market_router,
+)
+
+api_router.include_router(
+    historical_evidence_router,
 )

@@ -74,14 +74,6 @@ function atr(candles: MarketCandle[], period = 14): number | null {
     return finite(ranges.reduce((sum, value) => sum + value, 0) / ranges.length);
 }
 
-function trend(closes: number[], lookback: number): string {
-    if (closes.length <= lookback) return "Insufficient history";
-    const change = (closes.at(-1)! - closes.at(-(lookback + 1))!) / closes.at(-(lookback + 1))! * 100;
-    if (change > 2) return "Rising";
-    if (change < -2) return "Falling";
-    return "Sideways";
-}
-
 function check(label: string, status: CheckStatus, value: string, threshold: string, reason: string, scoreEffect = "Not included in the current zone-only score"): AnalysisCheck {
     return { label, status, value, threshold, reason, scoreEffect };
 }
@@ -102,13 +94,9 @@ export function analyzeStockZone(result: ZoneResearchResult, candles: MarketCand
     const demand = result.zone_type === "DEMAND";
     const lower = Math.min(result.distal_price, result.proximal_price);
     const upper = Math.max(result.distal_price, result.proximal_price);
-    const width = upper - lower;
-    // The detector's base index points at zone creation. The next three candles
-    // form the departure window, so they cannot also be counted as retests.
-    const afterBase = valid.slice(Math.min(result.base_index + 4, valid.length));
-    const touches = afterBase.filter((candle) => candle.low <= upper && candle.high >= lower);
-    const penetrations = touches.map((candle) => demand ? (upper - candle.low) / width * 100 : (candle.high - lower) / width * 100);
-    const broken = afterBase.some((candle) => demand ? candle.close < lower : candle.close > upper);
+    const canonicalRetests = result.test_count ?? result.touch_count;
+    const canonicalPenetration = result.max_penetration_percent ?? 0;
+    const broken = result.lifecycle_status === "INVALIDATED" || result.lifecycle_status === "REMOVED";
     const latest = valid.at(-1)?.close ?? result.current_price;
     const distance = latest > upper ? (latest - upper) / latest * 100 : latest < lower ? (lower - latest) / latest * 100 : 0;
     const position = broken ? "Invalidated" : latest >= lower && latest <= upper ? "Inside zone" : distance <= 5 ? "Approaching" : "Too far";
@@ -125,27 +113,24 @@ export function analyzeStockZone(result: ZoneResearchResult, candles: MarketCand
     const pressure = !volumeValues.length ? "Unavailable with the current data source" :
         upVolume > downVolume * 1.15 ? "Buyers stronger (price-and-volume estimate)" :
             downVolume > upVolume * 1.15 ? "Sellers stronger (price-and-volume estimate)" : "Balanced (price-and-volume estimate)";
-    const shortTrend = trend(closes, 10);
-    const mediumTrend = trend(closes, 30);
-    const longTrend = trend(closes, 100);
-    const trendVotes = [shortTrend, mediumTrend, longTrend];
-    const overallTrend = trendVotes.filter((value) => value === "Rising").length >= 2 ? "Rising" :
-        trendVotes.filter((value) => value === "Falling").length >= 2 ? "Falling" : "Mixed or sideways";
-    const directionTrendPass = demand ? overallTrend === "Rising" : overallTrend === "Falling";
+    const shortTrend = "Use canonical backend Trend";
+    const mediumTrend = "Use canonical backend Trend";
+    const longTrend = "Use canonical backend Trend";
+    const overallTrend = "Use canonical backend Trend";
     const rsiPass = rsi14 !== null && (demand ? rsi14 >= 40 && rsi14 <= 70 : rsi14 >= 30 && rsi14 <= 60);
     const volumeConfirmation = relativeVolume === null ? null : relativeVolume >= 1.2;
     const pressureDifference = upVolume + downVolume > 0 ? Math.abs(upVolume - downVolume) / (upVolume + downVolume) : 0;
     const pressureConfidence = volumeValues.length < 20 ? "Low" : pressureDifference >= .25 ? "High" : pressureDifference >= .10 ? "Medium" : "Low";
     const checks: AnalysisCheck[] = [
-        check("Fresh zone", result.is_fresh && touches.length === 0 ? "PASS" : "FAIL", `${touches.length} later wick intersection(s)`, "No later candle wick may enter the zone", touches.length ? "Quality reduced" : "Supports quality"),
+        check("Fresh zone", result.is_fresh ? "PASS" : "FAIL", result.is_fresh ? "No canonical visit recorded" : `${canonicalRetests} canonical visit(s)`, "Canonical lifecycle engine", result.is_fresh ? "Supports quality" : "Quality reduced"),
         check("Strong departure", result.strength_score >= 24.5 ? "PASS" : "FAIL", `${result.strength_score.toFixed(1)} / 35`, "At least 24.5 / 35", result.strength_score >= 24.5 ? "Supports quality" : "Quality reduced"),
-        check("Few retests", touches.length <= 1 ? "PASS" : "FAIL", `${touches.length} later wick intersection(s)`, "No more than one", touches.length <= 1 ? "Supports quality" : "Quality reduced"),
+        check("Few retests", canonicalRetests <= 1 ? "PASS" : "FAIL", `${canonicalRetests} distinct canonical visit(s)`, "No more than one", canonicalRetests <= 1 ? "Supports quality" : "Quality reduced"),
         check("Extra zone support", result.merge_score >= 7.5 ? "PASS" : result.merge_score > 0 ? "MIXED" : "FAIL", `${result.merge_score.toFixed(1)} / 15`, "At least 7.5 / 15", result.merge_score >= 7.5 ? "Supports quality" : "Limited support"),
         check("EMA alignment", ema20 === null || ema50 === null ? "UNAVAILABLE" : emaAlignment === "Mixed" ? "MIXED" : "PASS", emaAlignment, demand ? "EMA 20 above EMA 50 for demand" : "EMA 20 below EMA 50 for supply", "Context only"),
         check("Volume confirmation", volumeConfirmation === null ? "UNAVAILABLE" : volumeConfirmation ? "PASS" : "FAIL", relativeVolume === null ? "Volume unavailable from source" : `${relativeVolume.toFixed(2)}× 20-period average`, "At least 1.20×", "Context only"),
         check("RSI condition", rsi14 === null ? "UNAVAILABLE" : rsiPass ? "PASS" : "MIXED", rsi14 === null ? "Insufficient candle history" : rsi14.toFixed(1), demand ? "40 to 70 for demand context" : "30 to 60 for supply context", "Context only"),
-        check("Trend confirmation", directionTrendPass ? "PASS" : overallTrend.includes("Mixed") ? "MIXED" : "FAIL", overallTrend, demand ? "Rising trend supports demand" : "Falling trend supports supply", "Context only"),
-        check("Current-zone validity", broken ? "FAIL" : "PASS", position, "No candle close beyond the distal line", broken ? "Strong score must not be used" : "Zone remains active"),
+        check("Trend confirmation", "UNAVAILABLE", "Read from canonical backend Trend", "Canonical Trend service", "Context only"),
+        check("Current-zone validity", broken ? "FAIL" : "PASS", result.lifecycle_status ?? position, "Canonical lifecycle remains active", broken ? "Strong score must not be used" : "Zone remains active"),
         check("Sector strength", "UNAVAILABLE", "Sector benchmark not mapped", "Requires a maintained symbol-to-sector benchmark map", "Not scored"),
         check("Relative strength", "UNAVAILABLE", "Nifty comparison not loaded", "Requires aligned Nifty history", "Not scored"),
         check("Risk and reward", "UNAVAILABLE", "No validated opposing target zone", "Requires nearest opposing zone or confirmed structure target", "Not scored"),
@@ -156,10 +141,10 @@ export function analyzeStockZone(result: ZoneResearchResult, candles: MarketCand
         rsiDirection: rsi14 === null || priorRsi === null ? "Insufficient history" : rsi14 > priorRsi ? "Rising" : rsi14 < priorRsi ? "Falling" : "Flat",
         atr14, currentVolume, averageVolume20, relativeVolume, volumeConfirmation, pressure,
         shortTrend, mediumTrend, longTrend, overallTrend,
-        retests: touches.length,
-        firstRetest: touches.at(0)?.time ?? null,
-        latestRetest: touches.at(-1)?.time ?? null,
-        maximumPenetration: penetrations.length ? Math.max(...penetrations) : 0,
+        retests: canonicalRetests,
+        firstRetest: null,
+        latestRetest: null,
+        maximumPenetration: canonicalPenetration,
         broken, position, distanceFromZone: distance, positionExplanation, pressureConfidence,
         checks,
     };

@@ -17,6 +17,7 @@ from backend.api.scanner import (
     _timeframe_data,
     build_scanner_response,
 )
+from backend.config.canonical_methodology import SCANNER_METHODOLOGY_CACHE_VERSION
 from backend.models.market_scanner.market_scanner_result import (
     MarketScannerResult,
 )
@@ -76,6 +77,15 @@ def test_nifty50_uses_background_cache_path(monkeypatch) -> None:
     scanner_api._zone_scan_progress.clear()
 
 
+def test_zone_scan_cache_key_contains_canonical_methodology_version() -> None:
+    """Pre-Formation-V1 scan results must not share the active cache key."""
+
+    key = scanner_api._zone_scan_key("DAILY", "nse500", None)
+
+    assert SCANNER_METHODOLOGY_CACHE_VERSION in key
+    assert "formation-1.1" in key
+
+
 def test_cached_refresh_response_uses_active_progress(monkeypatch) -> None:
     """Cached rows should report progress from the running refresh."""
 
@@ -103,6 +113,39 @@ def test_cached_refresh_response_uses_active_progress(monkeypatch) -> None:
     assert observed.processed_symbols == 485
     assert observed.failed_symbols == 3
     assert observed.last_completed_at == response.last_completed_at
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+
+
+def test_refresh_never_reports_all_symbols_processed_before_publication(
+    monkeypatch,
+) -> None:
+    """500/500 is reserved for the completed, published scanner snapshot."""
+
+    response = _completed_zone_response(total_symbols=500)
+    key = scanner_api._zone_scan_key("DAILY", "nse500", None)
+    pending: Future[ZoneResearchResponse] = Future()
+    monkeypatch.setattr(
+        scanner_api._universe_service,
+        "get_symbols",
+        lambda universe, symbols: [f"TEST{index}" for index in range(500)],
+    )
+    scanner_api._zone_scan_cache.clear()
+    scanner_api._zone_scan_jobs.clear()
+    scanner_api._zone_scan_progress.clear()
+    scanner_api._zone_scan_cache[key] = (
+        monotonic() - scanner_api._zone_scan_ttl_seconds,
+        response,
+    )
+    scanner_api._zone_scan_jobs[key] = pending
+    scanner_api._zone_scan_progress[key] = (500, 0)
+
+    observed = scanner_api.get_research_zones("DAILY", "nse500", None)
+
+    assert observed.status == "refreshing"
+    assert observed.processed_symbols == 499
+    assert observed.failed_symbols == 0
     scanner_api._zone_scan_cache.clear()
     scanner_api._zone_scan_jobs.clear()
     scanner_api._zone_scan_progress.clear()

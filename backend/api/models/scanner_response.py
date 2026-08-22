@@ -8,6 +8,7 @@ Sprint:
 from backend.api.models.dashboard_response import (
     APIResponseModel,
 )
+from backend.config.canonical_methodology import SCANNER_METHODOLOGY_CACHE_VERSION
 
 
 class ScannerResultResponse(APIResponseModel):
@@ -106,6 +107,26 @@ class ZoneQualityComponentResponse(APIResponseModel):
     reason_codes: tuple[str, ...] = ()
 
 
+class CanonicalTradeConfidenceResponse(APIResponseModel):
+    """Canonical Trade Confidence serialized with a scanner row."""
+
+    score: float
+    label: str
+    zone_quality_score: float
+    zone_quality_contribution: float
+    location_contribution: float
+    trend_contribution: float
+    location_alignment: str
+    trend_alignment: str
+    combined_context: str
+    htf_overlap_type: str
+    htf_direction_compatibility: str
+    data_sufficiency: str
+    reason_codes: tuple[str, ...] = ()
+    evidence: tuple[str, ...] = ()
+    shadow_mode: bool = False
+
+
 class ZoneResearchResultResponse(APIResponseModel):
     """Detected zone context without execution claims."""
 
@@ -159,6 +180,8 @@ class ZoneResearchResultResponse(APIResponseModel):
     dashboard_qualified: bool = False
     qualification_reason_codes: tuple[str, ...] = ()
     departure_quality: str | None = None
+    canonical_formation_departure: str | None = None
+    dashboard_qualification_departure: str | None = None
     base_quality: str | None = None
     formation_quality: str | None = None
     departure_displacement: float | None = None
@@ -166,6 +189,7 @@ class ZoneResearchResultResponse(APIResponseModel):
     base_candle_count: int | None = None
     base_compactness: str | None = None
     base_compactness_reason: str | None = None
+    trade_confidence: CanonicalTradeConfidenceResponse | None = None
 
 
 class ZoneStateCountResponse(APIResponseModel):
@@ -210,6 +234,7 @@ class ZoneResearchResponse(APIResponseModel):
     dashboard_qualified_count: int = 0
     dashboard_rejected_count: int = 0
     qualification_rejection_counts: dict[str, int] = {}
+    methodology_version: str = SCANNER_METHODOLOGY_CACHE_VERSION
 
 
 class ZoneRuleDiagnosticResponse(APIResponseModel):

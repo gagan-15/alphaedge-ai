@@ -32,6 +32,7 @@ import type { ZoneResearchResponse } from "../types/scanner";
 import { useMarketUniverse } from "../market-universe/MarketUniverseState";
 
 const scannerResultCache = new Map<string, ZoneResearchResponse>();
+const scannerMethodologyVersion = "formation-1.1";
 
 const timeframes = [
     { value: "DAILY", label: "Daily" }, { value: "WEEKLY", label: "Weekly" },
@@ -114,7 +115,7 @@ function Scanner() {
         const suppliedSymbols = marketUniverse === "custom"
             ? customSymbols
             : watchlist;
-        const cacheKey = `${selectedTimeframe}:${marketUniverse}:${suppliedSymbols.join(",")}`;
+        const cacheKey = `${scannerMethodologyVersion}:${selectedTimeframe}:${marketUniverse}:${suppliedSymbols.join(",")}`;
         const cached = scannerResultCache.get(cacheKey);
         let receivedScannerResponse = Boolean(cached);
         if (cached) {
@@ -135,7 +136,10 @@ function Scanner() {
                 receivedScannerResponse = true;
                 const hasCompletedSnapshot = Boolean(data.last_completed_at)
                     || data.status === "completed";
-                if (hasCompletedSnapshot) {
+                if (
+                    hasCompletedSnapshot
+                    && data.methodology_version === scannerMethodologyVersion
+                ) {
                     scannerResultCache.set(cacheKey, data);
                 }
                 setScanner(data);
@@ -251,6 +255,7 @@ function Scanner() {
         || effectiveFilters.statusFilter !== statusFilter
         || effectiveFilters.proximityFilter !== proximityFilter
         || effectiveFilters.market !== market;
+    const isInitialLoad = isLoading && scanner === null;
 
     const visibleResults = (
         effectiveFilters.market === "NSE" ? scanner?.results ?? [] : []
@@ -315,7 +320,7 @@ function Scanner() {
     return (
         <Stack spacing={0} sx={{ bgcolor: "#ffffff" }}>
             <ScannerToolbar
-                isLoading={isLoading}
+                isLoading={isInitialLoad}
                 searchQuery={searchQuery}
                 onRefresh={reloadScanner}
                 onRunScan={reloadScanner}
@@ -339,7 +344,7 @@ function Scanner() {
                 onQuickPreset={applyQuickPreset}
             />
             <Box sx={{ height: 2 }}>
-                {(filtersSettling || isLoading || scanner?.status === "refreshing" || scanner?.status === "queued") && <LinearProgress sx={{ height: 2, borderRadius: 1 }} />}
+                {(filtersSettling || isInitialLoad) && <LinearProgress sx={{ height: 2, borderRadius: 1 }} />}
             </Box>
 
             {market === "BSE" && (
@@ -457,7 +462,7 @@ function Scanner() {
                 </Alert>
             )}
 
-            {isLoading && (
+            {isInitialLoad && (
                 <Stack
                     direction="row"
                     sx={{
@@ -476,6 +481,7 @@ function Scanner() {
                     results={location.pathname.startsWith("/stock-details/")
                     ? scanner?.results ?? []
                     : visibleResults}
+                    methodologyVersion={scanner?.methodology_version}
                     initialSelection={initialFilters?.symbol && initialFilters.selectedZone
                     ? {
                         symbol: initialFilters.symbol,

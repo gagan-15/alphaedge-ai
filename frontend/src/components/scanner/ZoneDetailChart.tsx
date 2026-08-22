@@ -30,7 +30,12 @@ import Tooltip from "@mui/material/Tooltip";
 import ViewSidebarOutlinedIcon from "@mui/icons-material/ViewSidebarOutlined";
 
 import { getMarketCandles } from "../../api/marketApi";
-import type { ConfluenceChartOverlay, ZoneResearchResult } from "../../types/scanner";
+import { getTimeframeConfluence } from "../../api/scannerApi";
+import type {
+    ConfluenceChartOverlay,
+    TimeframeConfluenceResponse,
+    ZoneResearchResult,
+} from "../../types/scanner";
 import { zoneSequenceLabel } from "./zoneLabels";
 import { overlayStyles } from "../../services/overlayService";
 import type { DeveloperChartZone } from "./developerZones";
@@ -71,6 +76,18 @@ const indicatorOptions = [
     { id: "SMA_200", label: "SMA 200", kind: "SMA", period: 200, color: "#ec4899" },
 ] as const;
 const indicatorPreferenceKey = "alphaedge.chart.indicators";
+const timeframeDisplayNames: Record<string, string> = {
+    "5m": "5-minute",
+    "15m": "15-minute",
+    "75m": "75-minute",
+    "125m": "125-minute",
+    "1D": "Daily",
+    "1W": "Weekly",
+    "1M": "Monthly",
+    "3M": "Quarterly",
+    "6M": "Half-Yearly",
+    "1Y": "Yearly",
+};
 
 const inactiveLifecycleStatuses = new Set([
     "TESTED",
@@ -210,11 +227,19 @@ function ZoneDetailChart({
         status: DeveloperChartZone["zoneStatus"];
     }>>([]);
     const [selectedIndicators, setSelectedIndicators] = useState<string[]>(readIndicatorPreference);
+    const [receivedTrendContext, setReceivedTrendContext] = useState<{
+        key: string;
+        data: TimeframeConfluenceResponse;
+    } | null>(null);
     const [developerTooltip, setDeveloperTooltip] = useState<{ left: number; top: number; zone: DeveloperChartZone } | null>(null);
     const executionIndex = confluenceTimeframes.findIndex((item) => item.timeframe === result.timeframe);
     const higherTimeframeButtons = executionIndex < 0 ? [] : confluenceTimeframes.slice(executionIndex + 1);
     const inspectedOverlay = availableConfluenceOverlays.find((overlay) => overlay.timeframe === inspectedConfluenceTimeframe);
     const selectedLocation = confluenceOverlays[0];
+    const trendRequestKey = `${result.symbol}:${result.timeframe}:${result.zone_type}:${result.proximal_price}:${result.distal_price}:${result.base_date}`;
+    const trendContext = receivedTrendContext?.key === trendRequestKey
+        ? receivedTrendContext.data
+        : null;
     const updateMeasurementLabel = useCallback(() => {
         const chart = chartRef.current;
         const candles = candleSeriesRef.current;
@@ -289,6 +314,20 @@ function ZoneDetailChart({
             }];
         }));
     }, []);
+
+    useEffect(() => {
+        let active = true;
+        void getTimeframeConfluence(result)
+            .then((response) => {
+                if (active) {
+                    setReceivedTrendContext({ key: trendRequestKey, data: response });
+                }
+            })
+            .catch(() => undefined);
+        return () => {
+            active = false;
+        };
+    }, [result, trendRequestKey]);
 
     useEffect(() => {
         const container = containerRef.current;
@@ -1092,19 +1131,22 @@ function ZoneDetailChart({
             <Box sx={{ px: 1.5, py: .8, bgcolor: "#f8fafc", borderBottom: "1px solid", borderColor: "divider" }}>
                 <Stack direction="row" sx={{ gap: 2.5, flexWrap: "wrap", alignItems: "center" }}>
                     <Typography variant="caption"><strong>LOCATION</strong> {selectedLocation ? `${selectedLocation.timeframeName} ${selectedLocation.zoneType}` : "No HTF selected"}</Typography>
-                    <Typography variant="caption"><strong>TREND</strong> Unavailable</Typography>
+                    <Typography variant="caption">
+                        <strong>TREND</strong>{" "}
+                        {trendContext?.canonical_trend.data_sufficient
+                            ? `${timeframeDisplayNames[trendContext.trend_timeframe ?? ""] ?? trendContext.trend_timeframe} ${trendContext.trend_state === "UPTREND" ? "Uptrend" : trendContext.trend_state === "DOWNTREND" ? "Downtrend" : "Sideways"}`
+                            : "Unavailable"}
+                    </Typography>
                     <Typography variant="caption"><strong>EXECUTION</strong> {result.timeframe} {result.zone_type} · {patternLabels[result.pattern_type ?? ""] ?? result.pattern_type ?? "Pattern unavailable"}</Typography>
                     <Typography variant="caption" sx={{ fontWeight: 700 }}>
                         <strong>ALIGNMENT</strong>{" "}
-                        {!selectedLocation
-                            ? "Select a higher timeframe to view its validated zone."
-                            : selectedLocation.relationship === "NO_OVERLAP"
-                                ? "No HTF zone overlap"
-                                : selectedLocation.direction === "OPPOSING"
-                                    ? `Opposing: ${result.timeframe} ${result.zone_type.toLowerCase()} lies in ${selectedLocation.timeframeName} ${selectedLocation.zoneType.toLowerCase()}`
-                                    : selectedLocation.relationship === "FULL_OVERLAP"
-                                        ? `Fully inside ${selectedLocation.timeframeName} ${selectedLocation.zoneType.toLowerCase()}`
-                                        : `${selectedLocation.relationship === "PARTIAL_OVERLAP" ? "Partial overlap" : "Touching"} with ${selectedLocation.timeframeName} ${selectedLocation.zoneType.toLowerCase()}`}
+                        {trendContext?.trend_alignment === "ALIGNED"
+                            ? "Aligned"
+                            : trendContext?.trend_alignment === "OPPOSING"
+                                ? "Opposing"
+                                : trendContext?.trend_alignment === "NEUTRAL"
+                                    ? "Neutral"
+                                    : "Unknown"}
                     </Typography>
                 </Stack>
                 {detailsVisible && (

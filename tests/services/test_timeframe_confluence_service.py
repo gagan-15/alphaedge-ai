@@ -73,4 +73,33 @@ def test_reason_codes_are_deterministic() -> None:
     assert reason("PARTIAL_OVERLAP", "OPPOSING") == "HTF_PARTIAL_OVERLAP_OPPOSING"
     assert reason("TOUCHING", "ALIGNED") == "HTF_TOUCHING_ALIGNED"
     assert reason("NO_OVERLAP", "ALIGNED") == "HTF_NO_OVERLAP"
-    assert reason("NO_OVERLAP", "NO_HTF_CONTEXT") == "HTF_CONTEXT_UNAVAILABLE"
+    assert reason("NO_OVERLAP", "NO_HTF_CONTEXT") == "HTF_NO_ACTIVE_ZONE"
+
+
+def test_daily_workflow_uses_native_weekly_and_monthly_history() -> None:
+    from backend.services.scanner.canonical_trend_service import CanonicalTrendService
+
+    assert CanonicalTrendService._source_for("1W") == ("10y", "1wk")
+    assert TimeframeConfluenceService._source_for_location("1M") == (
+        "10y",
+        "1mo",
+    )
+
+
+def test_combined_context_preserves_backend_canonical_results() -> None:
+    item = {
+        "relationship": "PARTIAL_OVERLAP",
+        "compatibility": "OPPOSING",
+        "reason_code": "HTF_PARTIAL_OVERLAP_OPPOSING",
+    }
+    result = TimeframeConfluenceService._combined_context(
+        "UPTREND", "ALIGNED", [item]
+    )
+
+    assert result == {
+        "trend_state": "UPTREND",
+        "trend_alignment": "ALIGNED",
+        "location_relationship": "PARTIAL_OVERLAP",
+        "location_compatibility": "OPPOSING",
+        "location_reason_code": "HTF_PARTIAL_OVERLAP_OPPOSING",
+    }

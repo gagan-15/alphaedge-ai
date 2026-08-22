@@ -1,5 +1,8 @@
 # Milestones 1.2 and 1.3 Formation Comparison
 
+> Historical comparison report. The current frozen production methodology is
+> [Canonical Formation V1](../canonical_formation_v1.md).
+
 ## Scope
 
 This report compares the frozen pre-migration detector with the canonical

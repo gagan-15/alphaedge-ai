@@ -6,6 +6,9 @@ from dataclasses import dataclass
 
 from backend.models.candle_classification import CandleClassification
 from backend.models.departure import DepartureDirection, DepartureStrength
+from backend.models.leg_in_structural_evidence import (
+    CanonicalLegInStructuralEvidence,
+)
 
 
 @dataclass(frozen=True)
@@ -48,3 +51,4 @@ class CanonicalFormationEvidence:
     closing_comparison_reference: float
     qualifying_close: float
     acceptance_reason: str
+    leg_in_structural_evidence: CanonicalLegInStructuralEvidence | None = None

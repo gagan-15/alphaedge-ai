@@ -27,9 +27,10 @@ import {
     defaultStockDetailsVisibility,
     type StockDetailsVisibility,
 } from "./stockDetailsPreferences";
-import { buildTradeConfidence, explainScoreDifference } from "./tradeConfidence";
+import { tradeConfidenceDisplay, tradeConfidenceExplanation } from "./tradeConfidenceRanking";
 import ZoneQualityBreakdown from "./ZoneQualityBreakdown";
 import { formatZoneQuality } from "./zoneQualityPresentation";
+import ComparableHistoricalEvidenceSection from "./ComparableHistoricalEvidence";
 
 const watchlistKey = "alphaedge.local.watchlist";
 const watchlistZonesKey = "alphaedge.local.watchlist.zones";
@@ -110,6 +111,8 @@ function FactorList({ title, factors, positive }: { title: string; factors: Zone
 
 interface ZoneExplanationPanelProps {
     result: ZoneResearchResult;
+    zones: ZoneResearchResult[];
+    methodologyVersion: string;
     confluenceOverlays?: ConfluenceChartOverlay[];
     confluenceOverlaysHidden?: boolean;
     onToggleConfluenceOverlay?: (overlay: ConfluenceChartOverlay) => void;
@@ -121,6 +124,8 @@ interface ZoneExplanationPanelProps {
 
 function ZoneExplanationPanel({
     result,
+    zones,
+    methodologyVersion,
     confluenceOverlays = [],
     confluenceOverlaysHidden = false,
     onToggleConfluenceOverlay,
@@ -152,15 +157,7 @@ function ZoneExplanationPanel({
         && sameNumber(receivedBackendAnalysis.selected_zone.distal_price, result.distal_price)
         ? receivedBackendAnalysis
         : null;
-    const rawZoneScore = result.raw_zone_score ?? (
-        result.freshness_score
-        + result.strength_score
-        + result.touch_score
-        + result.merge_score
-    );
-    const qualityCap = result.quality_cap ?? result.zone_score;
     const currentZone = `${result.distal_price.toLocaleString("en-IN")} – ${result.proximal_price.toLocaleString("en-IN")}`;
-    const unavailable = "Unavailable with the current data source";
     const number = (value: number | null, suffix = "") => value === null ? "Insufficient candle history" : `${value.toFixed(2)}${suffix}`;
     const displayChecks = analysis?.checks.map((item) => {
         if (item.label === "Relative strength" && backendAnalysis) {
@@ -173,8 +170,7 @@ function ZoneExplanationPanel({
             return { ...item, status, value: backendAnalysis.multi_timeframe.status.replaceAll("_", " "), threshold: "Daily, weekly and monthly must agree", reason: "Calculated from each timeframe's trend and EMA alignment", scoreEffect: "Context only" } as const;
         }
         if (item.label === "Risk and reward" && backendAnalysis) {
-            const ratio = backendAnalysis.trade_plan.risk_reward_ratio;
-            return { ...item, status: ratio === null ? "UNAVAILABLE" : ratio >= 2 ? "PASS" : "FAIL", value: ratio === null ? "No validated opposing target" : `1 : ${ratio}`, threshold: "At least 1 : 2", reason: backendAnalysis.trade_plan.target_basis, scoreEffect: "Context only" } as const;
+            return { ...item, status: "UNAVAILABLE", value: "Execution stop policy is not defined", threshold: "Requires an approved protective-stop policy", reason: "Structural invalidation is not presented as a protective stop.", scoreEffect: "Not scored" } as const;
         }
         if (item.label === "Sector strength" && backendAnalysis) {
             const comparison = backendAnalysis.sector.sector_vs_nifty?.["3m"];
@@ -198,18 +194,23 @@ function ZoneExplanationPanel({
         }
         return item;
     });
-    const confidence = buildTradeConfidence(result, analysis, backendAnalysis);
-    const tradeConfidence = confidence.score;
+    const canonicalConfidence = result.trade_confidence;
+    const confidence = tradeConfidenceDisplay(canonicalConfidence);
     const zoneLower = Math.min(result.proximal_price, result.distal_price);
     const zoneUpper = Math.max(result.proximal_price, result.distal_price);
     const plan = backendAnalysis?.trade_plan;
     const planIsSynchronized = Boolean(plan
-        && plan.illustrative_entry >= zoneLower
-        && plan.illustrative_entry <= zoneUpper
-        && (result.zone_type === "DEMAND" ? plan.invalidation_stop < zoneLower : plan.invalidation_stop > zoneUpper)
-        && (plan.target === null || (result.zone_type === "DEMAND" ? plan.target > zoneUpper : plan.target < zoneLower))
-        && sameNumber(plan.entry_range[0], zoneLower)
-        && sameNumber(plan.entry_range[1], zoneUpper));
+        && plan.symbol === result.symbol
+        && plan.timeframe === result.timeframe
+        && plan.zone_type === result.zone_type
+        && plan.interaction_range
+        && plan.planned_entry_reference !== null
+        && plan.structural_invalidation !== null
+        && sameNumber(plan.interaction_range[0], zoneLower)
+        && sameNumber(plan.interaction_range[1], zoneUpper)
+        && sameNumber(plan.planned_entry_reference, result.proximal_price)
+        && sameNumber(plan.structural_invalidation, result.distal_price)
+        && (plan.target === null || (result.zone_type === "DEMAND" ? plan.target > plan.planned_entry_reference : plan.target < plan.planned_entry_reference)));
     const watchlistAdded = watchlistSavedKey === selectedAnalysisKey
         || readObjects(watchlistZonesKey).some((item) => item.id === selectedAnalysisKey);
     const alertAdded = alertSavedKey === selectedAnalysisKey
@@ -316,35 +317,33 @@ function ZoneExplanationPanel({
                             <Grid size={{ xs: 12 }}>
                                 <Typography color="text.secondary" variant="overline">Trade Confidence</Typography>
                                 <Stack direction="row" spacing={1} sx={{ alignItems: "baseline" }}>
-                                    <Typography variant="h1">{analysis ? tradeConfidence : "—"}</Typography>
+                                    <Typography variant="h1">{confidence.score}</Typography>
                                     <Typography color="text.secondary">/ 100</Typography>
                                 </Stack>
-                                <Chip sx={{ mt: .5 }} label={analysis?.broken ? "Invalidated" : analysis ? confidence.recommendation : "Calculating"} color={analysis?.broken ? "error" : tradeConfidence >= 75 ? "success" : "warning"} />
-                                <Typography sx={{ mt: 1, fontWeight: 700 }}>This is the main score to use when deciding whether today's setup is worth considering.</Typography>
+                                <Chip sx={{ mt: .5 }} label={analysis?.broken ? "Invalidated" : confidence.label} color={analysis?.broken ? "error" : (canonicalConfidence?.score ?? 0) >= 75 ? "success" : "warning"} />
+                                <Typography sx={{ mt: 1, fontWeight: 700 }}>This score summarizes zone quality, higher-timeframe location and trend context. It is not a trade instruction.</Typography>
                             </Grid>
                             <Grid size={{ xs: 12 }}>
                                 <ZoneQualityBreakdown result={result} />
                             </Grid>
                             <Grid size={{ xs: 12 }}>
-                                <Typography sx={{ mt: 1, fontWeight: 800 }}>Data connected for {confidence.calculatedWeight} of {confidence.totalWeight} confidence points</Typography>
+                                <Typography sx={{ mt: 1, fontWeight: 800 }}>Context data: {canonicalConfidence?.data_sufficiency.replaceAll("_", " ") ?? "Unavailable"}</Typography>
                                 <Typography variant="caption" color="text.secondary">This shows data coverage, not the chance of profit.</Typography>
                             </Grid>
                         </Grid>
-                        {analysis && <Typography sx={{ mt: 1.5 }}>{explainScoreDifference(result.zone_score, tradeConfidence, result.zone_type)}</Typography>}
+                        <Typography sx={{ mt: 1.5 }}>{tradeConfidenceExplanation(canonicalConfidence)}</Typography>
                         <Typography color="text.secondary" sx={{ mt: 1 }}>{explanation.summary}</Typography>
                         <Button size="small" sx={{ mt: 1 }} onClick={() => setScoreDetailsOpen((open) => !open)}>{scoreDetailsOpen ? "Hide score explanation" : "Why is Trade Confidence this score?"}</Button>
                         {scoreDetailsOpen && <Stack spacing={1} sx={{ mt: 1 }}>
                             <Typography sx={{ fontWeight: 800 }}>Trade Confidence breakdown</Typography>
-                            {confidence.factors.map((factor) => <Box key={factor.key} sx={{ p: 1, border: "1px solid", borderColor: "divider", borderRadius: 1.25 }}>
-                                <Stack direction="row" sx={{ justifyContent: "space-between" }}>
-                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>{factor.status === "PASS" ? "✓" : factor.status === "FAIL" ? "✕" : factor.status === "MIXED" ? "◐" : "—"} {factor.label}</Typography>
-                                    <Typography variant="body2">{factor.status === "UNAVAILABLE" ? "Not available" : `${factor.weight} points available`}</Typography>
-                                </Stack>
-                                <Typography variant="caption" color="text.secondary">{factor.explanation}</Typography>
-                            </Box>)}
-                            <Typography sx={{ fontWeight: 800 }}>Final recommendation: {confidence.recommendation}.</Typography>
-                            <Typography variant="caption" color="text.secondary">Data connected for {confidence.calculatedWeight} of {confidence.totalWeight} possible points. Missing inputs receive no points and are never guessed.</Typography>
-                            <Typography variant="caption" color="text.secondary">Previous backend zone score: {rawZoneScore.toFixed(1)} raw, capped at {qualityCap.toFixed(1)}. It is kept only for API compatibility.</Typography>
+                            {canonicalConfidence ? <>
+                                <Field label="Zone Quality contribution" value={`${canonicalConfidence.zone_quality_contribution.toFixed(2)} / 40`} />
+                                <Field label="Higher-timeframe location contribution" value={`${canonicalConfidence.location_contribution.toFixed(2)} / 35`} note={canonicalConfidence.location_alignment.replaceAll("_", " ")} />
+                                <Field label="Canonical Trend contribution" value={`${canonicalConfidence.trend_contribution.toFixed(2)} / 25`} note={canonicalConfidence.trend_alignment.replaceAll("_", " ")} />
+                                <Field label="Combined context" value={canonicalConfidence.combined_context.replaceAll("_", " ")} />
+                                {canonicalConfidence.evidence.map((item) => <Typography key={item} variant="caption" color="text.secondary">{item}</Typography>)}
+                            </> : <Typography color="text.secondary">Canonical context is unavailable for this zone.</Typography>}
+                            <Typography variant="caption" color="text.secondary">Trade Confidence uses the frozen 40% Zone Quality, 35% higher-timeframe location and 25% Canonical Trend formula.</Typography>
                         </Stack>}
                     </Section>}
 
@@ -352,17 +351,18 @@ function ZoneExplanationPanel({
                         {receivedBackendAnalysis && !planIsSynchronized
                             ? <Typography color="warning.main">Trading plan unavailable because the selected analysis is out of sync.</Typography>
                             : <Grid container spacing={1}>
-                            <Grid size={{ xs: 6 }}><Field label="Entry range" value={backendAnalysis ? `₹${backendAnalysis.trade_plan.entry_range[0].toLocaleString("en-IN")} – ₹${backendAnalysis.trade_plan.entry_range[1].toLocaleString("en-IN")}` : "Calculating from active zones…"} /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Interaction range" value={plan?.interaction_range ? `₹${plan.interaction_range[0].toLocaleString("en-IN")} – ₹${plan.interaction_range[1].toLocaleString("en-IN")}` : "Calculating from the selected zone…"} note="The exact price area defined by the selected canonical zone." /></Grid>
                             <Grid size={{ xs: 6 }}><Field label="Expected holding period" value="Requires a validated outcome backtest" /></Grid>
-                            <Grid size={{ xs: 12 }}><Field label="Suggested trigger" value={result.zone_type === "DEMAND" ? "Wait for a bullish confirmation candle inside the demand zone before considering the setup." : "Wait for a bearish rejection candle inside the supply zone before considering the setup."} note="Do not use the zone as an immediate entry." /></Grid>
-                            <Grid size={{ xs: 6 }}><Field label="Illustrative entry" value={backendAnalysis ? `₹${backendAnalysis.trade_plan.illustrative_entry.toLocaleString("en-IN")}` : "Calculating…"} /></Grid>
-                            <Grid size={{ xs: 6 }}><Field label="Invalidation stop" value={backendAnalysis ? `₹${backendAnalysis.trade_plan.invalidation_stop.toLocaleString("en-IN")}` : "Calculating…"} note={backendAnalysis?.trade_plan.stop_buffer_rule} /></Grid>
-                            <Grid size={{ xs: 6 }}><Field label="Target" value={backendAnalysis?.trade_plan.target ? `₹${backendAnalysis.trade_plan.target.toLocaleString("en-IN")}` : backendAnalysis?.trade_plan.target_basis ?? "Calculating…"} /></Grid>
-                            <Grid size={{ xs: 6 }}><Field label="Risk : Reward" value={backendAnalysis?.trade_plan.risk_reward_ratio ? `1 : ${backendAnalysis.trade_plan.risk_reward_ratio}` : "No validated opposing target"} /></Grid>
-                            <Grid size={{ xs: 6 }}><Field label="Risk per share" value={backendAnalysis ? `₹${backendAnalysis.trade_plan.risk_per_share.toLocaleString("en-IN")}` : "Calculating…"} /></Grid>
-                            <Grid size={{ xs: 6 }}><Field label="Reward per share" value={backendAnalysis?.trade_plan.reward_per_share ? `₹${backendAnalysis.trade_plan.reward_per_share.toLocaleString("en-IN")}` : "No validated opposing target"} /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Proximal entry reference" value={plan?.planned_entry_reference != null ? `₹${plan.planned_entry_reference.toLocaleString("en-IN")}` : "Unavailable"} note="A structural planning coordinate, not a confirmed entry." /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Structural invalidation" value={plan?.structural_invalidation != null ? `₹${plan.structural_invalidation.toLocaleString("en-IN")}` : "Unavailable"} note="The distal boundary where the zone structure is no longer valid. This is not a protective stop." /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Nearest structural target" value={plan?.target != null ? `₹${plan.target.toLocaleString("en-IN")}` : "No valid opposing zone"} note="The nearest eligible opposite zone on the same timeframe." /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Available room" value={plan?.available_room != null ? `₹${plan.available_room.toLocaleString("en-IN")}` : "Unavailable without a target"} /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Protective stop" value="Not defined by structural plan" note="A future execution and risk policy must define it." /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Risk : Reward" value="Unavailable" note="Risk cannot be calculated until an execution stop policy is defined." /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Plan status" value={plan?.status.replaceAll("_", " ") ?? "Calculating…"} /></Grid>
+                            <Grid size={{ xs: 6 }}><Field label="Structural reward per share" value={plan?.structural_reward_per_share != null ? `₹${plan.structural_reward_per_share.toLocaleString("en-IN")}` : "Unavailable without a target"} /></Grid>
                         </Grid>}
-                        {planIsSynchronized && <Typography variant="caption" color="text.secondary">Research illustration only. The target uses the nearest detected opposing zone; no order is placed.</Typography>}
+                        {planIsSynchronized && <Typography variant="caption" color="text.secondary">Research only. This structural plan does not place orders or define an execution-ready stop.</Typography>}
                     </Section>}
 
                     {visibleSections.strengths && <FactorList title="Why AlphaEdge selected this zone" factors={explanation.positive_factors} positive />}
@@ -464,14 +464,13 @@ function ZoneExplanationPanel({
                         </Section>
                     )}
 
-                    {visibleSections.history && <Section title="History and Risk">
-                        <Grid container spacing={1}>
-                            {["Similar past zones", "Average gain", "Average loss", "Historical success rate", "Probability", "Volatility", "Gap risk", "Liquidity"].map((label) => (
-                                <Grid key={label} size={{ xs: 6 }}><Field label={label} value={label === "Volatility" && analysis ? number(analysis.atr14) : label === "Liquidity" ? "Requires average traded-value rules" : label === "Gap risk" ? "Requires next-session gap history" : "Requires historical-zone backtest"} /></Grid>
-                            ))}
-                        </Grid>
-                        <Typography variant="caption" color="text.secondary">{unavailable}: historical testing and probability need a validated, time-safe zone backtest. They are never guessed.</Typography>
-                    </Section>}
+                    {visibleSections.history && (
+                        <ComparableHistoricalEvidenceSection
+                            result={result}
+                            zones={zones}
+                            methodologyVersion={methodologyVersion}
+                        />
+                    )}
 
                     {visibleSections.actions && <Section title="Actions">
                         <Grid container spacing={1}>

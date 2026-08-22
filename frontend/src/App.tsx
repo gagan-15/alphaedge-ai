@@ -20,6 +20,7 @@ import Backtesting from "./pages/Backtesting";
 import Calculators from "./pages/Calculators";
 import Dashboard from "./pages/Dashboard";
 import EconomicCalendar from "./pages/EconomicCalendar";
+import HistoricalEvidence from "./pages/HistoricalEvidence";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing";
 import MyHoldings from "./pages/MyHoldings";
@@ -84,6 +85,10 @@ function App() {
             <Route
                 path="/reports"
                 element={<PrivatePage><Reports /></PrivatePage>}
+            />
+            <Route
+                path="/historical-evidence"
+                element={<PrivatePage><HistoricalEvidence /></PrivatePage>}
             />
             <Route
                 path="/settings"

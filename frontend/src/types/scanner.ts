@@ -103,6 +103,8 @@ export interface ZoneResearchResult {
     dashboard_qualified?: boolean;
     qualification_reason_codes?: string[];
     departure_quality?: "EXPLOSIVE" | "STRONG" | "ACCEPTABLE" | "WEAK" | string;
+    canonical_formation_departure?: "WEAK" | "STRONG" | "VERY_STRONG" | string | null;
+    dashboard_qualification_departure?: "EXPLOSIVE" | "STRONG" | "ACCEPTABLE" | "WEAK" | string | null;
     base_quality?: string | null;
     formation_quality?: string | null;
     departure_displacement?: number | null;
@@ -110,6 +112,25 @@ export interface ZoneResearchResult {
     base_candle_count?: number | null;
     base_compactness?: "EXCELLENT" | "STRONG" | "ACCEPTABLE" | "NOT_PRIMARY" | string;
     base_compactness_reason?: string | null;
+    trade_confidence?: CanonicalTradeConfidence | null;
+}
+
+export interface CanonicalTradeConfidence {
+    score: number;
+    label: "VERY_HIGH" | "HIGH" | "MODERATE" | "LOW" | "CONFLICTED" | "INSUFFICIENT_CONTEXT";
+    zone_quality_score: number;
+    zone_quality_contribution: number;
+    location_contribution: number;
+    trend_contribution: number;
+    location_alignment: string;
+    trend_alignment: string;
+    combined_context: string;
+    htf_overlap_type: string;
+    htf_direction_compatibility: string;
+    data_sufficiency: "AVAILABLE" | "PARTIAL" | "INSUFFICIENT";
+    reason_codes: string[];
+    evidence: string[];
+    shadow_mode: boolean;
 }
 
 export interface ZoneQualityComponent {
@@ -175,6 +196,7 @@ export interface ZoneResearchResponse {
     dashboard_qualified_count?: number;
     dashboard_rejected_count?: number;
     qualification_rejection_counts?: Record<string, number>;
+    methodology_version: string;
 }
 
 export interface ZoneRuleDiagnostic {
@@ -244,6 +266,43 @@ export interface TimeframeConfluenceResponse {
     location_timeframe: string | null;
     trend_timeframe: string | null;
     trend_state: string;
+    trend_alignment: "ALIGNED" | "OPPOSING" | "NEUTRAL" | "UNKNOWN";
+    workflow_source: "EXPLICIT_GTF_MAPPING" | "ALPHAEDGE_DERIVED" | "NO_CANONICAL_GTF_WORKFLOW";
+    canonical_trend: {
+        symbol: string;
+        trend_timeframe: string | null;
+        trend_state: "UPTREND" | "DOWNTREND" | "SIDEWAYS" | "UNAVAILABLE";
+        sma50_current: number | null;
+        sma50_seven_bars_ago: number | null;
+        sma_colour: "GREEN" | "RED" | "NEUTRAL" | "UNAVAILABLE";
+        atr14: number | null;
+        normalized_slope: number | null;
+        trend_angle_degrees: number | null;
+        evaluation_timestamp: string | null;
+        data_sufficient: boolean;
+        reason_codes: string[];
+    };
+    combined_context: {
+        trend_state: string;
+        trend_alignment: "ALIGNED" | "OPPOSING" | "NEUTRAL" | "UNKNOWN";
+        location_relationship: "FULL_OVERLAP" | "PARTIAL_OVERLAP" | "TOUCHING" | "NO_OVERLAP";
+        location_compatibility: "ALIGNED" | "OPPOSING" | "NO_HTF_CONTEXT";
+        location_reason_code: string;
+    };
+    canonical_analysis: {
+        symbol: string;
+        execution_timeframe: string;
+        trend_timeframe: string | null;
+        location_timeframe: string | null;
+        canonical_trend: TimeframeConfluenceResponse["canonical_trend"];
+        trend_alignment: "ALIGNED" | "OPPOSING" | "NEUTRAL" | "UNKNOWN";
+        htf_location: ConfluenceTimeframe | null;
+        location_relationship: "FULL_OVERLAP" | "PARTIAL_OVERLAP" | "TOUCHING" | "NO_OVERLAP";
+        location_compatibility: "ALIGNED" | "OPPOSING" | "NO_HTF_CONTEXT";
+        reason_codes: string[];
+        data_sufficient: boolean;
+    };
+    trade_confidence: CanonicalTradeConfidence;
     execution_zone: {
         zone_type: string;
         proximal_price: number;

@@ -112,7 +112,7 @@ export default function DashboardOpportunityTable({
                             >
                                 <TableCell width={46}>Rank</TableCell>
                                 <TableCell>Stock</TableCell>
-                                <TableCell align="center">AI Score</TableCell>
+                                <TableCell align="center">Zone Quality</TableCell>
                                 <TableCell>Zone</TableCell>
                                 <TableCell align="right">Distance</TableCell>
                                 <TableCell align="right">Trade Confidence</TableCell>

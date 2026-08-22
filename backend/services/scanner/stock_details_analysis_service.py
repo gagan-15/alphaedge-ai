@@ -13,13 +13,18 @@ from backend.config.sector_benchmark_config import (
 from backend.engines.demand_supply_engine.zone_detection_engine import (
     ZoneDetectionEngine,
 )
+from backend.engines.trade_planning_engine import CanonicalTradePlanningEngine
 from backend.engines.zone_scoring_engine.zone_scoring_engine import ZoneScoringEngine
+from backend.config.canonical_methodology import SCANNER_METHODOLOGY_CACHE_VERSION
+from backend.models.canonical_trade_plan import CanonicalPlanningZone
 from backend.models.zone import Zone, ZoneType
 from backend.services.market_data.market_data_service import MarketDataService
 from backend.services.market_data.timeframe_service import (
     INTRADAY_SOURCES,
     aggregate_timeframe,
 )
+from backend.services.scanner.canonical_trend_service import CanonicalTrendService
+from backend.services.scanner.zone_lifecycle_ui_service import ZoneLifecycleUiService
 
 
 class StockDetailsAnalysisService:
@@ -29,6 +34,9 @@ class StockDetailsAnalysisService:
         self._market = MarketDataService()
         self._zones = ZoneDetectionEngine()
         self._scores = ZoneScoringEngine()
+        self._trend = CanonicalTrendService(self._market)
+        self._lifecycle = ZoneLifecycleUiService()
+        self._trade_planning = CanonicalTradePlanningEngine()
 
     @staticmethod
     def _returns(stock: pd.Series, benchmark: pd.Series) -> dict[str, Any]:
@@ -62,124 +70,53 @@ class StockDetailsAnalysisService:
             }
         return result
 
-    @staticmethod
-    def _ema(series: pd.Series, period: int) -> float | None:
-        if len(series) < period:
-            return None
-        return float(series.ewm(span=period, adjust=False).mean().iloc[-1])
-
-    def _timeframe(
-        self, data: pd.DataFrame, label: str, demand: bool
-    ) -> dict[str, Any]:
-        framed = aggregate_timeframe(data, label)
-        close = framed["Close"]
-        ema20 = self._ema(close, 20)
-        ema50 = self._ema(close, 50)
-        if len(close) < 31:
-            trend = "INSUFFICIENT_HISTORY"
-        else:
-            change = float(close.iloc[-1] / close.iloc[-31] - 1) * 100
-            trend = "RISING" if change > 2 else "FALLING" if change < -2 else "SIDEWAYS"
-        if ema20 is None or ema50 is None:
-            alignment = "INSUFFICIENT_HISTORY"
-        elif ema20 > ema50:
-            alignment = "BULLISH"
-        elif ema20 < ema50:
-            alignment = "BEARISH"
-        else:
-            alignment = "MIXED"
-        confirmed = trend == ("RISING" if demand else "FALLING") and alignment == (
-            "BULLISH" if demand else "BEARISH"
-        )
-        return {
-            "timeframe": label,
-            "trend": trend,
-            "ema_alignment": alignment,
-            "confirmation": (
-                "CONFIRMED"
-                if confirmed
-                else (
-                    "NOT_CONFIRMED"
-                    if trend != "INSUFFICIENT_HISTORY"
-                    else "INSUFFICIENT_HISTORY"
-                )
-            ),
-        }
-
     def _trade_plan(
         self,
         selected: Zone,
         all_zones: list[Zone],
+        data: pd.DataFrame,
+        symbol: str,
+        timeframe: str,
         current_price: float,
     ) -> dict[str, Any]:
-        demand = selected.zone_type == ZoneType.DEMAND
-        width = selected.upper_price - selected.lower_price
-        buffer = width * 0.10
-        opposing = [
-            zone
-            for zone in all_zones
-            if zone.zone_type != selected.zone_type
-            and (
-                zone.lower_price > selected.upper_price
-                if demand
-                else zone.upper_price < selected.lower_price
+        """Build the plan from same-snapshot canonical engine outputs only."""
+
+        metadata = self._lifecycle.evaluate(
+            all_zones,
+            data,
+            symbol=symbol,
+            timeframe=timeframe,
+            current_price=current_price,
+        )
+        snapshot_id = f"{symbol}:{timeframe}:{len(data)}:{data.index[-1].isoformat()}"
+
+        def planning_zone(zone: Zone) -> CanonicalPlanningZone:
+            facts = metadata[zone.created_index]
+            demand = zone.zone_type == ZoneType.DEMAND
+            return CanonicalPlanningZone(
+                zone_id=facts.zone_id,
+                symbol=symbol,
+                timeframe=timeframe,
+                snapshot_id=snapshot_id,
+                methodology_version=SCANNER_METHODOLOGY_CACHE_VERSION,
+                zone_type=zone.zone_type.value,
+                proximal=zone.upper_price if demand else zone.lower_price,
+                distal=zone.lower_price if demand else zone.upper_price,
+                formation_evidence_available=zone.formation_evidence is not None,
+                authenticity_status=facts.authenticity_status,
+                lifecycle_status=facts.lifecycle_status,
+                is_active=not facts.is_invalidated,
+                is_removed=facts.lifecycle_status == "REMOVED",
             )
-        ]
-        opposing.sort(
-            key=lambda zone: zone.lower_price if demand else -zone.upper_price
-        )
-        nearest = opposing[0] if opposing else None
-        entry = selected.upper_price if demand else selected.lower_price
-        stop = (
-            selected.lower_price - buffer if demand else selected.upper_price + buffer
-        )
-        target = (
-            nearest.lower_price
-            if demand and nearest
-            else nearest.upper_price if nearest else None
-        )
-        risk = abs(entry - stop)
-        reward = abs(target - entry) if target is not None else None
-        ratio = reward / risk if reward is not None and risk > 0 else None
-        distance = abs(current_price - entry) / current_price * 100
-        return {
-            "entry_range": [
-                round(selected.lower_price, 2),
-                round(selected.upper_price, 2),
-            ],
-            "illustrative_entry": round(entry, 2),
-            "invalidation_stop": round(stop, 2),
-            "stop_buffer_rule": "10% of zone width beyond the distal line",
-            "target": round(target, 2) if target is not None else None,
-            "target_basis": (
-                "Nearest active opposing zone"
-                if nearest
-                else "No validated opposing zone found"
-            ),
-            "risk_per_share": round(risk, 2),
-            "reward_per_share": round(reward, 2) if reward is not None else None,
-            "risk_reward_ratio": round(ratio, 2) if ratio is not None else None,
-            "distance_to_entry_percent": round(distance, 2),
-            "research_only": True,
-        }
 
-    @staticmethod
-    def _trade_plan_is_valid(selected: Zone, plan: dict[str, Any]) -> bool:
-        """Ensure every plan coordinate belongs to the selected chart zone."""
-
-        lower = selected.lower_price
-        upper = selected.upper_price
-        entry_range = plan["entry_range"]
-        entry = plan["illustrative_entry"]
-        stop = plan["invalidation_stop"]
-        target = plan["target"]
-        demand = selected.zone_type == ZoneType.DEMAND
-        return bool(
-            entry_range == [round(lower, 2), round(upper, 2)]
-            and lower <= entry <= upper
-            and (stop < lower if demand else stop > upper)
-            and (target is None or (target > upper if demand else target < lower))
-        )
+        candidates = tuple(planning_zone(zone) for zone in all_zones)
+        selected_input = planning_zone(selected)
+        return self._trade_planning.build(
+            selected_input,
+            candidates,
+            expected_snapshot_id=snapshot_id,
+            expected_methodology_version=SCANNER_METHODOLOGY_CACHE_VERSION,
+        ).as_dict()
 
     def build(
         self,
@@ -204,11 +141,11 @@ class StockDetailsAnalysisService:
             analysis_source = stock
         analysis_data = aggregate_timeframe(analysis_source, timeframe)
         detected = self._zones.detect_zones(analysis_data)
-        selected = Zone(
-            zone_type=(ZoneType.DEMAND if zone_type == "DEMAND" else ZoneType.SUPPLY),
-            upper_price=max(proximal_price, distal_price),
-            lower_price=min(proximal_price, distal_price),
-            created_index=0,
+        selected = self._select_canonical_zone(
+            detected,
+            zone_type,
+            proximal_price,
+            distal_price,
         )
         current_price = float(analysis_data["Close"].iloc[-1])
         benchmark = self._returns(stock["Close"], nifty["Close"])
@@ -230,14 +167,32 @@ class StockDetailsAnalysisService:
                 "benchmark": None,
                 "status": "SECTOR_BENCHMARK_MAPPING_REQUIRED",
             }
+        workflow, canonical_trend = self._trend.analyze(symbol, timeframe)
+        alignment = self._trend.alignment(
+            selected.zone_type.value, canonical_trend.trend_state
+        ).value
+        confirmation = (
+            "CONFIRMED"
+            if alignment == "ALIGNED"
+            else "INSUFFICIENT_HISTORY" if alignment == "UNKNOWN" else "NOT_CONFIRMED"
+        )
         timeframes = [
-            self._timeframe(stock, label, selected.zone_type == ZoneType.DEMAND)
-            for label in ("1D", "1W", "1M")
+            {
+                "timeframe": workflow.trend,
+                "trend": canonical_trend.trend_state.value,
+                "ema_alignment": "NOT_APPLICABLE_CANONICAL_TREND",
+                "confirmation": confirmation,
+                "canonical_trend": canonical_trend.as_dict(),
+            }
         ]
-        confirmed = sum(item["confirmation"] == "CONFIRMED" for item in timeframes)
-        trade_plan = self._trade_plan(selected, detected, current_price)
-        if not self._trade_plan_is_valid(selected, trade_plan):
-            raise ValueError("Trading plan is not synchronized with selected zone.")
+        trade_plan = self._trade_plan(
+            selected,
+            detected,
+            analysis_data,
+            symbol,
+            timeframe,
+            current_price,
+        )
         return {
             "symbol": symbol,
             "selected_zone": {
@@ -252,11 +207,44 @@ class StockDetailsAnalysisService:
             "sector": sector,
             "multi_timeframe": {
                 "frames": timeframes,
-                "status": (
-                    "CONFIRMED"
-                    if confirmed == len(timeframes)
-                    else "MIXED" if confirmed else "NOT_CONFIRMED"
-                ),
+                "status": confirmation,
+                "workflow": {
+                    "location": workflow.location,
+                    "trend": workflow.trend,
+                    "execution": workflow.execution,
+                    "source": workflow.source.value,
+                },
             },
             "trade_plan": trade_plan,
         }
+
+    @staticmethod
+    def _select_canonical_zone(
+        detected: list[Zone],
+        zone_type: str,
+        proximal_price: float,
+        distal_price: float,
+    ) -> Zone:
+        """Resolve a request only to a zone accepted by the canonical engine."""
+
+        requested_type = (
+            ZoneType.DEMAND if zone_type == "DEMAND" else ZoneType.SUPPLY
+        )
+        requested_upper = max(proximal_price, distal_price)
+        requested_lower = min(proximal_price, distal_price)
+        tolerance = max(0.01, requested_upper * 1e-6)
+        selected = next(
+            (
+                zone
+                for zone in detected
+                if zone.zone_type == requested_type
+                and abs(zone.upper_price - requested_upper) <= tolerance
+                and abs(zone.lower_price - requested_lower) <= tolerance
+            ),
+            None,
+        )
+        if selected is None:
+            raise LookupError(
+                "Selected zone is not valid under the current canonical methodology."
+            )
+        return selected

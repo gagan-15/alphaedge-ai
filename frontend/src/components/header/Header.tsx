@@ -25,6 +25,7 @@ const navigation = [
     ["Portfolio", "/holdings"],
     ["Alerts", "/alerts"],
     ["Reports", "/reports"],
+    ["Evidence", "/historical-evidence"],
 ] as const;
 
 export default function Header() {

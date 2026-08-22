@@ -92,16 +92,28 @@ export interface StockDetailsBackendAnalysis {
         frames: Array<{ timeframe: string; trend: string; ema_alignment: string; confirmation: string }>;
     };
     trade_plan: {
-        entry_range: [number, number];
-        illustrative_entry: number;
-        invalidation_stop: number;
-        stop_buffer_rule: string;
+        selected_zone_id: string;
+        symbol: string;
+        timeframe: string;
+        snapshot_id: string;
+        methodology_version: string;
+        zone_type: string;
+        status: "COMPLETE_STRUCTURAL" | "PARTIAL" | "UNAVAILABLE";
+        interaction_range: [number, number] | null;
+        planned_entry_reference: number | null;
+        structural_invalidation: number | null;
         target: number | null;
-        target_basis: string;
-        risk_per_share: number;
-        reward_per_share: number | null;
-        risk_reward_ratio: number | null;
-        distance_to_entry_percent: number;
+        target_zone_id: string | null;
+        available_room: number | null;
+        structural_reward_per_share: number | null;
+        distance_entry_to_structural_invalidation: number | null;
+        protective_stop: number | null;
+        protective_stop_status: "POLICY_NOT_DEFINED";
+        risk_per_share: number | null;
+        risk_reward: number | null;
+        /** Deprecated compatibility field; canonical structural plans omit it. */
+        risk_reward_ratio?: number | null;
+        reason_codes: string[];
         research_only: boolean;
     };
 }
@@ -137,6 +149,7 @@ export async function getTimeframeConfluence(
                 proximal_price: result.proximal_price,
                 distal_price: result.distal_price,
                 refresh_key: result.base_date,
+                zone_quality_score: result.zone_score,
             },
         },
     );

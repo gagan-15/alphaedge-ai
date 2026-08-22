@@ -8,6 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test:chart": "node --test --experimental-strip-types tests/chartAnnotations.test.ts",
+    "test:ranking": "node --test --experimental-strip-types tests/tradeConfidenceRanking.test.ts",
+    "test:evidence": "node --test --experimental-strip-types tests/historicalEvidence.test.ts",
+    "test:evidence-comparable": "node --test --experimental-strip-types tests/comparableHistoricalEvidence.test.ts",
     "preview": "vite preview"
   },
   "dependencies": {

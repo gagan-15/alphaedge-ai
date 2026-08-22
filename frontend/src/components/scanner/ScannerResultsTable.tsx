@@ -5,6 +5,7 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import FullscreenRoundedIcon from "@mui/icons-material/FullscreenRounded";
 import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
+import QueryStatsRoundedIcon from "@mui/icons-material/QueryStatsRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -28,6 +29,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import type { ConfluenceChartOverlay, ZoneDiagnosticsResponse, ZoneResearchResult } from "../../types/scanner";
 import ZoneDetailChart from "./ZoneDetailChart";
@@ -35,16 +37,15 @@ import ZoneExplanationPanel from "./ZoneExplanationPanel";
 import { zoneSequenceLabel } from "./zoneLabels";
 import { readOverlayTimeframes, saveOverlayTimeframes } from "../../services/overlayService";
 import { selectZoneById, zoneIdFor } from "../../services/zoneSelectionService";
-import { getMarketCandles } from "../../api/marketApi";
-import { getStockDetailsAnalysis, getZoneDiagnostics } from "../../api/scannerApi";
-import { analyzeStockZone } from "./stockZoneAnalysis";
+import { getZoneDiagnostics } from "../../api/scannerApi";
 import { formatZoneQuality, formatZoneQualityLabel } from "./zoneQualityPresentation";
-import { buildTradeConfidence } from "./tradeConfidence";
+import { compareCanonicalTradeConfidence, tradeConfidenceDisplay } from "./tradeConfidenceRanking";
 import DeveloperZoneInspector from "./DeveloperZoneInspector";
 import { acceptedDeveloperZones, diagnosticDeveloperZones } from "./developerZones";
 
 interface ScannerResultsTableProps {
     results: ZoneResearchResult[];
+    methodologyVersion?: string;
     initialSelection?: {
         symbol: string;
         timeframe: string;
@@ -109,11 +110,8 @@ function normalizedTimeframe(value: string) {
     return aliases[value.toUpperCase()] ?? value.toUpperCase();
 }
 
-function resultKey(result: ZoneResearchResult) {
-    return `${result.symbol}:${result.timeframe}:${result.zone_type}:${result.proximal_price}:${result.distal_price}:${result.base_index}`;
-}
-
-function ScannerResultsTable({ results, initialSelection, onDetailsClose }: ScannerResultsTableProps) {
+function ScannerResultsTable({ results, methodologyVersion = "", initialSelection, onDetailsClose }: ScannerResultsTableProps) {
+    const navigate = useNavigate();
     const [page, setPage] = useState(0);
     const initialZones = initialSelection
         ? results.filter((zone) =>
@@ -138,7 +136,6 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
     const [developerMenuAnchor, setDeveloperMenuAnchor] = useState<HTMLElement | null>(null);
     const [developerDiagnostics, setDeveloperDiagnostics] = useState<ZoneDiagnosticsResponse | null>(null);
     const [developerDiagnosticsError, setDeveloperDiagnosticsError] = useState("");
-    const [confidenceScores, setConfidenceScores] = useState<Record<string, number>>({});
     const [selectedZones, setSelectedZones] = useState<ZoneResearchResult[]>(initialZone ? initialZones : []);
     const [selectedZoneId, setSelectedZoneId] = useState(() =>
         initialZone ? zoneIdFor(initialZones, initialZone) : ""
@@ -223,80 +220,18 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
         };
     }, [developerMode, selectedZoneId, selectedZones]);
 
-    useEffect(() => {
-        let active = true;
-        const controller = new AbortController();
-        let nextIndex = 0;
-        const entries: Array<readonly [string, number]> = [];
-        const enrichResult = async (result: ZoneResearchResult) => {
-            const intraday = ["5m", "15m", "75m", "125m", "1H", "2H", "4H", "6H"].includes(result.timeframe);
-            const period = intraday ? "1mo" : result.timeframe === "1D" ? "1y" : "10y";
-            const interval = intraday ? (result.timeframe.includes("H") ? "1h" : result.timeframe === "5m" || result.timeframe === "125m" ? "5m" : "15m") : "1d";
-            try {
-                const [candles, backend] = await Promise.all([
-                    getMarketCandles(result.symbol, period, interval, result.timeframe, controller.signal),
-                    getStockDetailsAnalysis(result, controller.signal),
-                ]);
-                return [resultKey(result), buildTradeConfidence(result, analyzeStockZone(result, candles.candles), backend).score] as const;
-            } catch {
-                return [resultKey(result), buildTradeConfidence(result, null, null).score] as const;
-            }
-        };
-        const worker = async () => {
-            while (active) {
-                const index = nextIndex++;
-                if (index >= results.length) return;
-                entries.push(await enrichResult(results[index]));
-                if (active) {
-                    setConfidenceScores((current) => ({
-                        ...current,
-                        [entries.at(-1)![0]]: entries.at(-1)![1],
-                    }));
-                }
-            }
-        };
-        const workerCount = Math.min(2, results.length);
-        void Promise.all(Array.from({ length: workerCount }, () => worker()));
-        return () => {
-            active = false;
-            controller.abort();
-        };
-    }, [results]);
-
-    useEffect(() => {
-        const selected = selectZoneById(selectedZones, selectedZoneId);
-        if (!selected) return;
-        const controller = new AbortController();
-        const intraday = ["5m", "15m", "75m", "125m", "1H", "2H", "4H", "6H"].includes(selected.timeframe);
-        const period = intraday ? "1mo" : selected.timeframe === "1D" ? "1y" : "10y";
-        const interval = intraday
-            ? (selected.timeframe.includes("H") ? "1h" : selected.timeframe === "5m" || selected.timeframe === "125m" ? "5m" : "15m")
-            : "1d";
-
-        void Promise.all([
-            getMarketCandles(selected.symbol, period, interval, selected.timeframe, controller.signal),
-            getStockDetailsAnalysis(selected, controller.signal),
-        ]).then(([candles, backend]) => {
-            if (controller.signal.aborted) return;
-            const score = buildTradeConfidence(selected, analyzeStockZone(selected, candles.candles), backend).score;
-            setConfidenceScores((current) => ({ ...current, [resultKey(selected)]: score }));
-        }).catch(() => {
-            if (controller.signal.aborted) return;
-            const score = buildTradeConfidence(selected, null, null).score;
-            setConfidenceScores((current) => ({ ...current, [resultKey(selected)]: score }));
-        });
-
-        return () => controller.abort();
-    }, [selectedZoneId, selectedZones]);
-
     const sortedResults = useMemo(() => [...results].sort((left, right) => {
-        const first = sortField === "trade_confidence" ? confidenceScores[resultKey(left)] ?? -1 : left[sortField];
-        const second = sortField === "trade_confidence" ? confidenceScores[resultKey(right)] ?? -1 : right[sortField];
+        if (sortField === "trade_confidence") {
+            const comparison = compareCanonicalTradeConfidence(left, right);
+            return sortDirection === "desc" ? comparison : -comparison;
+        }
+        const first = left[sortField];
+        const second = right[sortField];
         const comparison = typeof first === "string"
             ? first.localeCompare(String(second))
             : Number(first) - Number(second);
         return sortDirection === "asc" ? comparison : -comparison;
-    }), [confidenceScores, results, sortDirection, sortField]);
+    }), [results, sortDirection, sortField]);
     const groupedResults = useMemo(() => {
         const groups = new Map<string, ZoneResearchResult[]>();
         sortedResults.forEach((result) => {
@@ -305,13 +240,9 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
         return [...groups.entries()].map(([symbol, zones]) => ({
             symbol,
             zones,
-            primary: [...zones].sort((left, right) =>
-                (confidenceScores[resultKey(right)] ?? -1) - (confidenceScores[resultKey(left)] ?? -1)
-                || left.distance_percent - right.distance_percent
-                || right.zone_score - left.zone_score
-            )[0],
+            primary: [...zones].sort(compareCanonicalTradeConfidence)[0],
         }));
-    }, [confidenceScores, sortedResults]);
+    }, [sortedResults]);
     const safePage = Math.min(page, Math.max(0, Math.ceil(groupedResults.length / 14) - 1));
     const visibleGroups = groupedResults.slice(safePage * 14, safePage * 14 + 14);
 
@@ -433,9 +364,9 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                                     <TableCell align="center"><FilterAltOutlinedIcon sx={{ fontSize: 15, verticalAlign: "middle" }} /></TableCell>
                                     <TableCell align="center">#</TableCell>
                                     <TableCell>{sortableLabel("symbol", "Stock")}</TableCell>
-                                    <TableCell align="center">{sortableLabel("trade_confidence", "AI Score")}</TableCell>
+                                    <TableCell align="center">{sortableLabel("trade_confidence", "Trade Confidence")}</TableCell>
                                     <TableCell align="center">
-                                        <Tooltip title="Zone Quality measures only the structural quality of the Demand/Supply zone. AI Score measures the overall trading opportunity by combining technical and market factors.">
+                                        <Tooltip title="Zone Quality measures how well the zone itself was formed. Trade Confidence adds higher-timeframe location and trend context.">
                                             <Box component="span">{sortableLabel("zone_score", "Zone Quality")}</Box>
                                         </Tooltip>
                                     </TableCell>
@@ -452,8 +383,9 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                                 {visibleGroups.map(({ symbol, zones, primary: result }, index) => {
                                     const zoneKey = `${result.symbol}-${result.zone_type}-${result.base_date}-${result.proximal_price}`;
                                     const status = result.status;
-                                    const aiScore = confidenceScores[resultKey(result)] ?? buildTradeConfidence(result, null, null).score;
-                                    const scoreStyle = scorePresentation(aiScore);
+                                    const canonical = result.trade_confidence;
+                                    const confidence = tradeConfidenceDisplay(canonical);
+                                    const scoreStyle = scorePresentation(canonical?.score);
                                     const qualityStyle = qualityPresentation(result.zone_score);
                                     const statusStyle = statusPresentation(status);
                                     return (
@@ -479,8 +411,11 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                                                     <Typography sx={{ color: "#172033", fontSize: ".74rem", lineHeight: 1.35, fontWeight: 600 }}>{symbol}</Typography>
                                                 </TableCell>
                                                 <TableCell align="center">
-                                                    <Box sx={{ display: "inline-grid", width: 29, height: 29, placeItems: "center", borderRadius: "50%", border: "1px solid", borderColor: `${scoreStyle.border}B8`, bgcolor: scoreStyle.background }}>
-                                                        <Typography sx={{ color: scoreStyle.color, fontSize: ".69rem", fontWeight: 750 }}>{aiScore}</Typography>
+                                                    <Box>
+                                                        <Box sx={{ display: "inline-grid", width: 29, height: 29, placeItems: "center", borderRadius: "50%", border: "1px solid", borderColor: `${scoreStyle.border}B8`, bgcolor: scoreStyle.background }}>
+                                                            <Typography sx={{ color: scoreStyle.color, fontSize: ".64rem", fontWeight: 750 }}>{confidence.score}</Typography>
+                                                        </Box>
+                                                        <Typography color="text.secondary" sx={{ fontSize: ".52rem", mt: .2 }}>{confidence.label}</Typography>
                                                     </Box>
                                                 </TableCell>
                                                 <TableCell align="center">
@@ -524,17 +459,41 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                                                 </TableCell>
                                                 <TableCell align="center">{result.timeframe?.toUpperCase() ?? "1D"}</TableCell>
                                                 <TableCell align="center" sx={{ verticalAlign: "middle" }}>
-                                                    <IconButton
-                                                        size="small"
-                                                        aria-label={`Open ${result.symbol} full-screen chart`}
-                                                        onClick={(event) => {
-                                                            event.stopPropagation();
-                                                            openStock(zones, result);
-                                                        }}
-                                                        sx={{ width: 30, height: 30, color: "#66758b", transition: "background-color 150ms ease, color 150ms ease", "&:hover": { bgcolor: "#EEF4FF", color: "#344054" } }}
-                                                    >
-                                                        <VisibilityOutlinedIcon sx={{ fontSize: 17 }} />
-                                                    </IconButton>
+                                                    <Stack direction="row" spacing={.25} sx={{ justifyContent: "center" }}>
+                                                        {(normalizedTimeframe(result.timeframe) === "1D" || normalizedTimeframe(result.timeframe) === "1W") && (
+                                                            <Tooltip title="Historical Evidence">
+                                                                <IconButton
+                                                                    size="small"
+                                                                    aria-label={`View ${result.symbol} historical evidence`}
+                                                                    onClick={(event) => {
+                                                                        event.stopPropagation();
+                                                                        const query = new URLSearchParams({
+                                                                            timeframe: normalizedTimeframe(result.timeframe),
+                                                                            zone_type: result.zone_type,
+                                                                            pattern: patternLabels[result.pattern_type ?? ""] ?? result.pattern_type ?? "",
+                                                                            zone_quality: result.zone_quality_label ?? "",
+                                                                            trade_confidence: result.trade_confidence?.label ?? "",
+                                                                        });
+                                                                        navigate(`/historical-evidence?${query.toString()}`);
+                                                                    }}
+                                                                    sx={{ width: 30, height: 30, color: "#66758b", "&:hover": { bgcolor: "#EEF4FF", color: "#344054" } }}
+                                                                >
+                                                                    <QueryStatsRoundedIcon sx={{ fontSize: 17 }} />
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        )}
+                                                        <IconButton
+                                                            size="small"
+                                                            aria-label={`Open ${result.symbol} full-screen chart`}
+                                                            onClick={(event) => {
+                                                                event.stopPropagation();
+                                                                openStock(zones, result);
+                                                            }}
+                                                            sx={{ width: 30, height: 30, color: "#66758b", transition: "background-color 150ms ease, color 150ms ease", "&:hover": { bgcolor: "#EEF4FF", color: "#344054" } }}
+                                                        >
+                                                            <VisibilityOutlinedIcon sx={{ fontSize: 17 }} />
+                                                        </IconButton>
+                                                    </Stack>
                                                 </TableCell>
                                             </TableRow>
                                     );
@@ -559,7 +518,8 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                 {selectedZones.length > 0 && (() => {
                     const selectedZone = selectZoneById(selectedZones, selectedZoneId);
                     if (!selectedZone) return null;
-                    const selectedConfidence = confidenceScores[resultKey(selectedZone)];
+                    const selectedCanonical = selectedZone.trade_confidence;
+                    const selectedConfidence = tradeConfidenceDisplay(selectedCanonical);
                     const selectedQuality = qualityPresentation(selectedZone.zone_score);
                     const selectedStatus = statusPresentation(selectedZone.status);
                     return <>
@@ -568,10 +528,10 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                             <FullscreenRoundedIcon color="primary" />
                             <Box>
                                 <Typography variant="h6">{selectedZone.symbol} · Selected Zone {selectedZoneId} · {selectedZone.zone_type} · {patternLabels[selectedZone.pattern_type ?? ""]}</Typography>
-                                <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · Trade Confidence {selectedConfidence ?? "calculating"} · Zone Quality {formatZoneQuality(selectedZone.zone_score)} · delayed data · no order execution</Typography>
+                                <Typography variant="caption" color="text.secondary">{selectedZone.timeframe} research chart · Trade Confidence {selectedConfidence.score} · Zone Quality {formatZoneQuality(selectedZone.zone_score)} · delayed data · no order execution</Typography>
                             </Box>
                             <Stack direction="row" spacing={.75} sx={{ ml: "auto", alignItems: "center" }}>
-                                <Chip size="small" label={`AI Score ${selectedConfidence ?? "…"}`} sx={{ fontWeight: 700 }} />
+                                <Chip size="small" variant="outlined" label={`TC ${selectedConfidence.score} · ${selectedConfidence.label}`} />
                                 <Chip size="small" label={`Zone Quality ${formatZoneQuality(selectedZone.zone_score)} · ${formatZoneQualityLabel(selectedZone.zone_quality_label ?? selectedQuality.label)}`} sx={{ color: selectedQuality.color, bgcolor: selectedQuality.background, border: "1px solid", borderColor: selectedQuality.border, fontWeight: 700 }} />
                                 <Chip size="small" label={selectedZone.status === "WATCH" ? "NEARBY" : selectedZone.status} sx={{ color: selectedStatus.color, bgcolor: selectedStatus.background, border: "1px solid", borderColor: selectedStatus.border, fontWeight: 700 }} />
                             </Stack>
@@ -672,7 +632,7 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                                                 >
                                                     <Stack direction="row" sx={{ justifyContent: "space-between", gap: 1 }}>
                                                         <Typography sx={{ fontWeight: 800 }}>{selected ? "✓ " : ""}{zoneId} · {zone.zone_type} · {patternLabels[zone.pattern_type ?? ""]}</Typography>
-                                                        <Chip size="small" label={`Confidence ${confidenceScores[resultKey(zone)] ?? "…"} · Quality ${formatZoneQuality(zone.zone_score)}`} />
+                                                        <Chip size="small" label={`TC ${tradeConfidenceDisplay(zone.trade_confidence).score} · ZQ ${formatZoneQuality(zone.zone_score)}`} />
                                                     </Stack>
                                                     <Typography variant="caption" color="text.secondary">Status {zone.status} · Base {zone.base_date}{selected ? " · Selected" : " · Click to analyze"}</Typography>
                                                     {zone.status === "REACTING" && (
@@ -688,6 +648,8 @@ function ScannerResultsTable({ results, initialSelection, onDetailsClose }: Scan
                                     </CardContent></Card>
                                     <ZoneExplanationPanel
                                         result={selectedZone}
+                                        zones={selectedZones}
+                                        methodologyVersion={methodologyVersion}
                                         confluenceOverlays={confluenceOverlays}
                                         confluenceOverlaysHidden={confluenceOverlaysHidden}
                                         onToggleConfluenceOverlay={toggleConfluenceOverlay}

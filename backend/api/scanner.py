@@ -5,11 +5,11 @@ Sprint:
     2.64 - Scanner Results Foundation
 """
 
-from dataclasses import replace
 from concurrent.futures import Future, ThreadPoolExecutor
+from dataclasses import replace
 from datetime import UTC, datetime
 from threading import RLock
-from time import monotonic, sleep
+from time import monotonic, perf_counter, sleep
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Query
@@ -19,6 +19,7 @@ from backend.core.logger import logger
 from backend.api.models.scanner_response import (
     ScannerResponse,
     ScannerResultResponse,
+    CanonicalTradeConfidenceResponse,
     ZoneExplanationFactorResponse,
     ZoneExplanationResponse,
     ZoneQualityComponentResponse,
@@ -31,6 +32,7 @@ from backend.api.models.scanner_response import (
     ZoneRuleDiagnosticResponse,
 )
 from backend.config.scanner_config import ScannerConfig
+from backend.config.canonical_methodology import SCANNER_METHODOLOGY_CACHE_VERSION
 from backend.engines.demand_supply_engine.zone_detection_engine import (
     ZoneDetectionEngine,
 )
@@ -42,6 +44,8 @@ from backend.models.market_scanner.market_scanner_result import (
 )
 from backend.models.zone import Zone, ZoneType
 from backend.models.zone_scoring.canonical_zone_quality import ZoneQualityContext
+from backend.models.canonical_zone_analysis import CanonicalZoneAnalysis
+from backend.engines.trade_confidence_engine import CanonicalTradeConfidenceEngine
 from backend.services.scanner.scanner_service import (
     ScannerService,
 )
@@ -80,6 +84,7 @@ _zone_scoring_engine = ZoneScoringEngine()
 _zone_config = ScannerConfig()
 _stock_details_analysis = StockDetailsAnalysisService()
 _timeframe_confluence = TimeframeConfluenceService()
+_trade_confidence = CanonicalTradeConfidenceEngine()
 _zone_lifecycle_ui = ZoneLifecycleUiService()
 _dashboard_qualification = DashboardZoneQualificationService()
 _universe_service = UniverseService()
@@ -92,6 +97,78 @@ _zone_scan_lock = RLock()
 # available long enough that normal page navigation does not continuously start
 # another NSE 500 scan.
 _zone_scan_ttl_seconds = 1800.0
+
+
+def _serialize_trade_confidence(confidence: object) -> CanonicalTradeConfidenceResponse:
+    """Serialize the promoted canonical model without changing its values."""
+
+    return CanonicalTradeConfidenceResponse(
+        score=confidence.total_score,
+        label=confidence.label.value,
+        zone_quality_score=confidence.zone_quality_score,
+        zone_quality_contribution=confidence.zone_quality_contribution,
+        location_contribution=confidence.location_contribution,
+        trend_contribution=confidence.trend_contribution,
+        location_alignment=confidence.location_alignment,
+        trend_alignment=confidence.trend_alignment,
+        combined_context=confidence.combined_context,
+        htf_overlap_type=confidence.htf_overlap_type,
+        htf_direction_compatibility=confidence.htf_direction_compatibility,
+        data_sufficiency=confidence.data_sufficiency.value,
+        reason_codes=confidence.reason_codes,
+        evidence=confidence.evidence,
+        shadow_mode=False,
+    )
+
+
+def _canonical_trade_confidence_for_row(
+    item: ZoneResearchResultResponse,
+    *,
+    refresh_key: str,
+) -> CanonicalTradeConfidenceResponse:
+    """Compose shadow Trade Confidence from the same canonical context endpoint uses."""
+
+    payload = _timeframe_confluence.build(
+        item.symbol,
+        item.timeframe,
+        item.zone_type,
+        item.proximal_price,
+        item.distal_price,
+        refresh_key,
+    )
+    canonical = payload["canonical_analysis"]
+    analysis = CanonicalZoneAnalysis(
+        zone_id=item.zone_id or refresh_key,
+        symbol=item.symbol,
+        timeframe=item.timeframe,
+        zone_type=item.zone_type,
+        pattern=item.pattern_type,
+        proximal=item.proximal_price,
+        distal=item.distal_price,
+        formation_evidence=None,
+        lifecycle=None,
+        authenticity=None,
+        zone_quality=item.zone_score,
+        canonical_trend=canonical.get("canonical_trend"),
+        htf_context=canonical.get("htf_location"),
+        alignment=str(canonical.get("trend_alignment", "UNKNOWN")),
+        significant_gap=False,
+        gap_measurement=None,
+        trend_timeframe=canonical.get("trend_timeframe"),
+        location_timeframe=canonical.get("location_timeframe"),
+        trend_alignment=str(canonical.get("trend_alignment", "UNKNOWN")),
+        location_relationship=str(
+            canonical.get("location_relationship", "NO_OVERLAP")
+        ),
+        location_compatibility=str(
+            canonical.get("location_compatibility", "NO_HTF_CONTEXT")
+        ),
+        combined_context=payload.get("combined_context"),
+        data_sufficient=bool(canonical.get("data_sufficient", False)),
+        reason_codes=tuple(canonical.get("reason_codes", ())),
+    )
+    return _serialize_trade_confidence(_trade_confidence.evaluate(analysis))
+
 
 ZoneTimeframe = Literal[
     "MINUTE_5",
@@ -145,153 +222,134 @@ def _timeframe_data(data: DataFrame, timeframe: str) -> DataFrame:
     return aggregate_timeframe(data, _TIMEFRAME_LABELS[timeframe])
 
 
+def _canonical_gap_type(zone: Zone) -> str | None:
+    """Serialize immutable gap evidence produced by canonical formation."""
+
+    evidence = zone.formation_evidence
+    if evidence is None or not evidence.significant_gap:
+        return None
+    return "GAP UP" if evidence.leg_in_direction.value == "BULLISH" else "GAP DOWN"
+
+
+# Deprecated compatibility helpers. Production and Developer Mode must not call
+# these; canonical engines are the only source for application lifecycle data.
 def _measure_zone(zone: Zone, data: DataFrame) -> Zone:
-    """Add observable freshness, retest and departure measurements."""
-
-    zone_width = max(zone.upper_price - zone.lower_price, 1e-9)
-    departure_start = min(zone.created_index + 1, len(data))
-    departure_end = min(departure_start + 3, len(data))
-    departure = data.iloc[departure_start:departure_end]
-
+    width = max(zone.upper_price - zone.lower_price, 1e-9)
+    start = min(zone.created_index + 1, len(data))
+    end = min(start + 3, len(data))
+    departure = data.iloc[start:end]
     if departure.empty:
-        departure_multiple = 0.0
-        follow_through_ratio = 0.0
-        reversal_penalty = 1.0
+        multiple = follow = 0.0
+        penalty = 1.0
     elif zone.zone_type == ZoneType.DEMAND:
-        departure_multiple = max(
-            0.0,
-            (float(departure["High"].max()) - zone.upper_price) / zone_width,
-        )
-        follow_through_ratio = float(
-            (departure["Close"] > zone.upper_price).sum()
-        ) / len(departure)
-        reversal_penalty = (
+        multiple = max(0.0, (float(departure["High"].max()) - zone.upper_price) / width)
+        follow = float((departure["Close"] > zone.upper_price).sum()) / len(departure)
+        penalty = (
             0.45 if float(departure["Close"].iloc[-1]) <= zone.upper_price else 1.0
         )
     else:
-        departure_multiple = max(
-            0.0,
-            (zone.lower_price - float(departure["Low"].min())) / zone_width,
-        )
-        follow_through_ratio = float(
-            (departure["Close"] < zone.lower_price).sum()
-        ) / len(departure)
-        reversal_penalty = (
+        multiple = max(0.0, (zone.lower_price - float(departure["Low"].min())) / width)
+        follow = float((departure["Close"] < zone.lower_price).sum()) / len(departure)
+        penalty = (
             0.45 if float(departure["Close"].iloc[-1]) >= zone.lower_price else 1.0
         )
-
-    later = data.iloc[departure_end:]
+    later = data.iloc[end:]
     touches = int(
         ((later["Low"] <= zone.upper_price) & (later["High"] >= zone.lower_price)).sum()
     )
-    departure_strength = (
-        min(
-            35.0,
-            departure_multiple / 3.0 * 35.0,
-        )
-        * follow_through_ratio
-        * reversal_penalty
-    )
-
     return replace(
         zone,
-        strength=round(departure_strength, 2),
+        strength=round(min(35.0, multiple / 3.0 * 35.0) * follow * penalty, 2),
         is_fresh=touches == 0,
         touch_count=touches,
     )
 
 
 def _is_zone_invalidated(zone: Zone, data: DataFrame) -> bool:
-    """Return True when a later candle closes beyond the distal boundary."""
-
-    first_review_index = min(zone.created_index + 2, len(data))
-    later_closes = data.iloc[first_review_index:]["Close"]
-    if later_closes.empty:
+    closes = data.iloc[min(zone.created_index + 2, len(data)) :]["Close"]
+    if closes.empty:
         return False
-
-    if zone.zone_type == ZoneType.DEMAND:
-        return bool((later_closes < zone.lower_price).any())
-
-    return bool((later_closes > zone.upper_price).any())
+    return (
+        bool((closes < zone.lower_price).any())
+        if zone.zone_type == ZoneType.DEMAND
+        else bool((closes > zone.upper_price).any())
+    )
 
 
 def _has_completed_test(zone: Zone, data: DataFrame) -> bool:
-    """Return True when price tested the zone before the current candle."""
-
-    departure_end = min(zone.created_index + 4, len(data))
-    prior_candles = data.iloc[departure_end:-1]
-    if prior_candles.empty:
-        return False
-
-    overlaps = (prior_candles["Low"] <= zone.upper_price) & (
-        prior_candles["High"] >= zone.lower_price
+    candles = data.iloc[min(zone.created_index + 4, len(data)) : -1]
+    return (
+        False
+        if candles.empty
+        else bool(
+            (
+                (candles["Low"] <= zone.upper_price)
+                & (candles["High"] >= zone.lower_price)
+            ).any()
+        )
     )
-    return bool(overlaps.any())
+
+
+def _departure_gap(zone: Zone, data: DataFrame) -> str | None:
+    index = zone.created_index + 1
+    if index >= len(data):
+        return None
+    previous, departure = data.iloc[index - 1], data.iloc[index]
+    if float(departure["Low"]) > float(previous["High"]):
+        return "GAP UP"
+    if float(departure["High"]) < float(previous["Low"]):
+        return "GAP DOWN"
+    return None
 
 
 def _reaction_state(
-    zone: Zone,
-    data: DataFrame,
-    completion_percent: float,
+    zone: Zone, data: DataFrame, completion_percent: float
 ) -> dict[str, object]:
-    """Describe a confirmed reaction without changing zone detection.
-
-    A reaction begins only after a post-departure candle has entered the zone
-    and a later close crosses back through the proximal boundary in the
-    expected direction. It ends at the configured move beyond proximal.
-    """
-
-    departure_end = min(zone.created_index + 4, len(data))
-    later = data.iloc[departure_end:]
+    later = data.iloc[min(zone.created_index + 4, len(data)) :]
     if len(later) < 2:
         return {"active": False}
-
     demand = zone.zone_type == ZoneType.DEMAND
     touched = False
-    start_position: int | None = None
     previous_close: float | None = None
+    start_position: int | None = None
+    started = None
     for position, (index, candle) in enumerate(later.iterrows()):
-        low = float(candle["Low"])
-        high = float(candle["High"])
-        close = float(candle["Close"])
-        entered_on_candle = low <= zone.upper_price and high >= zone.lower_price
-        touched = touched or entered_on_candle
+        low, high, close = (
+            float(candle["Low"]),
+            float(candle["High"]),
+            float(candle["Close"]),
+        )
+        entered = low <= zone.upper_price and high >= zone.lower_price
+        touched = touched or entered
         crossed = touched and (
             (
                 demand
                 and close > zone.upper_price
                 and (
-                    entered_on_candle
-                    or (
-                        previous_close is not None
-                        and previous_close <= zone.upper_price
-                    )
+                    entered
+                    or previous_close is not None
+                    and previous_close <= zone.upper_price
                 )
             )
             or (
                 not demand
                 and close < zone.lower_price
                 and (
-                    entered_on_candle
-                    or (
-                        previous_close is not None
-                        and previous_close >= zone.lower_price
-                    )
+                    entered
+                    or previous_close is not None
+                    and previous_close >= zone.lower_price
                 )
             )
         )
         if crossed:
-            start_position = position
-            started = index
+            start_position, started = position, index
             break
         previous_close = close
-
     if start_position is None:
         return {"active": False}
-
     proximal = zone.upper_price if demand else zone.lower_price
     latest = float(data["Close"].iloc[-1])
-    reaction_percent = (
+    percent = (
         (latest - proximal) / proximal * 100
         if demand
         else (proximal - latest) / proximal * 100
@@ -299,51 +357,29 @@ def _reaction_state(
     completion_price = proximal * (
         1 + completion_percent / 100 if demand else 1 - completion_percent / 100
     )
-    reaction_candles = later.iloc[start_position:]
-    completed_mask = (
-        reaction_candles["Close"] >= completion_price
+    reaction = later.iloc[start_position:]
+    mask = (
+        reaction["Close"] >= completion_price
         if demand
-        else reaction_candles["Close"] <= completion_price
+        else reaction["Close"] <= completion_price
     )
-    completion_positions = [
-        position
-        for position, completed in enumerate(completed_mask.tolist())
-        if completed
-    ]
-    completed = bool(completion_positions)
-    end_position = completion_positions[0] if completed else None
-    ended_index = (
-        reaction_candles.index[end_position] if end_position is not None else None
-    )
-    duration = end_position + 1 if end_position is not None else len(reaction_candles)
+    positions = [index for index, complete in enumerate(mask.tolist()) if complete]
+    completed = bool(positions)
+    end_position = positions[0] if completed else None
+    ended = reaction.index[end_position] if end_position is not None else None
     return {
-        "active": not completed and reaction_percent >= 0,
-        "percent": round(reaction_percent, 2),
+        "active": not completed and percent >= 0,
+        "percent": round(percent, 2),
         "started": (
             started.isoformat() if hasattr(started, "isoformat") else str(started)
         ),
         "ended": (
-            ended_index.isoformat()
-            if ended_index is not None and hasattr(ended_index, "isoformat")
-            else str(ended_index) if ended_index is not None else None
+            ended.isoformat()
+            if ended is not None and hasattr(ended, "isoformat")
+            else str(ended) if ended is not None else None
         ),
-        "duration": duration,
+        "duration": end_position + 1 if end_position is not None else len(reaction),
     }
-
-
-def _departure_gap(zone: Zone, data: DataFrame) -> str | None:
-    """Classify a true non-overlapping gap on the departure candle."""
-
-    departure_index = zone.created_index + 1
-    if departure_index >= len(data):
-        return None
-    previous = data.iloc[departure_index - 1]
-    departure = data.iloc[departure_index]
-    if float(departure["Low"]) > float(previous["High"]):
-        return "GAP UP"
-    if float(departure["High"]) < float(previous["Low"]):
-        return "GAP DOWN"
-    return None
 
 
 def build_scanner_response(
@@ -429,6 +465,7 @@ def _scan_research_zones(
 ) -> ZoneResearchResponse:
     """Return recent demand and supply zones for research exploration."""
 
+    scan_started = perf_counter()
     results: list[ZoneResearchResultResponse] = []
     historical_results: list[ZoneResearchResultResponse] = []
     dashboard_base_preferences: dict[tuple[str, int], int] = {}
@@ -508,6 +545,7 @@ def _scan_research_zones(
         thread_name_prefix="alphaedge-zone-data",
     ) as executor:
         loaded_data = list(executor.map(load_symbol, universe_symbols))
+    load_completed = perf_counter()
 
     for symbol, loaded in zip(universe_symbols, loaded_data, strict=True):
         if loaded is None:
@@ -618,7 +656,7 @@ def _scan_research_zones(
             ]
             for detected_zone in dashboard_zones + historical_dashboard_zones:
                 qualification = qualifications[detected_zone.created_index]
-                zone = _measure_zone(detected_zone, data)
+                zone = detected_zone
                 metadata = canonical_metadata.get(detected_zone.created_index)
                 invalidated = bool(metadata and metadata.is_invalidated)
                 if invalidated:
@@ -661,7 +699,7 @@ def _scan_research_zones(
                     [zone], {zone.created_index: quality_context}
                 ).scored_zones[0]
                 explanation = ZoneExplanationService.build(zone, zone_score)
-                gap_type = _departure_gap(zone, data)
+                gap_type = _canonical_gap_type(zone)
                 demand = zone.zone_type.value == "DEMAND"
                 evidence = (
                     (
@@ -800,19 +838,21 @@ def _scan_research_zones(
                     is_duplicate=(metadata.is_duplicate if metadata else False),
                     overlap_percent=(metadata.overlap_percent if metadata else None),
                     dashboard_qualified=(
-                        metadata.dashboard_lifecycle_eligible
-                        if metadata
-                        else False
+                        metadata.dashboard_lifecycle_eligible if metadata else False
                     ),
                     qualification_reason_codes=(
                         qualification.qualification_reason_codes
-                        + (
-                            metadata.dashboard_lifecycle_reason_code,
-                        )
+                        + (metadata.dashboard_lifecycle_reason_code,)
                         if metadata
                         else qualification.qualification_reason_codes
                     ),
                     departure_quality=qualification.departure_quality,
+                    canonical_formation_departure=(
+                        zone.formation_evidence.departure_strength.value
+                        if zone.formation_evidence
+                        else None
+                    ),
+                    dashboard_qualification_departure=qualification.departure_quality,
                     base_quality=qualification.base_quality,
                     formation_quality=qualification.formation_quality,
                     departure_displacement=(qualification.departure_displacement),
@@ -821,9 +861,7 @@ def _scan_research_zones(
                     ),
                     base_candle_count=qualification.base_candle_count,
                     base_compactness=qualification.base_compactness,
-                    base_compactness_reason=(
-                        qualification.base_compactness_reason
-                    ),
+                    base_compactness_reason=(qualification.base_compactness_reason),
                 )
                 dashboard_base_preferences[(symbol, zone.created_index)] = (
                     qualification.base_preference_rank
@@ -846,6 +884,62 @@ def _scan_research_zones(
 
     results.sort(key=dashboard_sort_key)
     historical_results.sort(key=dashboard_sort_key)
+    analysis_completed = perf_counter()
+    # Enrich the completed scanner batch with promoted canonical Trade Confidence
+    # here so the browser never launches one context request per table row.
+    # A shared refresh key ties all values to this completed market snapshot;
+    # MarketDataService reuses OHLC datasets for zones sharing a symbol/frame.
+    confidence_snapshot = datetime.now(UTC).isoformat()
+
+    def enrich_symbol_rows(
+        rows: list[tuple[int, ZoneResearchResultResponse]],
+    ) -> list[tuple[int, ZoneResearchResultResponse]]:
+        enriched: list[tuple[int, ZoneResearchResultResponse]] = []
+        for index, item in rows:
+            try:
+                confidence = _canonical_trade_confidence_for_row(
+                    item,
+                    refresh_key=confidence_snapshot,
+                )
+            except Exception:
+                logger.exception(
+                    "Shadow Trade Confidence enrichment failed for %s %s.",
+                    item.symbol,
+                    item.zone_id or item.base_index,
+                )
+                confidence = None
+            enriched.append(
+                (index, item.model_copy(update={"trade_confidence": confidence}))
+            )
+        return enriched
+
+    rows_by_symbol: dict[str, list[tuple[int, ZoneResearchResultResponse]]] = {}
+    for index, item in enumerate(results):
+        rows_by_symbol.setdefault(item.symbol, []).append((index, item))
+    enriched_rows: list[ZoneResearchResultResponse | None] = [None] * len(results)
+    if rows_by_symbol:
+        with ThreadPoolExecutor(
+            max_workers=min(8, len(rows_by_symbol)),
+            thread_name_prefix="trade-confidence",
+        ) as confidence_executor:
+            futures = [
+                confidence_executor.submit(enrich_symbol_rows, rows)
+                for rows in rows_by_symbol.values()
+            ]
+            for future in futures:
+                for index, item in future.result():
+                    enriched_rows[index] = item
+        results = [item for item in enriched_rows if item is not None]
+    enrichment_completed = perf_counter()
+    logger.info(
+        "Zone scan phase timing: symbols=%s load_seconds=%.3f "
+        "analysis_seconds=%.3f confidence_seconds=%.3f total_seconds=%.3f.",
+        len(universe_symbols),
+        load_completed - scan_started,
+        analysis_completed - load_completed,
+        enrichment_completed - analysis_completed,
+        enrichment_completed - scan_started,
+    )
     logger.info(
         "Zone scan continuity summary: symbols=%s scanned=%s failed=%s "
         "zones=%s zero_range_skipped=%s zones_ended_at_data_break=%s "
@@ -889,7 +983,7 @@ def _zone_scan_key(
 ) -> str:
     return (
         f"{timeframe}:{universe}:{','.join(sorted(symbols or []))}:"
-        "v7-canonical-zone-quality"
+        f"{SCANNER_METHODOLOGY_CACHE_VERSION}:v7d-batch-trade-confidence"
     )
 
 
@@ -945,6 +1039,11 @@ def get_research_zones(
                 if job is not None
                 else (cached.processed_symbols, cached.failed_symbols)
             )
+            # Loading all symbol datasets is not scan completion: canonical
+            # analysis, enrichment and cache publication still follow.  Never
+            # display the misleading "500 / 500, refreshing" state.
+            if job is not None and processed >= len(universe_symbols):
+                processed = max(0, len(universe_symbols) - 1)
             return cached.model_copy(
                 update={
                     "status": "refreshing" if stale else "completed",
@@ -954,6 +1053,8 @@ def get_research_zones(
                 }
             )
         processed, failed = _zone_scan_progress.get(key, (0, 0))
+        if job is not None and processed >= len(universe_symbols):
+            processed = max(0, len(universe_symbols) - 1)
     return ZoneResearchResponse(
         total_scanned=0,
         total_zones=0,
@@ -1000,6 +1101,14 @@ def get_zone_diagnostics(
     data = _timeframe_data(data, timeframe)
     accepted, candidates = _zone_engine.detect_zones_with_diagnostics(data)
     accepted_by_index = {zone.created_index: zone for zone in accepted}
+    current_price = float(data["Close"].iloc[-1])
+    canonical_metadata = _zone_lifecycle_ui.evaluate(
+        accepted,
+        data,
+        symbol=normalized,
+        timeframe=_TIMEFRAME_LABELS[timeframe],
+        current_price=current_price,
+    )
     response: list[ZoneCandidateDiagnosticResponse] = []
     for candidate in candidates:
         start = int(candidate["base_start_index"])
@@ -1010,32 +1119,45 @@ def get_zone_diagnostics(
         score = candidate["score"]
         zone = accepted_by_index.get(end)
         if zone is not None:
-            measured = _measure_zone(zone, data)
+            metadata = canonical_metadata[zone.created_index]
             score = round(
-                _zone_scoring_engine.score([measured]).scored_zones[0].total_score,
+                _zone_scoring_engine.score(
+                    [zone],
+                    {
+                        zone.created_index: ZoneQualityContext(
+                            lifecycle_status=metadata.lifecycle_status,
+                            is_fresh=metadata.is_fresh,
+                            penetration_percent=metadata.current_penetration_percent,
+                            max_penetration_percent=metadata.max_penetration_percent,
+                            authenticity_status=metadata.authenticity_status,
+                        )
+                    },
+                )
+                .scored_zones[0]
+                .total_score,
                 1,
             )
-            invalidated = _is_zone_invalidated(measured, data)
-            completed_test = _has_completed_test(measured, data)
+            invalidated = metadata.is_invalidated
+            completed_test = metadata.test_count > 0
             rules.extend(
                 [
                     {
                         "key": "freshness",
                         "label": "Zone remains fresh",
-                        "passed": measured.is_fresh,
-                        "actual": measured.touch_count,
+                        "passed": metadata.is_fresh,
+                        "actual": metadata.test_count,
                         "required": 0,
                     },
                     {
                         "key": "retest_count",
                         "label": "Retest count",
-                        "passed": measured.touch_count == 0,
-                        "actual": measured.touch_count,
+                        "passed": metadata.test_count == 0,
+                        "actual": metadata.test_count,
                         "required": 0,
                     },
                     {
                         "key": "invalidation",
-                        "label": "No close beyond distal boundary",
+                        "label": "Canonical lifecycle remains active",
                         "passed": not invalidated,
                         "actual": "Invalidated" if invalidated else "Intact",
                         "required": "Intact",
@@ -1051,7 +1173,7 @@ def get_zone_diagnostics(
             )
             if invalidated:
                 status = "invalidated"
-                reasons.append("A later candle closed beyond the distal boundary.")
+                reasons.append("Canonical lifecycle invalidated this zone.")
             elif completed_test:
                 status = "rejected"
                 reasons.append(
@@ -1132,6 +1254,7 @@ def get_timeframe_confluence(
     proximal_price: float = Query(..., gt=0),
     distal_price: float = Query(..., gt=0),
     refresh_key: str = Query(""),
+    zone_quality_score: float = Query(0.0, ge=0, le=100),
 ) -> dict[str, object]:
     """Return cached zones only from timeframes above the execution chart."""
 
@@ -1142,14 +1265,31 @@ def get_timeframe_confluence(
             detail="Symbol is not in the scanner universe.",
         )
     try:
-        return _timeframe_confluence.build(
-            normalized,
-            execution_timeframe,
-            zone_type,
-            proximal_price,
-            distal_price,
-            refresh_key,
+        payload = dict(
+            _timeframe_confluence.build(
+                normalized,
+                execution_timeframe,
+                zone_type,
+                proximal_price,
+                distal_price,
+                refresh_key,
+            )
         )
+        endpoint_row = ZoneResearchResultResponse.model_construct(
+            symbol=normalized,
+            timeframe=execution_timeframe,
+            zone_type=zone_type,
+            proximal_price=proximal_price,
+            distal_price=distal_price,
+            zone_score=zone_quality_score,
+            zone_id=refresh_key or f"{normalized}:{execution_timeframe}",
+            pattern_type=None,
+        )
+        payload["trade_confidence"] = _canonical_trade_confidence_for_row(
+            endpoint_row,
+            refresh_key=refresh_key,
+        ).model_dump()
+        return payload
     except Exception as error:
         raise HTTPException(
             status_code=503,

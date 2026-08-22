@@ -21,6 +21,9 @@ from backend.engines.demand_supply_engine.zone_boundary_engine import (
     ZoneBoundaryEngine,
 )
 from backend.engines.demand_supply_engine.candle_classifier import CandleClassifier
+from backend.engines.demand_supply_engine.leg_in_structural_evidence_engine import (
+    LegInStructuralEvidenceEngine,
+)
 from backend.config.settings import MAX_BASE_CANDLES, MIN_BASE_CANDLES
 from backend.models.departure import (
     Departure,
@@ -39,6 +42,7 @@ from backend.models.formation_evidence import (
     CanonicalFormationEvidence,
     FormationCandleEvidence,
 )
+from backend.models.leg_in_structural_evidence import LegInFormationValidity
 from backend.validators.zone_boundary_validator import BoundaryValidationError
 
 
@@ -69,6 +73,7 @@ class ZoneDetectionEngine:
         self._boundary_engine = ZoneBoundaryEngine()
 
         self._candle_classifier = CandleClassifier()
+        self._leg_in_structure = LegInStructuralEvidenceEngine(self._candle_classifier)
 
     def detect_zones(
         self,
@@ -109,9 +114,7 @@ class ZoneDetectionEngine:
                 )
                 continue
 
-            leg_in_bullish = (
-                departure.leg_in_direction == DepartureDirection.BULLISH
-            )
+            leg_in_bullish = departure.leg_in_direction == DepartureDirection.BULLISH
 
             pattern = self._pattern_detector.detect(
                 leg_in_bullish,
@@ -129,6 +132,23 @@ class ZoneDetectionEngine:
                 logger.info(
                     "Rejecting zone boundary: %s.",
                     error.reason_code.value,
+                )
+                continue
+
+            structural_evidence = (
+                zone.formation_evidence.leg_in_structural_evidence
+                if zone.formation_evidence is not None
+                else None
+            )
+            if (
+                structural_evidence is not None
+                and structural_evidence.formation_validity
+                == LegInFormationValidity.INVALID_CLEAR_CONGESTION
+            ):
+                logger.info(
+                    "Rejecting formation: %s (%s).",
+                    structural_evidence.formation_validity.value,
+                    ", ".join(structural_evidence.formation_rejection_reasons),
                 )
                 continue
 
@@ -220,6 +240,40 @@ class ZoneDetectionEngine:
                         departure.leg_in_direction == DepartureDirection.BULLISH,
                         departure,
                     ).pattern_type.value
+                    try:
+                        rejected_zone = self._create_zone(
+                            market_data,
+                            base,
+                            self._pattern_detector.detect(
+                                departure.leg_in_direction
+                                == DepartureDirection.BULLISH,
+                                departure,
+                            ),
+                            departure,
+                        )
+                    except BoundaryValidationError:
+                        rejected_zone = None
+                    structural = (
+                        rejected_zone.formation_evidence.leg_in_structural_evidence
+                        if rejected_zone is not None
+                        and rejected_zone.formation_evidence is not None
+                        else None
+                    )
+                    if (
+                        structural is not None
+                        and structural.formation_validity
+                        == LegInFormationValidity.INVALID_CLEAR_CONGESTION
+                    ):
+                        failed.extend(structural.formation_rejection_reasons)
+                        rules.append(
+                            {
+                                "key": "leg_in_structural_validity",
+                                "label": "Clear directional Leg-In structure",
+                                "passed": False,
+                                "actual": structural.formation_validity.value,
+                                "required": LegInFormationValidity.VALID.value,
+                            }
+                        )
                 elif base.end_index + 1 < len(market_data):
                     next_close = float(market_data.iloc[base.end_index + 1]["Close"])
                     base_high = float(base_data["High"].max())
@@ -326,12 +380,23 @@ class ZoneDetectionEngine:
             pattern_type=pattern.pattern_type.value,
             boundary_result=boundary_result,
             formation_evidence=self._build_formation_evidence(
-                market_data, base, pattern, departure
+                market_data,
+                base,
+                pattern,
+                departure,
+                boundary_result.selected.proximal,
+                boundary_result.selected.distal,
             ),
         )
 
     def _build_formation_evidence(
-        self, market_data: DataFrame, base, pattern, departure: Departure
+        self,
+        market_data: DataFrame,
+        base,
+        pattern,
+        departure: Departure,
+        proximal: float,
+        distal: float,
     ) -> CanonicalFormationEvidence:
         """Freeze evidence established during canonical formation."""
         if any(
@@ -403,6 +468,9 @@ class ZoneDetectionEngine:
             closing_comparison_reference=departure.closing_comparison_reference,
             qualifying_close=departure.qualifying_close,
             acceptance_reason=departure.acceptance_reason,
+            leg_in_structural_evidence=self._leg_in_structure.evaluate(
+                market_data, base, departure, proximal, distal
+            ),
         )
 
     def _candle_evidence(
@@ -416,9 +484,7 @@ class ZoneDetectionEngine:
                 FormationCandleEvidence(
                     index=index,
                     timestamp=isoformat() if callable(isoformat) else str(timestamp),
-                    classification=self._candle_classifier.classify(
-                        market_data, index
-                    ),
+                    classification=self._candle_classifier.classify(market_data, index),
                 )
             )
         return tuple(evidence)
