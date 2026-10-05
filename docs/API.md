@@ -61,6 +61,69 @@ http://127.0.0.1:8000/openapi.json
 
 # Implemented APIs
 
+## Registration API
+
+### Endpoint
+
+```text
+POST /auth/register
+```
+
+### Purpose
+
+Creates a minimum-data AlphaEdge AI account. Registration requires acceptance
+of the Terms, market-risk disclosure, and adult confirmation.
+
+Stored account data is limited to full name, email, country, password hash,
+consent timestamps, account state, and audit timestamps. Plain passwords are
+never stored.
+
+New accounts remain unverified until the future local email-verification flow
+is completed.
+
+---
+
+## Login API
+
+```text
+POST /auth/login
+```
+
+Creates one revocable device session after email and password verification.
+The response contains a short access token. The refresh token is stored in a
+Secure, HttpOnly cookie and is not exposed to frontend JavaScript.
+
+## Refresh API
+
+```text
+POST /auth/refresh
+```
+
+Rotates the current refresh token. The old device session is revoked and a new
+session and token pair are created.
+
+## Logout APIs
+
+```text
+POST /auth/logout
+POST /auth/logout-all
+```
+
+Logout revokes the current device. Logout-all revokes every active device
+session for the account.
+
+## Email Verification APIs
+
+```text
+POST /auth/email-verification/request
+POST /auth/email-verification/verify
+```
+
+Development verification links are written only to local backend logs. Tokens
+are one-time, expire, and are stored only as hashes.
+
+---
+
 ## Health API
 
 ### Endpoint
@@ -101,6 +164,7 @@ Current modules include:
 
 - Market Overview
 - Portfolio Summary
+- Signals
 - Alerts
 - Scanner
 - Backtest Summary
@@ -126,6 +190,7 @@ JSON Response
 
 - Market
 - Portfolio
+- Signals
 - Alerts
 - Scanner
 - Backtest
@@ -149,6 +214,14 @@ Example
         "available_capital": 75000,
         "total_capital": 100000
     },
+    "signals": [
+        {
+            "symbol": "INFY",
+            "action": "BUY",
+            "price": 1642.5,
+            "confidence": 95.0
+        }
+    ],
     "alerts": [
         {
             "title": "BUY",
@@ -182,10 +255,56 @@ Example
 
 ---
 
+# Scanner API
+
+## Endpoint
+
+```text
+GET /scanner/
+```
+
+## Purpose
+
+Returns scanner results for the React Scanner page.
+
+The current implementation downloads and validates market data for configured
+symbols. It detects nearby fresh demand zones, scores and ranks them, builds
+trade setups, checks volume, trend, and momentum, and applies risk management
+before returning approved opportunities.
+
+The current scanner supports long opportunities only. One symbol failure does
+not stop the remaining scan.
+
+## Response
+
+```json
+{
+    "total_scanned": 4,
+    "total_matches": 2,
+    "results": [
+        {
+            "symbol": "INFY",
+            "entry_price": 1642.5,
+            "stop_loss": 1602.5,
+            "target_price": 1722.5,
+            "risk_reward_ratio": 2.0,
+            "confirmation_score": 92.0,
+            "volume_confirmed": true,
+            "trend_confirmed": true,
+            "momentum_confirmed": true,
+            "confirmed": true,
+            "approved": true,
+            "rejection_reason": null
+        }
+    ]
+}
+```
+
+---
+
 # Planned APIs
 
 - Market API
-- Scanner API
 - Signals API
 - Portfolio API
 - Risk API
@@ -258,3 +377,27 @@ The current REST APIs are designed as the single integration layer for:
 - Future Public APIs
 
 All future clients must consume the backend through the public REST API rather than accessing business logic directly.
+# Historical Candles
+
+`GET /market/candles`
+
+Returns normalized OHLCV candles for a validated symbol. Development data uses
+the delayed Yahoo Finance feed through the replaceable market-data provider.
+
+Query parameters:
+
+- `symbol`: NSE equity symbol, default `RELIANCE`
+- `period`: `1mo`, `3mo`, `6mo`, `1y`, `2y` or `5y`
+- `interval`: `1d`, `1h`, `30m` or `15m`
+
+The response includes `source` and `delayed` fields so the UI can clearly label
+data quality. The endpoint is read-only and does not support order execution.
+
+Scanner results also include detected zone metadata when available: zone type,
+proximal and distal levels, quality score, distance from current price,
+freshness, touch count, base index and analysis timeframe.
+
+`GET /scanner/zones` returns recent demand and supply research zones across the
+configured universe, including DBR/RBR/RBD/DBD pattern, proximity status,
+current delayed price, zone score and base date. It is separate from the
+stricter risk-approved opportunity endpoint.

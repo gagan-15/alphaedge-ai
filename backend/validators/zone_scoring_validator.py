@@ -26,10 +26,12 @@ class ZoneScoringValidator:
             raise ValueError("zones cannot be empty.")
 
         weights = (
-            config.freshness_weight
-            + config.strength_weight
-            + config.touch_weight
-            + config.merge_bonus_weight
+            config.base_quality_weight
+            + config.departure_quality_weight
+            + config.legout_dominance_weight
+            + config.structural_clearance_weight
+            + config.lifecycle_quality_weight
+            + config.authenticity_quality_weight
         )
 
         if weights != config.maximum_score:

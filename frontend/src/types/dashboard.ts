@@ -8,15 +8,27 @@
 export interface MarketOverviewResult {
     nifty50: number;
     nifty_change: number;
+    nifty_available: boolean;
 
     sensex: number;
     sensex_change: number;
+    sensex_available: boolean;
 
     bank_nifty: number;
     bank_nifty_change: number;
+    bank_nifty_available: boolean;
 
     india_vix: number;
     india_vix_change: number;
+    india_vix_available: boolean;
+    advancing: number;
+    declining: number;
+    unchanged: number;
+    total_symbols: number;
+    processed_symbols: number;
+    source: string;
+    data_status: "live" | "delayed" | "cached" | "refreshing";
+    updated_at: string;
 }
 
 export interface PortfolioResult {

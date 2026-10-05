@@ -821,6 +821,207 @@ This architecture allows additional pages such as Signals, Scanner, Portfolio, R
 
 --
 
+## Current Scanner Integration
+
+The current Scanner Results flow follows:
+
+Scanner API
+    ↓
+Scanner Service
+    ↓
+Entry Confirmation Engine
+    ↓
+Risk Management Engine
+    ↓
+Market Scanner Engine
+    ↓
+Scanner API Response Mapper
+    ↓
+React Scanner API Layer
+    ↓
+Scanner Page and Components
+
+The Scanner Service analyzes each configured symbol independently. A provider
+or analysis failure for one symbol is logged and does not stop the remaining
+scan.
+
+The Market Opportunity Service connects validated market data, demand-zone
+detection, zone scoring and ranking, trade setup, entry confirmation, risk
+management, screening, and scanning.
+
+The current scanner supports long opportunities from fresh demand zones near
+the current price. Short opportunities remain disabled until short-trade
+position sizing and risk calculations are implemented.
+
+The API response mapper is kept at the API boundary so domain models do not
+contain FastAPI route logic.
+
+---
+
+## AD-031 - Replaceable Market Data Providers
+
+External market data access follows:
+
+MarketDataService
+    â†“
+BaseMarketDataProvider
+    â†“
+Provider Adapter
+
+`BaseMarketDataProvider` defines the normalized historical OHLCV contract.
+`YahooProvider` is the current development adapter.
+
+Application services depend on the provider contract rather than a vendor.
+This allows future NSE-compatible, broker, licensed data, cached, and test
+providers to be introduced without changing trading engines.
+
+All provider output must pass through `MarketDataValidator` before it reaches
+indicators, scanners, backtests, or other trading intelligence engines.
+
+Provider implementations own vendor-specific symbol and response handling.
+Application services own orchestration and validation. Trading engines remain
+independent from network access.
+
+---
+
+## AD-032 - Responsive Dark Trading Shell
+
+The React application uses one shared dark trading shell for every page.
+
+The Material UI theme owns colors, typography, card borders, navigation
+states, and common component styling. AppLayout owns responsive page spacing.
+Header owns global search and account actions. Sidebar owns navigation only.
+
+The expanded sidebar is used on large screens. A compact icon sidebar is used
+on smaller screens so the application remains usable without changing page
+components.
+
+Dashboard pages and reusable cards must use theme values instead of hardcoded
+light backgrounds. This keeps the full product visually consistent and allows
+future dashboard panels to match the approved AlphaEdge AI design.
+
+---
+
+## AD-033 - Research-Only Product Boundary
+
+AlphaEdge AI is a market research and educational analytics platform.
+
+The platform does not execute orders, connect to brokers, manage user money,
+promise returns, or present results as guaranteed outcomes.
+
+Internal engines may use deterministic BUY, SELL, HOLD, and WAIT values for
+calculation compatibility. User-facing surfaces translate these values into
+Bullish Setup, Bearish Setup, and Watch.
+
+User-facing trade-plan fields use Possible Entry, Invalidation Level, Scenario
+Target, Conditions Matched, and Risk Check. Historical performance always
+states that past results do not guarantee future performance.
+
+Research disclaimers are displayed throughout the private application. Legal
+and compliance review remains required before charging for stock-specific
+research or adding any regulated service.
+
+---
+
+## AD-034 - Authentication Security Foundation
+
+Authentication uses Argon2 password hashing, short-lived signed access tokens,
+and separate refresh tokens.
+
+Refresh tokens include unique identifiers so rotation, session revocation, and
+logout can be implemented without changing token contracts. Refresh tokens
+will be stored in Secure, HttpOnly cookies. Access tokens will not be stored in
+browser local storage.
+
+Authentication secrets and token lifetimes come from environment variables.
+Weak secrets and invalid lifetimes are rejected before token services start.
+
+PostgreSQL owns production user and session data. Automated tests use isolated
+test storage and never depend on the production database.
+
+---
+
+## AD-035 - Minimum User Data
+
+Registration stores only full name, email, country, password hash, adult
+confirmation, Terms acceptance time, risk-disclosure acceptance time, account
+state, email-verification state, and audit timestamps.
+
+The platform does not collect PAN, Aadhaar, bank, broker, or payment
+information in the current product scope.
+
+Production account data uses PostgreSQL and versioned Alembic migrations.
+Registration normalizes email and country values, rejects duplicate accounts,
+and requires all safety consent before creating a user.
+
+---
+
+## AD-036 - Revocable Multi-Device Sessions
+
+Each successful login creates a separate AuthSession for one device. Only the
+refresh token identifier is stored; the full refresh token is never stored in
+the database.
+
+Refresh rotates the token and revokes the previous session. Logout revokes one
+device, while logout-all revokes every active session owned by the user.
+
+Unverified, inactive, expired, and revoked sessions cannot create new access
+tokens. Access tokens remain short lived and refresh tokens remain isolated in
+Secure, HttpOnly, SameSite cookies.
+
+---
+
+## AD-037 - Local Email Verification
+
+Development verification uses secure one-time tokens. Only token hashes are
+stored. Tokens expire, cannot be reused, and verification links are written
+only to local backend logs. Public API responses never expose tokens or reveal
+whether an email account exists.
+
+---
+
+## AD-038 - Protected Web Sessions
+
+Private frontend routes require an authenticated user. On page load, the web
+application restores a session through the Secure, HttpOnly refresh cookie.
+Short-lived access tokens stay only in JavaScript memory and are not written to
+local storage or session storage. Logout clears local state even if the backend
+is temporarily unavailable.
+
+Development CORS allows both `localhost:5173` and `127.0.0.1:5173`.
+
+---
+
+## AD-039 - Local Demo Access
+
+The Vite development server uses a local demo identity by default so UI work
+does not depend on registration or database setup. The bypass is compiled only
+when Vite development mode is active and is visibly marked in the header.
+Production builds never enable it. Developers can set
+`VITE_DEMO_MODE=false` when they need to test the real authentication flow.
+
+---
+
+## AD-040 - Interactive Research Charts
+
+The dashboard uses the free Apache-2.0 TradingView Lightweight Charts package,
+not the restricted hosted TradingView widget. Market data remains owned by the
+AlphaEdge data-provider boundary. The chart provides pan, zoom, crosshair,
+time-range selection and optional indicators, and includes the required
+TradingView attribution.
+
+---
+
+## AD-041 - Layered Risk Acknowledgement
+
+Registration consent remains authoritative for account creation. A separate
+versioned browser acknowledgement is shown before entering the application so
+the research-only, no-guarantee and no-order-execution boundaries remain
+visible. It does not claim regulatory registration and does not replace legal
+terms or professional advice.
+
+---
+
 # 9. Coding Philosophy
 
 The architecture always prefers:
@@ -886,3 +1087,26 @@ Business vision.
 # Architecture Motto
 
 > Good architecture makes future features easier to build, not harder.
+## Shared Market Universe and Market Data
+
+The application uses the canonical universe IDs `nifty50`, `nifty100`,
+`nifty200`, `nse500`, `fno`, `allnse`, `watchlist`, and `custom`. The default
+is `nse500`. `MarketUniverseContext` is the only frontend owner and persists
+the selection in local storage. Universe-dependent API calls send that value
+as the `universe` query parameter.
+
+On the backend, `UniverseService` is the only symbol source. Dashboard market
+benchmarks and breadth use the shared delayed market snapshot service. Large
+zone scans are cached by universe and timeframe and refreshed with controlled
+background workers, allowing clients to display the last completed result and
+refresh progress without waiting for a full universe scan.
+
+Production screens must not define fallback stock lists. User-owned collections,
+such as the watchlist and holdings, start from persisted user data and may be
+empty. A single-symbol API default is resolved through `UniverseService`.
+Maintained sector metadata lives beside universe constituent data rather than
+inside scanner logic.
+
+Fixed examples are allowed only in modules that are clearly marked as demo or
+development content. They must never feed the authenticated dashboard, scanner,
+signals, market overview, shared ticker, or production market calculations.

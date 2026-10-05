@@ -1,0 +1,4395 @@
+{
+  "dataset": {
+    "symbols_requested": 28,
+    "symbols": [
+      "RELIANCE",
+      "TCS",
+      "HDFCBANK",
+      "INFY",
+      "ICICIBANK",
+      "SBIN",
+      "HINDALCO",
+      "AUBANK",
+      "MAXHEALTH",
+      "SUNPHARMA",
+      "MARUTI",
+      "ITC",
+      "360ONE",
+      "ALKEM",
+      "BAJFINANCE",
+      "BSOFT",
+      "COHANCE",
+      "EIHOTEL",
+      "GLAXO",
+      "INDUSINDBK",
+      "JSWENERGY",
+      "LLOYDSME",
+      "MRPL",
+      "OIL",
+      "PREMIERENE",
+      "TATACHEM",
+      "TVSMOTOR",
+      "ZYDUSWELL"
+    ],
+    "series_requested": 140,
+    "series_succeeded": 140,
+    "series_failed": 0,
+    "zones_reconstructed": 1568,
+    "date_start": "2021-08-18 00:00:00",
+    "date_end": "2026-08-21 00:00:00",
+    "provider": "YahooProvider",
+    "maximum_zones_per_valid_segment": 8
+  },
+  "overall": {
+    "detected": 1568,
+    "interacted": 1185,
+    "never_interacted": 383,
+    "interaction_rate": {
+      "numerator": 1185,
+      "denominator": 1568,
+      "percent": 75.57,
+      "ci_low": 73.39,
+      "ci_high": 77.64
+    },
+    "structural_survival": {
+      "numerator": 217,
+      "denominator": 1185,
+      "percent": 18.31,
+      "ci_low": 16.21,
+      "ci_high": 20.62
+    },
+    "failure": {
+      "numerator": 968,
+      "denominator": 1185,
+      "percent": 81.69,
+      "ci_low": 79.38,
+      "ci_high": 83.79
+    },
+    "reaction_rates": {
+      "0.5": {
+        "numerator": 1147,
+        "denominator": 1185,
+        "percent": 96.79,
+        "ci_low": 95.63,
+        "ci_high": 97.65
+      },
+      "1": {
+        "numerator": 1062,
+        "denominator": 1185,
+        "percent": 89.62,
+        "ci_low": 87.75,
+        "ci_high": 91.23
+      },
+      "2": {
+        "numerator": 862,
+        "denominator": 1185,
+        "percent": 72.74,
+        "ci_low": 70.14,
+        "ci_high": 75.2
+      },
+      "3": {
+        "numerator": 728,
+        "denominator": 1185,
+        "percent": 61.43,
+        "ci_low": 58.63,
+        "ci_high": 64.16
+      },
+      "5": {
+        "numerator": 541,
+        "denominator": 1185,
+        "percent": 45.65,
+        "ci_low": 42.84,
+        "ci_high": 48.5
+      }
+    },
+    "target_available": 407,
+    "target_achievement": {
+      "numerator": 192,
+      "denominator": 407,
+      "percent": 47.17,
+      "ci_low": 42.37,
+      "ci_high": 52.03
+    },
+    "target_before_failure": {
+      "numerator": 90,
+      "denominator": 407,
+      "percent": 22.11,
+      "ci_low": 18.35,
+      "ci_high": 26.4
+    },
+    "failure_before_target": {
+      "numerator": 276,
+      "denominator": 407,
+      "percent": 67.81,
+      "ci_low": 63.13,
+      "ci_high": 72.17
+    },
+    "same_candle_ambiguous": 14,
+    "unresolved": 27,
+    "median_mfe_zone_width": 4.2979,
+    "median_mae_zone_width": 3.8982,
+    "median_mfe_atr": 2.7238,
+    "median_mae_atr": 2.4385,
+    "median_candles_to_interaction": 4.0
+  },
+  "by_timeframe": {
+    "125m": {
+      "detected": 118,
+      "interacted": 80,
+      "never_interacted": 38,
+      "interaction_rate": {
+        "numerator": 80,
+        "denominator": 118,
+        "percent": 67.8,
+        "ci_low": 58.92,
+        "ci_high": 75.55
+      },
+      "structural_survival": {
+        "numerator": 20,
+        "denominator": 80,
+        "percent": 25.0,
+        "ci_low": 16.81,
+        "ci_high": 35.48
+      },
+      "failure": {
+        "numerator": 60,
+        "denominator": 80,
+        "percent": 75.0,
+        "ci_low": 64.52,
+        "ci_high": 83.19
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 75,
+          "denominator": 80,
+          "percent": 93.75,
+          "ci_low": 86.19,
+          "ci_high": 97.3
+        },
+        "1": {
+          "numerator": 71,
+          "denominator": 80,
+          "percent": 88.75,
+          "ci_low": 79.98,
+          "ci_high": 93.97
+        },
+        "2": {
+          "numerator": 53,
+          "denominator": 80,
+          "percent": 66.25,
+          "ci_low": 55.36,
+          "ci_high": 75.65
+        },
+        "3": {
+          "numerator": 39,
+          "denominator": 80,
+          "percent": 48.75,
+          "ci_low": 38.11,
+          "ci_high": 59.51
+        },
+        "5": {
+          "numerator": 25,
+          "denominator": 80,
+          "percent": 31.25,
+          "ci_low": 22.15,
+          "ci_high": 42.07
+        }
+      },
+      "target_available": 17,
+      "target_achievement": {
+        "numerator": 6,
+        "denominator": 17,
+        "percent": 35.29,
+        "ci_low": 17.31,
+        "ci_high": 58.7
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 17,
+        "percent": 11.76,
+        "ci_low": 3.29,
+        "ci_high": 34.34
+      },
+      "failure_before_target": {
+        "numerator": 11,
+        "denominator": 17,
+        "percent": 64.71,
+        "ci_low": 41.3,
+        "ci_high": 82.69
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 4,
+      "median_mfe_zone_width": 2.8829,
+      "median_mae_zone_width": 2.5836,
+      "median_mfe_atr": 1.7403,
+      "median_mae_atr": 1.2894,
+      "median_candles_to_interaction": 3.0
+    },
+    "15m": {
+      "detected": 275,
+      "interacted": 228,
+      "never_interacted": 47,
+      "interaction_rate": {
+        "numerator": 228,
+        "denominator": 275,
+        "percent": 82.91,
+        "ci_low": 78.01,
+        "ci_high": 86.9
+      },
+      "structural_survival": {
+        "numerator": 29,
+        "denominator": 228,
+        "percent": 12.72,
+        "ci_low": 9.0,
+        "ci_high": 17.67
+      },
+      "failure": {
+        "numerator": 199,
+        "denominator": 228,
+        "percent": 87.28,
+        "ci_low": 82.33,
+        "ci_high": 91.0
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 222,
+          "denominator": 228,
+          "percent": 97.37,
+          "ci_low": 94.38,
+          "ci_high": 98.79
+        },
+        "1": {
+          "numerator": 209,
+          "denominator": 228,
+          "percent": 91.67,
+          "ci_low": 87.35,
+          "ci_high": 94.6
+        },
+        "2": {
+          "numerator": 183,
+          "denominator": 228,
+          "percent": 80.26,
+          "ci_low": 74.61,
+          "ci_high": 84.91
+        },
+        "3": {
+          "numerator": 169,
+          "denominator": 228,
+          "percent": 74.12,
+          "ci_low": 68.07,
+          "ci_high": 79.37
+        },
+        "5": {
+          "numerator": 141,
+          "denominator": 228,
+          "percent": 61.84,
+          "ci_low": 55.39,
+          "ci_high": 67.9
+        }
+      },
+      "target_available": 101,
+      "target_achievement": {
+        "numerator": 48,
+        "denominator": 101,
+        "percent": 47.52,
+        "ci_low": 38.06,
+        "ci_high": 57.18
+      },
+      "target_before_failure": {
+        "numerator": 22,
+        "denominator": 101,
+        "percent": 21.78,
+        "ci_low": 14.85,
+        "ci_high": 30.78
+      },
+      "failure_before_target": {
+        "numerator": 68,
+        "denominator": 101,
+        "percent": 67.33,
+        "ci_low": 57.69,
+        "ci_high": 75.69
+      },
+      "same_candle_ambiguous": 5,
+      "unresolved": 6,
+      "median_mfe_zone_width": 6.976,
+      "median_mae_zone_width": 6.2691,
+      "median_mfe_atr": 4.3906,
+      "median_mae_atr": 3.4999,
+      "median_candles_to_interaction": 4.0
+    },
+    "1D": {
+      "detected": 678,
+      "interacted": 508,
+      "never_interacted": 170,
+      "interaction_rate": {
+        "numerator": 508,
+        "denominator": 678,
+        "percent": 74.93,
+        "ci_low": 71.53,
+        "ci_high": 78.04
+      },
+      "structural_survival": {
+        "numerator": 84,
+        "denominator": 508,
+        "percent": 16.54,
+        "ci_low": 13.56,
+        "ci_high": 20.01
+      },
+      "failure": {
+        "numerator": 424,
+        "denominator": 508,
+        "percent": 83.46,
+        "ci_low": 79.99,
+        "ci_high": 86.44
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 488,
+          "denominator": 508,
+          "percent": 96.06,
+          "ci_low": 94.0,
+          "ci_high": 97.44
+        },
+        "1": {
+          "numerator": 448,
+          "denominator": 508,
+          "percent": 88.19,
+          "ci_low": 85.09,
+          "ci_high": 90.71
+        },
+        "2": {
+          "numerator": 360,
+          "denominator": 508,
+          "percent": 70.87,
+          "ci_low": 66.77,
+          "ci_high": 74.65
+        },
+        "3": {
+          "numerator": 304,
+          "denominator": 508,
+          "percent": 59.84,
+          "ci_low": 55.52,
+          "ci_high": 64.02
+        },
+        "5": {
+          "numerator": 226,
+          "denominator": 508,
+          "percent": 44.49,
+          "ci_low": 40.22,
+          "ci_high": 48.83
+        }
+      },
+      "target_available": 177,
+      "target_achievement": {
+        "numerator": 81,
+        "denominator": 177,
+        "percent": 45.76,
+        "ci_low": 38.59,
+        "ci_high": 53.11
+      },
+      "target_before_failure": {
+        "numerator": 32,
+        "denominator": 177,
+        "percent": 18.08,
+        "ci_low": 13.11,
+        "ci_high": 24.41
+      },
+      "failure_before_target": {
+        "numerator": 133,
+        "denominator": 177,
+        "percent": 75.14,
+        "ci_low": 68.29,
+        "ci_high": 80.93
+      },
+      "same_candle_ambiguous": 4,
+      "unresolved": 8,
+      "median_mfe_zone_width": 4.1399,
+      "median_mae_zone_width": 4.353,
+      "median_mfe_atr": 2.5228,
+      "median_mae_atr": 2.6272,
+      "median_candles_to_interaction": 4.0
+    },
+    "1W": {
+      "detected": 312,
+      "interacted": 225,
+      "never_interacted": 87,
+      "interaction_rate": {
+        "numerator": 225,
+        "denominator": 312,
+        "percent": 72.12,
+        "ci_low": 66.89,
+        "ci_high": 76.8
+      },
+      "structural_survival": {
+        "numerator": 61,
+        "denominator": 225,
+        "percent": 27.11,
+        "ci_low": 21.72,
+        "ci_high": 33.27
+      },
+      "failure": {
+        "numerator": 164,
+        "denominator": 225,
+        "percent": 72.89,
+        "ci_low": 66.73,
+        "ci_high": 78.28
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 220,
+          "denominator": 225,
+          "percent": 97.78,
+          "ci_low": 94.9,
+          "ci_high": 99.05
+        },
+        "1": {
+          "numerator": 199,
+          "denominator": 225,
+          "percent": 88.44,
+          "ci_low": 83.61,
+          "ci_high": 91.99
+        },
+        "2": {
+          "numerator": 151,
+          "denominator": 225,
+          "percent": 67.11,
+          "ci_low": 60.73,
+          "ci_high": 72.92
+        },
+        "3": {
+          "numerator": 120,
+          "denominator": 225,
+          "percent": 53.33,
+          "ci_low": 46.81,
+          "ci_high": 59.74
+        },
+        "5": {
+          "numerator": 82,
+          "denominator": 225,
+          "percent": 36.44,
+          "ci_low": 30.43,
+          "ci_high": 42.91
+        }
+      },
+      "target_available": 68,
+      "target_achievement": {
+        "numerator": 37,
+        "denominator": 68,
+        "percent": 54.41,
+        "ci_low": 42.66,
+        "ci_high": 65.7
+      },
+      "target_before_failure": {
+        "numerator": 25,
+        "denominator": 68,
+        "percent": 36.76,
+        "ci_low": 26.3,
+        "ci_high": 48.64
+      },
+      "failure_before_target": {
+        "numerator": 34,
+        "denominator": 68,
+        "percent": 50.0,
+        "ci_low": 38.44,
+        "ci_high": 61.56
+      },
+      "same_candle_ambiguous": 3,
+      "unresolved": 6,
+      "median_mfe_zone_width": 3.3047,
+      "median_mae_zone_width": 2.6279,
+      "median_mfe_atr": 2.3317,
+      "median_mae_atr": 2.0558,
+      "median_candles_to_interaction": 3.0
+    },
+    "75m": {
+      "detected": 185,
+      "interacted": 144,
+      "never_interacted": 41,
+      "interaction_rate": {
+        "numerator": 144,
+        "denominator": 185,
+        "percent": 77.84,
+        "ci_low": 71.32,
+        "ci_high": 83.22
+      },
+      "structural_survival": {
+        "numerator": 23,
+        "denominator": 144,
+        "percent": 15.97,
+        "ci_low": 10.89,
+        "ci_high": 22.83
+      },
+      "failure": {
+        "numerator": 121,
+        "denominator": 144,
+        "percent": 84.03,
+        "ci_low": 77.17,
+        "ci_high": 89.11
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 142,
+          "denominator": 144,
+          "percent": 98.61,
+          "ci_low": 95.08,
+          "ci_high": 99.62
+        },
+        "1": {
+          "numerator": 135,
+          "denominator": 144,
+          "percent": 93.75,
+          "ci_low": 88.55,
+          "ci_high": 96.68
+        },
+        "2": {
+          "numerator": 115,
+          "denominator": 144,
+          "percent": 79.86,
+          "ci_low": 72.57,
+          "ci_high": 85.6
+        },
+        "3": {
+          "numerator": 96,
+          "denominator": 144,
+          "percent": 66.67,
+          "ci_low": 58.62,
+          "ci_high": 73.84
+        },
+        "5": {
+          "numerator": 67,
+          "denominator": 144,
+          "percent": 46.53,
+          "ci_low": 38.58,
+          "ci_high": 54.66
+        }
+      },
+      "target_available": 44,
+      "target_achievement": {
+        "numerator": 20,
+        "denominator": 44,
+        "percent": 45.45,
+        "ci_low": 31.71,
+        "ci_high": 59.93
+      },
+      "target_before_failure": {
+        "numerator": 9,
+        "denominator": 44,
+        "percent": 20.45,
+        "ci_low": 11.15,
+        "ci_high": 34.5
+      },
+      "failure_before_target": {
+        "numerator": 30,
+        "denominator": 44,
+        "percent": 68.18,
+        "ci_low": 53.44,
+        "ci_high": 80.0
+      },
+      "same_candle_ambiguous": 2,
+      "unresolved": 3,
+      "median_mfe_zone_width": 4.5592,
+      "median_mae_zone_width": 3.5416,
+      "median_mfe_atr": 2.3941,
+      "median_mae_atr": 2.0807,
+      "median_candles_to_interaction": 5.0
+    }
+  },
+  "by_zone_type": {
+    "DEMAND": {
+      "detected": 831,
+      "interacted": 607,
+      "never_interacted": 224,
+      "interaction_rate": {
+        "numerator": 607,
+        "denominator": 831,
+        "percent": 73.04,
+        "ci_low": 69.93,
+        "ci_high": 75.95
+      },
+      "structural_survival": {
+        "numerator": 133,
+        "denominator": 607,
+        "percent": 21.91,
+        "ci_low": 18.8,
+        "ci_high": 25.37
+      },
+      "failure": {
+        "numerator": 474,
+        "denominator": 607,
+        "percent": 78.09,
+        "ci_low": 74.63,
+        "ci_high": 81.2
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 590,
+          "denominator": 607,
+          "percent": 97.2,
+          "ci_low": 95.56,
+          "ci_high": 98.24
+        },
+        "1": {
+          "numerator": 553,
+          "denominator": 607,
+          "percent": 91.1,
+          "ci_low": 88.57,
+          "ci_high": 93.12
+        },
+        "2": {
+          "numerator": 463,
+          "denominator": 607,
+          "percent": 76.28,
+          "ci_low": 72.73,
+          "ci_high": 79.49
+        },
+        "3": {
+          "numerator": 405,
+          "denominator": 607,
+          "percent": 66.72,
+          "ci_low": 62.88,
+          "ci_high": 70.35
+        },
+        "5": {
+          "numerator": 315,
+          "denominator": 607,
+          "percent": 51.89,
+          "ci_low": 47.92,
+          "ci_high": 55.84
+        }
+      },
+      "target_available": 161,
+      "target_achievement": {
+        "numerator": 86,
+        "denominator": 161,
+        "percent": 53.42,
+        "ci_low": 45.72,
+        "ci_high": 60.95
+      },
+      "target_before_failure": {
+        "numerator": 42,
+        "denominator": 161,
+        "percent": 26.09,
+        "ci_low": 19.92,
+        "ci_high": 33.37
+      },
+      "failure_before_target": {
+        "numerator": 105,
+        "denominator": 161,
+        "percent": 65.22,
+        "ci_low": 57.58,
+        "ci_high": 72.14
+      },
+      "same_candle_ambiguous": 5,
+      "unresolved": 9,
+      "median_mfe_zone_width": 5.3303,
+      "median_mae_zone_width": 3.5728,
+      "median_mfe_atr": 3.1715,
+      "median_mae_atr": 2.21,
+      "median_candles_to_interaction": 4.0
+    },
+    "SUPPLY": {
+      "detected": 737,
+      "interacted": 578,
+      "never_interacted": 159,
+      "interaction_rate": {
+        "numerator": 578,
+        "denominator": 737,
+        "percent": 78.43,
+        "ci_low": 75.31,
+        "ci_high": 81.24
+      },
+      "structural_survival": {
+        "numerator": 84,
+        "denominator": 578,
+        "percent": 14.53,
+        "ci_low": 11.89,
+        "ci_high": 17.64
+      },
+      "failure": {
+        "numerator": 494,
+        "denominator": 578,
+        "percent": 85.47,
+        "ci_low": 82.36,
+        "ci_high": 88.11
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 557,
+          "denominator": 578,
+          "percent": 96.37,
+          "ci_low": 94.51,
+          "ci_high": 97.61
+        },
+        "1": {
+          "numerator": 509,
+          "denominator": 578,
+          "percent": 88.06,
+          "ci_low": 85.16,
+          "ci_high": 90.46
+        },
+        "2": {
+          "numerator": 399,
+          "denominator": 578,
+          "percent": 69.03,
+          "ci_low": 65.15,
+          "ci_high": 72.66
+        },
+        "3": {
+          "numerator": 323,
+          "denominator": 578,
+          "percent": 55.88,
+          "ci_low": 51.81,
+          "ci_high": 59.88
+        },
+        "5": {
+          "numerator": 226,
+          "denominator": 578,
+          "percent": 39.1,
+          "ci_low": 35.21,
+          "ci_high": 43.14
+        }
+      },
+      "target_available": 246,
+      "target_achievement": {
+        "numerator": 106,
+        "denominator": 246,
+        "percent": 43.09,
+        "ci_low": 37.05,
+        "ci_high": 49.34
+      },
+      "target_before_failure": {
+        "numerator": 48,
+        "denominator": 246,
+        "percent": 19.51,
+        "ci_low": 15.04,
+        "ci_high": 24.92
+      },
+      "failure_before_target": {
+        "numerator": 171,
+        "denominator": 246,
+        "percent": 69.51,
+        "ci_low": 63.5,
+        "ci_high": 74.93
+      },
+      "same_candle_ambiguous": 9,
+      "unresolved": 18,
+      "median_mfe_zone_width": 3.7891,
+      "median_mae_zone_width": 4.6645,
+      "median_mfe_atr": 2.2949,
+      "median_mae_atr": 2.9614,
+      "median_candles_to_interaction": 3.0
+    }
+  },
+  "by_pattern": {
+    "DBD": {
+      "detected": 467,
+      "interacted": 368,
+      "never_interacted": 99,
+      "interaction_rate": {
+        "numerator": 368,
+        "denominator": 467,
+        "percent": 78.8,
+        "ci_low": 74.87,
+        "ci_high": 82.27
+      },
+      "structural_survival": {
+        "numerator": 47,
+        "denominator": 368,
+        "percent": 12.77,
+        "ci_low": 9.74,
+        "ci_high": 16.57
+      },
+      "failure": {
+        "numerator": 321,
+        "denominator": 368,
+        "percent": 87.23,
+        "ci_low": 83.43,
+        "ci_high": 90.26
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 354,
+          "denominator": 368,
+          "percent": 96.2,
+          "ci_low": 93.72,
+          "ci_high": 97.72
+        },
+        "1": {
+          "numerator": 327,
+          "denominator": 368,
+          "percent": 88.86,
+          "ci_low": 85.23,
+          "ci_high": 91.68
+        },
+        "2": {
+          "numerator": 255,
+          "denominator": 368,
+          "percent": 69.29,
+          "ci_low": 64.4,
+          "ci_high": 73.79
+        },
+        "3": {
+          "numerator": 202,
+          "denominator": 368,
+          "percent": 54.89,
+          "ci_low": 49.78,
+          "ci_high": 59.9
+        },
+        "5": {
+          "numerator": 143,
+          "denominator": 368,
+          "percent": 38.86,
+          "ci_low": 34.02,
+          "ci_high": 43.93
+        }
+      },
+      "target_available": 159,
+      "target_achievement": {
+        "numerator": 65,
+        "denominator": 159,
+        "percent": 40.88,
+        "ci_low": 33.54,
+        "ci_high": 48.65
+      },
+      "target_before_failure": {
+        "numerator": 28,
+        "denominator": 159,
+        "percent": 17.61,
+        "ci_low": 12.47,
+        "ci_high": 24.27
+      },
+      "failure_before_target": {
+        "numerator": 115,
+        "denominator": 159,
+        "percent": 72.33,
+        "ci_low": 64.91,
+        "ci_high": 78.69
+      },
+      "same_candle_ambiguous": 4,
+      "unresolved": 12,
+      "median_mfe_zone_width": 3.6487,
+      "median_mae_zone_width": 4.9815,
+      "median_mfe_atr": 2.1855,
+      "median_mae_atr": 3.0014,
+      "median_candles_to_interaction": 3.0
+    },
+    "DBR": {
+      "detected": 393,
+      "interacted": 286,
+      "never_interacted": 107,
+      "interaction_rate": {
+        "numerator": 286,
+        "denominator": 393,
+        "percent": 72.77,
+        "ci_low": 68.17,
+        "ci_high": 76.94
+      },
+      "structural_survival": {
+        "numerator": 64,
+        "denominator": 286,
+        "percent": 22.38,
+        "ci_low": 17.93,
+        "ci_high": 27.56
+      },
+      "failure": {
+        "numerator": 222,
+        "denominator": 286,
+        "percent": 77.62,
+        "ci_low": 72.44,
+        "ci_high": 82.07
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 277,
+          "denominator": 286,
+          "percent": 96.85,
+          "ci_low": 94.13,
+          "ci_high": 98.34
+        },
+        "1": {
+          "numerator": 256,
+          "denominator": 286,
+          "percent": 89.51,
+          "ci_low": 85.42,
+          "ci_high": 92.55
+        },
+        "2": {
+          "numerator": 207,
+          "denominator": 286,
+          "percent": 72.38,
+          "ci_low": 66.92,
+          "ci_high": 77.24
+        },
+        "3": {
+          "numerator": 185,
+          "denominator": 286,
+          "percent": 64.69,
+          "ci_low": 58.98,
+          "ci_high": 70.0
+        },
+        "5": {
+          "numerator": 129,
+          "denominator": 286,
+          "percent": 45.1,
+          "ci_low": 39.44,
+          "ci_high": 50.9
+        }
+      },
+      "target_available": 79,
+      "target_achievement": {
+        "numerator": 38,
+        "denominator": 79,
+        "percent": 48.1,
+        "ci_low": 37.43,
+        "ci_high": 58.95
+      },
+      "target_before_failure": {
+        "numerator": 22,
+        "denominator": 79,
+        "percent": 27.85,
+        "ci_low": 19.17,
+        "ci_high": 38.58
+      },
+      "failure_before_target": {
+        "numerator": 51,
+        "denominator": 79,
+        "percent": 64.56,
+        "ci_low": 53.56,
+        "ci_high": 74.2
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 6,
+      "median_mfe_zone_width": 4.2158,
+      "median_mae_zone_width": 3.6054,
+      "median_mfe_atr": 2.9677,
+      "median_mae_atr": 2.3116,
+      "median_candles_to_interaction": 4.0
+    },
+    "RBD": {
+      "detected": 270,
+      "interacted": 210,
+      "never_interacted": 60,
+      "interaction_rate": {
+        "numerator": 210,
+        "denominator": 270,
+        "percent": 77.78,
+        "ci_low": 72.45,
+        "ci_high": 82.33
+      },
+      "structural_survival": {
+        "numerator": 37,
+        "denominator": 210,
+        "percent": 17.62,
+        "ci_low": 13.06,
+        "ci_high": 23.34
+      },
+      "failure": {
+        "numerator": 173,
+        "denominator": 210,
+        "percent": 82.38,
+        "ci_low": 76.66,
+        "ci_high": 86.94
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 203,
+          "denominator": 210,
+          "percent": 96.67,
+          "ci_low": 93.28,
+          "ci_high": 98.38
+        },
+        "1": {
+          "numerator": 182,
+          "denominator": 210,
+          "percent": 86.67,
+          "ci_low": 81.4,
+          "ci_high": 90.61
+        },
+        "2": {
+          "numerator": 144,
+          "denominator": 210,
+          "percent": 68.57,
+          "ci_low": 62.01,
+          "ci_high": 74.47
+        },
+        "3": {
+          "numerator": 121,
+          "denominator": 210,
+          "percent": 57.62,
+          "ci_low": 50.86,
+          "ci_high": 64.11
+        },
+        "5": {
+          "numerator": 83,
+          "denominator": 210,
+          "percent": 39.52,
+          "ci_low": 33.16,
+          "ci_high": 46.27
+        }
+      },
+      "target_available": 87,
+      "target_achievement": {
+        "numerator": 41,
+        "denominator": 87,
+        "percent": 47.13,
+        "ci_low": 36.98,
+        "ci_high": 57.51
+      },
+      "target_before_failure": {
+        "numerator": 20,
+        "denominator": 87,
+        "percent": 22.99,
+        "ci_low": 15.4,
+        "ci_high": 32.86
+      },
+      "failure_before_target": {
+        "numerator": 56,
+        "denominator": 87,
+        "percent": 64.37,
+        "ci_low": 53.89,
+        "ci_high": 73.63
+      },
+      "same_candle_ambiguous": 5,
+      "unresolved": 6,
+      "median_mfe_zone_width": 3.9649,
+      "median_mae_zone_width": 4.2088,
+      "median_mfe_atr": 2.3317,
+      "median_mae_atr": 2.8599,
+      "median_candles_to_interaction": 4.0
+    },
+    "RBR": {
+      "detected": 438,
+      "interacted": 321,
+      "never_interacted": 117,
+      "interaction_rate": {
+        "numerator": 321,
+        "denominator": 438,
+        "percent": 73.29,
+        "ci_low": 68.95,
+        "ci_high": 77.22
+      },
+      "structural_survival": {
+        "numerator": 69,
+        "denominator": 321,
+        "percent": 21.5,
+        "ci_low": 17.35,
+        "ci_high": 26.31
+      },
+      "failure": {
+        "numerator": 252,
+        "denominator": 321,
+        "percent": 78.5,
+        "ci_low": 73.69,
+        "ci_high": 82.65
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 313,
+          "denominator": 321,
+          "percent": 97.51,
+          "ci_low": 95.16,
+          "ci_high": 98.73
+        },
+        "1": {
+          "numerator": 297,
+          "denominator": 321,
+          "percent": 92.52,
+          "ci_low": 89.12,
+          "ci_high": 94.92
+        },
+        "2": {
+          "numerator": 256,
+          "denominator": 321,
+          "percent": 79.75,
+          "ci_low": 75.01,
+          "ci_high": 83.78
+        },
+        "3": {
+          "numerator": 220,
+          "denominator": 321,
+          "percent": 68.54,
+          "ci_low": 63.26,
+          "ci_high": 73.37
+        },
+        "5": {
+          "numerator": 186,
+          "denominator": 321,
+          "percent": 57.94,
+          "ci_low": 52.48,
+          "ci_high": 63.22
+        }
+      },
+      "target_available": 82,
+      "target_achievement": {
+        "numerator": 48,
+        "denominator": 82,
+        "percent": 58.54,
+        "ci_low": 47.73,
+        "ci_high": 68.58
+      },
+      "target_before_failure": {
+        "numerator": 20,
+        "denominator": 82,
+        "percent": 24.39,
+        "ci_low": 16.38,
+        "ci_high": 34.69
+      },
+      "failure_before_target": {
+        "numerator": 54,
+        "denominator": 82,
+        "percent": 65.85,
+        "ci_low": 55.09,
+        "ci_high": 75.2
+      },
+      "same_candle_ambiguous": 5,
+      "unresolved": 3,
+      "median_mfe_zone_width": 6.09,
+      "median_mae_zone_width": 3.5591,
+      "median_mfe_atr": 3.4125,
+      "median_mae_atr": 2.0633,
+      "median_candles_to_interaction": 4.0
+    }
+  },
+  "by_lifecycle": {
+    "FORMING": {
+      "detected": 1568,
+      "interacted": 1185,
+      "never_interacted": 383,
+      "interaction_rate": {
+        "numerator": 1185,
+        "denominator": 1568,
+        "percent": 75.57,
+        "ci_low": 73.39,
+        "ci_high": 77.64
+      },
+      "structural_survival": {
+        "numerator": 217,
+        "denominator": 1185,
+        "percent": 18.31,
+        "ci_low": 16.21,
+        "ci_high": 20.62
+      },
+      "failure": {
+        "numerator": 968,
+        "denominator": 1185,
+        "percent": 81.69,
+        "ci_low": 79.38,
+        "ci_high": 83.79
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 1147,
+          "denominator": 1185,
+          "percent": 96.79,
+          "ci_low": 95.63,
+          "ci_high": 97.65
+        },
+        "1": {
+          "numerator": 1062,
+          "denominator": 1185,
+          "percent": 89.62,
+          "ci_low": 87.75,
+          "ci_high": 91.23
+        },
+        "2": {
+          "numerator": 862,
+          "denominator": 1185,
+          "percent": 72.74,
+          "ci_low": 70.14,
+          "ci_high": 75.2
+        },
+        "3": {
+          "numerator": 728,
+          "denominator": 1185,
+          "percent": 61.43,
+          "ci_low": 58.63,
+          "ci_high": 64.16
+        },
+        "5": {
+          "numerator": 541,
+          "denominator": 1185,
+          "percent": 45.65,
+          "ci_low": 42.84,
+          "ci_high": 48.5
+        }
+      },
+      "target_available": 407,
+      "target_achievement": {
+        "numerator": 192,
+        "denominator": 407,
+        "percent": 47.17,
+        "ci_low": 42.37,
+        "ci_high": 52.03
+      },
+      "target_before_failure": {
+        "numerator": 90,
+        "denominator": 407,
+        "percent": 22.11,
+        "ci_low": 18.35,
+        "ci_high": 26.4
+      },
+      "failure_before_target": {
+        "numerator": 276,
+        "denominator": 407,
+        "percent": 67.81,
+        "ci_low": 63.13,
+        "ci_high": 72.17
+      },
+      "same_candle_ambiguous": 14,
+      "unresolved": 27,
+      "median_mfe_zone_width": 4.2979,
+      "median_mae_zone_width": 3.8982,
+      "median_mfe_atr": 2.7238,
+      "median_mae_atr": 2.4385,
+      "median_candles_to_interaction": 4.0
+    }
+  },
+  "by_year": {
+    "2021": {
+      "detected": 54,
+      "interacted": 50,
+      "never_interacted": 4,
+      "interaction_rate": {
+        "numerator": 50,
+        "denominator": 54,
+        "percent": 92.59,
+        "ci_low": 82.45,
+        "ci_high": 97.08
+      },
+      "structural_survival": {
+        "numerator": 10,
+        "denominator": 50,
+        "percent": 20.0,
+        "ci_low": 11.24,
+        "ci_high": 33.04
+      },
+      "failure": {
+        "numerator": 40,
+        "denominator": 50,
+        "percent": 80.0,
+        "ci_low": 66.96,
+        "ci_high": 88.76
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 50,
+          "denominator": 50,
+          "percent": 100.0,
+          "ci_low": 92.87,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 50,
+          "denominator": 50,
+          "percent": 100.0,
+          "ci_low": 92.87,
+          "ci_high": 100.0
+        },
+        "2": {
+          "numerator": 46,
+          "denominator": 50,
+          "percent": 92.0,
+          "ci_low": 81.16,
+          "ci_high": 96.85
+        },
+        "3": {
+          "numerator": 43,
+          "denominator": 50,
+          "percent": 86.0,
+          "ci_low": 73.81,
+          "ci_high": 93.05
+        },
+        "5": {
+          "numerator": 36,
+          "denominator": 50,
+          "percent": 72.0,
+          "ci_low": 58.33,
+          "ci_high": 82.53
+        }
+      },
+      "target_available": 7,
+      "target_achievement": {
+        "numerator": 6,
+        "denominator": 7,
+        "percent": 85.71,
+        "ci_low": 48.69,
+        "ci_high": 97.43
+      },
+      "target_before_failure": {
+        "numerator": 3,
+        "denominator": 7,
+        "percent": 42.86,
+        "ci_low": 15.82,
+        "ci_high": 74.95
+      },
+      "failure_before_target": {
+        "numerator": 3,
+        "denominator": 7,
+        "percent": 42.86,
+        "ci_low": 15.82,
+        "ci_high": 74.95
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 0,
+      "median_mfe_zone_width": 6.6882,
+      "median_mae_zone_width": 3.9103,
+      "median_mfe_atr": 3.5114,
+      "median_mae_atr": 2.9818,
+      "median_candles_to_interaction": 7.5
+    },
+    "2022": {
+      "detected": 119,
+      "interacted": 106,
+      "never_interacted": 13,
+      "interaction_rate": {
+        "numerator": 106,
+        "denominator": 119,
+        "percent": 89.08,
+        "ci_low": 82.2,
+        "ci_high": 93.5
+      },
+      "structural_survival": {
+        "numerator": 11,
+        "denominator": 106,
+        "percent": 10.38,
+        "ci_low": 5.89,
+        "ci_high": 17.63
+      },
+      "failure": {
+        "numerator": 95,
+        "denominator": 106,
+        "percent": 89.62,
+        "ci_low": 82.37,
+        "ci_high": 94.11
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 103,
+          "denominator": 106,
+          "percent": 97.17,
+          "ci_low": 92.01,
+          "ci_high": 99.03
+        },
+        "1": {
+          "numerator": 97,
+          "denominator": 106,
+          "percent": 91.51,
+          "ci_low": 84.65,
+          "ci_high": 95.47
+        },
+        "2": {
+          "numerator": 79,
+          "denominator": 106,
+          "percent": 74.53,
+          "ci_low": 65.48,
+          "ci_high": 81.86
+        },
+        "3": {
+          "numerator": 69,
+          "denominator": 106,
+          "percent": 65.09,
+          "ci_low": 55.64,
+          "ci_high": 73.5
+        },
+        "5": {
+          "numerator": 51,
+          "denominator": 106,
+          "percent": 48.11,
+          "ci_low": 38.84,
+          "ci_high": 57.52
+        }
+      },
+      "target_available": 42,
+      "target_achievement": {
+        "numerator": 23,
+        "denominator": 42,
+        "percent": 54.76,
+        "ci_low": 39.95,
+        "ci_high": 68.78
+      },
+      "target_before_failure": {
+        "numerator": 10,
+        "denominator": 42,
+        "percent": 23.81,
+        "ci_low": 13.48,
+        "ci_high": 38.53
+      },
+      "failure_before_target": {
+        "numerator": 32,
+        "denominator": 42,
+        "percent": 76.19,
+        "ci_low": 61.47,
+        "ci_high": 86.52
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 0,
+      "median_mfe_zone_width": 4.6632,
+      "median_mae_zone_width": 5.0726,
+      "median_mfe_atr": 3.2566,
+      "median_mae_atr": 2.7493,
+      "median_candles_to_interaction": 5.0
+    },
+    "2023": {
+      "detected": 118,
+      "interacted": 98,
+      "never_interacted": 20,
+      "interaction_rate": {
+        "numerator": 98,
+        "denominator": 118,
+        "percent": 83.05,
+        "ci_low": 75.27,
+        "ci_high": 88.75
+      },
+      "structural_survival": {
+        "numerator": 19,
+        "denominator": 98,
+        "percent": 19.39,
+        "ci_low": 12.78,
+        "ci_high": 28.31
+      },
+      "failure": {
+        "numerator": 79,
+        "denominator": 98,
+        "percent": 80.61,
+        "ci_low": 71.69,
+        "ci_high": 87.22
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 95,
+          "denominator": 98,
+          "percent": 96.94,
+          "ci_low": 91.38,
+          "ci_high": 98.95
+        },
+        "1": {
+          "numerator": 89,
+          "denominator": 98,
+          "percent": 90.82,
+          "ci_low": 83.46,
+          "ci_high": 95.09
+        },
+        "2": {
+          "numerator": 78,
+          "denominator": 98,
+          "percent": 79.59,
+          "ci_low": 70.57,
+          "ci_high": 86.38
+        },
+        "3": {
+          "numerator": 67,
+          "denominator": 98,
+          "percent": 68.37,
+          "ci_low": 58.62,
+          "ci_high": 76.73
+        },
+        "5": {
+          "numerator": 53,
+          "denominator": 98,
+          "percent": 54.08,
+          "ci_low": 44.25,
+          "ci_high": 63.61
+        }
+      },
+      "target_available": 39,
+      "target_achievement": {
+        "numerator": 26,
+        "denominator": 39,
+        "percent": 66.67,
+        "ci_low": 50.98,
+        "ci_high": 79.37
+      },
+      "target_before_failure": {
+        "numerator": 18,
+        "denominator": 39,
+        "percent": 46.15,
+        "ci_low": 31.57,
+        "ci_high": 61.43
+      },
+      "failure_before_target": {
+        "numerator": 20,
+        "denominator": 39,
+        "percent": 51.28,
+        "ci_low": 36.2,
+        "ci_high": 66.13
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 0,
+      "median_mfe_zone_width": 6.7262,
+      "median_mae_zone_width": 5.0883,
+      "median_mfe_atr": 4.5355,
+      "median_mae_atr": 3.1441,
+      "median_candles_to_interaction": 4.0
+    },
+    "2024": {
+      "detected": 115,
+      "interacted": 90,
+      "never_interacted": 25,
+      "interaction_rate": {
+        "numerator": 90,
+        "denominator": 115,
+        "percent": 78.26,
+        "ci_low": 69.88,
+        "ci_high": 84.82
+      },
+      "structural_survival": {
+        "numerator": 14,
+        "denominator": 90,
+        "percent": 15.56,
+        "ci_low": 9.5,
+        "ci_high": 24.43
+      },
+      "failure": {
+        "numerator": 76,
+        "denominator": 90,
+        "percent": 84.44,
+        "ci_low": 75.57,
+        "ci_high": 90.5
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 89,
+          "denominator": 90,
+          "percent": 98.89,
+          "ci_low": 93.97,
+          "ci_high": 99.8
+        },
+        "1": {
+          "numerator": 86,
+          "denominator": 90,
+          "percent": 95.56,
+          "ci_low": 89.12,
+          "ci_high": 98.26
+        },
+        "2": {
+          "numerator": 64,
+          "denominator": 90,
+          "percent": 71.11,
+          "ci_low": 61.04,
+          "ci_high": 79.46
+        },
+        "3": {
+          "numerator": 55,
+          "denominator": 90,
+          "percent": 61.11,
+          "ci_low": 50.78,
+          "ci_high": 70.53
+        },
+        "5": {
+          "numerator": 42,
+          "denominator": 90,
+          "percent": 46.67,
+          "ci_low": 36.71,
+          "ci_high": 56.9
+        }
+      },
+      "target_available": 45,
+      "target_achievement": {
+        "numerator": 13,
+        "denominator": 45,
+        "percent": 28.89,
+        "ci_low": 17.73,
+        "ci_high": 43.37
+      },
+      "target_before_failure": {
+        "numerator": 4,
+        "denominator": 45,
+        "percent": 8.89,
+        "ci_low": 3.51,
+        "ci_high": 20.73
+      },
+      "failure_before_target": {
+        "numerator": 38,
+        "denominator": 45,
+        "percent": 84.44,
+        "ci_low": 71.22,
+        "ci_high": 92.25
+      },
+      "same_candle_ambiguous": 2,
+      "unresolved": 1,
+      "median_mfe_zone_width": 4.4029,
+      "median_mae_zone_width": 5.4277,
+      "median_mfe_atr": 2.6905,
+      "median_mae_atr": 3.5614,
+      "median_candles_to_interaction": 4.0
+    },
+    "2025": {
+      "detected": 300,
+      "interacted": 213,
+      "never_interacted": 87,
+      "interaction_rate": {
+        "numerator": 213,
+        "denominator": 300,
+        "percent": 71.0,
+        "ci_low": 65.63,
+        "ci_high": 75.84
+      },
+      "structural_survival": {
+        "numerator": 36,
+        "denominator": 213,
+        "percent": 16.9,
+        "ci_low": 12.47,
+        "ci_high": 22.51
+      },
+      "failure": {
+        "numerator": 177,
+        "denominator": 213,
+        "percent": 83.1,
+        "ci_low": 77.49,
+        "ci_high": 87.53
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 209,
+          "denominator": 213,
+          "percent": 98.12,
+          "ci_low": 95.27,
+          "ci_high": 99.27
+        },
+        "1": {
+          "numerator": 191,
+          "denominator": 213,
+          "percent": 89.67,
+          "ci_low": 84.86,
+          "ci_high": 93.08
+        },
+        "2": {
+          "numerator": 149,
+          "denominator": 213,
+          "percent": 69.95,
+          "ci_low": 63.49,
+          "ci_high": 75.71
+        },
+        "3": {
+          "numerator": 122,
+          "denominator": 213,
+          "percent": 57.28,
+          "ci_low": 50.56,
+          "ci_high": 63.73
+        },
+        "5": {
+          "numerator": 87,
+          "denominator": 213,
+          "percent": 40.85,
+          "ci_low": 34.46,
+          "ci_high": 47.55
+        }
+      },
+      "target_available": 83,
+      "target_achievement": {
+        "numerator": 40,
+        "denominator": 83,
+        "percent": 48.19,
+        "ci_low": 37.76,
+        "ci_high": 58.78
+      },
+      "target_before_failure": {
+        "numerator": 15,
+        "denominator": 83,
+        "percent": 18.07,
+        "ci_low": 11.27,
+        "ci_high": 27.7
+      },
+      "failure_before_target": {
+        "numerator": 57,
+        "denominator": 83,
+        "percent": 68.67,
+        "ci_low": 58.06,
+        "ci_high": 77.64
+      },
+      "same_candle_ambiguous": 2,
+      "unresolved": 9,
+      "median_mfe_zone_width": 3.8007,
+      "median_mae_zone_width": 3.4457,
+      "median_mfe_atr": 2.3946,
+      "median_mae_atr": 2.2825,
+      "median_candles_to_interaction": 4.0
+    },
+    "2026": {
+      "detected": 862,
+      "interacted": 628,
+      "never_interacted": 234,
+      "interaction_rate": {
+        "numerator": 628,
+        "denominator": 862,
+        "percent": 72.85,
+        "ci_low": 69.79,
+        "ci_high": 75.72
+      },
+      "structural_survival": {
+        "numerator": 127,
+        "denominator": 628,
+        "percent": 20.22,
+        "ci_low": 17.27,
+        "ci_high": 23.54
+      },
+      "failure": {
+        "numerator": 501,
+        "denominator": 628,
+        "percent": 79.78,
+        "ci_low": 76.46,
+        "ci_high": 82.73
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 601,
+          "denominator": 628,
+          "percent": 95.7,
+          "ci_low": 93.82,
+          "ci_high": 97.03
+        },
+        "1": {
+          "numerator": 549,
+          "denominator": 628,
+          "percent": 87.42,
+          "ci_low": 84.6,
+          "ci_high": 89.79
+        },
+        "2": {
+          "numerator": 446,
+          "denominator": 628,
+          "percent": 71.02,
+          "ci_low": 67.35,
+          "ci_high": 74.43
+        },
+        "3": {
+          "numerator": 372,
+          "denominator": 628,
+          "percent": 59.24,
+          "ci_low": 55.35,
+          "ci_high": 63.01
+        },
+        "5": {
+          "numerator": 272,
+          "denominator": 628,
+          "percent": 43.31,
+          "ci_low": 39.49,
+          "ci_high": 47.22
+        }
+      },
+      "target_available": 191,
+      "target_achievement": {
+        "numerator": 84,
+        "denominator": 191,
+        "percent": 43.98,
+        "ci_low": 37.13,
+        "ci_high": 51.07
+      },
+      "target_before_failure": {
+        "numerator": 40,
+        "denominator": 191,
+        "percent": 20.94,
+        "ci_low": 15.77,
+        "ci_high": 27.26
+      },
+      "failure_before_target": {
+        "numerator": 126,
+        "denominator": 191,
+        "percent": 65.97,
+        "ci_low": 58.99,
+        "ci_high": 72.31
+      },
+      "same_candle_ambiguous": 8,
+      "unresolved": 17,
+      "median_mfe_zone_width": 4.0093,
+      "median_mae_zone_width": 3.4289,
+      "median_mfe_atr": 2.4695,
+      "median_mae_atr": 2.2697,
+      "median_candles_to_interaction": 3.0
+    }
+  },
+  "by_symbol": {
+    "360ONE": {
+      "detected": 64,
+      "interacted": 56,
+      "never_interacted": 8,
+      "interaction_rate": {
+        "numerator": 56,
+        "denominator": 64,
+        "percent": 87.5,
+        "ci_low": 77.23,
+        "ci_high": 93.53
+      },
+      "structural_survival": {
+        "numerator": 12,
+        "denominator": 56,
+        "percent": 21.43,
+        "ci_low": 12.71,
+        "ci_high": 33.82
+      },
+      "failure": {
+        "numerator": 44,
+        "denominator": 56,
+        "percent": 78.57,
+        "ci_low": 66.18,
+        "ci_high": 87.29
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 51,
+          "denominator": 56,
+          "percent": 91.07,
+          "ci_low": 80.74,
+          "ci_high": 96.13
+        },
+        "1": {
+          "numerator": 47,
+          "denominator": 56,
+          "percent": 83.93,
+          "ci_low": 72.19,
+          "ci_high": 91.31
+        },
+        "2": {
+          "numerator": 39,
+          "denominator": 56,
+          "percent": 69.64,
+          "ci_low": 56.66,
+          "ci_high": 80.1
+        },
+        "3": {
+          "numerator": 31,
+          "denominator": 56,
+          "percent": 55.36,
+          "ci_low": 42.41,
+          "ci_high": 67.61
+        },
+        "5": {
+          "numerator": 21,
+          "denominator": 56,
+          "percent": 37.5,
+          "ci_low": 26.01,
+          "ci_high": 50.59
+        }
+      },
+      "target_available": 11,
+      "target_achievement": {
+        "numerator": 6,
+        "denominator": 11,
+        "percent": 54.55,
+        "ci_low": 28.01,
+        "ci_high": 78.73
+      },
+      "target_before_failure": {
+        "numerator": 5,
+        "denominator": 11,
+        "percent": 45.45,
+        "ci_low": 21.27,
+        "ci_high": 71.99
+      },
+      "failure_before_target": {
+        "numerator": 6,
+        "denominator": 11,
+        "percent": 54.55,
+        "ci_low": 28.01,
+        "ci_high": 78.73
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 0,
+      "median_mfe_zone_width": 3.3956,
+      "median_mae_zone_width": 2.8432,
+      "median_mfe_atr": 2.3381,
+      "median_mae_atr": 2.1674,
+      "median_candles_to_interaction": 3.0
+    },
+    "ALKEM": {
+      "detected": 48,
+      "interacted": 40,
+      "never_interacted": 8,
+      "interaction_rate": {
+        "numerator": 40,
+        "denominator": 48,
+        "percent": 83.33,
+        "ci_low": 70.42,
+        "ci_high": 91.3
+      },
+      "structural_survival": {
+        "numerator": 6,
+        "denominator": 40,
+        "percent": 15.0,
+        "ci_low": 7.06,
+        "ci_high": 29.07
+      },
+      "failure": {
+        "numerator": 34,
+        "denominator": 40,
+        "percent": 85.0,
+        "ci_low": 70.93,
+        "ci_high": 92.94
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 39,
+          "denominator": 40,
+          "percent": 97.5,
+          "ci_low": 87.12,
+          "ci_high": 99.56
+        },
+        "1": {
+          "numerator": 37,
+          "denominator": 40,
+          "percent": 92.5,
+          "ci_low": 80.14,
+          "ci_high": 97.42
+        },
+        "2": {
+          "numerator": 31,
+          "denominator": 40,
+          "percent": 77.5,
+          "ci_low": 62.5,
+          "ci_high": 87.68
+        },
+        "3": {
+          "numerator": 28,
+          "denominator": 40,
+          "percent": 70.0,
+          "ci_low": 54.57,
+          "ci_high": 81.93
+        },
+        "5": {
+          "numerator": 24,
+          "denominator": 40,
+          "percent": 60.0,
+          "ci_low": 44.6,
+          "ci_high": 73.65
+        }
+      },
+      "target_available": 15,
+      "target_achievement": {
+        "numerator": 7,
+        "denominator": 15,
+        "percent": 46.67,
+        "ci_low": 24.81,
+        "ci_high": 69.88
+      },
+      "target_before_failure": {
+        "numerator": 4,
+        "denominator": 15,
+        "percent": 26.67,
+        "ci_low": 10.9,
+        "ci_high": 51.95
+      },
+      "failure_before_target": {
+        "numerator": 11,
+        "denominator": 15,
+        "percent": 73.33,
+        "ci_low": 48.05,
+        "ci_high": 89.1
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 0,
+      "median_mfe_zone_width": 6.3213,
+      "median_mae_zone_width": 3.5414,
+      "median_mfe_atr": 4.0439,
+      "median_mae_atr": 2.1428,
+      "median_candles_to_interaction": 3.0
+    },
+    "AUBANK": {
+      "detected": 61,
+      "interacted": 44,
+      "never_interacted": 17,
+      "interaction_rate": {
+        "numerator": 44,
+        "denominator": 61,
+        "percent": 72.13,
+        "ci_low": 59.83,
+        "ci_high": 81.81
+      },
+      "structural_survival": {
+        "numerator": 8,
+        "denominator": 44,
+        "percent": 18.18,
+        "ci_low": 9.51,
+        "ci_high": 31.96
+      },
+      "failure": {
+        "numerator": 36,
+        "denominator": 44,
+        "percent": 81.82,
+        "ci_low": 68.04,
+        "ci_high": 90.49
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 40,
+          "denominator": 44,
+          "percent": 90.91,
+          "ci_low": 78.84,
+          "ci_high": 96.41
+        },
+        "1": {
+          "numerator": 39,
+          "denominator": 44,
+          "percent": 88.64,
+          "ci_low": 76.02,
+          "ci_high": 95.05
+        },
+        "2": {
+          "numerator": 33,
+          "denominator": 44,
+          "percent": 75.0,
+          "ci_low": 60.56,
+          "ci_high": 85.43
+        },
+        "3": {
+          "numerator": 29,
+          "denominator": 44,
+          "percent": 65.91,
+          "ci_low": 51.14,
+          "ci_high": 78.12
+        },
+        "5": {
+          "numerator": 21,
+          "denominator": 44,
+          "percent": 47.73,
+          "ci_low": 33.75,
+          "ci_high": 62.06
+        }
+      },
+      "target_available": 12,
+      "target_achievement": {
+        "numerator": 5,
+        "denominator": 12,
+        "percent": 41.67,
+        "ci_low": 19.33,
+        "ci_high": 68.05
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 12,
+        "percent": 16.67,
+        "ci_low": 4.7,
+        "ci_high": 44.8
+      },
+      "failure_before_target": {
+        "numerator": 10,
+        "denominator": 12,
+        "percent": 83.33,
+        "ci_low": 55.2,
+        "ci_high": 95.3
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 0,
+      "median_mfe_zone_width": 4.9327,
+      "median_mae_zone_width": 3.1527,
+      "median_mfe_atr": 2.9752,
+      "median_mae_atr": 1.5517,
+      "median_candles_to_interaction": 5.0
+    },
+    "BAJFINANCE": {
+      "detected": 51,
+      "interacted": 39,
+      "never_interacted": 12,
+      "interaction_rate": {
+        "numerator": 39,
+        "denominator": 51,
+        "percent": 76.47,
+        "ci_low": 63.24,
+        "ci_high": 86.0
+      },
+      "structural_survival": {
+        "numerator": 11,
+        "denominator": 39,
+        "percent": 28.21,
+        "ci_low": 16.54,
+        "ci_high": 43.78
+      },
+      "failure": {
+        "numerator": 28,
+        "denominator": 39,
+        "percent": 71.79,
+        "ci_low": 56.22,
+        "ci_high": 83.46
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 39,
+          "denominator": 39,
+          "percent": 100.0,
+          "ci_low": 91.03,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 36,
+          "denominator": 39,
+          "percent": 92.31,
+          "ci_low": 79.68,
+          "ci_high": 97.35
+        },
+        "2": {
+          "numerator": 25,
+          "denominator": 39,
+          "percent": 64.1,
+          "ci_low": 48.42,
+          "ci_high": 77.26
+        },
+        "3": {
+          "numerator": 18,
+          "denominator": 39,
+          "percent": 46.15,
+          "ci_low": 31.57,
+          "ci_high": 61.43
+        },
+        "5": {
+          "numerator": 15,
+          "denominator": 39,
+          "percent": 38.46,
+          "ci_low": 24.89,
+          "ci_high": 54.1
+        }
+      },
+      "target_available": 13,
+      "target_achievement": {
+        "numerator": 6,
+        "denominator": 13,
+        "percent": 46.15,
+        "ci_low": 23.21,
+        "ci_high": 70.86
+      },
+      "target_before_failure": {
+        "numerator": 5,
+        "denominator": 13,
+        "percent": 38.46,
+        "ci_low": 17.71,
+        "ci_high": 64.48
+      },
+      "failure_before_target": {
+        "numerator": 6,
+        "denominator": 13,
+        "percent": 46.15,
+        "ci_low": 23.21,
+        "ci_high": 70.86
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 2,
+      "median_mfe_zone_width": 2.9344,
+      "median_mae_zone_width": 4.1972,
+      "median_mfe_atr": 2.3137,
+      "median_mae_atr": 1.5532,
+      "median_candles_to_interaction": 5.0
+    },
+    "BSOFT": {
+      "detected": 54,
+      "interacted": 34,
+      "never_interacted": 20,
+      "interaction_rate": {
+        "numerator": 34,
+        "denominator": 54,
+        "percent": 62.96,
+        "ci_low": 49.63,
+        "ci_high": 74.58
+      },
+      "structural_survival": {
+        "numerator": 7,
+        "denominator": 34,
+        "percent": 20.59,
+        "ci_low": 10.35,
+        "ci_high": 36.8
+      },
+      "failure": {
+        "numerator": 27,
+        "denominator": 34,
+        "percent": 79.41,
+        "ci_low": 63.2,
+        "ci_high": 89.65
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 33,
+          "denominator": 34,
+          "percent": 97.06,
+          "ci_low": 85.08,
+          "ci_high": 99.48
+        },
+        "1": {
+          "numerator": 31,
+          "denominator": 34,
+          "percent": 91.18,
+          "ci_low": 77.04,
+          "ci_high": 96.95
+        },
+        "2": {
+          "numerator": 23,
+          "denominator": 34,
+          "percent": 67.65,
+          "ci_low": 50.84,
+          "ci_high": 80.87
+        },
+        "3": {
+          "numerator": 19,
+          "denominator": 34,
+          "percent": 55.88,
+          "ci_low": 39.45,
+          "ci_high": 71.12
+        },
+        "5": {
+          "numerator": 10,
+          "denominator": 34,
+          "percent": 29.41,
+          "ci_low": 16.83,
+          "ci_high": 46.17
+        }
+      },
+      "target_available": 13,
+      "target_achievement": {
+        "numerator": 5,
+        "denominator": 13,
+        "percent": 38.46,
+        "ci_low": 17.71,
+        "ci_high": 64.48
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 13,
+        "percent": 15.38,
+        "ci_low": 4.33,
+        "ci_high": 42.23
+      },
+      "failure_before_target": {
+        "numerator": 8,
+        "denominator": 13,
+        "percent": 61.54,
+        "ci_low": 35.52,
+        "ci_high": 82.29
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 2,
+      "median_mfe_zone_width": 3.3526,
+      "median_mae_zone_width": 4.9292,
+      "median_mfe_atr": 2.0213,
+      "median_mae_atr": 3.095,
+      "median_candles_to_interaction": 6.0
+    },
+    "COHANCE": {
+      "detected": 51,
+      "interacted": 36,
+      "never_interacted": 15,
+      "interaction_rate": {
+        "numerator": 36,
+        "denominator": 51,
+        "percent": 70.59,
+        "ci_low": 57.0,
+        "ci_high": 81.29
+      },
+      "structural_survival": {
+        "numerator": 6,
+        "denominator": 36,
+        "percent": 16.67,
+        "ci_low": 7.87,
+        "ci_high": 31.89
+      },
+      "failure": {
+        "numerator": 30,
+        "denominator": 36,
+        "percent": 83.33,
+        "ci_low": 68.11,
+        "ci_high": 92.13
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 36,
+          "denominator": 36,
+          "percent": 100.0,
+          "ci_low": 90.36,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 33,
+          "denominator": 36,
+          "percent": 91.67,
+          "ci_low": 78.17,
+          "ci_high": 97.13
+        },
+        "2": {
+          "numerator": 28,
+          "denominator": 36,
+          "percent": 77.78,
+          "ci_low": 61.92,
+          "ci_high": 88.28
+        },
+        "3": {
+          "numerator": 26,
+          "denominator": 36,
+          "percent": 72.22,
+          "ci_low": 56.01,
+          "ci_high": 84.15
+        },
+        "5": {
+          "numerator": 19,
+          "denominator": 36,
+          "percent": 52.78,
+          "ci_low": 37.01,
+          "ci_high": 68.01
+        }
+      },
+      "target_available": 11,
+      "target_achievement": {
+        "numerator": 6,
+        "denominator": 11,
+        "percent": 54.55,
+        "ci_low": 28.01,
+        "ci_high": 78.73
+      },
+      "target_before_failure": {
+        "numerator": 4,
+        "denominator": 11,
+        "percent": 36.36,
+        "ci_low": 15.17,
+        "ci_high": 64.62
+      },
+      "failure_before_target": {
+        "numerator": 7,
+        "denominator": 11,
+        "percent": 63.64,
+        "ci_low": 35.38,
+        "ci_high": 84.83
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 0,
+      "median_mfe_zone_width": 5.6148,
+      "median_mae_zone_width": 4.0233,
+      "median_mfe_atr": 3.8127,
+      "median_mae_atr": 2.3732,
+      "median_candles_to_interaction": 3.0
+    },
+    "EIHOTEL": {
+      "detected": 45,
+      "interacted": 36,
+      "never_interacted": 9,
+      "interaction_rate": {
+        "numerator": 36,
+        "denominator": 45,
+        "percent": 80.0,
+        "ci_low": 66.18,
+        "ci_high": 89.1
+      },
+      "structural_survival": {
+        "numerator": 9,
+        "denominator": 36,
+        "percent": 25.0,
+        "ci_low": 13.75,
+        "ci_high": 41.07
+      },
+      "failure": {
+        "numerator": 27,
+        "denominator": 36,
+        "percent": 75.0,
+        "ci_low": 58.93,
+        "ci_high": 86.25
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 33,
+          "denominator": 36,
+          "percent": 91.67,
+          "ci_low": 78.17,
+          "ci_high": 97.13
+        },
+        "1": {
+          "numerator": 27,
+          "denominator": 36,
+          "percent": 75.0,
+          "ci_low": 58.93,
+          "ci_high": 86.25
+        },
+        "2": {
+          "numerator": 22,
+          "denominator": 36,
+          "percent": 61.11,
+          "ci_low": 44.86,
+          "ci_high": 75.22
+        },
+        "3": {
+          "numerator": 16,
+          "denominator": 36,
+          "percent": 44.44,
+          "ci_low": 29.54,
+          "ci_high": 60.42
+        },
+        "5": {
+          "numerator": 10,
+          "denominator": 36,
+          "percent": 27.78,
+          "ci_low": 15.85,
+          "ci_high": 43.99
+        }
+      },
+      "target_available": 7,
+      "target_achievement": {
+        "numerator": 2,
+        "denominator": 7,
+        "percent": 28.57,
+        "ci_low": 8.22,
+        "ci_high": 64.11
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 7,
+        "percent": 28.57,
+        "ci_low": 8.22,
+        "ci_high": 64.11
+      },
+      "failure_before_target": {
+        "numerator": 4,
+        "denominator": 7,
+        "percent": 57.14,
+        "ci_low": 25.05,
+        "ci_high": 84.18
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 1,
+      "median_mfe_zone_width": 2.6424,
+      "median_mae_zone_width": 4.7022,
+      "median_mfe_atr": 1.8364,
+      "median_mae_atr": 3.0233,
+      "median_candles_to_interaction": 3.0
+    },
+    "GLAXO": {
+      "detected": 54,
+      "interacted": 36,
+      "never_interacted": 18,
+      "interaction_rate": {
+        "numerator": 36,
+        "denominator": 54,
+        "percent": 66.67,
+        "ci_low": 53.36,
+        "ci_high": 77.76
+      },
+      "structural_survival": {
+        "numerator": 5,
+        "denominator": 36,
+        "percent": 13.89,
+        "ci_low": 6.08,
+        "ci_high": 28.66
+      },
+      "failure": {
+        "numerator": 31,
+        "denominator": 36,
+        "percent": 86.11,
+        "ci_low": 71.34,
+        "ci_high": 93.92
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 36,
+          "denominator": 36,
+          "percent": 100.0,
+          "ci_low": 90.36,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 36,
+          "denominator": 36,
+          "percent": 100.0,
+          "ci_low": 90.36,
+          "ci_high": 100.0
+        },
+        "2": {
+          "numerator": 32,
+          "denominator": 36,
+          "percent": 88.89,
+          "ci_low": 74.69,
+          "ci_high": 95.59
+        },
+        "3": {
+          "numerator": 26,
+          "denominator": 36,
+          "percent": 72.22,
+          "ci_low": 56.01,
+          "ci_high": 84.15
+        },
+        "5": {
+          "numerator": 21,
+          "denominator": 36,
+          "percent": 58.33,
+          "ci_low": 42.2,
+          "ci_high": 72.86
+        }
+      },
+      "target_available": 16,
+      "target_achievement": {
+        "numerator": 7,
+        "denominator": 16,
+        "percent": 43.75,
+        "ci_low": 23.1,
+        "ci_high": 66.82
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 16,
+        "percent": 12.5,
+        "ci_low": 3.5,
+        "ci_high": 36.02
+      },
+      "failure_before_target": {
+        "numerator": 13,
+        "denominator": 16,
+        "percent": 81.25,
+        "ci_low": 56.99,
+        "ci_high": 93.41
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 0,
+      "median_mfe_zone_width": 6.1356,
+      "median_mae_zone_width": 5.5243,
+      "median_mfe_atr": 2.3323,
+      "median_mae_atr": 2.64,
+      "median_candles_to_interaction": 4.0
+    },
+    "HDFCBANK": {
+      "detected": 65,
+      "interacted": 50,
+      "never_interacted": 15,
+      "interaction_rate": {
+        "numerator": 50,
+        "denominator": 65,
+        "percent": 76.92,
+        "ci_low": 65.36,
+        "ci_high": 85.49
+      },
+      "structural_survival": {
+        "numerator": 13,
+        "denominator": 50,
+        "percent": 26.0,
+        "ci_low": 15.87,
+        "ci_high": 39.55
+      },
+      "failure": {
+        "numerator": 37,
+        "denominator": 50,
+        "percent": 74.0,
+        "ci_low": 60.45,
+        "ci_high": 84.13
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 48,
+          "denominator": 50,
+          "percent": 96.0,
+          "ci_low": 86.54,
+          "ci_high": 98.9
+        },
+        "1": {
+          "numerator": 42,
+          "denominator": 50,
+          "percent": 84.0,
+          "ci_low": 71.49,
+          "ci_high": 91.66
+        },
+        "2": {
+          "numerator": 30,
+          "denominator": 50,
+          "percent": 60.0,
+          "ci_low": 46.18,
+          "ci_high": 72.39
+        },
+        "3": {
+          "numerator": 24,
+          "denominator": 50,
+          "percent": 48.0,
+          "ci_low": 34.8,
+          "ci_high": 61.49
+        },
+        "5": {
+          "numerator": 20,
+          "denominator": 50,
+          "percent": 40.0,
+          "ci_low": 27.61,
+          "ci_high": 53.82
+        }
+      },
+      "target_available": 15,
+      "target_achievement": {
+        "numerator": 6,
+        "denominator": 15,
+        "percent": 40.0,
+        "ci_low": 19.82,
+        "ci_high": 64.25
+      },
+      "target_before_failure": {
+        "numerator": 3,
+        "denominator": 15,
+        "percent": 20.0,
+        "ci_low": 7.05,
+        "ci_high": 45.19
+      },
+      "failure_before_target": {
+        "numerator": 9,
+        "denominator": 15,
+        "percent": 60.0,
+        "ci_low": 35.75,
+        "ci_high": 80.18
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 2,
+      "median_mfe_zone_width": 2.7315,
+      "median_mae_zone_width": 2.9915,
+      "median_mfe_atr": 2.2325,
+      "median_mae_atr": 2.2222,
+      "median_candles_to_interaction": 3.0
+    },
+    "HINDALCO": {
+      "detected": 54,
+      "interacted": 36,
+      "never_interacted": 18,
+      "interaction_rate": {
+        "numerator": 36,
+        "denominator": 54,
+        "percent": 66.67,
+        "ci_low": 53.36,
+        "ci_high": 77.76
+      },
+      "structural_survival": {
+        "numerator": 11,
+        "denominator": 36,
+        "percent": 30.56,
+        "ci_low": 18.0,
+        "ci_high": 46.86
+      },
+      "failure": {
+        "numerator": 25,
+        "denominator": 36,
+        "percent": 69.44,
+        "ci_low": 53.14,
+        "ci_high": 82.0
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 36,
+          "denominator": 36,
+          "percent": 100.0,
+          "ci_low": 90.36,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 31,
+          "denominator": 36,
+          "percent": 86.11,
+          "ci_low": 71.34,
+          "ci_high": 93.92
+        },
+        "2": {
+          "numerator": 27,
+          "denominator": 36,
+          "percent": 75.0,
+          "ci_low": 58.93,
+          "ci_high": 86.25
+        },
+        "3": {
+          "numerator": 25,
+          "denominator": 36,
+          "percent": 69.44,
+          "ci_low": 53.14,
+          "ci_high": 82.0
+        },
+        "5": {
+          "numerator": 21,
+          "denominator": 36,
+          "percent": 58.33,
+          "ci_low": 42.2,
+          "ci_high": 72.86
+        }
+      },
+      "target_available": 15,
+      "target_achievement": {
+        "numerator": 6,
+        "denominator": 15,
+        "percent": 40.0,
+        "ci_low": 19.82,
+        "ci_high": 64.25
+      },
+      "target_before_failure": {
+        "numerator": 6,
+        "denominator": 15,
+        "percent": 40.0,
+        "ci_low": 19.82,
+        "ci_high": 64.25
+      },
+      "failure_before_target": {
+        "numerator": 8,
+        "denominator": 15,
+        "percent": 53.33,
+        "ci_low": 30.12,
+        "ci_high": 75.19
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 1,
+      "median_mfe_zone_width": 6.3158,
+      "median_mae_zone_width": 2.3847,
+      "median_mfe_atr": 3.368,
+      "median_mae_atr": 1.7993,
+      "median_candles_to_interaction": 4.0
+    },
+    "ICICIBANK": {
+      "detected": 62,
+      "interacted": 53,
+      "never_interacted": 9,
+      "interaction_rate": {
+        "numerator": 53,
+        "denominator": 62,
+        "percent": 85.48,
+        "ci_low": 74.66,
+        "ci_high": 92.17
+      },
+      "structural_survival": {
+        "numerator": 11,
+        "denominator": 53,
+        "percent": 20.75,
+        "ci_low": 12.0,
+        "ci_high": 33.46
+      },
+      "failure": {
+        "numerator": 42,
+        "denominator": 53,
+        "percent": 79.25,
+        "ci_low": 66.54,
+        "ci_high": 88.0
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 51,
+          "denominator": 53,
+          "percent": 96.23,
+          "ci_low": 87.25,
+          "ci_high": 98.96
+        },
+        "1": {
+          "numerator": 50,
+          "denominator": 53,
+          "percent": 94.34,
+          "ci_low": 84.63,
+          "ci_high": 98.06
+        },
+        "2": {
+          "numerator": 38,
+          "denominator": 53,
+          "percent": 71.7,
+          "ci_low": 58.43,
+          "ci_high": 82.03
+        },
+        "3": {
+          "numerator": 33,
+          "denominator": 53,
+          "percent": 62.26,
+          "ci_low": 48.81,
+          "ci_high": 74.06
+        },
+        "5": {
+          "numerator": 18,
+          "denominator": 53,
+          "percent": 33.96,
+          "ci_low": 22.69,
+          "ci_high": 47.41
+        }
+      },
+      "target_available": 16,
+      "target_achievement": {
+        "numerator": 5,
+        "denominator": 16,
+        "percent": 31.25,
+        "ci_low": 14.16,
+        "ci_high": 55.6
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 16,
+        "percent": 12.5,
+        "ci_low": 3.5,
+        "ci_high": 36.02
+      },
+      "failure_before_target": {
+        "numerator": 12,
+        "denominator": 16,
+        "percent": 75.0,
+        "ci_low": 50.5,
+        "ci_high": 89.82
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 1,
+      "median_mfe_zone_width": 3.7,
+      "median_mae_zone_width": 2.8568,
+      "median_mfe_atr": 2.5618,
+      "median_mae_atr": 2.392,
+      "median_candles_to_interaction": 3.0
+    },
+    "INDUSINDBK": {
+      "detected": 52,
+      "interacted": 35,
+      "never_interacted": 17,
+      "interaction_rate": {
+        "numerator": 35,
+        "denominator": 52,
+        "percent": 67.31,
+        "ci_low": 53.76,
+        "ci_high": 78.48
+      },
+      "structural_survival": {
+        "numerator": 2,
+        "denominator": 35,
+        "percent": 5.71,
+        "ci_low": 1.58,
+        "ci_high": 18.61
+      },
+      "failure": {
+        "numerator": 33,
+        "denominator": 35,
+        "percent": 94.29,
+        "ci_low": 81.39,
+        "ci_high": 98.42
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 35,
+          "denominator": 35,
+          "percent": 100.0,
+          "ci_low": 90.11,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 34,
+          "denominator": 35,
+          "percent": 97.14,
+          "ci_low": 85.47,
+          "ci_high": 99.49
+        },
+        "2": {
+          "numerator": 28,
+          "denominator": 35,
+          "percent": 80.0,
+          "ci_low": 64.11,
+          "ci_high": 89.96
+        },
+        "3": {
+          "numerator": 25,
+          "denominator": 35,
+          "percent": 71.43,
+          "ci_low": 54.95,
+          "ci_high": 83.67
+        },
+        "5": {
+          "numerator": 21,
+          "denominator": 35,
+          "percent": 60.0,
+          "ci_low": 43.57,
+          "ci_high": 74.45
+        }
+      },
+      "target_available": 12,
+      "target_achievement": {
+        "numerator": 6,
+        "denominator": 12,
+        "percent": 50.0,
+        "ci_low": 25.38,
+        "ci_high": 74.62
+      },
+      "target_before_failure": {
+        "numerator": 1,
+        "denominator": 12,
+        "percent": 8.33,
+        "ci_low": 1.49,
+        "ci_high": 35.39
+      },
+      "failure_before_target": {
+        "numerator": 10,
+        "denominator": 12,
+        "percent": 83.33,
+        "ci_low": 55.2,
+        "ci_high": 95.3
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 1,
+      "median_mfe_zone_width": 7.502,
+      "median_mae_zone_width": 3.974,
+      "median_mfe_atr": 3.6407,
+      "median_mae_atr": 2.1002,
+      "median_candles_to_interaction": 3.0
+    },
+    "INFY": {
+      "detected": 56,
+      "interacted": 44,
+      "never_interacted": 12,
+      "interaction_rate": {
+        "numerator": 44,
+        "denominator": 56,
+        "percent": 78.57,
+        "ci_low": 66.18,
+        "ci_high": 87.29
+      },
+      "structural_survival": {
+        "numerator": 7,
+        "denominator": 44,
+        "percent": 15.91,
+        "ci_low": 7.93,
+        "ci_high": 29.37
+      },
+      "failure": {
+        "numerator": 37,
+        "denominator": 44,
+        "percent": 84.09,
+        "ci_low": 70.63,
+        "ci_high": 92.07
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 42,
+          "denominator": 44,
+          "percent": 95.45,
+          "ci_low": 84.87,
+          "ci_high": 98.74
+        },
+        "1": {
+          "numerator": 40,
+          "denominator": 44,
+          "percent": 90.91,
+          "ci_low": 78.84,
+          "ci_high": 96.41
+        },
+        "2": {
+          "numerator": 31,
+          "denominator": 44,
+          "percent": 70.45,
+          "ci_low": 55.78,
+          "ci_high": 81.84
+        },
+        "3": {
+          "numerator": 30,
+          "denominator": 44,
+          "percent": 68.18,
+          "ci_low": 53.44,
+          "ci_high": 80.0
+        },
+        "5": {
+          "numerator": 21,
+          "denominator": 44,
+          "percent": 47.73,
+          "ci_low": 33.75,
+          "ci_high": 62.06
+        }
+      },
+      "target_available": 16,
+      "target_achievement": {
+        "numerator": 7,
+        "denominator": 16,
+        "percent": 43.75,
+        "ci_low": 23.1,
+        "ci_high": 66.82
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 16,
+        "percent": 12.5,
+        "ci_low": 3.5,
+        "ci_high": 36.02
+      },
+      "failure_before_target": {
+        "numerator": 13,
+        "denominator": 16,
+        "percent": 81.25,
+        "ci_low": 56.99,
+        "ci_high": 93.41
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 1,
+      "median_mfe_zone_width": 4.6719,
+      "median_mae_zone_width": 3.6146,
+      "median_mfe_atr": 2.2219,
+      "median_mae_atr": 2.2534,
+      "median_candles_to_interaction": 4.0
+    },
+    "ITC": {
+      "detected": 57,
+      "interacted": 40,
+      "never_interacted": 17,
+      "interaction_rate": {
+        "numerator": 40,
+        "denominator": 57,
+        "percent": 70.18,
+        "ci_low": 57.34,
+        "ci_high": 80.47
+      },
+      "structural_survival": {
+        "numerator": 5,
+        "denominator": 40,
+        "percent": 12.5,
+        "ci_low": 5.46,
+        "ci_high": 26.11
+      },
+      "failure": {
+        "numerator": 35,
+        "denominator": 40,
+        "percent": 87.5,
+        "ci_low": 73.89,
+        "ci_high": 94.54
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 40,
+          "denominator": 40,
+          "percent": 100.0,
+          "ci_low": 91.24,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 39,
+          "denominator": 40,
+          "percent": 97.5,
+          "ci_low": 87.12,
+          "ci_high": 99.56
+        },
+        "2": {
+          "numerator": 30,
+          "denominator": 40,
+          "percent": 75.0,
+          "ci_low": 59.81,
+          "ci_high": 85.81
+        },
+        "3": {
+          "numerator": 24,
+          "denominator": 40,
+          "percent": 60.0,
+          "ci_low": 44.6,
+          "ci_high": 73.65
+        },
+        "5": {
+          "numerator": 19,
+          "denominator": 40,
+          "percent": 47.5,
+          "ci_low": 32.94,
+          "ci_high": 62.5
+        }
+      },
+      "target_available": 12,
+      "target_achievement": {
+        "numerator": 7,
+        "denominator": 12,
+        "percent": 58.33,
+        "ci_low": 31.95,
+        "ci_high": 80.67
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 12,
+        "percent": 16.67,
+        "ci_low": 4.7,
+        "ci_high": 44.8
+      },
+      "failure_before_target": {
+        "numerator": 9,
+        "denominator": 12,
+        "percent": 75.0,
+        "ci_low": 46.77,
+        "ci_high": 91.11
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 0,
+      "median_mfe_zone_width": 3.9129,
+      "median_mae_zone_width": 2.6733,
+      "median_mfe_atr": 2.6784,
+      "median_mae_atr": 2.7666,
+      "median_candles_to_interaction": 3.0
+    },
+    "JSWENERGY": {
+      "detected": 51,
+      "interacted": 43,
+      "never_interacted": 8,
+      "interaction_rate": {
+        "numerator": 43,
+        "denominator": 51,
+        "percent": 84.31,
+        "ci_low": 71.99,
+        "ci_high": 91.83
+      },
+      "structural_survival": {
+        "numerator": 8,
+        "denominator": 43,
+        "percent": 18.6,
+        "ci_low": 9.74,
+        "ci_high": 32.62
+      },
+      "failure": {
+        "numerator": 35,
+        "denominator": 43,
+        "percent": 81.4,
+        "ci_low": 67.38,
+        "ci_high": 90.26
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 41,
+          "denominator": 43,
+          "percent": 95.35,
+          "ci_low": 84.54,
+          "ci_high": 98.72
+        },
+        "1": {
+          "numerator": 38,
+          "denominator": 43,
+          "percent": 88.37,
+          "ci_low": 75.52,
+          "ci_high": 94.93
+        },
+        "2": {
+          "numerator": 34,
+          "denominator": 43,
+          "percent": 79.07,
+          "ci_low": 64.79,
+          "ci_high": 88.58
+        },
+        "3": {
+          "numerator": 24,
+          "denominator": 43,
+          "percent": 55.81,
+          "ci_low": 41.11,
+          "ci_high": 69.57
+        },
+        "5": {
+          "numerator": 15,
+          "denominator": 43,
+          "percent": 34.88,
+          "ci_low": 22.42,
+          "ci_high": 49.83
+        }
+      },
+      "target_available": 17,
+      "target_achievement": {
+        "numerator": 10,
+        "denominator": 17,
+        "percent": 58.82,
+        "ci_low": 36.01,
+        "ci_high": 78.39
+      },
+      "target_before_failure": {
+        "numerator": 3,
+        "denominator": 17,
+        "percent": 17.65,
+        "ci_low": 6.19,
+        "ci_high": 41.03
+      },
+      "failure_before_target": {
+        "numerator": 13,
+        "denominator": 17,
+        "percent": 76.47,
+        "ci_low": 52.74,
+        "ci_high": 90.44
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 1,
+      "median_mfe_zone_width": 3.6985,
+      "median_mae_zone_width": 3.6819,
+      "median_mfe_atr": 2.3881,
+      "median_mae_atr": 2.2459,
+      "median_candles_to_interaction": 4.0
+    },
+    "LLOYDSME": {
+      "detected": 63,
+      "interacted": 52,
+      "never_interacted": 11,
+      "interaction_rate": {
+        "numerator": 52,
+        "denominator": 63,
+        "percent": 82.54,
+        "ci_low": 71.38,
+        "ci_high": 89.96
+      },
+      "structural_survival": {
+        "numerator": 12,
+        "denominator": 52,
+        "percent": 23.08,
+        "ci_low": 13.72,
+        "ci_high": 36.13
+      },
+      "failure": {
+        "numerator": 40,
+        "denominator": 52,
+        "percent": 76.92,
+        "ci_low": 63.87,
+        "ci_high": 86.28
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 51,
+          "denominator": 52,
+          "percent": 98.08,
+          "ci_low": 89.88,
+          "ci_high": 99.66
+        },
+        "1": {
+          "numerator": 47,
+          "denominator": 52,
+          "percent": 90.38,
+          "ci_low": 79.39,
+          "ci_high": 95.82
+        },
+        "2": {
+          "numerator": 41,
+          "denominator": 52,
+          "percent": 78.85,
+          "ci_low": 65.97,
+          "ci_high": 87.76
+        },
+        "3": {
+          "numerator": 34,
+          "denominator": 52,
+          "percent": 65.38,
+          "ci_low": 51.8,
+          "ci_high": 76.85
+        },
+        "5": {
+          "numerator": 21,
+          "denominator": 52,
+          "percent": 40.38,
+          "ci_low": 28.16,
+          "ci_high": 53.93
+        }
+      },
+      "target_available": 18,
+      "target_achievement": {
+        "numerator": 12,
+        "denominator": 18,
+        "percent": 66.67,
+        "ci_low": 43.75,
+        "ci_high": 83.72
+      },
+      "target_before_failure": {
+        "numerator": 6,
+        "denominator": 18,
+        "percent": 33.33,
+        "ci_low": 16.28,
+        "ci_high": 56.25
+      },
+      "failure_before_target": {
+        "numerator": 10,
+        "denominator": 18,
+        "percent": 55.56,
+        "ci_low": 33.72,
+        "ci_high": 75.44
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 1,
+      "median_mfe_zone_width": 4.1368,
+      "median_mae_zone_width": 3.4517,
+      "median_mfe_atr": 2.6905,
+      "median_mae_atr": 2.291,
+      "median_candles_to_interaction": 6.0
+    },
+    "MARUTI": {
+      "detected": 59,
+      "interacted": 41,
+      "never_interacted": 18,
+      "interaction_rate": {
+        "numerator": 41,
+        "denominator": 59,
+        "percent": 69.49,
+        "ci_low": 56.85,
+        "ci_high": 79.75
+      },
+      "structural_survival": {
+        "numerator": 11,
+        "denominator": 41,
+        "percent": 26.83,
+        "ci_low": 15.69,
+        "ci_high": 41.93
+      },
+      "failure": {
+        "numerator": 30,
+        "denominator": 41,
+        "percent": 73.17,
+        "ci_low": 58.07,
+        "ci_high": 84.31
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 40,
+          "denominator": 41,
+          "percent": 97.56,
+          "ci_low": 87.4,
+          "ci_high": 99.57
+        },
+        "1": {
+          "numerator": 38,
+          "denominator": 41,
+          "percent": 92.68,
+          "ci_low": 80.57,
+          "ci_high": 97.48
+        },
+        "2": {
+          "numerator": 32,
+          "denominator": 41,
+          "percent": 78.05,
+          "ci_low": 63.29,
+          "ci_high": 88.0
+        },
+        "3": {
+          "numerator": 28,
+          "denominator": 41,
+          "percent": 68.29,
+          "ci_low": 53.02,
+          "ci_high": 80.44
+        },
+        "5": {
+          "numerator": 23,
+          "denominator": 41,
+          "percent": 56.1,
+          "ci_low": 41.04,
+          "ci_high": 70.11
+        }
+      },
+      "target_available": 15,
+      "target_achievement": {
+        "numerator": 5,
+        "denominator": 15,
+        "percent": 33.33,
+        "ci_low": 15.18,
+        "ci_high": 58.29
+      },
+      "target_before_failure": {
+        "numerator": 5,
+        "denominator": 15,
+        "percent": 33.33,
+        "ci_low": 15.18,
+        "ci_high": 58.29
+      },
+      "failure_before_target": {
+        "numerator": 6,
+        "denominator": 15,
+        "percent": 40.0,
+        "ci_low": 19.82,
+        "ci_high": 64.25
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 4,
+      "median_mfe_zone_width": 5.2024,
+      "median_mae_zone_width": 2.6091,
+      "median_mfe_atr": 2.9367,
+      "median_mae_atr": 1.1287,
+      "median_candles_to_interaction": 3.0
+    },
+    "MAXHEALTH": {
+      "detected": 56,
+      "interacted": 42,
+      "never_interacted": 14,
+      "interaction_rate": {
+        "numerator": 42,
+        "denominator": 56,
+        "percent": 75.0,
+        "ci_low": 62.31,
+        "ci_high": 84.48
+      },
+      "structural_survival": {
+        "numerator": 11,
+        "denominator": 42,
+        "percent": 26.19,
+        "ci_low": 15.3,
+        "ci_high": 41.07
+      },
+      "failure": {
+        "numerator": 31,
+        "denominator": 42,
+        "percent": 73.81,
+        "ci_low": 58.93,
+        "ci_high": 84.7
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 42,
+          "denominator": 42,
+          "percent": 100.0,
+          "ci_low": 91.62,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 38,
+          "denominator": 42,
+          "percent": 90.48,
+          "ci_low": 77.93,
+          "ci_high": 96.23
+        },
+        "2": {
+          "numerator": 33,
+          "denominator": 42,
+          "percent": 78.57,
+          "ci_low": 64.06,
+          "ci_high": 88.29
+        },
+        "3": {
+          "numerator": 30,
+          "denominator": 42,
+          "percent": 71.43,
+          "ci_low": 56.43,
+          "ci_high": 82.83
+        },
+        "5": {
+          "numerator": 22,
+          "denominator": 42,
+          "percent": 52.38,
+          "ci_low": 37.72,
+          "ci_high": 66.64
+        }
+      },
+      "target_available": 18,
+      "target_achievement": {
+        "numerator": 8,
+        "denominator": 18,
+        "percent": 44.44,
+        "ci_low": 24.56,
+        "ci_high": 66.28
+      },
+      "target_before_failure": {
+        "numerator": 4,
+        "denominator": 18,
+        "percent": 22.22,
+        "ci_low": 9.0,
+        "ci_high": 45.21
+      },
+      "failure_before_target": {
+        "numerator": 11,
+        "denominator": 18,
+        "percent": 61.11,
+        "ci_low": 38.62,
+        "ci_high": 79.69
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 2,
+      "median_mfe_zone_width": 5.9317,
+      "median_mae_zone_width": 4.0044,
+      "median_mfe_atr": 3.7266,
+      "median_mae_atr": 2.1958,
+      "median_candles_to_interaction": 3.0
+    },
+    "MRPL": {
+      "detected": 69,
+      "interacted": 47,
+      "never_interacted": 22,
+      "interaction_rate": {
+        "numerator": 47,
+        "denominator": 69,
+        "percent": 68.12,
+        "ci_low": 56.42,
+        "ci_high": 77.91
+      },
+      "structural_survival": {
+        "numerator": 11,
+        "denominator": 47,
+        "percent": 23.4,
+        "ci_low": 13.6,
+        "ci_high": 37.22
+      },
+      "failure": {
+        "numerator": 36,
+        "denominator": 47,
+        "percent": 76.6,
+        "ci_low": 62.78,
+        "ci_high": 86.4
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 47,
+          "denominator": 47,
+          "percent": 100.0,
+          "ci_low": 92.44,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 43,
+          "denominator": 47,
+          "percent": 91.49,
+          "ci_low": 80.07,
+          "ci_high": 96.64
+        },
+        "2": {
+          "numerator": 34,
+          "denominator": 47,
+          "percent": 72.34,
+          "ci_low": 58.24,
+          "ci_high": 83.06
+        },
+        "3": {
+          "numerator": 31,
+          "denominator": 47,
+          "percent": 65.96,
+          "ci_low": 51.67,
+          "ci_high": 77.83
+        },
+        "5": {
+          "numerator": 26,
+          "denominator": 47,
+          "percent": 55.32,
+          "ci_low": 41.25,
+          "ci_high": 68.59
+        }
+      },
+      "target_available": 12,
+      "target_achievement": {
+        "numerator": 6,
+        "denominator": 12,
+        "percent": 50.0,
+        "ci_low": 25.38,
+        "ci_high": 74.62
+      },
+      "target_before_failure": {
+        "numerator": 4,
+        "denominator": 12,
+        "percent": 33.33,
+        "ci_low": 13.81,
+        "ci_high": 60.94
+      },
+      "failure_before_target": {
+        "numerator": 8,
+        "denominator": 12,
+        "percent": 66.67,
+        "ci_low": 39.06,
+        "ci_high": 86.19
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 0,
+      "median_mfe_zone_width": 6.0556,
+      "median_mae_zone_width": 4.1837,
+      "median_mfe_atr": 3.5464,
+      "median_mae_atr": 3.1409,
+      "median_candles_to_interaction": 4.0
+    },
+    "OIL": {
+      "detected": 57,
+      "interacted": 43,
+      "never_interacted": 14,
+      "interaction_rate": {
+        "numerator": 43,
+        "denominator": 57,
+        "percent": 75.44,
+        "ci_low": 62.9,
+        "ci_high": 84.77
+      },
+      "structural_survival": {
+        "numerator": 8,
+        "denominator": 43,
+        "percent": 18.6,
+        "ci_low": 9.74,
+        "ci_high": 32.62
+      },
+      "failure": {
+        "numerator": 35,
+        "denominator": 43,
+        "percent": 81.4,
+        "ci_low": 67.38,
+        "ci_high": 90.26
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 40,
+          "denominator": 43,
+          "percent": 93.02,
+          "ci_low": 81.39,
+          "ci_high": 97.6
+        },
+        "1": {
+          "numerator": 36,
+          "denominator": 43,
+          "percent": 83.72,
+          "ci_low": 70.03,
+          "ci_high": 91.88
+        },
+        "2": {
+          "numerator": 29,
+          "denominator": 43,
+          "percent": 67.44,
+          "ci_low": 52.52,
+          "ci_high": 79.51
+        },
+        "3": {
+          "numerator": 27,
+          "denominator": 43,
+          "percent": 62.79,
+          "ci_low": 47.86,
+          "ci_high": 75.62
+        },
+        "5": {
+          "numerator": 23,
+          "denominator": 43,
+          "percent": 53.49,
+          "ci_low": 38.92,
+          "ci_high": 67.49
+        }
+      },
+      "target_available": 25,
+      "target_achievement": {
+        "numerator": 13,
+        "denominator": 25,
+        "percent": 52.0,
+        "ci_low": 33.5,
+        "ci_high": 69.97
+      },
+      "target_before_failure": {
+        "numerator": 4,
+        "denominator": 25,
+        "percent": 16.0,
+        "ci_low": 6.4,
+        "ci_high": 34.65
+      },
+      "failure_before_target": {
+        "numerator": 18,
+        "denominator": 25,
+        "percent": 72.0,
+        "ci_low": 52.42,
+        "ci_high": 85.72
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 2,
+      "median_mfe_zone_width": 5.0959,
+      "median_mae_zone_width": 8.2726,
+      "median_mfe_atr": 1.4976,
+      "median_mae_atr": 3.7723,
+      "median_candles_to_interaction": 4.0
+    },
+    "PREMIERENE": {
+      "detected": 52,
+      "interacted": 40,
+      "never_interacted": 12,
+      "interaction_rate": {
+        "numerator": 40,
+        "denominator": 52,
+        "percent": 76.92,
+        "ci_low": 63.87,
+        "ci_high": 86.28
+      },
+      "structural_survival": {
+        "numerator": 4,
+        "denominator": 40,
+        "percent": 10.0,
+        "ci_low": 3.96,
+        "ci_high": 23.05
+      },
+      "failure": {
+        "numerator": 36,
+        "denominator": 40,
+        "percent": 90.0,
+        "ci_low": 76.95,
+        "ci_high": 96.04
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 39,
+          "denominator": 40,
+          "percent": 97.5,
+          "ci_low": 87.12,
+          "ci_high": 99.56
+        },
+        "1": {
+          "numerator": 39,
+          "denominator": 40,
+          "percent": 97.5,
+          "ci_low": 87.12,
+          "ci_high": 99.56
+        },
+        "2": {
+          "numerator": 27,
+          "denominator": 40,
+          "percent": 67.5,
+          "ci_low": 52.02,
+          "ci_high": 79.92
+        },
+        "3": {
+          "numerator": 22,
+          "denominator": 40,
+          "percent": 55.0,
+          "ci_low": 39.83,
+          "ci_high": 69.29
+        },
+        "5": {
+          "numerator": 17,
+          "denominator": 40,
+          "percent": 42.5,
+          "ci_low": 28.51,
+          "ci_high": 57.8
+        }
+      },
+      "target_available": 17,
+      "target_achievement": {
+        "numerator": 11,
+        "denominator": 17,
+        "percent": 64.71,
+        "ci_low": 41.3,
+        "ci_high": 82.69
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 17,
+        "percent": 11.76,
+        "ci_low": 3.29,
+        "ci_high": 34.34
+      },
+      "failure_before_target": {
+        "numerator": 13,
+        "denominator": 17,
+        "percent": 76.47,
+        "ci_low": 52.74,
+        "ci_high": 90.44
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 1,
+      "median_mfe_zone_width": 3.2323,
+      "median_mae_zone_width": 2.7232,
+      "median_mfe_atr": 2.8362,
+      "median_mae_atr": 2.4936,
+      "median_candles_to_interaction": 4.5
+    },
+    "RELIANCE": {
+      "detected": 62,
+      "interacted": 51,
+      "never_interacted": 11,
+      "interaction_rate": {
+        "numerator": 51,
+        "denominator": 62,
+        "percent": 82.26,
+        "ci_low": 70.96,
+        "ci_high": 89.79
+      },
+      "structural_survival": {
+        "numerator": 6,
+        "denominator": 51,
+        "percent": 11.76,
+        "ci_low": 5.51,
+        "ci_high": 23.38
+      },
+      "failure": {
+        "numerator": 45,
+        "denominator": 51,
+        "percent": 88.24,
+        "ci_low": 76.62,
+        "ci_high": 94.49
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 50,
+          "denominator": 51,
+          "percent": 98.04,
+          "ci_low": 89.7,
+          "ci_high": 99.65
+        },
+        "1": {
+          "numerator": 47,
+          "denominator": 51,
+          "percent": 92.16,
+          "ci_low": 81.5,
+          "ci_high": 96.91
+        },
+        "2": {
+          "numerator": 37,
+          "denominator": 51,
+          "percent": 72.55,
+          "ci_low": 59.05,
+          "ci_high": 82.89
+        },
+        "3": {
+          "numerator": 30,
+          "denominator": 51,
+          "percent": 58.82,
+          "ci_low": 45.17,
+          "ci_high": 71.25
+        },
+        "5": {
+          "numerator": 23,
+          "denominator": 51,
+          "percent": 45.1,
+          "ci_low": 32.27,
+          "ci_high": 58.62
+        }
+      },
+      "target_available": 17,
+      "target_achievement": {
+        "numerator": 7,
+        "denominator": 17,
+        "percent": 41.18,
+        "ci_low": 21.61,
+        "ci_high": 63.99
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 17,
+        "percent": 11.76,
+        "ci_low": 3.29,
+        "ci_high": 34.34
+      },
+      "failure_before_target": {
+        "numerator": 13,
+        "denominator": 17,
+        "percent": 76.47,
+        "ci_low": 52.74,
+        "ci_high": 90.44
+      },
+      "same_candle_ambiguous": 2,
+      "unresolved": 0,
+      "median_mfe_zone_width": 4.537,
+      "median_mae_zone_width": 5.7368,
+      "median_mfe_atr": 2.6203,
+      "median_mae_atr": 3.1328,
+      "median_candles_to_interaction": 4.0
+    },
+    "SBIN": {
+      "detected": 55,
+      "interacted": 37,
+      "never_interacted": 18,
+      "interaction_rate": {
+        "numerator": 37,
+        "denominator": 55,
+        "percent": 67.27,
+        "ci_low": 54.1,
+        "ci_high": 78.19
+      },
+      "structural_survival": {
+        "numerator": 1,
+        "denominator": 37,
+        "percent": 2.7,
+        "ci_low": 0.48,
+        "ci_high": 13.82
+      },
+      "failure": {
+        "numerator": 36,
+        "denominator": 37,
+        "percent": 97.3,
+        "ci_low": 86.18,
+        "ci_high": 99.52
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 34,
+          "denominator": 37,
+          "percent": 91.89,
+          "ci_low": 78.7,
+          "ci_high": 97.2
+        },
+        "1": {
+          "numerator": 32,
+          "denominator": 37,
+          "percent": 86.49,
+          "ci_low": 72.02,
+          "ci_high": 94.09
+        },
+        "2": {
+          "numerator": 27,
+          "denominator": 37,
+          "percent": 72.97,
+          "ci_low": 57.02,
+          "ci_high": 84.6
+        },
+        "3": {
+          "numerator": 22,
+          "denominator": 37,
+          "percent": 59.46,
+          "ci_low": 43.49,
+          "ci_high": 73.65
+        },
+        "5": {
+          "numerator": 17,
+          "denominator": 37,
+          "percent": 45.95,
+          "ci_low": 31.04,
+          "ci_high": 61.62
+        }
+      },
+      "target_available": 14,
+      "target_achievement": {
+        "numerator": 3,
+        "denominator": 14,
+        "percent": 21.43,
+        "ci_low": 7.57,
+        "ci_high": 47.59
+      },
+      "target_before_failure": {
+        "numerator": 1,
+        "denominator": 14,
+        "percent": 7.14,
+        "ci_low": 1.27,
+        "ci_high": 31.47
+      },
+      "failure_before_target": {
+        "numerator": 13,
+        "denominator": 14,
+        "percent": 92.86,
+        "ci_low": 68.53,
+        "ci_high": 98.73
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 0,
+      "median_mfe_zone_width": 4.3362,
+      "median_mae_zone_width": 6.4166,
+      "median_mfe_atr": 1.7277,
+      "median_mae_atr": 5.4017,
+      "median_candles_to_interaction": 3.0
+    },
+    "SUNPHARMA": {
+      "detected": 56,
+      "interacted": 47,
+      "never_interacted": 9,
+      "interaction_rate": {
+        "numerator": 47,
+        "denominator": 56,
+        "percent": 83.93,
+        "ci_low": 72.19,
+        "ci_high": 91.31
+      },
+      "structural_survival": {
+        "numerator": 4,
+        "denominator": 47,
+        "percent": 8.51,
+        "ci_low": 3.36,
+        "ci_high": 19.93
+      },
+      "failure": {
+        "numerator": 43,
+        "denominator": 47,
+        "percent": 91.49,
+        "ci_low": 80.07,
+        "ci_high": 96.64
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 47,
+          "denominator": 47,
+          "percent": 100.0,
+          "ci_low": 92.44,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 40,
+          "denominator": 47,
+          "percent": 85.11,
+          "ci_low": 72.31,
+          "ci_high": 92.59
+        },
+        "2": {
+          "numerator": 34,
+          "denominator": 47,
+          "percent": 72.34,
+          "ci_low": 58.24,
+          "ci_high": 83.06
+        },
+        "3": {
+          "numerator": 25,
+          "denominator": 47,
+          "percent": 53.19,
+          "ci_low": 39.23,
+          "ci_high": 66.67
+        },
+        "5": {
+          "numerator": 17,
+          "denominator": 47,
+          "percent": 36.17,
+          "ci_low": 23.97,
+          "ci_high": 50.46
+        }
+      },
+      "target_available": 7,
+      "target_achievement": {
+        "numerator": 3,
+        "denominator": 7,
+        "percent": 42.86,
+        "ci_low": 15.82,
+        "ci_high": 74.95
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 7,
+        "percent": 28.57,
+        "ci_low": 8.22,
+        "ci_high": 64.11
+      },
+      "failure_before_target": {
+        "numerator": 5,
+        "denominator": 7,
+        "percent": 71.43,
+        "ci_low": 35.89,
+        "ci_high": 91.78
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 0,
+      "median_mfe_zone_width": 3.3772,
+      "median_mae_zone_width": 4.935,
+      "median_mfe_atr": 1.7463,
+      "median_mae_atr": 3.7637,
+      "median_candles_to_interaction": 4.0
+    },
+    "TATACHEM": {
+      "detected": 50,
+      "interacted": 44,
+      "never_interacted": 6,
+      "interaction_rate": {
+        "numerator": 44,
+        "denominator": 50,
+        "percent": 88.0,
+        "ci_low": 76.2,
+        "ci_high": 94.38
+      },
+      "structural_survival": {
+        "numerator": 6,
+        "denominator": 44,
+        "percent": 13.64,
+        "ci_low": 6.4,
+        "ci_high": 26.71
+      },
+      "failure": {
+        "numerator": 38,
+        "denominator": 44,
+        "percent": 86.36,
+        "ci_low": 73.29,
+        "ci_high": 93.6
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 44,
+          "denominator": 44,
+          "percent": 100.0,
+          "ci_low": 91.97,
+          "ci_high": 100.0
+        },
+        "1": {
+          "numerator": 38,
+          "denominator": 44,
+          "percent": 86.36,
+          "ci_low": 73.29,
+          "ci_high": 93.6
+        },
+        "2": {
+          "numerator": 31,
+          "denominator": 44,
+          "percent": 70.45,
+          "ci_low": 55.78,
+          "ci_high": 81.84
+        },
+        "3": {
+          "numerator": 27,
+          "denominator": 44,
+          "percent": 61.36,
+          "ci_low": 46.62,
+          "ci_high": 74.28
+        },
+        "5": {
+          "numerator": 21,
+          "denominator": 44,
+          "percent": 47.73,
+          "ci_low": 33.75,
+          "ci_high": 62.06
+        }
+      },
+      "target_available": 14,
+      "target_achievement": {
+        "numerator": 8,
+        "denominator": 14,
+        "percent": 57.14,
+        "ci_low": 32.59,
+        "ci_high": 78.62
+      },
+      "target_before_failure": {
+        "numerator": 3,
+        "denominator": 14,
+        "percent": 21.43,
+        "ci_low": 7.57,
+        "ci_high": 47.59
+      },
+      "failure_before_target": {
+        "numerator": 9,
+        "denominator": 14,
+        "percent": 64.29,
+        "ci_low": 38.76,
+        "ci_high": 83.66
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 1,
+      "median_mfe_zone_width": 4.3909,
+      "median_mae_zone_width": 7.9404,
+      "median_mfe_atr": 2.9999,
+      "median_mae_atr": 3.4619,
+      "median_candles_to_interaction": 3.0
+    },
+    "TCS": {
+      "detected": 51,
+      "interacted": 41,
+      "never_interacted": 10,
+      "interaction_rate": {
+        "numerator": 41,
+        "denominator": 51,
+        "percent": 80.39,
+        "ci_low": 67.54,
+        "ci_high": 88.98
+      },
+      "structural_survival": {
+        "numerator": 7,
+        "denominator": 41,
+        "percent": 17.07,
+        "ci_low": 8.53,
+        "ci_high": 31.26
+      },
+      "failure": {
+        "numerator": 34,
+        "denominator": 41,
+        "percent": 82.93,
+        "ci_low": 68.74,
+        "ci_high": 91.47
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 38,
+          "denominator": 41,
+          "percent": 92.68,
+          "ci_low": 80.57,
+          "ci_high": 97.48
+        },
+        "1": {
+          "numerator": 36,
+          "denominator": 41,
+          "percent": 87.8,
+          "ci_low": 74.46,
+          "ci_high": 94.68
+        },
+        "2": {
+          "numerator": 28,
+          "denominator": 41,
+          "percent": 68.29,
+          "ci_low": 53.02,
+          "ci_high": 80.44
+        },
+        "3": {
+          "numerator": 26,
+          "denominator": 41,
+          "percent": 63.41,
+          "ci_low": 48.12,
+          "ci_high": 76.41
+        },
+        "5": {
+          "numerator": 20,
+          "denominator": 41,
+          "percent": 48.78,
+          "ci_low": 34.25,
+          "ci_high": 63.52
+        }
+      },
+      "target_available": 13,
+      "target_achievement": {
+        "numerator": 8,
+        "denominator": 13,
+        "percent": 61.54,
+        "ci_low": 35.52,
+        "ci_high": 82.29
+      },
+      "target_before_failure": {
+        "numerator": 4,
+        "denominator": 13,
+        "percent": 30.77,
+        "ci_low": 12.68,
+        "ci_high": 57.63
+      },
+      "failure_before_target": {
+        "numerator": 7,
+        "denominator": 13,
+        "percent": 53.85,
+        "ci_low": 29.14,
+        "ci_high": 76.79
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 1,
+      "median_mfe_zone_width": 3.822,
+      "median_mae_zone_width": 3.0002,
+      "median_mfe_atr": 2.9352,
+      "median_mae_atr": 3.0328,
+      "median_candles_to_interaction": 5.0
+    },
+    "TVSMOTOR": {
+      "detected": 62,
+      "interacted": 42,
+      "never_interacted": 20,
+      "interaction_rate": {
+        "numerator": 42,
+        "denominator": 62,
+        "percent": 67.74,
+        "ci_low": 55.37,
+        "ci_high": 78.05
+      },
+      "structural_survival": {
+        "numerator": 10,
+        "denominator": 42,
+        "percent": 23.81,
+        "ci_low": 13.48,
+        "ci_high": 38.53
+      },
+      "failure": {
+        "numerator": 32,
+        "denominator": 42,
+        "percent": 76.19,
+        "ci_low": 61.47,
+        "ci_high": 86.52
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 40,
+          "denominator": 42,
+          "percent": 95.24,
+          "ci_low": 84.21,
+          "ci_high": 98.68
+        },
+        "1": {
+          "numerator": 35,
+          "denominator": 42,
+          "percent": 83.33,
+          "ci_low": 69.4,
+          "ci_high": 91.68
+        },
+        "2": {
+          "numerator": 28,
+          "denominator": 42,
+          "percent": 66.67,
+          "ci_low": 51.55,
+          "ci_high": 78.99
+        },
+        "3": {
+          "numerator": 22,
+          "denominator": 42,
+          "percent": 52.38,
+          "ci_low": 37.72,
+          "ci_high": 66.64
+        },
+        "5": {
+          "numerator": 16,
+          "denominator": 42,
+          "percent": 38.1,
+          "ci_low": 25.0,
+          "ci_high": 53.19
+        }
+      },
+      "target_available": 17,
+      "target_achievement": {
+        "numerator": 9,
+        "denominator": 17,
+        "percent": 52.94,
+        "ci_low": 30.96,
+        "ci_high": 73.83
+      },
+      "target_before_failure": {
+        "numerator": 6,
+        "denominator": 17,
+        "percent": 35.29,
+        "ci_low": 17.31,
+        "ci_high": 58.7
+      },
+      "failure_before_target": {
+        "numerator": 10,
+        "denominator": 17,
+        "percent": 58.82,
+        "ci_low": 36.01,
+        "ci_high": 78.39
+      },
+      "same_candle_ambiguous": 0,
+      "unresolved": 1,
+      "median_mfe_zone_width": 3.2036,
+      "median_mae_zone_width": 4.0861,
+      "median_mfe_atr": 2.8658,
+      "median_mae_atr": 3.3673,
+      "median_candles_to_interaction": 3.0
+    },
+    "ZYDUSWELL": {
+      "detected": 51,
+      "interacted": 36,
+      "never_interacted": 15,
+      "interaction_rate": {
+        "numerator": 36,
+        "denominator": 51,
+        "percent": 70.59,
+        "ci_low": 57.0,
+        "ci_high": 81.29
+      },
+      "structural_survival": {
+        "numerator": 5,
+        "denominator": 36,
+        "percent": 13.89,
+        "ci_low": 6.08,
+        "ci_high": 28.66
+      },
+      "failure": {
+        "numerator": 31,
+        "denominator": 36,
+        "percent": 86.11,
+        "ci_low": 71.34,
+        "ci_high": 93.92
+      },
+      "reaction_rates": {
+        "0.5": {
+          "numerator": 35,
+          "denominator": 36,
+          "percent": 97.22,
+          "ci_low": 85.83,
+          "ci_high": 99.51
+        },
+        "1": {
+          "numerator": 33,
+          "denominator": 36,
+          "percent": 91.67,
+          "ci_low": 78.17,
+          "ci_high": 97.13
+        },
+        "2": {
+          "numerator": 30,
+          "denominator": 36,
+          "percent": 83.33,
+          "ci_low": 68.11,
+          "ci_high": 92.13
+        },
+        "3": {
+          "numerator": 26,
+          "denominator": 36,
+          "percent": 72.22,
+          "ci_low": 56.01,
+          "ci_high": 84.15
+        },
+        "5": {
+          "numerator": 19,
+          "denominator": 36,
+          "percent": 52.78,
+          "ci_low": 37.01,
+          "ci_high": 68.01
+        }
+      },
+      "target_available": 19,
+      "target_achievement": {
+        "numerator": 8,
+        "denominator": 19,
+        "percent": 42.11,
+        "ci_low": 23.14,
+        "ci_high": 63.72
+      },
+      "target_before_failure": {
+        "numerator": 2,
+        "denominator": 19,
+        "percent": 10.53,
+        "ci_low": 2.94,
+        "ci_high": 31.39
+      },
+      "failure_before_target": {
+        "numerator": 14,
+        "denominator": 19,
+        "percent": 73.68,
+        "ci_low": 51.21,
+        "ci_high": 88.19
+      },
+      "same_candle_ambiguous": 1,
+      "unresolved": 2,
+      "median_mfe_zone_width": 5.5439,
+      "median_mae_zone_width": 3.9021,
+      "median_mfe_atr": 2.916,
+      "median_mae_atr": 2.5826,
+      "median_candles_to_interaction": 4.0
+    }
+  },
+  "data_quality": {
+    "series_requested": 140,
+    "series_succeeded": 140,
+    "series_failed": 0,
+    "reconstruction_failures": 0,
+    "limitations": [
+      "Instrument-specific tick-size metadata unavailable; no tick component was added to hybrid stop candidates."
+    ]
+  },
+  "excluded_metrics": {
+    "zone_quality": "The frozen replay did not store point-in-time Zone Quality.",
+    "trade_confidence": "The frozen replay did not store point-in-time HTF, Trend, or Trade Confidence.",
+    "zone_quality_x_trade_confidence": "Required point-in-time fields are unavailable.",
+    "market_regime": "No frozen research-only regime definition was present.",
+    "failure_before_reaction": "Threshold crossing timestamps were not stored; later MFE cannot be used without leakage."
+  }
+}

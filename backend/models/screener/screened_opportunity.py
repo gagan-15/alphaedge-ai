@@ -22,3 +22,22 @@ class ScreenedOpportunity:
     symbol: str
 
     risk_management_result: RiskManagementResult
+
+    zone_type: str | None = None
+
+    proximal_price: float | None = None
+
+    distal_price: float | None = None
+
+    zone_score: float | None = None
+
+    distance_percent: float | None = None
+
+    zone_fresh: bool | None = None
+
+    touch_count: int | None = None
+
+    base_index: int | None = None
+
+    timeframe: str | None = None
+    pattern_type: str | None = None

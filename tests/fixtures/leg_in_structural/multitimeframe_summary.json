@@ -1,0 +1,3655 @@
+{
+  "audit_only": true,
+  "production_gate_active": false,
+  "datasets": [
+    {
+      "audit_only": true,
+      "production_gate_active": false,
+      "timeframe": "DAILY",
+      "universe": "nse500",
+      "symbols_requested": 500,
+      "symbols_processed": 500,
+      "canonical_zones": 932,
+      "dashboard_qualified": 96,
+      "dashboard_visible": 63,
+      "patterns": {
+        "RBD": 135,
+        "DBR": 283,
+        "RBR": 244,
+        "DBD": 270
+      },
+      "zone_types": {
+        "SUPPLY": 405,
+        "DEMAND": 527
+      },
+      "one_candle_leg_ins": 855,
+      "multi_candle_leg_ins": 77,
+      "structural_states": {
+        "CONGESTED": 406,
+        "ACCEPTABLE": 192,
+        "INSUFFICIENT_EVIDENCE": 61,
+        "CLEAN": 127,
+        "BORDERLINE": 146
+      },
+      "reason_codes": {
+        "LEG_IN_DISPLACEMENT_STRONG": 471,
+        "APPROACH_HIGH_OCCUPANCY": 492,
+        "APPROACH_OVERLAP_ACCEPTABLE": 683,
+        "APPROACH_DIRECTIONAL": 674,
+        "APPROACH_LOW_OCCUPANCY": 440,
+        "APPROACH_HIGH_OVERLAP": 249,
+        "LEG_IN_DISPLACEMENT_WEAK": 461,
+        "APPROACH_INSUFFICIENT_HISTORY": 61,
+        "APPROACH_DIRECTION_CHANGES": 258
+      },
+      "metric_distributions": {
+        "directional_displacement": {
+          "min": 0.0,
+          "p10": 1.219999,
+          "p25": 4.649963,
+          "median": 15.450012,
+          "p75": 41.800049,
+          "p90": 104.299805,
+          "max": 9573.285682
+        },
+        "displacement_zone_width_ratio": {
+          "min": 0.0,
+          "p10": 0.3,
+          "p25": 0.587676,
+          "median": 1.012655,
+          "p75": 1.748011,
+          "p90": 2.790666,
+          "max": 13.357221
+        },
+        "displacement_volatility_ratio": {
+          "min": 0.0,
+          "p10": 0.211678,
+          "p25": 0.42503,
+          "median": 0.707158,
+          "p75": 1.103617,
+          "p90": 1.627873,
+          "max": 7.710467
+        },
+        "approach_overlap_ratio": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "median": 0.537569,
+          "p75": 0.817518,
+          "p90": 0.997421,
+          "max": 1.0
+        },
+        "prior_zone_occupancy_ratio": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.5,
+          "median": 1.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "directional_efficiency": {
+          "min": 0.0,
+          "p10": 0.294116,
+          "p25": 0.669058,
+          "median": 1.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "approach_direction_changes": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "median": 0.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 2.0
+        },
+        "approach_candle_count": {
+          "min": 1.0,
+          "p10": 1.0,
+          "p25": 1.0,
+          "median": 2.0,
+          "p75": 2.0,
+          "p90": 3.0,
+          "max": 6.0
+        }
+      },
+      "threshold_study": [
+        {
+          "rule": "WIDTH_050",
+          "retained": 741,
+          "rejected": 191,
+          "dashboard_retained": 47,
+          "dashboard_rejected": 16,
+          "one_candle_retained": 671,
+          "one_candle_rejected": 184,
+          "multi_candle_retained": 70,
+          "multi_candle_rejected": 7,
+          "patterns_retained": {
+            "DBR": 209,
+            "RBR": 213,
+            "RBD": 99,
+            "DBD": 220
+          },
+          "patterns_rejected": {
+            "DBR": 74,
+            "RBR": 31,
+            "RBD": 36,
+            "DBD": 50
+          },
+          "types_retained": {
+            "DEMAND": 422,
+            "SUPPLY": 319
+          },
+          "types_rejected": {
+            "DEMAND": 105,
+            "SUPPLY": 86
+          }
+        },
+        {
+          "rule": "WIDTH_100",
+          "retained": 471,
+          "rejected": 461,
+          "dashboard_retained": 34,
+          "dashboard_rejected": 29,
+          "one_candle_retained": 418,
+          "one_candle_rejected": 437,
+          "multi_candle_retained": 53,
+          "multi_candle_rejected": 24,
+          "patterns_retained": {
+            "DBR": 125,
+            "RBR": 142,
+            "RBD": 62,
+            "DBD": 142
+          },
+          "patterns_rejected": {
+            "DBR": 158,
+            "RBR": 102,
+            "RBD": 73,
+            "DBD": 128
+          },
+          "types_retained": {
+            "DEMAND": 267,
+            "SUPPLY": 204
+          },
+          "types_rejected": {
+            "DEMAND": 260,
+            "SUPPLY": 201
+          }
+        },
+        {
+          "rule": "VOL_075",
+          "retained": 406,
+          "rejected": 526,
+          "dashboard_retained": 28,
+          "dashboard_rejected": 35,
+          "one_candle_retained": 356,
+          "one_candle_rejected": 499,
+          "multi_candle_retained": 50,
+          "multi_candle_rejected": 27,
+          "patterns_retained": {
+            "DBR": 103,
+            "RBR": 135,
+            "RBD": 57,
+            "DBD": 111
+          },
+          "patterns_rejected": {
+            "DBR": 180,
+            "RBR": 109,
+            "RBD": 78,
+            "DBD": 159
+          },
+          "types_retained": {
+            "DEMAND": 238,
+            "SUPPLY": 168
+          },
+          "types_rejected": {
+            "DEMAND": 289,
+            "SUPPLY": 237
+          }
+        },
+        {
+          "rule": "VOL_100",
+          "retained": 262,
+          "rejected": 670,
+          "dashboard_retained": 28,
+          "dashboard_rejected": 35,
+          "one_candle_retained": 220,
+          "one_candle_rejected": 635,
+          "multi_candle_retained": 42,
+          "multi_candle_rejected": 35,
+          "patterns_retained": {
+            "DBR": 65,
+            "RBR": 92,
+            "RBD": 45,
+            "DBD": 60
+          },
+          "patterns_rejected": {
+            "DBR": 218,
+            "RBR": 152,
+            "RBD": 90,
+            "DBD": 210
+          },
+          "types_retained": {
+            "DEMAND": 157,
+            "SUPPLY": 105
+          },
+          "types_rejected": {
+            "DEMAND": 370,
+            "SUPPLY": 300
+          }
+        },
+        {
+          "rule": "OCC_080",
+          "retained": 440,
+          "rejected": 492,
+          "dashboard_retained": 35,
+          "dashboard_rejected": 28,
+          "one_candle_retained": 387,
+          "one_candle_rejected": 468,
+          "multi_candle_retained": 53,
+          "multi_candle_rejected": 24,
+          "patterns_retained": {
+            "DBR": 122,
+            "RBR": 136,
+            "RBD": 78,
+            "DBD": 104
+          },
+          "patterns_rejected": {
+            "DBR": 161,
+            "RBR": 108,
+            "RBD": 57,
+            "DBD": 166
+          },
+          "types_retained": {
+            "DEMAND": 258,
+            "SUPPLY": 182
+          },
+          "types_rejected": {
+            "DEMAND": 269,
+            "SUPPLY": 223
+          }
+        },
+        {
+          "rule": "OCC_065",
+          "retained": 391,
+          "rejected": 541,
+          "dashboard_retained": 31,
+          "dashboard_rejected": 32,
+          "one_candle_retained": 347,
+          "one_candle_rejected": 508,
+          "multi_candle_retained": 44,
+          "multi_candle_rejected": 33,
+          "patterns_retained": {
+            "DBR": 111,
+            "RBR": 126,
+            "RBD": 75,
+            "DBD": 79
+          },
+          "patterns_rejected": {
+            "DBR": 172,
+            "RBR": 118,
+            "RBD": 60,
+            "DBD": 191
+          },
+          "types_retained": {
+            "DEMAND": 237,
+            "SUPPLY": 154
+          },
+          "types_rejected": {
+            "DEMAND": 290,
+            "SUPPLY": 251
+          }
+        },
+        {
+          "rule": "OVERLAP_080",
+          "retained": 683,
+          "rejected": 249,
+          "dashboard_retained": 40,
+          "dashboard_rejected": 23,
+          "one_candle_retained": 619,
+          "one_candle_rejected": 236,
+          "multi_candle_retained": 64,
+          "multi_candle_rejected": 13,
+          "patterns_retained": {
+            "DBR": 206,
+            "RBR": 194,
+            "RBD": 95,
+            "DBD": 188
+          },
+          "patterns_rejected": {
+            "DBR": 77,
+            "RBR": 50,
+            "RBD": 40,
+            "DBD": 82
+          },
+          "types_retained": {
+            "DEMAND": 400,
+            "SUPPLY": 283
+          },
+          "types_rejected": {
+            "DEMAND": 127,
+            "SUPPLY": 122
+          }
+        },
+        {
+          "rule": "COMBINED_LENIENT",
+          "retained": 709,
+          "rejected": 223,
+          "dashboard_retained": 47,
+          "dashboard_rejected": 16,
+          "one_candle_retained": 639,
+          "one_candle_rejected": 216,
+          "multi_candle_retained": 70,
+          "multi_candle_rejected": 7,
+          "patterns_retained": {
+            "DBR": 201,
+            "RBR": 205,
+            "RBD": 97,
+            "DBD": 206
+          },
+          "patterns_rejected": {
+            "DBR": 82,
+            "RBR": 39,
+            "RBD": 38,
+            "DBD": 64
+          },
+          "types_retained": {
+            "DEMAND": 406,
+            "SUPPLY": 303
+          },
+          "types_rejected": {
+            "DEMAND": 121,
+            "SUPPLY": 102
+          }
+        },
+        {
+          "rule": "COMBINED_BALANCED",
+          "retained": 630,
+          "rejected": 302,
+          "dashboard_retained": 42,
+          "dashboard_rejected": 21,
+          "one_candle_retained": 570,
+          "one_candle_rejected": 285,
+          "multi_candle_retained": 60,
+          "multi_candle_rejected": 17,
+          "patterns_retained": {
+            "DBR": 185,
+            "RBR": 188,
+            "RBD": 87,
+            "DBD": 170
+          },
+          "patterns_rejected": {
+            "DBR": 98,
+            "RBR": 56,
+            "RBD": 48,
+            "DBD": 100
+          },
+          "types_retained": {
+            "DEMAND": 373,
+            "SUPPLY": 257
+          },
+          "types_rejected": {
+            "DEMAND": 154,
+            "SUPPLY": 148
+          }
+        },
+        {
+          "rule": "TIERED_MINIMUM",
+          "retained": 465,
+          "rejected": 467,
+          "dashboard_retained": 36,
+          "dashboard_rejected": 27,
+          "one_candle_retained": 412,
+          "one_candle_rejected": 443,
+          "multi_candle_retained": 53,
+          "multi_candle_rejected": 24,
+          "patterns_retained": {
+            "DBR": 118,
+            "RBR": 147,
+            "RBD": 81,
+            "DBD": 119
+          },
+          "patterns_rejected": {
+            "DBR": 165,
+            "RBR": 97,
+            "RBD": 54,
+            "DBD": 151
+          },
+          "types_retained": {
+            "DEMAND": 265,
+            "SUPPLY": 200
+          },
+          "types_rejected": {
+            "DEMAND": 262,
+            "SUPPLY": 205
+          }
+        }
+      ],
+      "performance": {
+        "data_load_seconds": 25.620147,
+        "detection_seconds": 29.35212,
+        "detection_ms_per_zone": 31.493691
+      }
+    },
+    {
+      "audit_only": true,
+      "production_gate_active": false,
+      "timeframe": "WEEKLY",
+      "universe": "nifty100",
+      "symbols_requested": 100,
+      "symbols_processed": 100,
+      "canonical_zones": 21,
+      "dashboard_qualified": 0,
+      "dashboard_visible": 0,
+      "patterns": {
+        "RBD": 4,
+        "DBD": 4,
+        "DBR": 4,
+        "RBR": 9
+      },
+      "zone_types": {
+        "SUPPLY": 8,
+        "DEMAND": 13
+      },
+      "one_candle_leg_ins": 19,
+      "multi_candle_leg_ins": 2,
+      "structural_states": {
+        "INSUFFICIENT_EVIDENCE": 7,
+        "CONGESTED": 8,
+        "CLEAN": 3,
+        "ACCEPTABLE": 2,
+        "BORDERLINE": 1
+      },
+      "reason_codes": {
+        "LEG_IN_DISPLACEMENT_WEAK": 13,
+        "APPROACH_HIGH_OCCUPANCY": 13,
+        "APPROACH_OVERLAP_ACCEPTABLE": 15,
+        "APPROACH_DIRECTIONAL": 14,
+        "APPROACH_INSUFFICIENT_HISTORY": 7,
+        "APPROACH_HIGH_OVERLAP": 6,
+        "APPROACH_DIRECTION_CHANGES": 7,
+        "LEG_IN_DISPLACEMENT_STRONG": 8,
+        "APPROACH_LOW_OCCUPANCY": 8
+      },
+      "metric_distributions": {
+        "directional_displacement": {
+          "min": 0.0,
+          "p10": 4.0,
+          "p25": 11.599991,
+          "median": 31.099976,
+          "p75": 221.183608,
+          "p90": 460.0,
+          "max": 1033.202857
+        },
+        "displacement_zone_width_ratio": {
+          "min": 0.0,
+          "p10": 0.234604,
+          "p25": 0.451808,
+          "median": 0.933715,
+          "p75": 1.470224,
+          "p90": 1.559933,
+          "max": 6.441968
+        },
+        "displacement_volatility_ratio": {
+          "min": 0.0,
+          "p10": 0.069065,
+          "p25": 0.158573,
+          "median": 0.33987,
+          "p75": 0.631801,
+          "p90": 1.253426,
+          "max": 1.687957
+        },
+        "approach_overlap_ratio": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "median": 0.648495,
+          "p75": 0.819209,
+          "p90": 0.912087,
+          "max": 0.991804
+        },
+        "prior_zone_occupancy_ratio": {
+          "min": 0.0,
+          "p10": 0.333333,
+          "p25": 0.5,
+          "median": 1.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "directional_efficiency": {
+          "min": 0.0,
+          "p10": 0.172413,
+          "p25": 0.505495,
+          "median": 1.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "approach_direction_changes": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "median": 0.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "approach_candle_count": {
+          "min": 1.0,
+          "p10": 1.0,
+          "p25": 1.0,
+          "median": 2.0,
+          "p75": 2.0,
+          "p90": 2.0,
+          "max": 3.0
+        }
+      },
+      "threshold_study": [
+        {
+          "rule": "WIDTH_050",
+          "retained": 13,
+          "rejected": 8,
+          "dashboard_retained": 0,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 11,
+          "one_candle_rejected": 8,
+          "multi_candle_retained": 2,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 3,
+            "RBR": 6,
+            "RBD": 2,
+            "DBD": 2
+          },
+          "patterns_rejected": {
+            "DBR": 1,
+            "RBR": 3,
+            "RBD": 2,
+            "DBD": 2
+          },
+          "types_retained": {
+            "DEMAND": 9,
+            "SUPPLY": 4
+          },
+          "types_rejected": {
+            "DEMAND": 4,
+            "SUPPLY": 4
+          }
+        },
+        {
+          "rule": "WIDTH_100",
+          "retained": 8,
+          "rejected": 13,
+          "dashboard_retained": 0,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 6,
+          "one_candle_rejected": 13,
+          "multi_candle_retained": 2,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 1,
+            "RBR": 6,
+            "RBD": 1,
+            "DBD": 0
+          },
+          "patterns_rejected": {
+            "DBR": 3,
+            "RBR": 3,
+            "RBD": 3,
+            "DBD": 4
+          },
+          "types_retained": {
+            "DEMAND": 7,
+            "SUPPLY": 1
+          },
+          "types_rejected": {
+            "DEMAND": 6,
+            "SUPPLY": 7
+          }
+        },
+        {
+          "rule": "VOL_075",
+          "retained": 2,
+          "rejected": 19,
+          "dashboard_retained": 0,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 1,
+          "one_candle_rejected": 18,
+          "multi_candle_retained": 1,
+          "multi_candle_rejected": 1,
+          "patterns_retained": {
+            "DBR": 0,
+            "RBR": 1,
+            "RBD": 1,
+            "DBD": 0
+          },
+          "patterns_rejected": {
+            "DBR": 4,
+            "RBR": 8,
+            "RBD": 3,
+            "DBD": 4
+          },
+          "types_retained": {
+            "DEMAND": 1,
+            "SUPPLY": 1
+          },
+          "types_rejected": {
+            "DEMAND": 12,
+            "SUPPLY": 7
+          }
+        },
+        {
+          "rule": "VOL_100",
+          "retained": 2,
+          "rejected": 19,
+          "dashboard_retained": 0,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 1,
+          "one_candle_rejected": 18,
+          "multi_candle_retained": 1,
+          "multi_candle_rejected": 1,
+          "patterns_retained": {
+            "DBR": 0,
+            "RBR": 1,
+            "RBD": 1,
+            "DBD": 0
+          },
+          "patterns_rejected": {
+            "DBR": 4,
+            "RBR": 8,
+            "RBD": 3,
+            "DBD": 4
+          },
+          "types_retained": {
+            "DEMAND": 1,
+            "SUPPLY": 1
+          },
+          "types_rejected": {
+            "DEMAND": 12,
+            "SUPPLY": 7
+          }
+        },
+        {
+          "rule": "OCC_080",
+          "retained": 8,
+          "rejected": 13,
+          "dashboard_retained": 0,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 6,
+          "one_candle_rejected": 13,
+          "multi_candle_retained": 2,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 2,
+            "RBR": 3,
+            "RBD": 2,
+            "DBD": 1
+          },
+          "patterns_rejected": {
+            "DBR": 2,
+            "RBR": 6,
+            "RBD": 2,
+            "DBD": 3
+          },
+          "types_retained": {
+            "DEMAND": 5,
+            "SUPPLY": 3
+          },
+          "types_rejected": {
+            "DEMAND": 8,
+            "SUPPLY": 5
+          }
+        },
+        {
+          "rule": "OCC_065",
+          "retained": 8,
+          "rejected": 13,
+          "dashboard_retained": 0,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 6,
+          "one_candle_rejected": 13,
+          "multi_candle_retained": 2,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 2,
+            "RBR": 3,
+            "RBD": 2,
+            "DBD": 1
+          },
+          "patterns_rejected": {
+            "DBR": 2,
+            "RBR": 6,
+            "RBD": 2,
+            "DBD": 3
+          },
+          "types_retained": {
+            "DEMAND": 5,
+            "SUPPLY": 3
+          },
+          "types_rejected": {
+            "DEMAND": 8,
+            "SUPPLY": 5
+          }
+        },
+        {
+          "rule": "OVERLAP_080",
+          "retained": 15,
+          "rejected": 6,
+          "dashboard_retained": 0,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 13,
+          "one_candle_rejected": 6,
+          "multi_candle_retained": 2,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 3,
+            "RBR": 5,
+            "RBD": 4,
+            "DBD": 3
+          },
+          "patterns_rejected": {
+            "DBR": 1,
+            "RBR": 4,
+            "RBD": 0,
+            "DBD": 1
+          },
+          "types_retained": {
+            "DEMAND": 8,
+            "SUPPLY": 7
+          },
+          "types_rejected": {
+            "DEMAND": 5,
+            "SUPPLY": 1
+          }
+        },
+        {
+          "rule": "COMBINED_LENIENT",
+          "retained": 12,
+          "rejected": 9,
+          "dashboard_retained": 0,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 10,
+          "one_candle_rejected": 9,
+          "multi_candle_retained": 2,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 2,
+            "RBR": 6,
+            "RBD": 2,
+            "DBD": 2
+          },
+          "patterns_rejected": {
+            "DBR": 2,
+            "RBR": 3,
+            "RBD": 2,
+            "DBD": 2
+          },
+          "types_retained": {
+            "DEMAND": 8,
+            "SUPPLY": 4
+          },
+          "types_rejected": {
+            "DEMAND": 5,
+            "SUPPLY": 4
+          }
+        },
+        {
+          "rule": "COMBINED_BALANCED",
+          "retained": 12,
+          "rejected": 9,
+          "dashboard_retained": 0,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 10,
+          "one_candle_rejected": 9,
+          "multi_candle_retained": 2,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 2,
+            "RBR": 6,
+            "RBD": 2,
+            "DBD": 2
+          },
+          "patterns_rejected": {
+            "DBR": 2,
+            "RBR": 3,
+            "RBD": 2,
+            "DBD": 2
+          },
+          "types_retained": {
+            "DEMAND": 8,
+            "SUPPLY": 4
+          },
+          "types_rejected": {
+            "DEMAND": 5,
+            "SUPPLY": 4
+          }
+        },
+        {
+          "rule": "TIERED_MINIMUM",
+          "retained": 6,
+          "rejected": 15,
+          "dashboard_retained": 0,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 4,
+          "one_candle_rejected": 15,
+          "multi_candle_retained": 2,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 2,
+            "RBR": 2,
+            "RBD": 1,
+            "DBD": 1
+          },
+          "patterns_rejected": {
+            "DBR": 2,
+            "RBR": 7,
+            "RBD": 3,
+            "DBD": 3
+          },
+          "types_retained": {
+            "DEMAND": 4,
+            "SUPPLY": 2
+          },
+          "types_rejected": {
+            "DEMAND": 9,
+            "SUPPLY": 6
+          }
+        }
+      ],
+      "performance": {
+        "data_load_seconds": 6.270546,
+        "detection_seconds": 0.374484,
+        "detection_ms_per_zone": 17.832567
+      }
+    },
+    {
+      "audit_only": true,
+      "production_gate_active": false,
+      "timeframe": "MINUTE_15",
+      "universe": "nifty50",
+      "symbols_requested": 50,
+      "symbols_processed": 50,
+      "canonical_zones": 1125,
+      "dashboard_qualified": 321,
+      "dashboard_visible": 51,
+      "patterns": {
+        "DBD": 349,
+        "RBD": 220,
+        "RBR": 331,
+        "DBR": 225
+      },
+      "zone_types": {
+        "SUPPLY": 569,
+        "DEMAND": 556
+      },
+      "one_candle_leg_ins": 1052,
+      "multi_candle_leg_ins": 73,
+      "structural_states": {
+        "BORDERLINE": 168,
+        "CONGESTED": 490,
+        "ACCEPTABLE": 274,
+        "CLEAN": 191,
+        "INSUFFICIENT_EVIDENCE": 2
+      },
+      "reason_codes": {
+        "LEG_IN_DISPLACEMENT_WEAK": 511,
+        "APPROACH_LOW_OCCUPANCY": 568,
+        "APPROACH_OVERLAP_ACCEPTABLE": 756,
+        "APPROACH_DIRECTION_CHANGES": 289,
+        "LEG_IN_DISPLACEMENT_STRONG": 614,
+        "APPROACH_HIGH_OCCUPANCY": 557,
+        "APPROACH_DIRECTIONAL": 836,
+        "APPROACH_HIGH_OVERLAP": 369,
+        "APPROACH_INSUFFICIENT_HISTORY": 2
+      },
+      "metric_distributions": {
+        "directional_displacement": {
+          "min": 0.0,
+          "p10": 0.300049,
+          "p25": 0.899994,
+          "median": 2.900024,
+          "p75": 6.5,
+          "p90": 14.5,
+          "max": 76.0
+        },
+        "displacement_zone_width_ratio": {
+          "min": 0.0,
+          "p10": 0.253744,
+          "p25": 0.600016,
+          "median": 1.096791,
+          "p75": 1.923095,
+          "p90": 3.13517,
+          "max": 19.996745
+        },
+        "displacement_volatility_ratio": {
+          "min": 0.0,
+          "p10": 0.231574,
+          "p25": 0.415574,
+          "median": 0.725437,
+          "p75": 1.157895,
+          "p90": 1.844673,
+          "max": 13.416851
+        },
+        "approach_overlap_ratio": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "median": 0.62499,
+          "p75": 0.882347,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "prior_zone_occupancy_ratio": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.5,
+          "median": 0.666667,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "directional_efficiency": {
+          "min": 0.0,
+          "p10": 0.309097,
+          "p25": 0.702705,
+          "median": 1.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "approach_direction_changes": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "median": 0.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 2.0
+        },
+        "approach_candle_count": {
+          "min": 1.0,
+          "p10": 1.0,
+          "p25": 2.0,
+          "median": 2.0,
+          "p75": 2.0,
+          "p90": 3.0,
+          "max": 7.0
+        }
+      },
+      "threshold_study": [
+        {
+          "rule": "WIDTH_050",
+          "retained": 905,
+          "rejected": 220,
+          "dashboard_retained": 46,
+          "dashboard_rejected": 5,
+          "one_candle_retained": 841,
+          "one_candle_rejected": 211,
+          "multi_candle_retained": 64,
+          "multi_candle_rejected": 9,
+          "patterns_retained": {
+            "DBR": 172,
+            "RBR": 269,
+            "RBD": 171,
+            "DBD": 293
+          },
+          "patterns_rejected": {
+            "DBR": 53,
+            "RBR": 62,
+            "RBD": 49,
+            "DBD": 56
+          },
+          "types_retained": {
+            "DEMAND": 441,
+            "SUPPLY": 464
+          },
+          "types_rejected": {
+            "DEMAND": 115,
+            "SUPPLY": 105
+          }
+        },
+        {
+          "rule": "WIDTH_100",
+          "retained": 614,
+          "rejected": 511,
+          "dashboard_retained": 33,
+          "dashboard_rejected": 18,
+          "one_candle_retained": 560,
+          "one_candle_rejected": 492,
+          "multi_candle_retained": 54,
+          "multi_candle_rejected": 19,
+          "patterns_retained": {
+            "DBR": 105,
+            "RBR": 177,
+            "RBD": 118,
+            "DBD": 214
+          },
+          "patterns_rejected": {
+            "DBR": 120,
+            "RBR": 154,
+            "RBD": 102,
+            "DBD": 135
+          },
+          "types_retained": {
+            "DEMAND": 282,
+            "SUPPLY": 332
+          },
+          "types_rejected": {
+            "DEMAND": 274,
+            "SUPPLY": 237
+          }
+        },
+        {
+          "rule": "VOL_075",
+          "retained": 542,
+          "rejected": 583,
+          "dashboard_retained": 27,
+          "dashboard_rejected": 24,
+          "one_candle_retained": 485,
+          "one_candle_rejected": 567,
+          "multi_candle_retained": 57,
+          "multi_candle_rejected": 16,
+          "patterns_retained": {
+            "DBR": 90,
+            "RBR": 170,
+            "RBD": 100,
+            "DBD": 182
+          },
+          "patterns_rejected": {
+            "DBR": 135,
+            "RBR": 161,
+            "RBD": 120,
+            "DBD": 167
+          },
+          "types_retained": {
+            "DEMAND": 260,
+            "SUPPLY": 282
+          },
+          "types_rejected": {
+            "DEMAND": 296,
+            "SUPPLY": 287
+          }
+        },
+        {
+          "rule": "VOL_100",
+          "retained": 362,
+          "rejected": 763,
+          "dashboard_retained": 17,
+          "dashboard_rejected": 34,
+          "one_candle_retained": 322,
+          "one_candle_rejected": 730,
+          "multi_candle_retained": 40,
+          "multi_candle_rejected": 33,
+          "patterns_retained": {
+            "DBR": 52,
+            "RBR": 121,
+            "RBD": 63,
+            "DBD": 126
+          },
+          "patterns_rejected": {
+            "DBR": 173,
+            "RBR": 210,
+            "RBD": 157,
+            "DBD": 223
+          },
+          "types_retained": {
+            "DEMAND": 173,
+            "SUPPLY": 189
+          },
+          "types_rejected": {
+            "DEMAND": 383,
+            "SUPPLY": 380
+          }
+        },
+        {
+          "rule": "OCC_080",
+          "retained": 568,
+          "rejected": 557,
+          "dashboard_retained": 35,
+          "dashboard_rejected": 16,
+          "one_candle_retained": 514,
+          "one_candle_rejected": 538,
+          "multi_candle_retained": 54,
+          "multi_candle_rejected": 19,
+          "patterns_retained": {
+            "DBR": 130,
+            "RBR": 138,
+            "RBD": 136,
+            "DBD": 164
+          },
+          "patterns_rejected": {
+            "DBR": 95,
+            "RBR": 193,
+            "RBD": 84,
+            "DBD": 185
+          },
+          "types_retained": {
+            "DEMAND": 268,
+            "SUPPLY": 300
+          },
+          "types_rejected": {
+            "DEMAND": 288,
+            "SUPPLY": 269
+          }
+        },
+        {
+          "rule": "OCC_065",
+          "retained": 530,
+          "rejected": 595,
+          "dashboard_retained": 35,
+          "dashboard_rejected": 16,
+          "one_candle_retained": 483,
+          "one_candle_rejected": 569,
+          "multi_candle_retained": 47,
+          "multi_candle_rejected": 26,
+          "patterns_retained": {
+            "DBR": 123,
+            "RBR": 129,
+            "RBD": 131,
+            "DBD": 147
+          },
+          "patterns_rejected": {
+            "DBR": 102,
+            "RBR": 202,
+            "RBD": 89,
+            "DBD": 202
+          },
+          "types_retained": {
+            "DEMAND": 252,
+            "SUPPLY": 278
+          },
+          "types_rejected": {
+            "DEMAND": 304,
+            "SUPPLY": 291
+          }
+        },
+        {
+          "rule": "OVERLAP_080",
+          "retained": 756,
+          "rejected": 369,
+          "dashboard_retained": 38,
+          "dashboard_rejected": 13,
+          "one_candle_retained": 689,
+          "one_candle_rejected": 363,
+          "multi_candle_retained": 67,
+          "multi_candle_rejected": 6,
+          "patterns_retained": {
+            "DBR": 143,
+            "RBR": 235,
+            "RBD": 142,
+            "DBD": 236
+          },
+          "patterns_rejected": {
+            "DBR": 82,
+            "RBR": 96,
+            "RBD": 78,
+            "DBD": 113
+          },
+          "types_retained": {
+            "DEMAND": 378,
+            "SUPPLY": 378
+          },
+          "types_rejected": {
+            "DEMAND": 178,
+            "SUPPLY": 191
+          }
+        },
+        {
+          "rule": "COMBINED_LENIENT",
+          "retained": 870,
+          "rejected": 255,
+          "dashboard_retained": 44,
+          "dashboard_rejected": 7,
+          "one_candle_retained": 807,
+          "one_candle_rejected": 245,
+          "multi_candle_retained": 63,
+          "multi_candle_rejected": 10,
+          "patterns_retained": {
+            "DBR": 165,
+            "RBR": 258,
+            "RBD": 167,
+            "DBD": 280
+          },
+          "patterns_rejected": {
+            "DBR": 60,
+            "RBR": 73,
+            "RBD": 53,
+            "DBD": 69
+          },
+          "types_retained": {
+            "DEMAND": 423,
+            "SUPPLY": 447
+          },
+          "types_rejected": {
+            "DEMAND": 133,
+            "SUPPLY": 122
+          }
+        },
+        {
+          "rule": "COMBINED_BALANCED",
+          "retained": 782,
+          "rejected": 343,
+          "dashboard_retained": 43,
+          "dashboard_rejected": 8,
+          "one_candle_retained": 724,
+          "one_candle_rejected": 328,
+          "multi_candle_retained": 58,
+          "multi_candle_rejected": 15,
+          "patterns_retained": {
+            "DBR": 152,
+            "RBR": 228,
+            "RBD": 156,
+            "DBD": 246
+          },
+          "patterns_rejected": {
+            "DBR": 73,
+            "RBR": 103,
+            "RBD": 64,
+            "DBD": 103
+          },
+          "types_retained": {
+            "DEMAND": 380,
+            "SUPPLY": 402
+          },
+          "types_rejected": {
+            "DEMAND": 176,
+            "SUPPLY": 167
+          }
+        },
+        {
+          "rule": "TIERED_MINIMUM",
+          "retained": 633,
+          "rejected": 492,
+          "dashboard_retained": 39,
+          "dashboard_rejected": 12,
+          "one_candle_retained": 579,
+          "one_candle_rejected": 473,
+          "multi_candle_retained": 54,
+          "multi_candle_rejected": 19,
+          "patterns_retained": {
+            "DBR": 137,
+            "RBR": 157,
+            "RBD": 148,
+            "DBD": 191
+          },
+          "patterns_rejected": {
+            "DBR": 88,
+            "RBR": 174,
+            "RBD": 72,
+            "DBD": 158
+          },
+          "types_retained": {
+            "DEMAND": 294,
+            "SUPPLY": 339
+          },
+          "types_rejected": {
+            "DEMAND": 262,
+            "SUPPLY": 230
+          }
+        }
+      ],
+      "performance": {
+        "data_load_seconds": 4.344461,
+        "detection_seconds": 51.74376,
+        "detection_ms_per_zone": 45.994453
+      }
+    },
+    {
+      "audit_only": true,
+      "production_gate_active": false,
+      "timeframe": "MINUTE_75",
+      "universe": "nifty50",
+      "symbols_requested": 50,
+      "symbols_processed": 50,
+      "canonical_zones": 236,
+      "dashboard_qualified": 59,
+      "dashboard_visible": 17,
+      "patterns": {
+        "DBD": 69,
+        "RBR": 54,
+        "RBD": 50,
+        "DBR": 63
+      },
+      "zone_types": {
+        "SUPPLY": 119,
+        "DEMAND": 117
+      },
+      "one_candle_leg_ins": 221,
+      "multi_candle_leg_ins": 15,
+      "structural_states": {
+        "CONGESTED": 92,
+        "BORDERLINE": 33,
+        "ACCEPTABLE": 59,
+        "CLEAN": 47,
+        "INSUFFICIENT_EVIDENCE": 5
+      },
+      "reason_codes": {
+        "LEG_IN_DISPLACEMENT_STRONG": 129,
+        "APPROACH_HIGH_OCCUPANCY": 103,
+        "APPROACH_HIGH_OVERLAP": 67,
+        "APPROACH_DIRECTION_CHANGES": 54,
+        "APPROACH_LOW_OCCUPANCY": 133,
+        "APPROACH_OVERLAP_ACCEPTABLE": 169,
+        "LEG_IN_DISPLACEMENT_WEAK": 107,
+        "APPROACH_DIRECTIONAL": 182,
+        "APPROACH_INSUFFICIENT_HISTORY": 5
+      },
+      "metric_distributions": {
+        "directional_displacement": {
+          "min": 0.0,
+          "p10": 0.779999,
+          "p25": 2.549988,
+          "median": 6.800049,
+          "p75": 18.899902,
+          "p90": 39.0,
+          "max": 218.0
+        },
+        "displacement_zone_width_ratio": {
+          "min": 0.0,
+          "p10": 0.261368,
+          "p25": 0.634916,
+          "median": 1.125,
+          "p75": 2.196078,
+          "p90": 3.681685,
+          "max": 16.715382
+        },
+        "displacement_volatility_ratio": {
+          "min": 0.0,
+          "p10": 0.255561,
+          "p25": 0.473684,
+          "median": 0.722222,
+          "p75": 1.251789,
+          "p90": 1.815498,
+          "max": 6.740341
+        },
+        "approach_overlap_ratio": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "median": 0.568969,
+          "p75": 0.840907,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "prior_zone_occupancy_ratio": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.333333,
+          "median": 0.5,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "directional_efficiency": {
+          "min": 0.0,
+          "p10": 0.453487,
+          "p25": 0.824189,
+          "median": 1.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "approach_direction_changes": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "median": 0.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 2.0
+        },
+        "approach_candle_count": {
+          "min": 1.0,
+          "p10": 1.0,
+          "p25": 1.0,
+          "median": 2.0,
+          "p75": 2.0,
+          "p90": 3.0,
+          "max": 5.0
+        }
+      },
+      "threshold_study": [
+        {
+          "rule": "WIDTH_050",
+          "retained": 195,
+          "rejected": 41,
+          "dashboard_retained": 17,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 180,
+          "one_candle_rejected": 41,
+          "multi_candle_retained": 15,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 55,
+            "RBR": 43,
+            "RBD": 38,
+            "DBD": 59
+          },
+          "patterns_rejected": {
+            "DBR": 8,
+            "RBR": 11,
+            "RBD": 12,
+            "DBD": 10
+          },
+          "types_retained": {
+            "DEMAND": 98,
+            "SUPPLY": 97
+          },
+          "types_rejected": {
+            "DEMAND": 19,
+            "SUPPLY": 22
+          }
+        },
+        {
+          "rule": "WIDTH_100",
+          "retained": 129,
+          "rejected": 107,
+          "dashboard_retained": 12,
+          "dashboard_rejected": 5,
+          "one_candle_retained": 116,
+          "one_candle_rejected": 105,
+          "multi_candle_retained": 13,
+          "multi_candle_rejected": 2,
+          "patterns_retained": {
+            "DBR": 35,
+            "RBR": 30,
+            "RBD": 21,
+            "DBD": 43
+          },
+          "patterns_rejected": {
+            "DBR": 28,
+            "RBR": 24,
+            "RBD": 29,
+            "DBD": 26
+          },
+          "types_retained": {
+            "DEMAND": 65,
+            "SUPPLY": 64
+          },
+          "types_rejected": {
+            "DEMAND": 52,
+            "SUPPLY": 55
+          }
+        },
+        {
+          "rule": "VOL_075",
+          "retained": 111,
+          "rejected": 125,
+          "dashboard_retained": 10,
+          "dashboard_rejected": 7,
+          "one_candle_retained": 98,
+          "one_candle_rejected": 123,
+          "multi_candle_retained": 13,
+          "multi_candle_rejected": 2,
+          "patterns_retained": {
+            "DBR": 31,
+            "RBR": 25,
+            "RBD": 23,
+            "DBD": 32
+          },
+          "patterns_rejected": {
+            "DBR": 32,
+            "RBR": 29,
+            "RBD": 27,
+            "DBD": 37
+          },
+          "types_retained": {
+            "DEMAND": 56,
+            "SUPPLY": 55
+          },
+          "types_rejected": {
+            "DEMAND": 61,
+            "SUPPLY": 64
+          }
+        },
+        {
+          "rule": "VOL_100",
+          "retained": 85,
+          "rejected": 151,
+          "dashboard_retained": 8,
+          "dashboard_rejected": 9,
+          "one_candle_retained": 72,
+          "one_candle_rejected": 149,
+          "multi_candle_retained": 13,
+          "multi_candle_rejected": 2,
+          "patterns_retained": {
+            "DBR": 20,
+            "RBR": 22,
+            "RBD": 17,
+            "DBD": 26
+          },
+          "patterns_rejected": {
+            "DBR": 43,
+            "RBR": 32,
+            "RBD": 33,
+            "DBD": 43
+          },
+          "types_retained": {
+            "DEMAND": 42,
+            "SUPPLY": 43
+          },
+          "types_rejected": {
+            "DEMAND": 75,
+            "SUPPLY": 76
+          }
+        },
+        {
+          "rule": "OCC_080",
+          "retained": 133,
+          "rejected": 103,
+          "dashboard_retained": 11,
+          "dashboard_rejected": 6,
+          "one_candle_retained": 119,
+          "one_candle_rejected": 102,
+          "multi_candle_retained": 14,
+          "multi_candle_rejected": 1,
+          "patterns_retained": {
+            "DBR": 42,
+            "RBR": 27,
+            "RBD": 32,
+            "DBD": 32
+          },
+          "patterns_rejected": {
+            "DBR": 21,
+            "RBR": 27,
+            "RBD": 18,
+            "DBD": 37
+          },
+          "types_retained": {
+            "DEMAND": 69,
+            "SUPPLY": 64
+          },
+          "types_rejected": {
+            "DEMAND": 48,
+            "SUPPLY": 55
+          }
+        },
+        {
+          "rule": "OCC_065",
+          "retained": 126,
+          "rejected": 110,
+          "dashboard_retained": 11,
+          "dashboard_rejected": 6,
+          "one_candle_retained": 113,
+          "one_candle_rejected": 108,
+          "multi_candle_retained": 13,
+          "multi_candle_rejected": 2,
+          "patterns_retained": {
+            "DBR": 42,
+            "RBR": 23,
+            "RBD": 31,
+            "DBD": 30
+          },
+          "patterns_rejected": {
+            "DBR": 21,
+            "RBR": 31,
+            "RBD": 19,
+            "DBD": 39
+          },
+          "types_retained": {
+            "DEMAND": 65,
+            "SUPPLY": 61
+          },
+          "types_rejected": {
+            "DEMAND": 52,
+            "SUPPLY": 58
+          }
+        },
+        {
+          "rule": "OVERLAP_080",
+          "retained": 169,
+          "rejected": 67,
+          "dashboard_retained": 12,
+          "dashboard_rejected": 5,
+          "one_candle_retained": 155,
+          "one_candle_rejected": 66,
+          "multi_candle_retained": 14,
+          "multi_candle_rejected": 1,
+          "patterns_retained": {
+            "DBR": 45,
+            "RBR": 36,
+            "RBD": 36,
+            "DBD": 52
+          },
+          "patterns_rejected": {
+            "DBR": 18,
+            "RBR": 18,
+            "RBD": 14,
+            "DBD": 17
+          },
+          "types_retained": {
+            "DEMAND": 81,
+            "SUPPLY": 88
+          },
+          "types_rejected": {
+            "DEMAND": 36,
+            "SUPPLY": 31
+          }
+        },
+        {
+          "rule": "COMBINED_LENIENT",
+          "retained": 187,
+          "rejected": 49,
+          "dashboard_retained": 17,
+          "dashboard_rejected": 0,
+          "one_candle_retained": 172,
+          "one_candle_rejected": 49,
+          "multi_candle_retained": 15,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 53,
+            "RBR": 40,
+            "RBD": 36,
+            "DBD": 58
+          },
+          "patterns_rejected": {
+            "DBR": 10,
+            "RBR": 14,
+            "RBD": 14,
+            "DBD": 11
+          },
+          "types_retained": {
+            "DEMAND": 93,
+            "SUPPLY": 94
+          },
+          "types_rejected": {
+            "DEMAND": 24,
+            "SUPPLY": 25
+          }
+        },
+        {
+          "rule": "COMBINED_BALANCED",
+          "retained": 165,
+          "rejected": 71,
+          "dashboard_retained": 13,
+          "dashboard_rejected": 4,
+          "one_candle_retained": 150,
+          "one_candle_rejected": 71,
+          "multi_candle_retained": 15,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 47,
+            "RBR": 34,
+            "RBD": 34,
+            "DBD": 50
+          },
+          "patterns_rejected": {
+            "DBR": 16,
+            "RBR": 20,
+            "RBD": 16,
+            "DBD": 19
+          },
+          "types_retained": {
+            "DEMAND": 81,
+            "SUPPLY": 84
+          },
+          "types_rejected": {
+            "DEMAND": 36,
+            "SUPPLY": 35
+          }
+        },
+        {
+          "rule": "TIERED_MINIMUM",
+          "retained": 139,
+          "rejected": 97,
+          "dashboard_retained": 11,
+          "dashboard_rejected": 6,
+          "one_candle_retained": 125,
+          "one_candle_rejected": 96,
+          "multi_candle_retained": 14,
+          "multi_candle_rejected": 1,
+          "patterns_retained": {
+            "DBR": 44,
+            "RBR": 27,
+            "RBD": 32,
+            "DBD": 36
+          },
+          "patterns_rejected": {
+            "DBR": 19,
+            "RBR": 27,
+            "RBD": 18,
+            "DBD": 33
+          },
+          "types_retained": {
+            "DEMAND": 71,
+            "SUPPLY": 68
+          },
+          "types_rejected": {
+            "DEMAND": 46,
+            "SUPPLY": 51
+          }
+        }
+      ],
+      "performance": {
+        "data_load_seconds": 3.771137,
+        "detection_seconds": 8.87424,
+        "detection_ms_per_zone": 37.602714
+      }
+    },
+    {
+      "audit_only": true,
+      "production_gate_active": false,
+      "timeframe": "MINUTE_125",
+      "universe": "nifty50",
+      "symbols_requested": 50,
+      "symbols_processed": 50,
+      "canonical_zones": 162,
+      "dashboard_qualified": 35,
+      "dashboard_visible": 16,
+      "patterns": {
+        "RBD": 34,
+        "DBD": 45,
+        "DBR": 36,
+        "RBR": 47
+      },
+      "zone_types": {
+        "SUPPLY": 79,
+        "DEMAND": 83
+      },
+      "one_candle_leg_ins": 151,
+      "multi_candle_leg_ins": 11,
+      "structural_states": {
+        "INSUFFICIENT_EVIDENCE": 5,
+        "BORDERLINE": 29,
+        "CONGESTED": 67,
+        "CLEAN": 32,
+        "ACCEPTABLE": 29
+      },
+      "reason_codes": {
+        "LEG_IN_DISPLACEMENT_WEAK": 72,
+        "APPROACH_HIGH_OCCUPANCY": 80,
+        "APPROACH_OVERLAP_ACCEPTABLE": 117,
+        "APPROACH_DIRECTIONAL": 129,
+        "APPROACH_INSUFFICIENT_HISTORY": 5,
+        "APPROACH_LOW_OCCUPANCY": 82,
+        "APPROACH_HIGH_OVERLAP": 45,
+        "APPROACH_DIRECTION_CHANGES": 33,
+        "LEG_IN_DISPLACEMENT_STRONG": 90
+      },
+      "metric_distributions": {
+        "directional_displacement": {
+          "min": 0.0,
+          "p10": 1.0,
+          "p25": 3.149994,
+          "median": 9.200073,
+          "p75": 22.199951,
+          "p90": 40.5,
+          "max": 198.5
+        },
+        "displacement_zone_width_ratio": {
+          "min": 0.0,
+          "p10": 0.205882,
+          "p25": 0.568179,
+          "median": 1.116931,
+          "p75": 2.198987,
+          "p90": 3.814879,
+          "max": 11.374275
+        },
+        "displacement_volatility_ratio": {
+          "min": 0.0,
+          "p10": 0.252383,
+          "p25": 0.479257,
+          "median": 0.873565,
+          "p75": 1.444934,
+          "p90": 2.107145,
+          "max": 4.749996
+        },
+        "approach_overlap_ratio": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "median": 0.566533,
+          "p75": 0.853245,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "prior_zone_occupancy_ratio": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.333333,
+          "median": 0.666667,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "directional_efficiency": {
+          "min": 0.0,
+          "p10": 0.402597,
+          "p25": 0.86285,
+          "median": 1.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 1.0
+        },
+        "approach_direction_changes": {
+          "min": 0.0,
+          "p10": 0.0,
+          "p25": 0.0,
+          "median": 0.0,
+          "p75": 1.0,
+          "p90": 1.0,
+          "max": 2.0
+        },
+        "approach_candle_count": {
+          "min": 1.0,
+          "p10": 1.0,
+          "p25": 1.0,
+          "median": 2.0,
+          "p75": 2.0,
+          "p90": 3.0,
+          "max": 4.0
+        }
+      },
+      "threshold_study": [
+        {
+          "rule": "WIDTH_050",
+          "retained": 126,
+          "rejected": 36,
+          "dashboard_retained": 13,
+          "dashboard_rejected": 3,
+          "one_candle_retained": 115,
+          "one_candle_rejected": 36,
+          "multi_candle_retained": 11,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 28,
+            "RBR": 34,
+            "RBD": 26,
+            "DBD": 38
+          },
+          "patterns_rejected": {
+            "DBR": 8,
+            "RBR": 13,
+            "RBD": 8,
+            "DBD": 7
+          },
+          "types_retained": {
+            "DEMAND": 62,
+            "SUPPLY": 64
+          },
+          "types_rejected": {
+            "DEMAND": 21,
+            "SUPPLY": 15
+          }
+        },
+        {
+          "rule": "WIDTH_100",
+          "retained": 90,
+          "rejected": 72,
+          "dashboard_retained": 8,
+          "dashboard_rejected": 8,
+          "one_candle_retained": 82,
+          "one_candle_rejected": 69,
+          "multi_candle_retained": 8,
+          "multi_candle_rejected": 3,
+          "patterns_retained": {
+            "DBR": 21,
+            "RBR": 21,
+            "RBD": 18,
+            "DBD": 30
+          },
+          "patterns_rejected": {
+            "DBR": 15,
+            "RBR": 26,
+            "RBD": 16,
+            "DBD": 15
+          },
+          "types_retained": {
+            "DEMAND": 42,
+            "SUPPLY": 48
+          },
+          "types_rejected": {
+            "DEMAND": 41,
+            "SUPPLY": 31
+          }
+        },
+        {
+          "rule": "VOL_075",
+          "retained": 84,
+          "rejected": 78,
+          "dashboard_retained": 10,
+          "dashboard_rejected": 6,
+          "one_candle_retained": 75,
+          "one_candle_rejected": 76,
+          "multi_candle_retained": 9,
+          "multi_candle_rejected": 2,
+          "patterns_retained": {
+            "DBR": 20,
+            "RBR": 24,
+            "RBD": 15,
+            "DBD": 25
+          },
+          "patterns_rejected": {
+            "DBR": 16,
+            "RBR": 23,
+            "RBD": 19,
+            "DBD": 20
+          },
+          "types_retained": {
+            "DEMAND": 44,
+            "SUPPLY": 40
+          },
+          "types_rejected": {
+            "DEMAND": 39,
+            "SUPPLY": 39
+          }
+        },
+        {
+          "rule": "VOL_100",
+          "retained": 65,
+          "rejected": 97,
+          "dashboard_retained": 8,
+          "dashboard_rejected": 8,
+          "one_candle_retained": 57,
+          "one_candle_rejected": 94,
+          "multi_candle_retained": 8,
+          "multi_candle_rejected": 3,
+          "patterns_retained": {
+            "DBR": 16,
+            "RBR": 20,
+            "RBD": 9,
+            "DBD": 20
+          },
+          "patterns_rejected": {
+            "DBR": 20,
+            "RBR": 27,
+            "RBD": 25,
+            "DBD": 25
+          },
+          "types_retained": {
+            "DEMAND": 36,
+            "SUPPLY": 29
+          },
+          "types_rejected": {
+            "DEMAND": 47,
+            "SUPPLY": 50
+          }
+        },
+        {
+          "rule": "OCC_080",
+          "retained": 82,
+          "rejected": 80,
+          "dashboard_retained": 9,
+          "dashboard_rejected": 7,
+          "one_candle_retained": 72,
+          "one_candle_rejected": 79,
+          "multi_candle_retained": 10,
+          "multi_candle_rejected": 1,
+          "patterns_retained": {
+            "DBR": 20,
+            "RBR": 16,
+            "RBD": 17,
+            "DBD": 29
+          },
+          "patterns_rejected": {
+            "DBR": 16,
+            "RBR": 31,
+            "RBD": 17,
+            "DBD": 16
+          },
+          "types_retained": {
+            "DEMAND": 36,
+            "SUPPLY": 46
+          },
+          "types_rejected": {
+            "DEMAND": 47,
+            "SUPPLY": 33
+          }
+        },
+        {
+          "rule": "OCC_065",
+          "retained": 73,
+          "rejected": 89,
+          "dashboard_retained": 7,
+          "dashboard_rejected": 9,
+          "one_candle_retained": 66,
+          "one_candle_rejected": 85,
+          "multi_candle_retained": 7,
+          "multi_candle_rejected": 4,
+          "patterns_retained": {
+            "DBR": 18,
+            "RBR": 14,
+            "RBD": 17,
+            "DBD": 24
+          },
+          "patterns_rejected": {
+            "DBR": 18,
+            "RBR": 33,
+            "RBD": 17,
+            "DBD": 21
+          },
+          "types_retained": {
+            "DEMAND": 32,
+            "SUPPLY": 41
+          },
+          "types_rejected": {
+            "DEMAND": 51,
+            "SUPPLY": 38
+          }
+        },
+        {
+          "rule": "OVERLAP_080",
+          "retained": 117,
+          "rejected": 45,
+          "dashboard_retained": 10,
+          "dashboard_rejected": 6,
+          "one_candle_retained": 108,
+          "one_candle_rejected": 43,
+          "multi_candle_retained": 9,
+          "multi_candle_rejected": 2,
+          "patterns_retained": {
+            "DBR": 27,
+            "RBR": 31,
+            "RBD": 24,
+            "DBD": 35
+          },
+          "patterns_rejected": {
+            "DBR": 9,
+            "RBR": 16,
+            "RBD": 10,
+            "DBD": 10
+          },
+          "types_retained": {
+            "DEMAND": 58,
+            "SUPPLY": 59
+          },
+          "types_rejected": {
+            "DEMAND": 25,
+            "SUPPLY": 20
+          }
+        },
+        {
+          "rule": "COMBINED_LENIENT",
+          "retained": 126,
+          "rejected": 36,
+          "dashboard_retained": 13,
+          "dashboard_rejected": 3,
+          "one_candle_retained": 115,
+          "one_candle_rejected": 36,
+          "multi_candle_retained": 11,
+          "multi_candle_rejected": 0,
+          "patterns_retained": {
+            "DBR": 28,
+            "RBR": 34,
+            "RBD": 26,
+            "DBD": 38
+          },
+          "patterns_rejected": {
+            "DBR": 8,
+            "RBR": 13,
+            "RBD": 8,
+            "DBD": 7
+          },
+          "types_retained": {
+            "DEMAND": 62,
+            "SUPPLY": 64
+          },
+          "types_rejected": {
+            "DEMAND": 21,
+            "SUPPLY": 15
+          }
+        },
+        {
+          "rule": "COMBINED_BALANCED",
+          "retained": 109,
+          "rejected": 53,
+          "dashboard_retained": 11,
+          "dashboard_rejected": 5,
+          "one_candle_retained": 99,
+          "one_candle_rejected": 52,
+          "multi_candle_retained": 10,
+          "multi_candle_rejected": 1,
+          "patterns_retained": {
+            "DBR": 25,
+            "RBR": 27,
+            "RBD": 24,
+            "DBD": 33
+          },
+          "patterns_rejected": {
+            "DBR": 11,
+            "RBR": 20,
+            "RBD": 10,
+            "DBD": 12
+          },
+          "types_retained": {
+            "DEMAND": 52,
+            "SUPPLY": 57
+          },
+          "types_rejected": {
+            "DEMAND": 31,
+            "SUPPLY": 22
+          }
+        },
+        {
+          "rule": "TIERED_MINIMUM",
+          "retained": 90,
+          "rejected": 72,
+          "dashboard_retained": 10,
+          "dashboard_rejected": 6,
+          "one_candle_retained": 80,
+          "one_candle_rejected": 71,
+          "multi_candle_retained": 10,
+          "multi_candle_rejected": 1,
+          "patterns_retained": {
+            "DBR": 21,
+            "RBR": 19,
+            "RBD": 18,
+            "DBD": 32
+          },
+          "patterns_rejected": {
+            "DBR": 15,
+            "RBR": 28,
+            "RBD": 16,
+            "DBD": 13
+          },
+          "types_retained": {
+            "DEMAND": 40,
+            "SUPPLY": 50
+          },
+          "types_rejected": {
+            "DEMAND": 43,
+            "SUPPLY": 29
+          }
+        }
+      ],
+      "performance": {
+        "data_load_seconds": 5.385012,
+        "detection_seconds": 5.764452,
+        "detection_ms_per_zone": 35.583035
+      }
+    }
+  ],
+  "combined": {
+    "canonical_zones": 2476,
+    "dashboard_visible": 147,
+    "one_candle_leg_ins": 2298,
+    "multi_candle_leg_ins": 178,
+    "structural_states": {
+      "CONGESTED": 1063,
+      "ACCEPTABLE": 556,
+      "INSUFFICIENT_EVIDENCE": 80,
+      "CLEAN": 400,
+      "BORDERLINE": 377
+    }
+  },
+  "threshold_study": {
+    "HARD_WIDTH_050": {
+      "retained": 1980,
+      "rejected": 496,
+      "dashboard_retained": 123,
+      "dashboard_rejected": 24,
+      "one_candle_retained": 1818,
+      "one_candle_rejected": 480,
+      "multi_candle_retained": 162,
+      "multi_candle_rejected": 16,
+      "patterns_retained": {
+        "DBR": 467,
+        "RBR": 565,
+        "RBD": 336,
+        "DBD": 612
+      },
+      "patterns_rejected": {
+        "DBR": 144,
+        "RBR": 120,
+        "RBD": 107,
+        "DBD": 125
+      },
+      "types_retained": {
+        "DEMAND": 1032,
+        "SUPPLY": 948
+      },
+      "types_rejected": {
+        "DEMAND": 264,
+        "SUPPLY": 232
+      },
+      "timeframes_retained": {
+        "1D": 741,
+        "1W": 13,
+        "15m": 905,
+        "75m": 195,
+        "125m": 126
+      },
+      "timeframes_rejected": {
+        "1D": 191,
+        "1W": 8,
+        "15m": 220,
+        "75m": 41,
+        "125m": 36
+      }
+    },
+    "HARD_WIDTH_100": {
+      "retained": 1312,
+      "rejected": 1164,
+      "dashboard_retained": 87,
+      "dashboard_rejected": 60,
+      "one_candle_retained": 1182,
+      "one_candle_rejected": 1116,
+      "multi_candle_retained": 130,
+      "multi_candle_rejected": 48,
+      "patterns_retained": {
+        "DBR": 287,
+        "RBR": 376,
+        "RBD": 220,
+        "DBD": 429
+      },
+      "patterns_rejected": {
+        "DBR": 324,
+        "RBR": 309,
+        "RBD": 223,
+        "DBD": 308
+      },
+      "types_retained": {
+        "DEMAND": 663,
+        "SUPPLY": 649
+      },
+      "types_rejected": {
+        "DEMAND": 633,
+        "SUPPLY": 531
+      },
+      "timeframes_retained": {
+        "1D": 471,
+        "1W": 8,
+        "15m": 614,
+        "75m": 129,
+        "125m": 90
+      },
+      "timeframes_rejected": {
+        "1D": 461,
+        "1W": 13,
+        "15m": 511,
+        "75m": 107,
+        "125m": 72
+      }
+    },
+    "HARD_VOLATILITY_075": {
+      "retained": 1145,
+      "rejected": 1331,
+      "dashboard_retained": 75,
+      "dashboard_rejected": 72,
+      "one_candle_retained": 1015,
+      "one_candle_rejected": 1283,
+      "multi_candle_retained": 130,
+      "multi_candle_rejected": 48,
+      "patterns_retained": {
+        "DBR": 244,
+        "RBR": 355,
+        "RBD": 196,
+        "DBD": 350
+      },
+      "patterns_rejected": {
+        "DBR": 367,
+        "RBR": 330,
+        "RBD": 247,
+        "DBD": 387
+      },
+      "types_retained": {
+        "DEMAND": 599,
+        "SUPPLY": 546
+      },
+      "types_rejected": {
+        "DEMAND": 697,
+        "SUPPLY": 634
+      },
+      "timeframes_retained": {
+        "1D": 406,
+        "1W": 2,
+        "15m": 542,
+        "75m": 111,
+        "125m": 84
+      },
+      "timeframes_rejected": {
+        "1D": 526,
+        "1W": 19,
+        "15m": 583,
+        "75m": 125,
+        "125m": 78
+      }
+    },
+    "HARD_VOLATILITY_100": {
+      "retained": 776,
+      "rejected": 1700,
+      "dashboard_retained": 61,
+      "dashboard_rejected": 86,
+      "one_candle_retained": 672,
+      "one_candle_rejected": 1626,
+      "multi_candle_retained": 104,
+      "multi_candle_rejected": 74,
+      "patterns_retained": {
+        "DBR": 153,
+        "RBR": 256,
+        "RBD": 135,
+        "DBD": 232
+      },
+      "patterns_rejected": {
+        "DBR": 458,
+        "RBR": 429,
+        "RBD": 308,
+        "DBD": 505
+      },
+      "types_retained": {
+        "DEMAND": 409,
+        "SUPPLY": 367
+      },
+      "types_rejected": {
+        "DEMAND": 887,
+        "SUPPLY": 813
+      },
+      "timeframes_retained": {
+        "1D": 262,
+        "1W": 2,
+        "15m": 362,
+        "75m": 85,
+        "125m": 65
+      },
+      "timeframes_rejected": {
+        "1D": 670,
+        "1W": 19,
+        "15m": 763,
+        "75m": 151,
+        "125m": 97
+      }
+    },
+    "HARD_OCCUPANCY_080": {
+      "retained": 1231,
+      "rejected": 1245,
+      "dashboard_retained": 90,
+      "dashboard_rejected": 57,
+      "one_candle_retained": 1098,
+      "one_candle_rejected": 1200,
+      "multi_candle_retained": 133,
+      "multi_candle_rejected": 45,
+      "patterns_retained": {
+        "DBR": 316,
+        "RBR": 320,
+        "RBD": 265,
+        "DBD": 330
+      },
+      "patterns_rejected": {
+        "DBR": 295,
+        "RBR": 365,
+        "RBD": 178,
+        "DBD": 407
+      },
+      "types_retained": {
+        "DEMAND": 636,
+        "SUPPLY": 595
+      },
+      "types_rejected": {
+        "DEMAND": 660,
+        "SUPPLY": 585
+      },
+      "timeframes_retained": {
+        "1D": 440,
+        "1W": 8,
+        "15m": 568,
+        "75m": 133,
+        "125m": 82
+      },
+      "timeframes_rejected": {
+        "1D": 492,
+        "1W": 13,
+        "15m": 557,
+        "75m": 103,
+        "125m": 80
+      }
+    },
+    "HARD_OCCUPANCY_065": {
+      "retained": 1128,
+      "rejected": 1348,
+      "dashboard_retained": 84,
+      "dashboard_rejected": 63,
+      "one_candle_retained": 1015,
+      "one_candle_rejected": 1283,
+      "multi_candle_retained": 113,
+      "multi_candle_rejected": 65,
+      "patterns_retained": {
+        "DBR": 296,
+        "RBR": 295,
+        "RBD": 256,
+        "DBD": 281
+      },
+      "patterns_rejected": {
+        "DBR": 315,
+        "RBR": 390,
+        "RBD": 187,
+        "DBD": 456
+      },
+      "types_retained": {
+        "DEMAND": 591,
+        "SUPPLY": 537
+      },
+      "types_rejected": {
+        "DEMAND": 705,
+        "SUPPLY": 643
+      },
+      "timeframes_retained": {
+        "1D": 391,
+        "1W": 8,
+        "15m": 530,
+        "75m": 126,
+        "125m": 73
+      },
+      "timeframes_rejected": {
+        "1D": 541,
+        "1W": 13,
+        "15m": 595,
+        "75m": 110,
+        "125m": 89
+      }
+    },
+    "HARD_OVERLAP_080": {
+      "retained": 1740,
+      "rejected": 736,
+      "dashboard_retained": 100,
+      "dashboard_rejected": 47,
+      "one_candle_retained": 1584,
+      "one_candle_rejected": 714,
+      "multi_candle_retained": 156,
+      "multi_candle_rejected": 22,
+      "patterns_retained": {
+        "DBR": 424,
+        "RBR": 501,
+        "RBD": 301,
+        "DBD": 514
+      },
+      "patterns_rejected": {
+        "DBR": 187,
+        "RBR": 184,
+        "RBD": 142,
+        "DBD": 223
+      },
+      "types_retained": {
+        "DEMAND": 925,
+        "SUPPLY": 815
+      },
+      "types_rejected": {
+        "DEMAND": 371,
+        "SUPPLY": 365
+      },
+      "timeframes_retained": {
+        "1D": 683,
+        "1W": 15,
+        "15m": 756,
+        "75m": 169,
+        "125m": 117
+      },
+      "timeframes_rejected": {
+        "1D": 249,
+        "1W": 6,
+        "15m": 369,
+        "75m": 67,
+        "125m": 45
+      }
+    },
+    "COMBINED_LENIENT": {
+      "retained": 1904,
+      "rejected": 572,
+      "dashboard_retained": 121,
+      "dashboard_rejected": 26,
+      "one_candle_retained": 1743,
+      "one_candle_rejected": 555,
+      "multi_candle_retained": 161,
+      "multi_candle_rejected": 17,
+      "patterns_retained": {
+        "DBR": 449,
+        "RBR": 543,
+        "RBD": 328,
+        "DBD": 584
+      },
+      "patterns_rejected": {
+        "DBR": 162,
+        "RBR": 142,
+        "RBD": 115,
+        "DBD": 153
+      },
+      "types_retained": {
+        "DEMAND": 992,
+        "SUPPLY": 912
+      },
+      "types_rejected": {
+        "DEMAND": 304,
+        "SUPPLY": 268
+      },
+      "timeframes_retained": {
+        "1D": 709,
+        "1W": 12,
+        "15m": 870,
+        "75m": 187,
+        "125m": 126
+      },
+      "timeframes_rejected": {
+        "1D": 223,
+        "1W": 9,
+        "15m": 255,
+        "75m": 49,
+        "125m": 36
+      }
+    },
+    "COMBINED_BALANCED": {
+      "retained": 1698,
+      "rejected": 778,
+      "dashboard_retained": 109,
+      "dashboard_rejected": 38,
+      "one_candle_retained": 1553,
+      "one_candle_rejected": 745,
+      "multi_candle_retained": 145,
+      "multi_candle_rejected": 33,
+      "patterns_retained": {
+        "DBR": 411,
+        "RBR": 483,
+        "RBD": 303,
+        "DBD": 501
+      },
+      "patterns_rejected": {
+        "DBR": 200,
+        "RBR": 202,
+        "RBD": 140,
+        "DBD": 236
+      },
+      "types_retained": {
+        "DEMAND": 894,
+        "SUPPLY": 804
+      },
+      "types_rejected": {
+        "DEMAND": 402,
+        "SUPPLY": 376
+      },
+      "timeframes_retained": {
+        "1D": 630,
+        "1W": 12,
+        "15m": 782,
+        "75m": 165,
+        "125m": 109
+      },
+      "timeframes_rejected": {
+        "1D": 302,
+        "1W": 9,
+        "15m": 343,
+        "75m": 71,
+        "125m": 53
+      }
+    },
+    "TIERED_MINIMUM": {
+      "retained": 1333,
+      "rejected": 1143,
+      "dashboard_retained": 96,
+      "dashboard_rejected": 51,
+      "one_candle_retained": 1200,
+      "one_candle_rejected": 1098,
+      "multi_candle_retained": 133,
+      "multi_candle_rejected": 45,
+      "patterns_retained": {
+        "DBR": 322,
+        "RBR": 352,
+        "RBD": 280,
+        "DBD": 379
+      },
+      "patterns_rejected": {
+        "DBR": 289,
+        "RBR": 333,
+        "RBD": 163,
+        "DBD": 358
+      },
+      "types_retained": {
+        "DEMAND": 674,
+        "SUPPLY": 659
+      },
+      "types_rejected": {
+        "DEMAND": 622,
+        "SUPPLY": 521
+      },
+      "timeframes_retained": {
+        "1D": 465,
+        "1W": 6,
+        "15m": 633,
+        "75m": 139,
+        "125m": 90
+      },
+      "timeframes_rejected": {
+        "1D": 467,
+        "1W": 15,
+        "15m": 492,
+        "75m": 97,
+        "125m": 72
+      }
+    }
+  },
+  "examples": {
+    "clean_one_candle_drop": {
+      "symbol": "AUBANK",
+      "timeframe": "1D",
+      "zone_id": "ZONE-3368BE72DBEF0E03B460",
+      "pattern": "DBR",
+      "zone_type": "DEMAND",
+      "proximal": 979.049214840442,
+      "distal": 959.0686186192086,
+      "created_index": 18,
+      "formation_timestamp": "2026-07-23 00:00:00",
+      "dashboard_qualified": true,
+      "dashboard_visible": true,
+      "leg_in_start_index": 17,
+      "leg_in_end_index": 17,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 17,
+      "broader_approach_end_index": 17,
+      "approach_candle_count": 1,
+      "pause_candle_count": 0,
+      "backward_walk_stop_reason": "OPPOSITE_EXCITING_IMPULSE",
+      "directional_displacement": 23.776897,
+      "total_approach_travel": 23.776897,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 1.189999,
+      "displacement_volatility_ratio": 1.195978,
+      "approach_overlap_ratio": 0.0,
+      "prior_zone_occupancy_ratio": 0.0,
+      "pre_leg_in_occupancy_ratio": null,
+      "weighted_full_approach_occupancy_ratio": 0.0,
+      "material_zone_width_occupancy_ratio": 0.0,
+      "body_occupancy_ratio": 0.0,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 0.0,
+      "approach_direction_changes": 0,
+      "structural_state": "CLEAN",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 17,
+          "timestamp": "2026-07-22 00:00:00",
+          "open": 1003.0259205134474,
+          "high": 1003.0259205134474,
+          "low": 974.753389331613,
+          "close": 979.2490234375,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 17,
+          "timestamp": "2026-07-22T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 23.7768970759474,
+          "range": 28.2725311818344,
+          "body_ratio": 0.8409893307050087,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 18,
+          "timestamp": "2026-07-23T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 1.298726559192,
+          "range": 29.2715612689189,
+          "body_ratio": 0.044368202545144474,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 19,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 34.9660437230569,
+          "range": 48.4529463019504,
+          "body_ratio": 0.7216494845360806,
+          "explosive": false
+        },
+        {
+          "index": 20,
+          "timestamp": "2026-07-27T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 31.1696801006319,
+          "range": 40.9602206454064,
+          "body_ratio": 0.7609744188262206,
+          "explosive": false
+        }
+      ]
+    },
+    "clean_one_candle_rally": {
+      "symbol": "CHOICEIN",
+      "timeframe": "1D",
+      "zone_id": "ZONE-33A7EA133B94C2366FB3",
+      "pattern": "RBD",
+      "zone_type": "SUPPLY",
+      "proximal": 843.7999877929688,
+      "distal": 854.2999877929688,
+      "created_index": 30,
+      "formation_timestamp": "2026-08-10 00:00:00",
+      "dashboard_qualified": true,
+      "dashboard_visible": true,
+      "leg_in_start_index": 29,
+      "leg_in_end_index": 29,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 28,
+      "broader_approach_end_index": 29,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 15.850037,
+      "total_approach_travel": 15.850037,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 1.509527,
+      "displacement_volatility_ratio": 1.13417,
+      "approach_overlap_ratio": 0.837835,
+      "prior_zone_occupancy_ratio": 0.0,
+      "pre_leg_in_occupancy_ratio": 0.0,
+      "weighted_full_approach_occupancy_ratio": 0.0,
+      "material_zone_width_occupancy_ratio": 0.0,
+      "body_occupancy_ratio": 0.0,
+      "adjacent_body_overlap_ratio": 0.1519,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 0,
+      "structural_state": "CLEAN",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_HIGH_OVERLAP",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 28,
+          "timestamp": "2026-08-06 00:00:00",
+          "open": 825.2999877929688,
+          "high": 841.8499755859375,
+          "low": 824.5,
+          "close": 833.2000122070312,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 29,
+          "timestamp": "2026-08-07 00:00:00",
+          "open": 832.0,
+          "high": 843.9500122070312,
+          "low": 831.0,
+          "close": 841.1500244140625,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 29,
+          "timestamp": "2026-08-07T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 9.1500244140625,
+          "range": 12.9500122070312,
+          "body_ratio": 0.7065649257916916,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 30,
+          "timestamp": "2026-08-10T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 0.9500122070312,
+          "range": 12.4500122070312,
+          "body_ratio": 0.0763061265509986,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 31,
+          "timestamp": "2026-08-11T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 27.6499633789063,
+          "range": 34.2999877929688,
+          "body_ratio": 0.8061216681999608,
+          "explosive": true
+        }
+      ]
+    },
+    "clean_multi_candle_drop": {
+      "symbol": "MAXHEALTH",
+      "timeframe": "125m",
+      "zone_id": "ZONE-FC61DC709F51D9D37564",
+      "pattern": "DBD",
+      "zone_type": "SUPPLY",
+      "proximal": 1040.0,
+      "distal": 1044.699951171875,
+      "created_index": 82,
+      "formation_timestamp": "2026-08-11 13:15:00+05:30",
+      "dashboard_qualified": true,
+      "dashboard_visible": true,
+      "leg_in_start_index": 80,
+      "leg_in_end_index": 81,
+      "leg_in_candle_count": 2,
+      "broader_approach_start_index": 78,
+      "broader_approach_end_index": 81,
+      "approach_candle_count": 4,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "OPPOSITE_EXCITING_IMPULSE",
+      "directional_displacement": 39.5,
+      "total_approach_travel": 39.5,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 8.404343,
+      "displacement_volatility_ratio": 3.640541,
+      "approach_overlap_ratio": 0.492853,
+      "prior_zone_occupancy_ratio": 0.25,
+      "pre_leg_in_occupancy_ratio": 0.0,
+      "weighted_full_approach_occupancy_ratio": 0.1,
+      "material_zone_width_occupancy_ratio": 0.5,
+      "body_occupancy_ratio": 0.25,
+      "adjacent_body_overlap_ratio": 0.032052,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 0,
+      "structural_state": "CLEAN",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 78,
+          "timestamp": "2026-08-10 12:15:00+05:30",
+          "open": 1079.5,
+          "high": 1079.699951171875,
+          "low": 1072.9000244140625,
+          "close": 1074.300048828125,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 79,
+          "timestamp": "2026-08-10 14:20:00+05:30",
+          "open": 1074.800048828125,
+          "high": 1075.0,
+          "low": 1054.5,
+          "close": 1069.0,
+          "structure": "BASE",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 80,
+          "timestamp": "2026-08-11 09:05:00+05:30",
+          "open": 1066.300048828125,
+          "high": 1066.300048828125,
+          "low": 1042.699951171875,
+          "close": 1050.0,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 81,
+          "timestamp": "2026-08-11 11:10:00+05:30",
+          "open": 1050.0,
+          "high": 1052.800048828125,
+          "low": 1035.800048828125,
+          "close": 1040.0,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 80,
+          "timestamp": "2026-08-11T09:05:00+05:30",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 16.300048828125,
+          "range": 23.60009765625,
+          "body_ratio": 0.6906771770839799,
+          "explosive": false
+        },
+        {
+          "index": 81,
+          "timestamp": "2026-08-11T11:10:00+05:30",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 10.0,
+          "range": 17.0,
+          "body_ratio": 0.5882352941176471,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 82,
+          "timestamp": "2026-08-11T13:15:00+05:30",
+          "structure": "BASE",
+          "direction": "NEUTRAL",
+          "body": 0.0,
+          "range": 6.699951171875,
+          "body_ratio": 0.0,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 83,
+          "timestamp": "2026-08-12T08:00:00+05:30",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 13.9000244140625,
+          "range": 18.699951171875,
+          "body_ratio": 0.7433187544878909,
+          "explosive": true
+        },
+        {
+          "index": 84,
+          "timestamp": "2026-08-12T10:05:00+05:30",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 9.7999877929688,
+          "range": 11.7000122070313,
+          "body_ratio": 0.8376049203674633,
+          "explosive": false
+        }
+      ]
+    },
+    "clean_multi_candle_rally": {
+      "symbol": "HINDALCO",
+      "timeframe": "125m",
+      "zone_id": "ZONE-43644A82DB1DD180F72D",
+      "pattern": "RBR",
+      "zone_type": "DEMAND",
+      "proximal": 1003.9500122070312,
+      "distal": 1000.25,
+      "created_index": 62,
+      "formation_timestamp": "2026-08-04 10:25:00+05:30",
+      "dashboard_qualified": true,
+      "dashboard_visible": true,
+      "leg_in_start_index": 60,
+      "leg_in_end_index": 61,
+      "leg_in_candle_count": 2,
+      "broader_approach_start_index": 58,
+      "broader_approach_end_index": 61,
+      "approach_candle_count": 4,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "OPPOSITE_EXCITING_IMPULSE",
+      "directional_displacement": 19.5,
+      "total_approach_travel": 19.5,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 5.270253,
+      "displacement_volatility_ratio": 2.805763,
+      "approach_overlap_ratio": 0.517319,
+      "prior_zone_occupancy_ratio": 0.0,
+      "pre_leg_in_occupancy_ratio": 0.0,
+      "weighted_full_approach_occupancy_ratio": 0.0,
+      "material_zone_width_occupancy_ratio": 0.25,
+      "body_occupancy_ratio": 0.25,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 0.666667,
+      "approach_direction_changes": 0,
+      "structural_state": "CLEAN",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 58,
+          "timestamp": "2026-08-03 09:25:00+05:30",
+          "open": 984.4500122070312,
+          "high": 988.7999877929688,
+          "low": 982.2000122070312,
+          "close": 988.25,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 59,
+          "timestamp": "2026-08-03 11:30:00+05:30",
+          "open": 988.5,
+          "high": 991.0,
+          "low": 986.6500244140625,
+          "close": 989.3499755859375,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 60,
+          "timestamp": "2026-08-03 13:35:00+05:30",
+          "open": 989.4000244140625,
+          "high": 994.9000244140625,
+          "low": 987.4500122070312,
+          "close": 994.9000244140625,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 61,
+          "timestamp": "2026-08-04 08:20:00+05:30",
+          "open": 994.9000244140625,
+          "high": 1011.0999755859375,
+          "low": 993.0999755859375,
+          "close": 1003.9500122070312,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 60,
+          "timestamp": "2026-08-03T13:35:00+05:30",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 5.5,
+          "range": 7.4500122070313,
+          "body_ratio": 0.7382538239077133,
+          "explosive": false
+        },
+        {
+          "index": 61,
+          "timestamp": "2026-08-04T08:20:00+05:30",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 9.0499877929687,
+          "range": 18.0,
+          "body_ratio": 0.5027770996093722,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 62,
+          "timestamp": "2026-08-04T10:25:00+05:30",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 0.7999877929687,
+          "range": 6.0999755859375,
+          "body_ratio": 0.13114606471752796,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 63,
+          "timestamp": "2026-08-04T12:30:00+05:30",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 9.5499877929687,
+          "range": 13.0499877929688,
+          "body_ratio": 0.7318005154084616,
+          "explosive": true
+        },
+        {
+          "index": 64,
+          "timestamp": "2026-08-04T14:35:00+05:30",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 7.2999877929688,
+          "range": 8.75,
+          "body_ratio": 0.8342843191964343,
+          "explosive": false
+        }
+      ]
+    },
+    "congested_drop": {
+      "symbol": "ATUL",
+      "timeframe": "1D",
+      "zone_id": "ZONE-A0209D99299EAAFEB5E2",
+      "pattern": "DBR",
+      "zone_type": "DEMAND",
+      "proximal": 6148.5,
+      "distal": 6070.0,
+      "created_index": 18,
+      "formation_timestamp": "2026-07-23 00:00:00",
+      "dashboard_qualified": true,
+      "dashboard_visible": true,
+      "leg_in_start_index": 17,
+      "leg_in_end_index": 17,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 17,
+      "broader_approach_end_index": 17,
+      "approach_candle_count": 1,
+      "pause_candle_count": 0,
+      "backward_walk_stop_reason": "OPPOSITE_EXCITING_IMPULSE",
+      "directional_displacement": 87.5,
+      "total_approach_travel": 87.5,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 1.11465,
+      "displacement_volatility_ratio": 0.569136,
+      "approach_overlap_ratio": 0.0,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": null,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 0.0,
+      "adjacent_body_overlap_ratio": 0.0,
+      "material_adjacent_range_overlap_ratio": 0.0,
+      "approach_direction_changes": 0,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_STRONG",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 17,
+          "timestamp": "2026-07-22 00:00:00",
+          "open": 6225.0,
+          "high": 6232.0,
+          "low": 6070.0,
+          "close": 6137.5,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 17,
+          "timestamp": "2026-07-22T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 87.5,
+          "range": 162.0,
+          "body_ratio": 0.5401234567901234,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 18,
+          "timestamp": "2026-07-23T00:00:00",
+          "structure": "BASE",
+          "direction": "BEARISH",
+          "body": 18.5,
+          "range": 223.0,
+          "body_ratio": 0.08295964125560538,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 19,
+          "timestamp": "2026-07-24T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 271.5,
+          "range": 447.5,
+          "body_ratio": 0.6067039106145251,
+          "explosive": false
+        },
+        {
+          "index": 20,
+          "timestamp": "2026-07-27T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 199.5,
+          "range": 288.0,
+          "body_ratio": 0.6927083333333334,
+          "explosive": false
+        }
+      ]
+    },
+    "congested_rally": {
+      "symbol": "JUBLPHARMA",
+      "timeframe": "1D",
+      "zone_id": "ZONE-42E3128B042B1FA75EB2",
+      "pattern": "RBD",
+      "zone_type": "SUPPLY",
+      "proximal": 929.7000122070312,
+      "distal": 995.0,
+      "created_index": 31,
+      "formation_timestamp": "2026-08-11 00:00:00",
+      "dashboard_qualified": true,
+      "dashboard_visible": true,
+      "leg_in_start_index": 30,
+      "leg_in_end_index": 30,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 29,
+      "broader_approach_end_index": 30,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 36.700012,
+      "total_approach_travel": 36.700012,
+      "directional_efficiency": 1.0,
+      "displacement_zone_width_ratio": 0.562022,
+      "displacement_volatility_ratio": 1.59219,
+      "approach_overlap_ratio": 0.539216,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 0.5,
+      "body_occupancy_ratio": 1.0,
+      "adjacent_body_overlap_ratio": 0.491669,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 0,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTIONAL"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 29,
+          "timestamp": "2026-08-07 00:00:00",
+          "open": 926.0,
+          "high": 945.0,
+          "low": 914.4000244140625,
+          "close": 932.0,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 30,
+          "timestamp": "2026-08-10 00:00:00",
+          "open": 929.0499877929688,
+          "high": 970.2999877929688,
+          "low": 928.5,
+          "close": 962.7000122070312,
+          "structure": "EXCITING",
+          "direction": "BULLISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 30,
+          "timestamp": "2026-08-10T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 33.6500244140624,
+          "range": 41.7999877929688,
+          "body_ratio": 0.8050247426082429,
+          "explosive": true
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 31,
+          "timestamp": "2026-08-11T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 35.2999877929688,
+          "range": 86.7999877929688,
+          "body_ratio": 0.4066819442090781,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 32,
+          "timestamp": "2026-08-12T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 76.4500122070313,
+          "range": 87.1500244140625,
+          "body_ratio": 0.8772230727533261,
+          "explosive": true
+        }
+      ]
+    },
+    "borderline": {
+      "symbol": "ABCAPITAL",
+      "timeframe": "1D",
+      "zone_id": "ZONE-5EB5D7B3EED397D43219",
+      "pattern": "DBR",
+      "zone_type": "DEMAND",
+      "proximal": 401.54998779296875,
+      "distal": 394.25,
+      "created_index": 15,
+      "formation_timestamp": "2026-07-20 00:00:00",
+      "dashboard_qualified": false,
+      "dashboard_visible": false,
+      "leg_in_start_index": 13,
+      "leg_in_end_index": 13,
+      "leg_in_candle_count": 1,
+      "broader_approach_start_index": 12,
+      "broader_approach_end_index": 13,
+      "approach_candle_count": 2,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 3.299988,
+      "total_approach_travel": 5.899963,
+      "directional_efficiency": 0.559323,
+      "displacement_zone_width_ratio": 0.452054,
+      "displacement_volatility_ratio": 0.354837,
+      "approach_overlap_ratio": 0.447998,
+      "prior_zone_occupancy_ratio": 0.5,
+      "pre_leg_in_occupancy_ratio": 0.0,
+      "weighted_full_approach_occupancy_ratio": 0.2,
+      "material_zone_width_occupancy_ratio": 0.5,
+      "body_occupancy_ratio": 0.5,
+      "adjacent_body_overlap_ratio": 0.769238,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "BORDERLINE",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_LOW_OCCUPANCY",
+        "APPROACH_OVERLAP_ACCEPTABLE",
+        "APPROACH_DIRECTION_CHANGES"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 12,
+          "timestamp": "2026-07-15 00:00:00",
+          "open": 403.0,
+          "high": 408.45001220703125,
+          "low": 402.20001220703125,
+          "close": 404.29998779296875,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 13,
+          "timestamp": "2026-07-16 00:00:00",
+          "open": 404.0,
+          "high": 405.0,
+          "low": 398.3999938964844,
+          "close": 399.70001220703125,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 13,
+          "timestamp": "2026-07-16T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 4.29998779296875,
+          "range": 6.6000061035156,
+          "body_ratio": 0.6515126994622462,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 14,
+          "timestamp": "2026-07-17T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 1.5999755859375,
+          "range": 7.25,
+          "body_ratio": 0.22068628771551724,
+          "explosive": false
+        },
+        {
+          "index": 15,
+          "timestamp": "2026-07-20T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 0.19998168945315,
+          "range": 8.6000061035156,
+          "body_ratio": 0.02325366831674682,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 16,
+          "timestamp": "2026-07-21T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 7.69998168945315,
+          "range": 9.1499938964844,
+          "body_ratio": 0.841528614834555,
+          "explosive": false
+        }
+      ]
+    },
+    "sonacoms": {
+      "symbol": "SONACOMS",
+      "timeframe": "1D",
+      "zone_id": "ZONE-C23D92B583AC182F3540",
+      "pattern": "DBR",
+      "zone_type": "DEMAND",
+      "proximal": 720.5,
+      "distal": 707.0,
+      "created_index": 22,
+      "formation_timestamp": "2026-07-29 00:00:00",
+      "dashboard_qualified": true,
+      "dashboard_visible": true,
+      "leg_in_start_index": 20,
+      "leg_in_end_index": 21,
+      "leg_in_candle_count": 2,
+      "broader_approach_start_index": 19,
+      "broader_approach_end_index": 21,
+      "approach_candle_count": 3,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 0.0,
+      "total_approach_travel": 17.850037,
+      "directional_efficiency": 0.0,
+      "displacement_zone_width_ratio": 0.0,
+      "displacement_volatility_ratio": 0.0,
+      "approach_overlap_ratio": 0.823427,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 0.666667,
+      "adjacent_body_overlap_ratio": 0.069619,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_HIGH_OVERLAP",
+        "APPROACH_DIRECTION_CHANGES"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 19,
+          "timestamp": "2026-07-24 00:00:00",
+          "open": 710.9500122070312,
+          "high": 741.6500244140625,
+          "low": 705.0,
+          "close": 717.9500122070312,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 20,
+          "timestamp": "2026-07-27 00:00:00",
+          "open": 728.7999877929688,
+          "high": 728.7999877929688,
+          "low": 714.5,
+          "close": 720.9000244140625,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 21,
+          "timestamp": "2026-07-28 00:00:00",
+          "open": 722.0,
+          "high": 723.75,
+          "low": 707.0,
+          "close": 713.0,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 20,
+          "timestamp": "2026-07-27T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 7.8999633789063,
+          "range": 14.2999877929688,
+          "body_ratio": 0.5524454631206507,
+          "explosive": false
+        },
+        {
+          "index": 21,
+          "timestamp": "2026-07-28T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 9.0,
+          "range": 16.75,
+          "body_ratio": 0.5373134328358209,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 22,
+          "timestamp": "2026-07-29T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 2.5,
+          "range": 13.6500244140625,
+          "body_ratio": 0.18314985557274574,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 23,
+          "timestamp": "2026-07-30T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 48.7000122070312,
+          "range": 52.9500122070312,
+          "body_ratio": 0.9197356181263421,
+          "explosive": true
+        }
+      ]
+    }
+  },
+  "sonacoms": [
+    {
+      "symbol": "SONACOMS",
+      "timeframe": "1D",
+      "zone_id": "ZONE-C23D92B583AC182F3540",
+      "pattern": "DBR",
+      "zone_type": "DEMAND",
+      "proximal": 720.5,
+      "distal": 707.0,
+      "created_index": 22,
+      "formation_timestamp": "2026-07-29 00:00:00",
+      "dashboard_qualified": true,
+      "dashboard_visible": true,
+      "leg_in_start_index": 20,
+      "leg_in_end_index": 21,
+      "leg_in_candle_count": 2,
+      "broader_approach_start_index": 19,
+      "broader_approach_end_index": 21,
+      "approach_candle_count": 3,
+      "pause_candle_count": 1,
+      "backward_walk_stop_reason": "SECOND_PAUSE_OR_CONGESTION",
+      "directional_displacement": 0.0,
+      "total_approach_travel": 17.850037,
+      "directional_efficiency": 0.0,
+      "displacement_zone_width_ratio": 0.0,
+      "displacement_volatility_ratio": 0.0,
+      "approach_overlap_ratio": 0.823427,
+      "prior_zone_occupancy_ratio": 1.0,
+      "pre_leg_in_occupancy_ratio": 1.0,
+      "weighted_full_approach_occupancy_ratio": 1.0,
+      "material_zone_width_occupancy_ratio": 1.0,
+      "body_occupancy_ratio": 0.666667,
+      "adjacent_body_overlap_ratio": 0.069619,
+      "material_adjacent_range_overlap_ratio": 1.0,
+      "approach_direction_changes": 1,
+      "structural_state": "CONGESTED",
+      "reason_codes": [
+        "LEG_IN_DISPLACEMENT_WEAK",
+        "APPROACH_HIGH_OCCUPANCY",
+        "APPROACH_HIGH_OVERLAP",
+        "APPROACH_DIRECTION_CHANGES"
+      ],
+      "broader_approach_candles": [
+        {
+          "index": 19,
+          "timestamp": "2026-07-24 00:00:00",
+          "open": 710.9500122070312,
+          "high": 741.6500244140625,
+          "low": 705.0,
+          "close": 717.9500122070312,
+          "structure": "BASE",
+          "direction": "BULLISH"
+        },
+        {
+          "index": 20,
+          "timestamp": "2026-07-27 00:00:00",
+          "open": 728.7999877929688,
+          "high": 728.7999877929688,
+          "low": 714.5,
+          "close": 720.9000244140625,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        },
+        {
+          "index": 21,
+          "timestamp": "2026-07-28 00:00:00",
+          "open": 722.0,
+          "high": 723.75,
+          "low": 707.0,
+          "close": 713.0,
+          "structure": "EXCITING",
+          "direction": "BEARISH"
+        }
+      ],
+      "canonical_leg_in_candles": [
+        {
+          "index": 20,
+          "timestamp": "2026-07-27T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 7.8999633789063,
+          "range": 14.2999877929688,
+          "body_ratio": 0.5524454631206507,
+          "explosive": false
+        },
+        {
+          "index": 21,
+          "timestamp": "2026-07-28T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BEARISH",
+          "body": 9.0,
+          "range": 16.75,
+          "body_ratio": 0.5373134328358209,
+          "explosive": false
+        }
+      ],
+      "canonical_base_candles": [
+        {
+          "index": 22,
+          "timestamp": "2026-07-29T00:00:00",
+          "structure": "BASE",
+          "direction": "BULLISH",
+          "body": 2.5,
+          "range": 13.6500244140625,
+          "body_ratio": 0.18314985557274574,
+          "explosive": false
+        }
+      ],
+      "canonical_leg_out_candles": [
+        {
+          "index": 23,
+          "timestamp": "2026-07-30T00:00:00",
+          "structure": "EXCITING",
+          "direction": "BULLISH",
+          "body": 48.7000122070312,
+          "range": 52.9500122070312,
+          "body_ratio": 0.9197356181263421,
+          "explosive": true
+        }
+      ]
+    }
+  ]
+}

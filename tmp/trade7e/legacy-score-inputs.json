@@ -1,0 +1,280 @@
+{
+  "records": [],
+  "failures": [
+    {
+      "symbol": "ERIS",
+      "zone_id": "ZONE-99E79886CFB37DB68090",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "JBMA",
+      "zone_id": "ZONE-493EFA540337C8A8845A",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "MARICO",
+      "zone_id": "ZONE-0A3D1D37289059FCDE44",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "NESTLEIND",
+      "zone_id": "ZONE-8117D38ED0DF4D0F385E",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "HSCL",
+      "zone_id": "ZONE-B582A2CD1CF247A9FF9B",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "TITAN",
+      "zone_id": "ZONE-00A44D80DB8E98BCF0B9",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "MARUTI",
+      "zone_id": "ZONE-BF0CEE34D95BE30F4139",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "CAMS",
+      "zone_id": "ZONE-F156DB433A2E5B50CC23",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "RELIANCE",
+      "zone_id": "ZONE-F0BF1E493E2BFF1000CE",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "SUMICHEM",
+      "zone_id": "ZONE-A303061E99A8F41A33F7",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "CARTRADE",
+      "zone_id": "ZONE-F0FE71CC396213574148",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "ANTHEM",
+      "zone_id": "ZONE-D1E4FD2A04D6662EBB47",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "HAVELLS",
+      "zone_id": "ZONE-D50222E6E0CC8E758115",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "PFOCUS",
+      "zone_id": "ZONE-0F39956F876F78A8417D",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "TCS",
+      "zone_id": "ZONE-DF69B7291838B8C0DB6B",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "JSWENERGY",
+      "zone_id": "ZONE-79504C482D216E74EF93",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "NH",
+      "zone_id": "ZONE-33E02B75980B361CE9BF",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "MAHABANK",
+      "zone_id": "ZONE-897C1D75F2CC01B4D65F",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "TITAGARH",
+      "zone_id": "ZONE-BF651C29601672CC4FF1",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "FSL",
+      "zone_id": "ZONE-268BFE54428D461C4DEB",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "PNB",
+      "zone_id": "ZONE-DA083BC1EF5B49B0BC51",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "GICRE",
+      "zone_id": "ZONE-8AF7071C64772D13F334",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "FORTIS",
+      "zone_id": "ZONE-D5AE5CA7278AC8F99450",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "SBIN",
+      "zone_id": "ZONE-4F1A3B91BE5E60A938E9",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "DABUR",
+      "zone_id": "ZONE-14CE7CDB39F41993A559",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "ABCAPITAL",
+      "zone_id": "ZONE-36781CB746FF947A65A3",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "CHOICEIN",
+      "zone_id": "ZONE-33A7EA133B94C2366FB3",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "JUBLPHARMA",
+      "zone_id": "ZONE-42E3128B042B1FA75EB2",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "IRB",
+      "zone_id": "ZONE-94240BABECE8240EF692",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "IEX",
+      "zone_id": "ZONE-F6469A5D1ABCD668337A",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "NUVAMA",
+      "zone_id": "ZONE-1CCD78424F1F25E3E5F5",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "NEULANDLAB",
+      "zone_id": "ZONE-3590BE7A6EDEC6E2D69D",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "BLUEDART",
+      "zone_id": "ZONE-D0D3497673ED98A2811A",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "ENDURANCE",
+      "zone_id": "ZONE-E78A02BF0933F9BFDF65",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "ZFCVINDIA",
+      "zone_id": "ZONE-B82F23A8E54D8CD949C0",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "PHOENIXLTD",
+      "zone_id": "ZONE-01055EEF04FCE982C6EA",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "MANKIND",
+      "zone_id": "ZONE-45D37FBF061BF8E3CB87",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "CONCORDBIO",
+      "zone_id": "ZONE-2798704A578FF18BA4A6",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "PIIND",
+      "zone_id": "ZONE-AB912501C5768429C944",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "AARTIIND",
+      "zone_id": "ZONE-F8664FD74FE8245251AF",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "DEVYANI",
+      "zone_id": "ZONE-219699DD9BDE6F3AC3A8",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "BLUESTARCO",
+      "zone_id": "ZONE-40F43EC1723D9D718C59",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "GRAPHITE",
+      "zone_id": "ZONE-5D18CA59FB6E367E6876",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "AUBANK",
+      "zone_id": "ZONE-3368BE72DBEF0E03B460",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "ATUL",
+      "zone_id": "ZONE-A0209D99299EAAFEB5E2",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "TBOTEK",
+      "zone_id": "ZONE-2A960F3785F962EFD640",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "TEGA",
+      "zone_id": "ZONE-D8AD1F626DA3CFCFC962",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "HEROMOTOCO",
+      "zone_id": "ZONE-DFB73221B94BF14058C2",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "J&KBANK",
+      "zone_id": "ZONE-3FEA8F78A099D9B9EDAE",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "DIVISLAB",
+      "zone_id": "ZONE-2FBBC857D25C21EFDC67",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "KEI",
+      "zone_id": "ZONE-7A78226156011635814F",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "PVRINOX",
+      "zone_id": "ZONE-A7FD3C9DAA4FB04549F1",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "DEVYANI",
+      "zone_id": "ZONE-B2CB2CFF4B184232AF0D",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "GLAND",
+      "zone_id": "ZONE-D7FD0049F6C18A43E9BF",
+      "reason": "MarketDataValidationError"
+    },
+    {
+      "symbol": "REDINGTON",
+      "zone_id": "ZONE-B018ACB6D704E36868BD",
+      "reason": "MarketDataValidationError"
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "audit": {
+    "name": "MILESTONE_9B_HISTORICAL_CONTEXT_RECONSTRUCTION",
+    "production_activation": false,
+    "duration_seconds": 8.366
+  },
+  "dataset": {
+    "historical_zones": 5,
+    "source_inputs": [
+      "tmp\\milestone9\\current_replay.json"
+    ],
+    "cached_symbol_timeframes": 3
+  },
+  "records": [
+    {
+      "zone_id": "ZONE-BF3C81EDD465D5960577",
+      "symbol": "RELIANCE",
+      "timeframe": "15m",
+      "planning_timestamp": "2026-07-20 10:45:00+05:30",
+      "zone_quality": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      },
+      "trade_confidence": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      }
+    },
+    {
+      "zone_id": "ZONE-761B1757C6DA8B0F69E5",
+      "symbol": "RELIANCE",
+      "timeframe": "15m",
+      "planning_timestamp": "2026-07-22 09:30:00+05:30",
+      "zone_quality": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      },
+      "trade_confidence": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      }
+    },
+    {
+      "zone_id": "ZONE-310C451A43FEB86110DB",
+      "symbol": "RELIANCE",
+      "timeframe": "15m",
+      "planning_timestamp": "2026-07-23 12:30:00+05:30",
+      "zone_quality": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      },
+      "trade_confidence": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      }
+    },
+    {
+      "zone_id": "ZONE-89015AE0E43A23D922D0",
+      "symbol": "RELIANCE",
+      "timeframe": "15m",
+      "planning_timestamp": "2026-07-28 10:45:00+05:30",
+      "zone_quality": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      },
+      "trade_confidence": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      }
+    },
+    {
+      "zone_id": "ZONE-09E29D02DEDAF6A2BA79",
+      "symbol": "RELIANCE",
+      "timeframe": "15m",
+      "planning_timestamp": "2026-07-30 10:30:00+05:30",
+      "zone_quality": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      },
+      "trade_confidence": {
+        "status": "UNAVAILABLE",
+        "reason": "HISTORICAL_ZONE_NOT_RECONSTRUCTED"
+      }
+    }
+  ],
+  "failures": []
+}

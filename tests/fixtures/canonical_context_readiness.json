@@ -1,0 +1,12 @@
+[
+  {"case": "high_quality_aligned", "trend": "UPTREND", "trend_alignment": "ALIGNED", "location_relationship": "FULL_OVERLAP", "location_compatibility": "ALIGNED"},
+  {"case": "high_quality_no_location", "trend": "UPTREND", "trend_alignment": "ALIGNED", "location_relationship": "NO_OVERLAP", "location_compatibility": "NO_HTF_CONTEXT"},
+  {"case": "high_quality_opposing_location", "trend": "UPTREND", "trend_alignment": "ALIGNED", "location_relationship": "PARTIAL_OVERLAP", "location_compatibility": "OPPOSING"},
+  {"case": "high_quality_opposing_trend", "trend": "DOWNTREND", "trend_alignment": "OPPOSING", "location_relationship": "FULL_OVERLAP", "location_compatibility": "ALIGNED"},
+  {"case": "moderate_quality_strong_context", "trend": "UPTREND", "trend_alignment": "ALIGNED", "location_relationship": "FULL_OVERLAP", "location_compatibility": "ALIGNED"},
+  {"case": "sideways", "trend": "SIDEWAYS", "trend_alignment": "NEUTRAL", "location_relationship": "TOUCHING", "location_compatibility": "ALIGNED"},
+  {"case": "trend_unavailable", "trend": "UNAVAILABLE", "trend_alignment": "UNKNOWN", "location_relationship": "NO_OVERLAP", "location_compatibility": "NO_HTF_CONTEXT"},
+  {"case": "partial_overlap", "trend": "UPTREND", "trend_alignment": "ALIGNED", "location_relationship": "PARTIAL_OVERLAP", "location_compatibility": "ALIGNED"},
+  {"case": "touching", "trend": "DOWNTREND", "trend_alignment": "ALIGNED", "location_relationship": "TOUCHING", "location_compatibility": "ALIGNED"},
+  {"case": "no_overlap", "trend": "SIDEWAYS", "trend_alignment": "NEUTRAL", "location_relationship": "NO_OVERLAP", "location_compatibility": "OPPOSING"}
+]

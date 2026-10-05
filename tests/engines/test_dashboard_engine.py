@@ -29,6 +29,12 @@ from backend.models.backtesting.backtest_result import (
 from backend.models.dashboard.dashboard_result import (
     DashboardResult,
 )
+from backend.models.dashboard.market_overview_result import (
+    MarketOverviewResult,
+)
+from backend.models.dashboard.signals_result import (
+    SignalResult,
+)
 from backend.models.market_scanner.market_scanner_result import (
     MarketScannerResult,
 )
@@ -68,6 +74,26 @@ def test_build_dashboard() -> None:
         total_capital=100000,
     )
 
+    market = MarketOverviewResult(
+        nifty50=24731.45,
+        nifty_change=0.85,
+        sensex=81214.85,
+        sensex_change=0.78,
+        bank_nifty=54372.15,
+        bank_nifty_change=1.15,
+        india_vix=12.45,
+        india_vix_change=-2.35,
+    )
+
+    signals = (
+        SignalResult(
+            symbol="INFY",
+            action="BUY",
+            price=1642.50,
+            confidence=95.0,
+        ),
+    )
+
     alerts = (
         AlertResult(
             title="BUY",
@@ -99,7 +125,9 @@ def test_build_dashboard() -> None:
     )
 
     result = engine.build(
+        market=market,
         portfolio=portfolio,
+        signals=signals,
         alerts=alerts,
         scanner=scanner,
         backtest=backtest,
@@ -111,7 +139,9 @@ def test_build_dashboard() -> None:
         DashboardResult,
     )
 
+    assert result.market == market
     assert result.portfolio == portfolio
+    assert result.signals == signals
     assert result.alerts == alerts
     assert result.scanner == scanner
     assert result.backtest == backtest

@@ -1,0 +1,55 @@
+import axios from "axios";
+import { API_BASE_URL } from "./config";
+
+const authApi = axios.create({
+    baseURL: `${API_BASE_URL}/auth`,
+    timeout: 10000,
+    withCredentials: true,
+});
+
+export interface LoginInput {
+    email: string;
+    password: string;
+    device_name: string;
+}
+
+export interface RegistrationInput {
+    full_name: string;
+    email: string;
+    password: string;
+    country: string;
+    accepts_terms: boolean;
+    accepts_risk_disclosure: boolean;
+    confirms_adult: boolean;
+}
+
+export async function loginAccount(input: LoginInput) {
+    const response = await authApi.post("/login", input);
+    return response.data;
+}
+
+export async function registerAccount(input: RegistrationInput) {
+    const response = await authApi.post("/register", input);
+    return response.data;
+}
+
+export async function verifyEmail(token: string) {
+    const response = await authApi.post(
+        "/email-verification/verify",
+        { token },
+    );
+    return response.data;
+}
+
+export async function refreshSession() {
+    const response = await authApi.post("/refresh");
+    return response.data;
+}
+
+export async function logoutSession() {
+    await authApi.post("/logout");
+}
+
+export async function logoutAllSessions() {
+    await authApi.post("/logout-all");
+}

@@ -1,15 +1,20 @@
 """
-Tests for Multi-Timeframe Engine.
+Multi-Timeframe Engine.
 
 Sprint:
     2.32 - Multi-Timeframe Engine
 """
 
-import pandas as pd
-import pytest
+from pandas import DataFrame
 
-from backend.engines.multi_timeframe_engine.multi_timeframe_engine import (
-    MultiTimeframeEngine,
+from backend.config.multi_timeframe_config import (
+    MultiTimeframeConfig,
+)
+from backend.engines.demand_supply_engine.market_structure_engine import (
+    MarketStructureEngine,
+)
+from backend.models.market_structure.market_structure_state import (
+    StructureTrend,
 )
 from backend.models.multi_timeframe.multi_timeframe_request import (
     MultiTimeframeRequest,
@@ -17,109 +22,82 @@ from backend.models.multi_timeframe.multi_timeframe_request import (
 from backend.models.multi_timeframe.multi_timeframe_result import (
     MultiTimeframeResult,
 )
+from backend.validators.multi_timeframe_validator import (
+    MultiTimeframeValidator,
+)
 
 
-@pytest.fixture
-def sample_market_data():
+class MultiTimeframeEngine:
+    """
+    Analyze multiple timeframes.
+    """
 
-    df = pd.DataFrame(
-        {
-            "Open": [100, 101, 102, 103, 104, 105, 106],
-            "High": [101, 103, 105, 104, 107, 106, 108],
-            "Low": [99, 100, 101, 100, 103, 102, 104],
-            "Close": [100, 102, 104, 103, 106, 105, 107],
-        }
-    )
-
-    return {
-        "1W": df.copy(),
-        "1D": df.copy(),
-        "4H": df.copy(),
-        "1H": df.copy(),
-    }
-
-
-@pytest.fixture
-def request():
-
-    return MultiTimeframeRequest(
-        primary_timeframe="1D",
-        timeframes=[
-            "1W",
-            "1D",
-            "4H",
-            "1H",
-        ],
-    )
-
-
-class TestMultiTimeframeEngine:
-
-    def test_engine_creation(self):
-
-        engine = MultiTimeframeEngine()
-
-        assert engine is not None
-
-    def test_result_type(
+    def __init__(
         self,
-        request,
-        sample_market_data,
-    ):
+        config: MultiTimeframeConfig | None = None,
+    ) -> None:
 
-        engine = MultiTimeframeEngine()
+        self._config = config or MultiTimeframeConfig()
 
-        result = engine.analyze(
-            request,
-            sample_market_data,
+        self._market_structure = (
+            MarketStructureEngine()
         )
 
-        assert isinstance(
-            result,
-            MultiTimeframeResult,
-        )
-
-    def test_primary_timeframe(
+    def analyze(
         self,
-        request,
-        sample_market_data,
-    ):
+        request: MultiTimeframeRequest,
+        market_data: dict[str, DataFrame],
+    ) -> MultiTimeframeResult:
 
-        engine = MultiTimeframeEngine()
-
-        result = engine.analyze(
+        MultiTimeframeValidator.validate(
             request,
-            sample_market_data,
+            self._config,
         )
 
-        assert result.primary_timeframe == "1D"
+        results = {}
 
-    def test_total_timeframes(
-        self,
-        request,
-        sample_market_data,
-    ):
+        for timeframe in request.timeframes:
 
-        engine = MultiTimeframeEngine()
+            results[timeframe] = (
+                self._market_structure.analyze(
+                    market_data[timeframe],
+                )
+            )
 
-        result = engine.analyze(
-            request,
-            sample_market_data,
+        aligned = self._resolve_alignment(
+            results,
         )
 
-        assert result.total_timeframes == 4
-
-    def test_primary_result(
-        self,
-        request,
-        sample_market_data,
-    ):
-
-        engine = MultiTimeframeEngine()
-
-        result = engine.analyze(
-            request,
-            sample_market_data,
+        return MultiTimeframeResult(
+            timeframe_results=results,
+            primary_timeframe=request.primary_timeframe,
+            aligned_trend=aligned,
+            is_aligned=(
+                aligned
+                != StructureTrend.SIDEWAYS
+            ),
         )
 
-        assert result.primary_result is not None
+    @staticmethod
+    def _resolve_alignment(
+        results,
+    ) -> StructureTrend:
+
+        trends = [
+            result.state.trend
+            for result in results.values()
+        ]
+
+        if all(
+            trend == StructureTrend.BULLISH
+            for trend in trends
+        ):
+            return StructureTrend.BULLISH
+
+        if all(
+            trend == StructureTrend.BEARISH
+            for trend in trends
+        ):
+            return StructureTrend.BEARISH
+
+        return StructureTrend.SIDEWAYS

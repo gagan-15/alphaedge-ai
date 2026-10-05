@@ -14,6 +14,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 
 import type { AIExplanationResult } from "../../types/dashboard";
+import { getResearchLabel } from "../../utils/researchLanguage";
 
 interface AIInsightCardProps {
     insight: AIExplanationResult;
@@ -55,7 +56,9 @@ function AIInsightCard({
                     </Box>
 
                     <Chip
-                        label={insight.decision}
+                        label={getResearchLabel(
+                            insight.decision,
+                        )}
                         color={chipColor}
                     />
                 </Box>
@@ -86,7 +89,7 @@ function AIInsightCard({
                         variant="body2"
                         color="text.secondary"
                     >
-                        Confidence Score: {insight.confidence_score}%
+                        Conditions matched: {insight.confidence_score}%
                     </Typography>
 
                     <LinearProgress
