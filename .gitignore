@@ -18,6 +18,8 @@ venv/
 # ==================================================
 
 .env
+.env.*
+!.env.example
 
 # ==================================================
 # IDE
@@ -60,7 +62,21 @@ build/
 dist/
 *.egg-info/
 
+# Runtime scanner persistence (schema is created by application code)
+backend/data/scanner/*.sqlite3
+backend/data/scanner/*.sqlite3-*
+backend/data/shadow/*.sqlite3
+backend/data/shadow/*.sqlite3-*
+
 __pycache__/
 *.py[cod]
 
 frontend_old/
+
+# Local Dhan state and generated audit artifacts are not source code.
+backend/data/shadow/
+backend/historical_evidence/data/dhan-evidence-*.sqlite3*
+backend/historical_evidence/data/current-dhan-evidence.json
+tmp/
+logs/
+*.update.lock

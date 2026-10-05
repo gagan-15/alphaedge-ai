@@ -75,7 +75,7 @@ class ScannerService:
 
     def get_scanner(
         self,
-        universe: UniverseName = "nse500",
+        universe: UniverseName = "allnse",
         supplied_symbols: list[str] | None = None,
     ) -> MarketScannerResult:
         """

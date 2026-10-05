@@ -5,6 +5,8 @@
  *     2.64 - Scanner Results Foundation
  */
 
+import type { MarketUniverse } from "../market-universe/MarketUniverseState";
+
 export interface ScannerResult {
     symbol: string;
 
@@ -53,6 +55,7 @@ export interface ScannerResponse {
 
 export interface ZoneResearchResult {
     symbol: string;
+    instrument_id?: string | null;
     zone_type: string;
     pattern_type: string | null;
     gap_type: string | null;
@@ -77,6 +80,8 @@ export interface ZoneResearchResult {
     evidence: string[];
     explanation: ZoneExplanation;
     current_price: number;
+    price_source?: "LIVE_QUOTE" | "PERSISTED_DHAN_CLOSE";
+    price_as_of?: string | null;
     timeframe: string;
     base_index: number;
     base_date: string;
@@ -197,6 +202,34 @@ export interface ZoneResearchResponse {
     dashboard_rejected_count?: number;
     qualification_rejection_counts?: Record<string, number>;
     methodology_version: string;
+}
+
+export interface PersistedZonePage {
+    state: "READY" | "BUILDING" | "STALE" | "FAILED" | "UNAVAILABLE";
+    selected_timeframe?: string;
+    selected_universe?: MarketUniverse;
+    refresh_state?: "BUILDING" | null;
+    snapshot_id?: number;
+    last_completed_at?: string;
+    methodology_version?: string;
+    total: number;
+    page: number;
+    page_size: number;
+    results: ZoneResearchResult[];
+    processed_symbols?: number;
+    total_symbols?: number;
+    failed_symbols?: number;
+}
+
+export interface ScannerCapabilities {
+    storage_version: string;
+    methodology_version: string;
+    universes: Array<{
+        id: MarketUniverse;
+        instrument_count: number;
+        state: string;
+    }>;
+    timeframes: Array<{ id: string; label: string; state: string }>;
 }
 
 export interface ZoneRuleDiagnostic {

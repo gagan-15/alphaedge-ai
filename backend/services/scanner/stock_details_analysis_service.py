@@ -126,19 +126,36 @@ class StockDetailsAnalysisService:
         distal_price: float,
         timeframe: str,
     ) -> dict[str, Any]:
-        stock = self._market.get_stock_data(symbol, period="10y", interval="1d")
+        # Rebuild the selected zone from the same durable candle revision used
+        # by the scanner. A fresh provider download can contain corrections and
+        # must not make an already-selected canonical snapshot drift mid-view.
+        if self._market.has_persisted_data(symbol, "1d"):
+            stock_segments = self._market.load_persisted_segments(
+                symbol, period="10y", interval="1d"
+            ).segments
+        else:
+            stock_segments = self._market.get_stock_data_segments(
+                symbol, period="10y", interval="1d"
+            ).segments
+        stock = pd.concat(stock_segments).sort_index()
         nifty = self._market.get_stock_data(
             NIFTY_BENCHMARK, period="10y", interval="1d"
         )
         if timeframe in INTRADAY_SOURCES:
             source_period, source_interval = INTRADAY_SOURCES[timeframe]
-            analysis_source = self._market.get_stock_data(
-                symbol,
-                period=source_period,
-                interval=source_interval,
-            )
+            if self._market.has_persisted_data(symbol, source_interval):
+                source_segments = self._market.load_persisted_segments(
+                    symbol, period=source_period, interval=source_interval
+                ).segments
+            else:
+                source_segments = self._market.get_stock_data_segments(
+                    symbol, period=source_period, interval=source_interval
+                ).segments
+            analysis_source = source_segments[-1]
         else:
-            analysis_source = stock
+            # The scanner only publishes active zones from the latest valid
+            # continuity segment; Stock Details must use that same segment.
+            analysis_source = stock_segments[-1]
         analysis_data = aggregate_timeframe(analysis_source, timeframe)
         detected = self._zones.detect_zones(analysis_data)
         selected = self._select_canonical_zone(

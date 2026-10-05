@@ -16,7 +16,7 @@ const api = axios.create({
 });
 
 export async function getDashboard(
-    universe = "nse500",
+    universe = "allnse",
     symbols: string[] = [],
 ): Promise<DashboardResult> {
     try {

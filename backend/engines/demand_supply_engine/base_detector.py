@@ -122,6 +122,38 @@ class BaseDetector:
 
         return detected_bases
 
+    def detect_ending_at_or_after(
+        self, market_data: DataFrame, minimum_end_index: int
+    ) -> list[BaseRegion]:
+        """Discover Base regions only in an affected suffix.
+
+        Classification still receives the complete DataFrame.  The scan walks
+        backwards over the actual contiguous Base run at the boundary, so a
+        region is never truncated or reinterpreted by the optimization.
+        """
+        self._validate_input(market_data)
+        self._validate_configuration()
+        start = max(0, min(int(minimum_end_index), len(market_data) - 1))
+        while start > 0 and self._is_base_candle(market_data, start - 1):
+            start -= 1
+        detected: list[BaseRegion] = []
+        current_start: int | None = None
+        for positional_index in range(start, len(market_data)):
+            if self._is_base_candle(market_data, positional_index):
+                if current_start is None:
+                    current_start = positional_index
+                continue
+            if current_start is not None:
+                self._append_region_if_valid(
+                    detected, current_start, positional_index - 1,
+                )
+                current_start = None
+        if current_start is not None:
+            self._append_region_if_valid(
+                detected, current_start, len(market_data) - 1,
+            )
+        return [base for base in detected if base.end_index >= minimum_end_index]
+
     def diagnose(self, market_data: DataFrame) -> list[dict[str, object]]:
         """Return candle-level base checks without changing normal detection."""
 

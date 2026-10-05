@@ -1,11 +1,13 @@
 import StarBorderRoundedIcon from "@mui/icons-material/StarBorderRounded";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import FullscreenRoundedIcon from "@mui/icons-material/FullscreenRounded";
 import BugReportOutlinedIcon from "@mui/icons-material/BugReportOutlined";
 import QueryStatsRoundedIcon from "@mui/icons-material/QueryStatsRounded";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -46,6 +48,7 @@ import { acceptedDeveloperZones, diagnosticDeveloperZones } from "./developerZon
 interface ScannerResultsTableProps {
     results: ZoneResearchResult[];
     methodologyVersion?: string;
+    candleRefreshKey?: string | null;
     initialSelection?: {
         symbol: string;
         timeframe: string;
@@ -55,7 +58,17 @@ interface ScannerResultsTableProps {
         baseIndex?: number;
     };
     onDetailsClose?: () => void;
+    serverTotal?: number;
+    serverPage?: number;
+    onServerPageChange?: (page: number) => void;
+    serverSort?: ScannerSort;
+    serverSortDirection?: "asc" | "desc";
+    onServerSortChange?: (sort: ScannerSort, direction: "asc" | "desc") => void;
+    emptyStateTitle?: string;
+    emptyStateDescription?: string;
 }
+
+export type ScannerSort = "symbol" | "trade_confidence" | "zone_score" | "distance_percent" | "current_price";
 
 const patternLabels: Record<string, string> = {
     DROP_BASE_RALLY: "DBR",
@@ -110,7 +123,7 @@ function normalizedTimeframe(value: string) {
     return aliases[value.toUpperCase()] ?? value.toUpperCase();
 }
 
-function ScannerResultsTable({ results, methodologyVersion = "", initialSelection, onDetailsClose }: ScannerResultsTableProps) {
+function ScannerResultsTable({ results, methodologyVersion = "", candleRefreshKey, initialSelection, onDetailsClose, serverTotal, serverPage, onServerPageChange, serverSort, serverSortDirection, onServerSortChange, emptyStateTitle = "No matching research zones", emptyStateDescription = "Run the scanner or reduce the active filters." }: ScannerResultsTableProps) {
     const navigate = useNavigate();
     const [page, setPage] = useState(0);
     const initialZones = initialSelection
@@ -127,7 +140,7 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
             && (initialSelection.distalPrice === undefined || zone.distal_price === initialSelection.distalPrice)
         ) ?? initialZones.find((zone) => zone.zone_type === initialSelection.selectedZone.toUpperCase())
         : undefined;
-    const [sortField, setSortField] = useState<"symbol" | "trade_confidence" | "zone_score" | "distance_percent">("trade_confidence");
+    const [sortField, setSortField] = useState<ScannerSort>("trade_confidence");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
     const [developerMode, setDeveloperMode] = useState(false);
     const [analysisPanelOpen, setAnalysisPanelOpen] = useState(() =>
@@ -220,7 +233,10 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
         };
     }, [developerMode, selectedZoneId, selectedZones]);
 
-    const sortedResults = useMemo(() => [...results].sort((left, right) => {
+    const externallySorted = serverPage !== undefined && onServerSortChange !== undefined;
+    const activeSortField = externallySorted ? serverSort : sortField;
+    const activeSortDirection = externallySorted ? (serverSortDirection ?? "asc") : sortDirection;
+    const sortedResults = useMemo(() => externallySorted ? results : [...results].sort((left, right) => {
         if (sortField === "trade_confidence") {
             const comparison = compareCanonicalTradeConfidence(left, right);
             return sortDirection === "desc" ? comparison : -comparison;
@@ -231,8 +247,15 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
             ? first.localeCompare(String(second))
             : Number(first) - Number(second);
         return sortDirection === "asc" ? comparison : -comparison;
-    }), [results, sortDirection, sortField]);
+    }), [externallySorted, results, sortDirection, sortField]);
     const groupedResults = useMemo(() => {
+        if (externallySorted) {
+            return sortedResults.map((result) => ({
+                symbol: result.symbol,
+                zones: [result],
+                primary: result,
+            }));
+        }
         const groups = new Map<string, ZoneResearchResult[]>();
         sortedResults.forEach((result) => {
             groups.set(result.symbol, [...(groups.get(result.symbol) ?? []), result]);
@@ -242,16 +265,24 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
             zones,
             primary: [...zones].sort(compareCanonicalTradeConfidence)[0],
         }));
-    }, [sortedResults]);
-    const safePage = Math.min(page, Math.max(0, Math.ceil(groupedResults.length / 14) - 1));
-    const visibleGroups = groupedResults.slice(safePage * 14, safePage * 14 + 14);
+    }, [externallySorted, sortedResults]);
+    const externallyPaged = serverPage !== undefined && onServerPageChange !== undefined;
+    const safePage = externallyPaged ? serverPage - 1 : Math.min(page, Math.max(0, Math.ceil(groupedResults.length / 14) - 1));
+    const visibleGroups = externallyPaged ? groupedResults : groupedResults.slice(safePage * 14, safePage * 14 + 14);
 
-    function chooseSort(field: typeof sortField) {
+    function chooseSort(field: ScannerSort) {
+        if (externallySorted) {
+            onServerSortChange(
+                field,
+                field === activeSortField && activeSortDirection === "desc" ? "asc" : "desc",
+            );
+            return;
+        }
         if (field === sortField) {
             setSortDirection((current) => current === "asc" ? "desc" : "asc");
         } else {
             setSortField(field);
-            setSortDirection("desc");
+            setSortDirection(field === "distance_percent" || field === "current_price" ? "asc" : "desc");
         }
     }
 
@@ -318,9 +349,9 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
         return () => window.removeEventListener("keydown", handleShortcut);
     }, [toggleAnalysisPanel]);
 
-    function sortableLabel(field: typeof sortField, label: string) {
+    function sortableLabel(field: ScannerSort, label: string) {
         return (
-            <TableSortLabel active={sortField === field} direction={sortField === field ? sortDirection : "asc"} onClick={() => chooseSort(field)}>
+            <TableSortLabel active={activeSortField === field} direction={activeSortField === field ? activeSortDirection : "asc"} onClick={() => chooseSort(field)}>
                 {label}
             </TableSortLabel>
         );
@@ -339,12 +370,12 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
 
                 {results.length === 0 ? (
                     <Box sx={{ py: 8, textAlign: "center" }}>
-                        <Typography variant="h6" color="text.secondary">No matching research zones</Typography>
-                        <Typography color="text.secondary">Run the scanner or reduce the active filters.</Typography>
+                        <Typography variant="h6" color="text.secondary">{emptyStateTitle}</Typography>
+                        <Typography color="text.secondary">{emptyStateDescription}</Typography>
                     </Box>
                 ) : (
                     <TableContainer>
-                        <Table stickyHeader size="small" sx={{ width: "100%", minWidth: 1440, tableLayout: "fixed" }}>
+                        <Table stickyHeader size="small" sx={{ width: "100%", minWidth: 1535, tableLayout: "fixed" }}>
                             <colgroup>
                                 <col style={{ width: 40 }} />
                                 <col style={{ width: 50 }} />
@@ -354,8 +385,8 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
                                 <col style={{ width: 260 }} />
                                 <col style={{ width: 80 }} />
                                 <col style={{ width: 155 }} />
-                                <col style={{ width: 105 }} />
-                                <col style={{ width: 125 }} />
+                                <col style={{ width: 115 }} />
+                                <col style={{ width: 210 }} />
                                 <col style={{ width: 90 }} />
                                 <col style={{ width: 75 }} />
                             </colgroup>
@@ -373,8 +404,15 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
                                     <TableCell>Zone (Price Range)</TableCell>
                                     <TableCell align="center">Pattern</TableCell>
                                     <TableCell align="center">Status</TableCell>
-                                    <TableCell align="right">Distance</TableCell>
-                                    <TableCell align="right">LTP</TableCell>
+                                    <TableCell align="right" sx={{ minWidth: 115 }}>{sortableLabel("distance_percent", "Distance")}</TableCell>
+                                    <TableCell align="right" sx={{ minWidth: 210 }}>
+                                        <Stack direction="row" spacing={.35} sx={{ alignItems: "center", justifyContent: "flex-end" }}>
+                                            {sortableLabel("current_price", "Current Market Price")}
+                                            <Tooltip title="Latest available Dhan market price. Falls back to the latest persisted Dhan close when a live quote is unavailable.">
+                                                <InfoOutlinedIcon sx={{ fontSize: 14, color: "#667085" }} />
+                                            </Tooltip>
+                                        </Stack>
+                                    </TableCell>
                                     <TableCell align="center">Timeframe</TableCell>
                                     <TableCell align="center">Action</TableCell>
                                 </TableRow>
@@ -433,7 +471,7 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
                                                 <TableCell align="center">
                                                     <Chip
                                                         size="small"
-                                                        label={status === "WATCH" ? "NEARBY" : status}
+                                                        label={status === "WATCH" ? "FAR" : status}
                                                         sx={{
                                                             height: 27,
                                                             borderRadius: "999px",
@@ -455,7 +493,13 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
                                                     {result.distance_percent === null ? "—" : `${result.distance_percent.toFixed(2)}%`}
                                                 </TableCell>
                                                 <TableCell align="right" sx={{ color: "text.primary", fontWeight: "600 !important" }}>
-                                                    ₹{result.current_price.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                                                    <Tooltip title={result.price_source === "LIVE_QUOTE"
+                                                        ? `Live Dhan quote${result.price_as_of ? ` · ${new Date(result.price_as_of).toLocaleTimeString()}` : ""}`
+                                                        : `Persisted Dhan close${result.price_as_of ? ` · ${new Date(result.price_as_of).toLocaleDateString()}` : ""}`}>
+                                                        <Box component="span" sx={{ cursor: "help" }}>
+                                                            ₹{result.current_price.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                                                        </Box>
+                                                    </Tooltip>
                                                 </TableCell>
                                                 <TableCell align="center">{result.timeframe?.toUpperCase() ?? "1D"}</TableCell>
                                                 <TableCell align="center" sx={{ verticalAlign: "middle" }}>
@@ -503,13 +547,24 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
                     </TableContainer>
                 )}
                 {groupedResults.length > 0 && (() => {
-                    const pageCount = Math.ceil(groupedResults.length / 14);
-                    const pageButton = (value: number) => <Button key={value} size="small" variant={safePage === value - 1 ? "contained" : "outlined"} onClick={() => setPage(value - 1)} sx={{ minWidth: 34, width: 34, height: 34, p: 0, borderColor: safePage === value - 1 ? "primary.main" : "#dbe1e9", color: safePage === value - 1 ? "#fff" : "text.secondary" }}>{value}</Button>;
+                    const resultTotal = serverTotal ?? groupedResults.length;
+                    const pageCount = Math.ceil(resultTotal / 14);
+                    const goToPage = (value: number) => externallyPaged ? onServerPageChange(value) : setPage(value - 1);
+                    const pageButton = (value: number) => <Button key={value} size="small" variant={safePage === value - 1 ? "contained" : "outlined"} onClick={() => goToPage(value)} sx={{ minWidth: 34, width: 34, height: 34, p: 0, borderColor: safePage === value - 1 ? "primary.main" : "#dbe1e9", color: safePage === value - 1 ? "#fff" : "text.secondary" }}>{value}</Button>;
                     return <Stack direction="row" sx={{ px: 1.25, py: 1.5, alignItems: "center", borderTop: "1px solid", borderColor: "divider" }}>
-                        <Typography color="text.secondary" sx={{ fontSize: ".66rem" }}>Showing {safePage * 14 + 1} to {Math.min((safePage + 1) * 14, groupedResults.length)} of {groupedResults.length} results</Typography>
+                        <Typography color="text.secondary" sx={{ fontSize: ".66rem" }}>Showing {safePage * 14 + 1} to {Math.min((safePage + 1) * 14, resultTotal)} of {resultTotal} results</Typography>
                         <Stack direction="row" spacing={0.75} sx={{ ml: "auto", alignItems: "center" }}>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                aria-label="Previous page"
+                                title="Previous page"
+                                disabled={safePage <= 0}
+                                onClick={() => goToPage(safePage)}
+                                sx={{ minWidth: 34, width: 34, height: 34, p: 0 }}
+                            ><ChevronLeftRoundedIcon fontSize="small" /></Button>
                             {pageButton(1)}{pageCount > 1 && pageButton(2)}{pageCount > 2 && pageButton(3)}{pageCount > 4 && <Typography color="text.secondary">…</Typography>}{pageCount > 3 && pageButton(pageCount)}
-                            <Button size="small" variant="outlined" disabled={safePage >= pageCount - 1} onClick={() => setPage((current) => current + 1)} sx={{ minWidth: 34, width: 34, height: 34, p: 0 }}><ChevronRightRoundedIcon fontSize="small" /></Button>
+                            <Button size="small" variant="outlined" aria-label="Next page" title="Next page" disabled={safePage >= pageCount - 1} onClick={() => goToPage(safePage + 2)} sx={{ minWidth: 34, width: 34, height: 34, p: 0 }}><ChevronRightRoundedIcon fontSize="small" /></Button>
                         </Stack>
                     </Stack>;
                 })()}
@@ -533,7 +588,7 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
                             <Stack direction="row" spacing={.75} sx={{ ml: "auto", alignItems: "center" }}>
                                 <Chip size="small" variant="outlined" label={`TC ${selectedConfidence.score} · ${selectedConfidence.label}`} />
                                 <Chip size="small" label={`Zone Quality ${formatZoneQuality(selectedZone.zone_score)} · ${formatZoneQualityLabel(selectedZone.zone_quality_label ?? selectedQuality.label)}`} sx={{ color: selectedQuality.color, bgcolor: selectedQuality.background, border: "1px solid", borderColor: selectedQuality.border, fontWeight: 700 }} />
-                                <Chip size="small" label={selectedZone.status === "WATCH" ? "NEARBY" : selectedZone.status} sx={{ color: selectedStatus.color, bgcolor: selectedStatus.background, border: "1px solid", borderColor: selectedStatus.border, fontWeight: 700 }} />
+                                <Chip size="small" label={selectedZone.status === "WATCH" ? "FAR" : selectedZone.status} sx={{ color: selectedStatus.color, bgcolor: selectedStatus.background, border: "1px solid", borderColor: selectedStatus.border, fontWeight: 700 }} />
                             </Stack>
                             {import.meta.env.DEV && (
                                 <>
@@ -563,6 +618,7 @@ function ScannerResultsTable({ results, methodologyVersion = "", initialSelectio
                             <Box sx={{ flex: "1 1 auto", minWidth: 0, transition: "width 200ms ease" }}>
                                 <ZoneDetailChart
                                     result={selectedZone}
+                                    candleRefreshKey={candleRefreshKey}
                                     zones={selectedZones}
                                     selectedZoneId={selectedZoneId}
                                     confluenceOverlays={confluenceOverlaysHidden ? [] : confluenceOverlays}

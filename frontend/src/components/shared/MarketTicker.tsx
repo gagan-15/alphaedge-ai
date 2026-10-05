@@ -11,10 +11,10 @@ export default function MarketTicker() {
     const { dashboard, lastUpdated, isLoading, refresh } = useMarketIntelligence();
     const market = dashboard?.market;
     const items = [
-        ["NIFTY 50", market?.nifty50, market?.nifty_change],
-        ["SENSEX", market?.sensex, market?.sensex_change],
-        ["BANK NIFTY", market?.bank_nifty, market?.bank_nifty_change],
-        ["INDIA VIX", market?.india_vix, market?.india_vix_change],
+        ["NIFTY 50", market?.nifty50, market?.nifty_change, market?.nifty_available],
+        ["SENSEX", market?.sensex, market?.sensex_change, market?.sensex_available],
+        ["BANK NIFTY", market?.bank_nifty, market?.bank_nifty_change, market?.bank_nifty_available],
+        ["INDIA VIX", market?.india_vix, market?.india_vix_change, market?.india_vix_available],
     ] as const;
 
     return (
@@ -40,8 +40,15 @@ export default function MarketTicker() {
             }}
         >
             <Stack direction="row" sx={{ width: "100%", minWidth: 760, alignItems: "center" }}>
-                {items.map(([label, value, change], index) => {
-                    const positive = (change ?? 0) >= 0;
+                {items.map(([label, value, change, available], index) => {
+                    const positive = (change ?? 0) > 0;
+                    const negative = (change ?? 0) < 0;
+                    const changePrefix = positive ? "▲ +" : negative ? "▼ " : "";
+                    const changeColor = positive
+                        ? "success.main"
+                        : negative
+                            ? "error.main"
+                            : "text.secondary";
                     return (
                         <Box
                             key={label}
@@ -68,8 +75,10 @@ export default function MarketTicker() {
                         >
                             <Stack direction="row" spacing={0.8} sx={{ alignItems: "baseline", whiteSpace: "nowrap" }}>
                                 <Typography sx={{ color: "#7a8699", fontSize: "0.62rem", lineHeight: 1.25, fontWeight: 500, letterSpacing: ".02em" }}>{label}</Typography>
-                                <Typography sx={{ fontSize: "0.75rem", lineHeight: 1.25, fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{value ? value.toLocaleString("en-IN", { maximumFractionDigits: 2 }) : "—"}</Typography>
-                                {change !== undefined && <Typography sx={{ color: positive ? "success.main" : "error.main", fontSize: "0.62rem", lineHeight: 1.25, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{positive ? "▲ +" : "▼ "}{change.toFixed(2)}%</Typography>}
+                                {available && value !== undefined && change !== undefined ? <>
+                                    <Typography sx={{ fontSize: "0.75rem", lineHeight: 1.25, fontWeight: 650, fontVariantNumeric: "tabular-nums" }}>{value.toLocaleString("en-IN", { maximumFractionDigits: 2 })}</Typography>
+                                    <Typography sx={{ color: changeColor, fontSize: "0.62rem", lineHeight: 1.25, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{changePrefix}{change.toFixed(2)}%</Typography>
+                                </> : <Typography sx={{ fontSize: "0.75rem", lineHeight: 1.25, fontWeight: 650 }}>Unavailable</Typography>}
                             </Stack>
                         </Box>
                     );
@@ -77,10 +86,10 @@ export default function MarketTicker() {
                 <Box sx={{ ml: "auto", pl: 2.25, flex: "0 0 auto" }}>
                     <Stack direction="row" spacing={0.75} sx={{ alignItems: "center" }}>
                         <Box sx={{ textAlign: "right" }}>
-                            <Typography color="text.secondary" sx={{ fontSize: "0.54rem" }}>Delayed data · Last updated</Typography>
+                            <Typography color="text.secondary" sx={{ fontSize: "0.54rem" }}>Dhan live quotes · Last updated</Typography>
                             <Typography sx={{ fontSize: "0.64rem", fontWeight: 600 }}>{lastUpdated ? lastUpdated.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) : "Waiting"}</Typography>
                         </Box>
-                        <Tooltip title="Refresh market data"><span><IconButton size="small" disabled={isLoading} onClick={() => void refresh()}><RefreshRoundedIcon sx={{ fontSize: 17 }} /></IconButton></span></Tooltip>
+                        <Tooltip title="Refresh Dashboard data and index quotes"><span><IconButton size="small" disabled={isLoading} onClick={() => void refresh()}><RefreshRoundedIcon sx={{ fontSize: 17 }} /></IconButton></span></Tooltip>
                     </Stack>
                 </Box>
             </Stack>

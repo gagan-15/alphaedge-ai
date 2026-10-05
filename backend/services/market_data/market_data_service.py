@@ -1,13 +1,21 @@
 from pandas import DataFrame
+from pandas import Timedelta
 from threading import RLock
 from time import monotonic
+from pathlib import Path
+import os
 
 from backend.core.logger import logger
 from backend.data_providers.base_market_data_provider import BaseMarketDataProvider
 from backend.data_providers.yahoo.yahoo_provider import YahooProvider
+from backend.config.market_data_providers import MARKET_DATA_PROVIDER
 from backend.validators.market_data_validator import (
     MarketDataValidator,
     ValidatedMarketDataSegments,
+)
+from backend.services.market_data.persistent_market_data_store import (
+    CandleMergeResult,
+    PersistentMarketDataStore,
 )
 
 
@@ -19,6 +27,7 @@ class MarketDataService:
     def __init__(
         self,
         provider: BaseMarketDataProvider | None = None,
+        persistent_store: PersistentMarketDataStore | None = None,
     ) -> None:
         """
         Initialize the service with a market data provider.
@@ -29,7 +38,33 @@ class MarketDataService:
                 by default during development.
         """
 
-        self._provider = provider or YahooProvider()
+        if provider is not None:
+            self._provider = provider
+        elif MARKET_DATA_PROVIDER == "dhan":
+            # Dhan is source-labelled and opt-in. Existing Yahoo data remain
+            # untouched; callers must materialize into a Dhan-specific store.
+            from backend.data_providers.dhan import DhanMarketDataProvider
+
+            self._provider = DhanMarketDataProvider()
+        else:
+            self._provider = YahooProvider()
+        # Test/fake providers stay isolated unless persistence is explicitly
+        # injected. Production's default provider uses durable OHLCV storage.
+        if persistent_store is not None:
+            self._persistent_store = persistent_store
+        elif provider is not None:
+            self._persistent_store = None
+        elif MARKET_DATA_PROVIDER == "dhan":
+            dhan_path = Path(
+                os.getenv(
+                    "DHAN_PRODUCTION_DATABASE_PATH",
+                    "backend/data/scanner/alphaedge-dhan.sqlite3",
+                )
+            )
+            self._persistent_store = PersistentMarketDataStore(dhan_path)
+        else:
+            self._persistent_store = PersistentMarketDataStore()
+        self._last_merge_result: dict[tuple[str, str], CandleMergeResult] = {}
 
     def get_stock_data(
         self,
@@ -85,11 +120,39 @@ class MarketDataService:
                     zero_range_rows=result.zero_range_rows,
                 )
 
-        data = self._provider.download_stock_data(
-            symbol=symbol,
-            period=period,
-            interval=interval,
-        )
+        data: DataFrame
+        store = self._persistent_store
+        instrument_id = f"NSE:{symbol.strip().upper()}"
+        if store is not None:
+            latest = store.latest_timestamp(instrument_id, interval)
+            if latest is None:
+                downloaded = self._provider.download_stock_data(
+                    symbol=symbol,
+                    period=period,
+                    interval=interval,
+                )
+            else:
+                overlap = Timedelta(days=7 if interval == "1d" else 2)
+                downloaded = self._provider.download_stock_data_since(
+                    symbol,
+                    start=latest - overlap,
+                    interval=interval,
+                )
+            merge = store.merge(
+                instrument_id,
+                "NSE",
+                interval,
+                downloaded,
+                provider=type(self._provider).__name__,
+            )
+            self._last_merge_result[(symbol.strip().upper(), interval)] = merge
+            data = store.load(instrument_id, interval)
+        else:
+            data = self._provider.download_stock_data(
+                symbol=symbol,
+                period=period,
+                interval=interval,
+            )
         result = MarketDataValidator.validate_segments(data)
         with self._cache_lock:
             self._segment_cache[cache_key] = (monotonic(), result)
@@ -113,3 +176,168 @@ class MarketDataService:
     ] = {}
     _cache_lock = RLock()
     _cache_ttl_seconds = 300.0
+
+    def persisted_revision(self, symbol: str, interval: str) -> str | None:
+        """Expose an operational candle revision without exposing storage details."""
+
+        if self._persistent_store is None:
+            return None
+        return self._persistent_store.revision(
+            f"NSE:{symbol.strip().upper()}", interval
+        )
+
+    def has_persisted_data(self, symbol: str, interval: str) -> bool:
+        return bool(
+            self._persistent_store
+            and self._persistent_store.latest_timestamp(
+                f"NSE:{symbol.strip().upper()}", interval
+            ) is not None
+        )
+
+    def load_persisted_segments(
+        self,
+        symbol: str,
+        *,
+        period: str,
+        interval: str,
+    ) -> ValidatedMarketDataSegments:
+        """Load and cache durable candles without making a provider request."""
+
+        store = self._persistent_store
+        if store is None:
+            raise ValueError("Persistent market-data storage is unavailable.")
+        normalized = symbol.strip().upper()
+        data = store.load(f"NSE:{normalized}", interval)
+        result = MarketDataValidator.validate_segments(data)
+        cache_key = (normalized, period, interval)
+        with self._cache_lock:
+            self._segment_cache[cache_key] = (monotonic(), result)
+        return ValidatedMarketDataSegments(
+            segments=tuple(segment.copy() for segment in result.segments),
+            zero_range_rows=result.zero_range_rows,
+        )
+
+    def prefetch_stock_data_batch(
+        self,
+        symbols: list[str],
+        *,
+        period: str,
+        interval: str,
+    ) -> dict[str, CandleMergeResult]:
+        """Fetch and persist a bounded batch without retaining full histories."""
+
+        store = self._persistent_store
+        if store is None or not symbols:
+            return {}
+        frames = self._provider.download_stock_data_batch(
+            symbols, period=period, interval=interval
+        )
+        merged: dict[str, CandleMergeResult] = {}
+        for symbol, frame in frames.items():
+            normalized = symbol.strip().upper()
+            result = store.merge(
+                f"NSE:{normalized}", "NSE", interval, frame,
+                provider=type(self._provider).__name__,
+            )
+            merged[normalized] = result
+        return merged
+
+    def bootstrap_daily_history_batch(
+        self,
+        symbols: list[str],
+        *,
+        period: str,
+        semantics_version: str,
+        final_attempt: bool = False,
+    ) -> dict[str, CandleMergeResult]:
+        """Persist one bounded full-history batch and checkpoint each symbol."""
+
+        store = self._persistent_store
+        if store is None or not symbols:
+            return {}
+        pending = [
+            symbol.strip().upper()
+            for symbol in symbols
+            if not store.bootstrap_complete(
+                f"NSE:{symbol.strip().upper()}", "1d", semantics_version, period
+            )
+        ]
+        if not pending:
+            return {}
+        frames = self._provider.download_stock_data_batch(
+            pending, period=period, interval="1d"
+        )
+        merged: dict[str, CandleMergeResult] = {}
+        for symbol in pending:
+            instrument_id = f"NSE:{symbol}"
+            frame = frames.get(symbol)
+            if frame is None or frame.empty:
+                store.mark_bootstrap(
+                    instrument_id, "1d", semantics_version, period,
+                    status="FAILED" if final_attempt else "RETRYABLE",
+                    error="Provider returned no Daily history.",
+                )
+                continue
+            try:
+                result = store.merge(
+                    instrument_id, "NSE", "1d", frame,
+                    provider=type(self._provider).__name__,
+                )
+                store.mark_bootstrap(
+                    instrument_id, "1d", semantics_version, period,
+                    status="COMPLETE",
+                )
+                merged[symbol] = result
+            except Exception as error:
+                store.mark_bootstrap(
+                    instrument_id, "1d", semantics_version, period,
+                    status="FAILED" if final_attempt else "RETRYABLE",
+                    error=str(error),
+                )
+        return merged
+
+    def daily_bootstrap_complete(
+        self,
+        symbol: str,
+        *,
+        period: str,
+        semantics_version: str,
+    ) -> bool:
+        store = self._persistent_store
+        return bool(
+            store
+            and store.bootstrap_complete(
+                f"NSE:{symbol.strip().upper()}", "1d", semantics_version, period
+            )
+        )
+
+    def daily_bootstrap_progress(
+        self, *, period: str, semantics_version: str,
+        universe: str | None = None,
+    ) -> dict[str, int]:
+        return (
+            self._persistent_store.bootstrap_progress(
+                semantics_version, period, universe
+            )
+            if self._persistent_store
+            else {}
+        )
+
+    def persisted_universe_revision(self, interval: str) -> str | None:
+        return (
+            self._persistent_store.universe_revision(interval)
+            if self._persistent_store
+            else None
+        )
+
+    def release_symbol_cache(self, symbol: str) -> None:
+        """Release transient frames after bounded background symbol work."""
+
+        normalized = symbol.strip().upper()
+        with self._cache_lock:
+            for key in tuple(self._cache):
+                if key[0] == normalized:
+                    self._cache.pop(key, None)
+            for key in tuple(self._segment_cache):
+                if key[0] == normalized:
+                    self._segment_cache.pop(key, None)

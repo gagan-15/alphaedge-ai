@@ -14,9 +14,9 @@ import { HISTORICAL_EVIDENCE_VERSION } from "../types/historicalEvidence";
 const evidenceApi = axios.create({ baseURL: `${API_BASE_URL}/historical-evidence` });
 const comparableRequests = new Map<string, Promise<ComparableHistoricalEvidence>>();
 
-export function evidenceQuery(filters: HistoricalEvidenceFilters) {
+export function evidenceQuery(filters: HistoricalEvidenceFilters, version = HISTORICAL_EVIDENCE_VERSION) {
     return {
-        dataset_version: HISTORICAL_EVIDENCE_VERSION,
+        dataset_version: version,
         timeframe: filters.timeframe || undefined,
         zone_type: filters.zoneType || undefined,
         pattern: filters.pattern || undefined,
@@ -28,16 +28,25 @@ export function evidenceQuery(filters: HistoricalEvidenceFilters) {
     };
 }
 
-export async function getHistoricalEvidenceMetadata() {
-    const response = await evidenceApi.get<HistoricalEvidenceMetadata>("/metadata", {
-        params: { dataset_version: HISTORICAL_EVIDENCE_VERSION },
-    });
-    return response.data;
+export async function getHistoricalEvidenceMetadata(version = HISTORICAL_EVIDENCE_VERSION): Promise<HistoricalEvidenceMetadata> {
+    try {
+        const response = await evidenceApi.get<HistoricalEvidenceMetadata>("/metadata", {
+            params: { dataset_version: version },
+        });
+        return response.data;
+    } catch (error) {
+        // Preserve the explicitly labelled baseline during a rolling backend
+        // deployment; never invent refreshed evidence when it is unavailable.
+        if (version === "latest" && axios.isAxiosError(error) && error.response?.status === 409) {
+            return getHistoricalEvidenceMetadata(HISTORICAL_EVIDENCE_VERSION);
+        }
+        throw error;
+    }
 }
 
-export async function getHistoricalEvidenceSummary(filters: HistoricalEvidenceFilters) {
+export async function getHistoricalEvidenceSummary(filters: HistoricalEvidenceFilters, version = HISTORICAL_EVIDENCE_VERSION) {
     const response = await evidenceApi.get<HistoricalEvidenceSummary>("/summary", {
-        params: evidenceQuery(filters),
+        params: evidenceQuery(filters, version),
     });
     return response.data;
 }
@@ -48,10 +57,11 @@ export async function getHistoricalEvidenceZones(
     pageSize: number,
     sortBy: string,
     sortDirection: "asc" | "desc",
+    version = HISTORICAL_EVIDENCE_VERSION,
 ) {
     const response = await evidenceApi.get<HistoricalEvidenceZonesPage>("/zones", {
         params: {
-            ...evidenceQuery(filters),
+            ...evidenceQuery(filters, version),
             page,
             page_size: pageSize,
             sort_by: sortBy,

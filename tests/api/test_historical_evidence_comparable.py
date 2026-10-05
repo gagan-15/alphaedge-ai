@@ -50,6 +50,15 @@ def test_level_2_broadens_pattern_only() -> None:
     assert "pattern" not in payload["applied_cohort_definition"]
 
 
+def test_current_excellent_label_uses_frozen_elite_cohort() -> None:
+    response = comparable(zone_quality_label="EXCELLENT")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["current_zone"]["zone_quality_label"] == "EXCELLENT"
+    if payload["selected_match_level"] in (1, 2):
+        assert payload["applied_cohort_definition"]["zone_quality_label"] == "ELITE"
+
+
 def test_level_3_broadens_zone_quality_only_after_narrower_levels() -> None:
     payload = comparable(
         zone_quality_label="STRONG", trade_confidence_label="MODERATE"

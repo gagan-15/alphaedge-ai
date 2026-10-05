@@ -61,7 +61,7 @@ def _empty_manifest(symbols: list[str], shard: int, count: int) -> dict:
     }
 
 
-def _run_symbol(service: MarketDataService, symbol: str) -> dict:
+def _run_symbol(service: MarketDataService, symbol: str, *, start=START, end=END) -> dict:
     started = perf_counter()
     validated = service.get_stock_data_segments(symbol, "5y", "1d")
     engine = LargeScaleHistoricalReplayEngine()
@@ -72,7 +72,7 @@ def _run_symbol(service: MarketDataService, symbol: str) -> dict:
     for source_segment in validated.segments:
         index = pd.DatetimeIndex(source_segment.index)
         comparable = index.tz_localize(None) if index.tz is not None else index
-        mask = (comparable >= START) & (comparable <= END)
+        mask = (comparable >= start) & (comparable <= end)
         daily = source_segment.loc[mask].copy()
         if len(daily) < 20:
             continue

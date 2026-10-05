@@ -28,7 +28,7 @@ _dashboard_service = DashboardService()
     response_model=DashboardResponse,
 )
 def get_dashboard(
-    universe: UniverseName = Query(default="nse500"),
+    universe: UniverseName = Query(default="allnse"),
     symbols: list[str] | None = Query(default=None),
 ) -> DashboardResponse:
     """

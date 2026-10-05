@@ -15,6 +15,9 @@ export interface HistoricalEvidenceMetadata {
     trade_confidence_counts: Record<string, number>;
     supported_timeframes?: string[];
     source_universe?: string;
+    provider?: string;
+    coverage_note?: string;
+    excluded_symbols?: Array<string | { symbol: string; reason: string }>;
 }
 
 export interface HistoricalEvidenceSummary {

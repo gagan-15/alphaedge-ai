@@ -61,7 +61,7 @@ class DashboardService:
 
     def get_dashboard(
         self,
-        universe: UniverseName = "nse500",
+        universe: UniverseName = "allnse",
         supplied_symbols: list[str] | None = None,
     ) -> DashboardResult:
         """
@@ -72,21 +72,34 @@ class DashboardService:
         snapshot = self._snapshot_service.get_snapshot(universe, supplied_symbols)
         symbols = self._universe_service.get_symbols(universe, supplied_symbols)
 
-        def value(name: str) -> tuple[float, float]:
+        def value(name: str) -> tuple[float, float, bool]:
             quote = snapshot.quotes.get(name)
-            return (quote.price, quote.change_percent) if quote else (0.0, 0.0)
+            if quote:
+                return quote.price, quote.change_percent, True
+            return 0.0, 0.0, False
 
-        nifty, nifty_change = value("nifty50")
-        sensex, sensex_change = value("sensex")
-        bank_nifty, bank_nifty_change = value("bank_nifty")
-        india_vix, india_vix_change = value("india_vix")
+        nifty, nifty_change, nifty_available = value("nifty50")
+        sensex, sensex_change, sensex_available = value("sensex")
+        bank_nifty, bank_nifty_change, bank_nifty_available = value("bank_nifty")
+        india_vix, india_vix_change, india_vix_available = value("india_vix")
         breadth_total = snapshot.advancing + snapshot.declining + snapshot.unchanged
         participation = (
             snapshot.advancing / breadth_total * 100
             if breadth_total
             else 0.0
         )
-        average_change = (nifty_change + sensex_change + bank_nifty_change) / 3
+        available_changes = [
+            change for change, available in (
+                (nifty_change, nifty_available),
+                (sensex_change, sensex_available),
+                (bank_nifty_change, bank_nifty_available),
+            ) if available
+        ]
+        average_change = (
+            sum(available_changes) / len(available_changes)
+            if available_changes
+            else 0.0
+        )
         decision = (
             AIExplanationDecision.BUY
             if average_change > 0.25 and participation >= 50
@@ -97,12 +110,16 @@ class DashboardService:
             market=MarketOverviewResult(
                 nifty50=nifty,
                 nifty_change=nifty_change,
+                nifty_available=nifty_available,
                 sensex=sensex,
                 sensex_change=sensex_change,
+                sensex_available=sensex_available,
                 bank_nifty=bank_nifty,
                 bank_nifty_change=bank_nifty_change,
+                bank_nifty_available=bank_nifty_available,
                 india_vix=india_vix,
                 india_vix_change=india_vix_change,
+                india_vix_available=india_vix_available,
                 advancing=snapshot.advancing,
                 declining=snapshot.declining,
                 unchanged=snapshot.unchanged,

@@ -1,6 +1,7 @@
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import AppBar from "@mui/material/AppBar";
+import Autocomplete from "@mui/material/Autocomplete";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -11,11 +12,12 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../auth/AuthState";
 import BrandLogo from "../brand/BrandLogo";
+import { searchInstruments, type InstrumentSearchResult } from "../../api/scannerApi";
 
 const navigation = [
     ["Dashboard", "/dashboard"],
@@ -33,6 +35,25 @@ export default function Header() {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
     const [profileAnchor, setProfileAnchor] = useState<HTMLElement | null>(null);
+    const [searchText, setSearchText] = useState("");
+    const [instrumentResults, setInstrumentResults] = useState<InstrumentSearchResult[]>([]);
+
+    useEffect(() => {
+        if (searchText.trim().length < 1) {
+            queueMicrotask(() => setInstrumentResults([]));
+            return;
+        }
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => {
+            void searchInstruments(searchText, controller.signal)
+                .then(setInstrumentResults)
+                .catch(() => setInstrumentResults([]));
+        }, 200);
+        return () => {
+            window.clearTimeout(timeout);
+            controller.abort();
+        };
+    }, [searchText]);
 
     async function signOut() {
         setProfileAnchor(null);
@@ -53,7 +74,52 @@ export default function Header() {
                     })}
                 </Stack>
                 <Box sx={{ flex: 1 }} />
-                <TextField size="small" placeholder="Search stocks, indices..." aria-label="Search AlphaEdge AI" onChange={(event) => window.dispatchEvent(new CustomEvent("alphaedge:global-search", { detail: event.target.value }))} sx={{ display: { xs: "none", md: "block" }, width: { md: 340, lg: 370, xl: 400 }, minWidth: { md: 320, lg: 340, xl: 370 }, maxWidth: 400, flex: "0 0 auto", "& .MuiInputBase-root": { width: "100%" }, "& .MuiOutlinedInput-root": { height: 40, bgcolor: "#ffffff", fontSize: "0.74rem", borderRadius: "12px", "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#C9D0DB" }, "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "primary.main", borderWidth: 1 } }, "& .MuiOutlinedInput-notchedOutline": { borderColor: "#DFE5EE" }, "& input": { py: 0, height: 40, boxSizing: "border-box" }, "& input::placeholder": { color: "#667085", opacity: 1 }, "& .MuiInputAdornment-root": { color: "#748197", alignItems: "center" } }} slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchRoundedIcon sx={{ fontSize: 18 }} /></InputAdornment> } }} />
+                <Autocomplete
+                    freeSolo
+                    filterOptions={(options) => options}
+                    options={instrumentResults}
+                    inputValue={searchText}
+                    getOptionLabel={(option) => typeof option === "string" ? option : option.exchange_symbol}
+                    onInputChange={(_, value) => {
+                        setSearchText(value);
+                        window.dispatchEvent(new CustomEvent("alphaedge:global-search", { detail: value }));
+                    }}
+                    onChange={(_, option) => {
+                        if (!option || typeof option === "string") return;
+                        setSearchText(option.exchange_symbol);
+                        navigate(`/stock-details/${encodeURIComponent(option.exchange_symbol)}`, {
+                            state: {
+                                symbol: option.exchange_symbol,
+                                instrumentOnly: true,
+                                instrumentName: option.instrument_name,
+                            },
+                        });
+                    }}
+                    renderOption={(props, option) => (
+                        <Box component="li" {...props} key={option.instrument_id} sx={{ display: "block !important" }}>
+                            <Typography sx={{ fontSize: "0.75rem", fontWeight: 700 }}>{option.exchange_symbol}</Typography>
+                            <Typography color="text.secondary" sx={{ fontSize: "0.66rem" }}>
+                                {option.instrument_name} · {option.exchange} · {option.series}
+                            </Typography>
+                        </Box>
+                    )}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            size="small"
+                            placeholder="Search stocks, indices..."
+                            aria-label="Search AlphaEdge AI"
+                            slotProps={{
+                                ...params.slotProps,
+                                input: {
+                                    ...params.slotProps.input,
+                                    startAdornment: <InputAdornment position="start"><SearchRoundedIcon sx={{ fontSize: 18 }} /></InputAdornment>,
+                                },
+                            }}
+                        />
+                    )}
+                    sx={{ display: { xs: "none", md: "block" }, width: { md: 340, lg: 370, xl: 400 }, minWidth: { md: 320, lg: 340, xl: 370 }, maxWidth: 400, flex: "0 0 auto", "& .MuiInputBase-root": { width: "100%" }, "& .MuiOutlinedInput-root": { height: 40, py: "0 !important", bgcolor: "#ffffff", fontSize: "0.74rem", borderRadius: "12px", "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#C9D0DB" }, "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "primary.main", borderWidth: 1 } }, "& .MuiOutlinedInput-notchedOutline": { borderColor: "#DFE5EE" }, "& input": { py: 0, height: 40, boxSizing: "border-box" }, "& input::placeholder": { color: "#667085", opacity: 1 }, "& .MuiInputAdornment-root": { color: "#748197", alignItems: "center" } }}
+                />
                 <IconButton size="small" aria-label="Notifications" sx={{ color: "#667085", transition: "color 160ms ease", "&:hover": { color: "primary.main", bgcolor: "#F4F1FF" } }}><NotificationsNoneOutlinedIcon fontSize="small" /></IconButton>
                 <Stack
                     component="button"

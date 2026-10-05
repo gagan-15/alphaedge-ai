@@ -14,6 +14,8 @@ import type {
     ZoneResearchResponse,
     ZoneResearchResult,
     ZoneDiagnosticsResponse,
+    PersistedZonePage,
+    ScannerCapabilities,
 } from "../types/scanner";
 import type { MarketUniverse } from "../market-universe/MarketUniverseState";
 
@@ -24,8 +26,83 @@ const api = axios.create({
 
 const researchZoneRequests = new Map<string, Promise<ZoneResearchResponse>>();
 
+export interface InstrumentSearchResult {
+    instrument_id: string;
+    exchange: string;
+    exchange_symbol: string;
+    display_symbol: string;
+    instrument_name: string;
+    isin: string;
+    series: string;
+    is_active: number;
+    provider_identifier: string;
+}
+
+export interface DhanRuntimeStatus {
+    provider: "dhan";
+    data_status: "READY" | "UPDATING" | "CANCELLING" | "CANCELLED" | "FAILED";
+    auth_status?: "AUTH_VALID" | "AUTH_RENEWED" | "AUTH_REGENERATED" | "AUTH_REQUIRED";
+    last_successful_update: string | null;
+    latest_trading_date: string | null;
+    last_update: {
+        status: string;
+        stage?: string;
+        error?: string | null;
+        instruments_checked?: number;
+        instruments_changed?: number;
+        instruments_failed?: number;
+        progress_completed?: number;
+        progress_total?: number;
+        affected_timeframes?: string;
+        started_at?: string | null;
+        completed_at?: string | null;
+        run_id?: number;
+    };
+    snapshots: Record<string, {
+        snapshot_id: number;
+        status: "READY" | "BUILDING" | "FAILED";
+        completed_at: string | null;
+        result_count: number;
+    }>;
+}
+
+export async function getDhanRuntimeStatus(): Promise<DhanRuntimeStatus> {
+    const response = await api.get<DhanRuntimeStatus>("/scanner/dhan-runtime-status");
+    return response.data;
+}
+
+export async function startDhanIncrementalUpdate(): Promise<{ status: string; message: string }> {
+    const response = await api.post<{ status: string; message: string }>(
+        "/scanner/dhan-incremental-update",
+        undefined,
+        { headers: { "X-AlphaEdge-Update-Intent": "explicit-user" } },
+    );
+    return response.data;
+}
+
+export async function cancelDhanIncrementalUpdate(runId: number): Promise<{ status: string; run_id: number; message: string }> {
+    const response = await api.post<{ status: string; run_id: number; message: string }>(
+        `/scanner/dhan-incremental-update/${runId}/cancel`,
+        undefined,
+        { headers: { "X-AlphaEdge-Update-Intent": "explicit-user" } },
+    );
+    return response.data;
+}
+
+export async function searchInstruments(
+    query: string,
+    signal?: AbortSignal,
+): Promise<InstrumentSearchResult[]> {
+    if (!query.trim()) return [];
+    const response = await api.get<{ results: InstrumentSearchResult[] }>(
+        "/scanner/instruments/search",
+        { params: { q: query.trim(), limit: 8 }, signal },
+    );
+    return response.data.results;
+}
+
 export async function getScanner(
-    universe: MarketUniverse = "nse500",
+    universe: MarketUniverse = "allindia",
     symbols: string[] = [],
 ): Promise<ScannerResponse> {
     try {
@@ -45,16 +122,61 @@ export async function getScanner(
     }
 }
 
+export async function getScannerCapabilities(
+    universe: MarketUniverse = "allindia",
+): Promise<ScannerCapabilities> {
+    const response = await api.get<ScannerCapabilities>("/scanner/capabilities", {
+        params: { universe },
+    });
+    return response.data;
+}
+
+export async function getPersistedZonePage(params: {
+    timeframe: string;
+    universe: MarketUniverse;
+    symbols?: string[];
+    zoneType?: string;
+    pattern?: string;
+    minimumQuality?: number;
+    status?: string;
+    maxDistance?: number;
+    symbol?: string;
+    sort?: string;
+    descending?: boolean;
+    page?: number;
+    pageSize?: number;
+}): Promise<PersistedZonePage> {
+    const response = await api.get<PersistedZonePage>("/scanner/persisted-zones", {
+        params: {
+            timeframe: params.timeframe,
+            universe: params.universe,
+            symbols: params.symbols,
+            zone_type: params.zoneType,
+            pattern: params.pattern,
+            min_zone_quality: params.minimumQuality,
+            status: params.status,
+            max_distance: params.maxDistance,
+            symbol: params.symbol,
+            sort: params.sort,
+            descending: params.descending,
+            page: params.page ?? 1,
+            page_size: params.pageSize ?? 14,
+        },
+    });
+    return response.data;
+}
+
 export async function getResearchZones(
     timeframe = "DAILY",
-    universe: MarketUniverse = "nse500",
+    universe: MarketUniverse = "allindia",
     symbols: string[] = [],
+    includeResults = true,
 ): Promise<ZoneResearchResponse> {
-    const requestKey = `${timeframe}:${universe}:${symbols.join(",")}`;
+    const requestKey = `${timeframe}:${universe}:${symbols.join(",")}:${includeResults}`;
     const active = researchZoneRequests.get(requestKey);
     if (active) return active;
     const request = api.get<ZoneResearchResponse>("/scanner/zones", {
-        params: { timeframe, universe, symbols },
+        params: { timeframe, universe, symbols, include_results: includeResults },
     }).then((response) => response.data).finally(() => {
         researchZoneRequests.delete(requestKey);
     });

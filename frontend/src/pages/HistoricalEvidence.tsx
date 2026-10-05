@@ -111,11 +111,12 @@ export default function HistoricalEvidence() {
 
     useEffect(() => {
         let active = true;
-        getHistoricalEvidenceMetadata().then((value) => { if (active) setMetadata(value); }).catch((reason) => { if (active) setError(historicalEvidenceErrorMessage(reason)); }).finally(() => { if (active) setMetadataLoading(false); });
+        getHistoricalEvidenceMetadata("latest").then((value) => { if (active) setMetadata(value); }).catch((reason) => { if (active) setError(historicalEvidenceErrorMessage(reason)); }).finally(() => { if (active) setMetadataLoading(false); });
         return () => { active = false; };
     }, []);
 
     useEffect(() => {
+        if (!metadata) return;
         const nextParams = writeFilters(filters);
         if (page > 1) nextParams.set("page", String(page));
         if (sortBy !== "formation_timestamp") nextParams.set("sort_by", sortBy);
@@ -123,30 +124,32 @@ export default function HistoricalEvidence() {
         setSearchParams(nextParams, { replace: true });
         let active = true;
         Promise.all([
-            getHistoricalEvidenceSummary(filters),
-            getHistoricalEvidenceZones(filters, page, PAGE_SIZE, sortBy, sortDirection),
+            getHistoricalEvidenceSummary(filters, metadata.historical_evidence_version),
+            getHistoricalEvidenceZones(filters, page, PAGE_SIZE, sortBy, sortDirection, metadata.historical_evidence_version),
         ]).then(([summaryValue, zonesValue]) => {
             if (!active) return;
             setSummary(summaryValue);
             setZones(zonesValue);
         }).catch((reason) => { if (active) setError(historicalEvidenceErrorMessage(reason)); }).finally(() => { if (active) setLoading(false); });
         return () => { active = false; };
-    }, [filters, page, setSearchParams, sortBy, sortDirection]);
+    }, [filters, page, setSearchParams, sortBy, sortDirection, metadata]);
 
-    const versionMismatch = useMemo(() => [metadata?.historical_evidence_version, summary?.historical_evidence_version, zones?.historical_evidence_version].filter(Boolean).some((version) => version !== HISTORICAL_EVIDENCE_VERSION), [metadata, summary, zones]);
+    const versionMismatch = useMemo(() => [summary?.historical_evidence_version, zones?.historical_evidence_version].filter(Boolean).some((version) => version !== metadata?.historical_evidence_version), [metadata, summary, zones]);
     const veryHighEmpty = filters.tradeConfidence === "VERY_HIGH" && !loading && summary?.historical_zones === 0;
 
     return <Stack spacing={1.5} sx={{ maxWidth: 1680, mx: "auto" }}>
         <Stack direction={{ xs: "column", md: "row" }} sx={{ justifyContent: "space-between", gap: 1 }}>
-            <Box><Typography variant="h4">Historical Evidence</Typography><Typography color="text.secondary">Explore the frozen Milestone 9C research baseline without changing current scanner results.</Typography></Box>
-            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}><Chip label="Research baseline" variant="outlined" color="primary" /><Chip label={HISTORICAL_EVIDENCE_VERSION} /></Stack>
+            <Box><Typography variant="h4">Historical Evidence</Typography><Typography color="text.secondary">Historical zone outcomes through the published observation cutoff, without changing current scanner results.</Typography></Box>
+            <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}><Chip label={metadata?.provider === "dhan" ? "Dhan research evidence" : "Research baseline"} variant="outlined" color="primary" /><Chip label={metadata?.historical_evidence_version ?? HISTORICAL_EVIDENCE_VERSION} /></Stack>
         </Stack>
 
         <Card><CardContent><Grid container spacing={1.5} sx={{ alignItems: "center" }}>
-            {[['Dataset', 'Milestone 9C Research Baseline'], ['Period', metadata ? `${metadata.dataset_period.start} to ${metadata.dataset_period.end}` : 'Loading...'], ['Coverage', 'Current NSE 500 constituent historical replay'], ['Zones', metadata ? metadata.record_count.toLocaleString() : '...'], ['Timeframes', 'Daily and Weekly']].map(([label, value]) => <Grid key={label} size={{ xs: 12, sm: 6, lg: 2.4 }}><Typography color="text.secondary" sx={{ fontSize: ".64rem", textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</Typography><Typography sx={{ mt: .25, fontWeight: 650 }}>{value}</Typography></Grid>)}
+            {[['Dataset', metadata?.provider === 'dhan' ? 'Dhan Historical Outcomes' : 'Milestone 9C Research Baseline'], ['Period', metadata ? `${metadata.dataset_period.start} to ${metadata.dataset_period.end}` : 'Loading...'], ['Coverage', 'Current NSE 500 constituent historical replay'], ['Zones', metadata ? metadata.record_count.toLocaleString() : '...'], ['Timeframes', 'Daily and Weekly']].map(([label, value]) => <Grid key={label} size={{ xs: 12, sm: 6, lg: 2.4 }}><Typography color="text.secondary" sx={{ fontSize: ".64rem", textTransform: "uppercase", letterSpacing: ".06em" }}>{label}</Typography><Typography sx={{ mt: .25, fontWeight: 650 }}>{value}</Typography></Grid>)}
         </Grid></CardContent></Card>
 
-        {versionMismatch && <Alert severity="error">Dataset version mismatch. This page requires {HISTORICAL_EVIDENCE_VERSION}; displayed results have been stopped.</Alert>}
+        {metadata?.coverage_note && <Alert severity="info">{metadata.coverage_note}</Alert>}
+        {!!metadata?.excluded_symbols?.length && <Alert severity="warning">Excluded instruments: {metadata.excluded_symbols.map((item) => typeof item === "string" ? item : `${item.symbol} (${item.reason})`).join(", ")}. No replacement histories were fabricated.</Alert>}
+        {versionMismatch && <Alert severity="error">Dataset version mismatch. This page requires {metadata?.historical_evidence_version}; displayed results have been stopped.</Alert>}
         {error && <Alert severity="error">{error}</Alert>}
 
         <Card><CardContent><Stack direction="row" useFlexGap sx={{ flexWrap: "wrap", gap: 1, alignItems: "center" }}>
@@ -174,7 +177,7 @@ export default function HistoricalEvidence() {
             <Grid container spacing={1.2}><Grid size={{ xs: 12, lg: 8 }}><ReactionDepthChart summary={summary} /></Grid><Grid size={{ xs: 12, lg: 4 }}><Card sx={{ height: "100%" }}><CardContent><Typography variant="h6">Evidence reliability</Typography><Chip sx={{ mt: 1 }} label={reliabilityLabel(summary.reliability)} color={summary.interacted_zones >= 300 ? "success" : "warning"} variant="outlined" /><Typography sx={{ mt: 1.2, fontWeight: 650 }}>{summary.interacted_zones.toLocaleString()} interacted zones</Typography><Typography color="text.secondary" sx={{ mt: .5 }}>Reliability reflects the amount of evidence in this filtered cohort. It does not describe a future outcome.</Typography><Typography color="text.secondary" sx={{ mt: 1 }}>Historical reactions are research observations, not a trading probability, promise, or guarantee.</Typography></CardContent></Card></Grid></Grid>
         </>}
 
-        {veryHighEmpty && <Alert severity="info">No VERY HIGH observations exist in the frozen Milestone 9C baseline. AlphaEdge does not substitute another Trade Confidence group.</Alert>}
+        {veryHighEmpty && <Alert severity="info">No VERY HIGH observations exist in this cohort. AlphaEdge does not substitute another Trade Confidence group.</Alert>}
 
         <Card><CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
             <Stack direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "space-between", gap: 1, px: 2, py: 1.5, borderBottom: "1px solid", borderColor: "divider" }}><Box><Typography variant="h6">Historical zones</Typography><Typography color="text.secondary">Server-filtered and deterministically paginated.</Typography></Box><Stack direction="row" spacing={1}><FilterSelect label="Sort" value={sortBy} options={SORT_OPTIONS.map(([value, label]) => [value, label])} onChange={(value) => { setLoading(true); setSortBy(value); setPage(1); }} /><FilterSelect label="Direction" value={sortDirection} options={[["desc", "Descending"], ["asc", "Ascending"]]} onChange={(value) => { setLoading(true); setSortDirection(value as "asc" | "desc"); setPage(1); }} /></Stack></Stack>
@@ -187,6 +190,6 @@ export default function HistoricalEvidence() {
             <Stack direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "space-between", alignItems: "center", gap: 1, px: 2, py: 1.4, borderTop: "1px solid", borderColor: "divider" }}><Typography color="text.secondary">{zones ? `${zones.total.toLocaleString()} zones - Page ${zones.page} of ${zones.total_pages || 1}` : "Loading zones..."}</Typography><Pagination page={page} count={Math.max(zones?.total_pages ?? 1, 1)} onChange={(_, value) => { setLoading(true); setPage(value); }} color="primary" size="small" disabled={loading} /></Stack>
         </CardContent></Card>
 
-        <Alert severity="info" icon={<InfoOutlinedIcon />}>This page presents frozen historical research evidence. It does not use current market data, alter scanner ranking, or predict what will happen next. Daily and Weekly evidence is available; 15-minute, 75-minute, and 125-minute evidence is not part of this baseline.</Alert>
+        <Alert severity="info" icon={<InfoOutlinedIcon />}>This page reads a validated historical research snapshot. Opening it does not fetch data or recalculate zones. It does not alter scanner ranking or predict future outcomes. Evidence covers Daily and Weekly; newer formations have shorter observation periods.</Alert>
     </Stack>;
 }

@@ -8,6 +8,8 @@ from datetime import UTC, datetime
 from threading import RLock
 from time import monotonic
 
+from backend.config.market_data_providers import MARKET_DATA_PROVIDER
+from backend.services.market_data.dhan_index_quote_service import DhanIndexQuoteService
 from backend.services.market_data.market_data_service import MarketDataService
 from backend.services.scanner.universe_service import UniverseName, UniverseService
 
@@ -46,20 +48,26 @@ class MarketSnapshotService:
     _lock = RLock()
     _executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="market-snapshot")
     _ttl_seconds = 300.0
+    _dhan_ttl_seconds = 5.0
 
     def __init__(
         self,
         market_data: MarketDataService | None = None,
         universe_service: UniverseService | None = None,
+        dhan_index_quotes: DhanIndexQuoteService | None = None,
     ) -> None:
         self._market_data = market_data or MarketDataService()
         self._universe_service = universe_service or UniverseService()
+        self._dhan_index_quotes = dhan_index_quotes or DhanIndexQuoteService()
 
     def get_snapshot(
         self,
-        universe: UniverseName = "nse500",
+        universe: UniverseName = "allnse",
         supplied_symbols: list[str] | None = None,
     ) -> MarketSnapshot:
+        if MARKET_DATA_PROVIDER == "dhan":
+            return self._get_dhan_snapshot(universe, supplied_symbols)
+
         key = self._cache_key(universe, supplied_symbols)
         with self._lock:
             cached = self._cache.get(key)
@@ -105,6 +113,42 @@ class MarketSnapshotService:
             data_status="refreshing",
             updated_at=datetime.now(UTC),
         )
+
+    def _get_dhan_snapshot(
+        self,
+        universe: UniverseName,
+        supplied_symbols: list[str] | None,
+    ) -> MarketSnapshot:
+        """Return Dhan index cards without scheduling legacy Yahoo breadth work."""
+        key = f"dhan:{self._cache_key(universe, supplied_symbols)}"
+        with self._lock:
+            cached = self._cache.get(key)
+            fresh = cached and monotonic() - cached[0] < self._dhan_ttl_seconds
+        if fresh:
+            return cached[1]
+
+        index_quotes = self._dhan_index_quotes.quotes()
+        quotes = {
+            name: QuoteSnapshot(name, quote.price, float(quote.change_percent))
+            for name, quote in index_quotes.items()
+            if quote.change_percent is not None
+        }
+        snapshot = MarketSnapshot(
+            quotes=quotes,
+            advancing=0,
+            declining=0,
+            unchanged=0,
+            total_symbols=len(
+                self._universe_service.get_symbols(universe, supplied_symbols)
+            ),
+            processed_symbols=0,
+            source="Dhan Market Quote API",
+            data_status="live" if quotes else "unavailable",
+            updated_at=datetime.now(UTC),
+        )
+        with self._lock:
+            self._cache[key] = (monotonic(), snapshot)
+        return snapshot
 
     def _refresh_breadth(
         self,

@@ -25,6 +25,13 @@ def _filters(**values):
 
 def _call(method, *args, **kwargs):
     try:
+        if args and args[0] != HISTORICAL_EVIDENCE_VERSION:
+            from backend.historical_evidence.current import current_service
+            current = current_service()
+            if current is not None and args[0] in {'latest', current.version}:
+                return getattr(current, method.__name__)(current.version, *args[1:], **kwargs)
+            if args[0] == 'latest':
+                return method(HISTORICAL_EVIDENCE_VERSION, *args[1:], **kwargs)
         return method(*args, **kwargs)
     except HistoricalEvidenceVersionMismatch as exception:
         raise HTTPException(status_code=409, detail=str(exception)) from exception

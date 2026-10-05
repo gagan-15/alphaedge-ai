@@ -63,16 +63,16 @@ class ZoneDetectionEngine:
     """
 
     def __init__(self) -> None:
+        self._candle_classifier = CandleClassifier()
 
-        self._base_detector = BaseDetector()
+        self._base_detector = BaseDetector(self._candle_classifier)
 
-        self._departure_detector = DepartureDetector()
+        self._departure_detector = DepartureDetector(self._candle_classifier)
 
         self._pattern_detector = PatternDetector()
 
         self._boundary_engine = ZoneBoundaryEngine()
 
-        self._candle_classifier = CandleClassifier()
         self._leg_in_structure = LegInStructuralEvidenceEngine(self._candle_classifier)
 
     def detect_zones(
@@ -86,10 +86,28 @@ class ZoneDetectionEngine:
 
         logger.info("Starting zone detection.")
 
-        detected_zones: list[Zone] = []
-
+        self._candle_classifier.clear_cache()
         base_regions = self._base_detector.detect(market_data)
+        return self._detect_from_bases(market_data, base_regions)
 
+    def detect_zones_from_base_end(
+        self, market_data: DataFrame, minimum_base_end_index: int
+    ) -> list[Zone]:
+        """Detect only formations whose Base ends in the affected suffix.
+
+        This is an execution optimization, not an analytical variant.  Base
+        discovery and every downstream canonical rule still receive the full
+        validated candle array, so indexes, ATR warm-up, maximal Leg-In/Out,
+        boundaries, and formation evidence retain their reference semantics.
+        """
+        self._candle_classifier.clear_cache()
+        base_regions = self._base_detector.detect_ending_at_or_after(
+            market_data, minimum_base_end_index,
+        )
+        return self._detect_from_bases(market_data, base_regions)
+
+    def _detect_from_bases(self, market_data, base_regions) -> list[Zone]:
+        detected_zones: list[Zone] = []
         logger.info(f"{len(base_regions)} base region(s) detected.")
 
         for base in base_regions:

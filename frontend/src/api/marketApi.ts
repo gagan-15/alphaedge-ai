@@ -32,14 +32,16 @@ export async function getMarketCandles(
     interval = "1d",
     timeframe = "1D",
     signal?: AbortSignal,
+    instrumentId?: string | null,
+    formationDate?: string | null,
 ): Promise<CandleSeriesResult> {
-    const key = `${symbol}:${period}:${interval}:${timeframe}`;
+    const key = `${symbol}:${period}:${interval}:${timeframe}:${instrumentId ?? ""}:${formationDate ?? ""}`;
     // Background scanner enrichment is cancellable. Do not place those
     // requests in the shared cache because an opened chart must never wait on
     // an obsolete background request from a previous symbol or timeframe.
     if (signal) {
         const response = await marketApi.get<CandleSeriesResult>("/candles", {
-            params: { symbol, period, interval, timeframe },
+            params: { symbol, period, interval, timeframe, instrument_id: instrumentId, formation_date: formationDate },
             signal,
         });
         return response.data;
@@ -47,11 +49,16 @@ export async function getMarketCandles(
     const cached = candleCache.get(key);
     if (cached) return cached;
     const request = marketApi.get<CandleSeriesResult>("/candles", {
-        params: { symbol, period, interval, timeframe },
-    }).then((response) => response.data).catch((error) => {
-        candleCache.delete(key);
-        throw error;
-    });
+        params: { symbol, period, interval, timeframe, instrument_id: instrumentId, formation_date: formationDate },
+    }).then((response) => response.data);
     candleCache.set(key, request);
-    return request;
+    try {
+        return await request;
+    } finally {
+        // Coalesce only simultaneous requests. Candle history is mutable after
+        // a successful Dhan incremental update, so keeping this promise for
+        // the browser session would leave an opened/reopened chart stale even
+        // though the persisted chart API already contains newer sessions.
+        if (candleCache.get(key) === request) candleCache.delete(key);
+    }
 }

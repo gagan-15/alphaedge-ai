@@ -31,7 +31,8 @@ class HistoricalEvidenceVersionMismatch(HistoricalEvidenceValidationError):
 
 
 class HistoricalEvidenceService:
-    def __init__(self, repository: HistoricalEvidenceRepository | None = None) -> None:
+    def __init__(self, repository: HistoricalEvidenceRepository | None = None, *, version: str = HISTORICAL_EVIDENCE_VERSION) -> None:
+        self.version = version
         self.repository = repository or HistoricalEvidenceRepository(
             DEFAULT_DATABASE_PATH
         )
@@ -39,7 +40,7 @@ class HistoricalEvidenceService:
     def _verify_version(self, version: str) -> dict[str, Any]:
         metadata = self.repository.metadata()
         mounted = metadata.get("historical_evidence_version")
-        if version != HISTORICAL_EVIDENCE_VERSION or mounted != version:
+        if version != self.version or mounted != version:
             raise HistoricalEvidenceVersionMismatch(
                 f"Requested dataset version '{version}' is not available; mounted version is '{mounted}'."
             )
@@ -211,6 +212,14 @@ class HistoricalEvidenceService:
         normalized_timeframe = aliases.get(normalized_timeframe, normalized_timeframe)
         inputs["timeframe"] = normalized_timeframe
 
+        # The current canonical Zone Quality engine names its top band EXCELLENT,
+        # while the frozen Milestone 9C read model records the same band as ELITE.
+        # Preserve the current-zone label in the response and translate only the
+        # immutable historical cohort lookup.
+        historical_zone_quality_label = {
+            "EXCELLENT": "ELITE",
+        }.get(zone_quality_label.upper(), zone_quality_label.upper())
+
         base = {
             "historical_evidence_version": metadata["historical_evidence_version"],
             "methodology_fingerprint": metadata["methodology_fingerprint"],
@@ -251,9 +260,12 @@ class HistoricalEvidenceService:
             self.filters(
                 **common,
                 pattern=pattern,
-                zone_quality_label=zone_quality_label,
+                zone_quality_label=historical_zone_quality_label,
             ),
-            self.filters(**common, zone_quality_label=zone_quality_label),
+            self.filters(
+                **common,
+                zone_quality_label=historical_zone_quality_label,
+            ),
             validated_common,
         )
         summaries = tuple(self.summary(version, cohort) for cohort in level_filters)
@@ -295,13 +307,13 @@ class HistoricalEvidenceService:
                 "timeframe": normalized_timeframe,
                 "zone_type": zone_type.upper(),
                 "pattern": pattern.upper(),
-                "zone_quality_label": zone_quality_label.upper(),
+                "zone_quality_label": historical_zone_quality_label,
                 "trade_confidence_label": trade_confidence_label.upper(),
             },
             {
                 "timeframe": normalized_timeframe,
                 "zone_type": zone_type.upper(),
-                "zone_quality_label": zone_quality_label.upper(),
+                "zone_quality_label": historical_zone_quality_label,
                 "trade_confidence_label": trade_confidence_label.upper(),
             },
             {

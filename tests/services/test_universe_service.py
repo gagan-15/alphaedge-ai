@@ -25,8 +25,8 @@ def test_predefined_universe_counts(universe: str, expected_count: int) -> None:
     assert len(symbols) == len(set(symbols))
 
 
-def test_default_universe_is_nse500() -> None:
-    assert len(UniverseService(DATA_DIRECTORY).get_symbols()) == 500
+def test_default_universe_is_all_nse() -> None:
+    assert len(UniverseService(DATA_DIRECTORY).get_symbols()) == 2390
 
 
 @pytest.mark.parametrize("universe", ["watchlist", "custom"])

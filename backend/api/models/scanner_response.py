@@ -131,6 +131,9 @@ class ZoneResearchResultResponse(APIResponseModel):
     """Detected zone context without execution claims."""
 
     symbol: str
+    # Source-aware identity is required to plot a persisted-provider zone
+    # against precisely the candle series that formed it.
+    instrument_id: str | None = None
     zone_type: str
     pattern_type: str | None = None
     proximal_price: float
@@ -154,6 +157,8 @@ class ZoneResearchResultResponse(APIResponseModel):
     evidence: tuple[str, ...]
     explanation: ZoneExplanationResponse
     current_price: float
+    price_source: str = "PERSISTED_DHAN_CLOSE"
+    price_as_of: str | None = None
     timeframe: str
     base_index: int
     base_date: str
@@ -221,7 +226,7 @@ class ZoneResearchResponse(APIResponseModel):
     timeframe: str = "1D"
     results: tuple[ZoneResearchResultResponse, ...]
     historical_results: tuple[ZoneResearchResultResponse, ...] = ()
-    universe: str = "nse500"
+    universe: str = "allnse"
     status: str = "completed"
     total_symbols: int = 0
     processed_symbols: int = 0

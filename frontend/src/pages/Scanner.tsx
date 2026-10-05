@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
@@ -24,12 +24,20 @@ import Tabs from "@mui/material/Tabs";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import { getResearchZones } from "../api/scannerApi";
+import { cancelDhanIncrementalUpdate, getDhanRuntimeStatus, getPersistedZonePage, getResearchZones, getScannerCapabilities, startDhanIncrementalUpdate, type DhanRuntimeStatus } from "../api/scannerApi";
 import ScannerResultsTable from "../components/scanner/ScannerResultsTable";
+import DhanDataStatus from "../components/scanner/DhanDataStatus";
 import ScannerToolbar, { type ScannerQuickPreset } from "../components/scanner/ScannerToolbar";
+import TradingChart from "../components/dashboard/TradingChart";
+import {
+    rowsForSelectedTimeframe,
+    scannerSelectionMatches,
+    shouldRequestScannerBuild,
+    timeframeStatusMessage,
+} from "../components/scanner/scannerTimeframeState";
 
 import type { ZoneResearchResponse } from "../types/scanner";
-import { useMarketUniverse } from "../market-universe/MarketUniverseState";
+import { marketUniverseOptions, useMarketUniverse, type MarketUniverse } from "../market-universe/MarketUniverseState";
 
 const scannerResultCache = new Map<string, ZoneResearchResponse>();
 const scannerMethodologyVersion = "formation-1.1";
@@ -40,10 +48,9 @@ const timeframes = [
     { value: "HALFYEARLY", label: "Half-yearly" }, { value: "YEARLY", label: "Yearly" },
 ] as const;
 const intradayTimeframes = [
-    { value: "MINUTE_5", label: "5m" }, { value: "MINUTE_15", label: "15m" },
+    { value: "MINUTE_15", label: "15m" },
     { value: "MINUTE_75", label: "75m" }, { value: "MINUTE_125", label: "125m" },
-    { value: "HOUR_1", label: "1H" }, { value: "HOUR_2", label: "2H" },
-    { value: "HOUR_4", label: "4H" }, { value: "HOUR_6", label: "6H" },
+    { value: "HOUR_1", label: "1H" },
 ] as const;
 
 function scannerPreference<T>(key: "defaultTimeframe" | "minimumQuality", fallback: T): T {
@@ -56,9 +63,10 @@ function scannerPreference<T>(key: "defaultTimeframe" | "minimumQuality", fallba
 }
 
 function Scanner() {
-    const { marketUniverse, customSymbols } = useMarketUniverse();
+    const { marketUniverse, setMarketUniverse, customSymbols } = useMarketUniverse();
     const location = useLocation();
     const navigate = useNavigate();
+    const { symbol: routeSymbol } = useParams();
     const initialFilters = location.state as {
         zoneType?: "DEMAND" | "SUPPLY";
         timeframe?: string;
@@ -67,6 +75,8 @@ function Scanner() {
         proximalPrice?: number;
         distalPrice?: number;
         baseIndex?: number;
+        instrumentOnly?: boolean;
+        instrumentName?: string;
     } | null;
     const [scanner, setScanner] =
         useState<ZoneResearchResponse | null>(null);
@@ -88,9 +98,13 @@ function Scanner() {
         () => initialFilters?.timeframe ?? scannerPreference("defaultTimeframe", "DAILY"),
     );
     const [market, setMarket] = useState("NSE");
+    const [universeOptions, setUniverseOptions] = useState<Array<{ value: MarketUniverse; label: string }>>(
+        marketUniverseOptions.map((option) => ({ ...option })),
+    );
     const [patternFilter, setPatternFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
     const [proximityFilter, setProximityFilter] = useState(100);
+    const [actionableActive, setActionableActive] = useState(false);
     const [effectiveFilters, setEffectiveFilters] = useState(() => ({
         searchQuery: "",
         minimumScore: scannerPreference("minimumQuality", 40),
@@ -105,7 +119,26 @@ function Scanner() {
         market: "NSE",
     }));
     const [insightVisible, setInsightVisible] = useState(true);
+    const [resultPage, setResultPage] = useState(1);
+    const [resultSort, setResultSort] = useState<"contextual_rank" | "symbol" | "trade_confidence" | "zone_quality" | "distance" | "current_price">("contextual_rank");
+    const [resultSortDirection, setResultSortDirection] = useState<"asc" | "desc">("asc");
+    const [persistedResults, setPersistedResults] = useState<ZoneResearchResponse["results"]>([]);
+    const [persistedTotal, setPersistedTotal] = useState(0);
+    const [persistedState, setPersistedState] = useState<
+        "LOADING" | "READY" | "BUILDING" | "STALE" | "FAILED" | "UNAVAILABLE"
+    >("LOADING");
+    const [persistedRefreshState, setPersistedRefreshState] = useState<"BUILDING" | null>(null);
+    const [persistedProgress, setPersistedProgress] = useState({ processed: 0, total: 0 });
+    const [persistedReloadNonce, setPersistedReloadNonce] = useState(0);
+    const [dhanRuntimeStatus, setDhanRuntimeStatus] = useState<DhanRuntimeStatus | null>(null);
+    const [persistedSelection, setPersistedSelection] = useState({
+        timeframe,
+        universe: marketUniverse,
+    });
     const requestVersion = useRef(0);
+    const updateWasRunning = useRef(false);
+    const instrumentOnly = location.pathname.startsWith("/stock-details/")
+        && (!initialFilters?.selectedZone || initialFilters.instrumentOnly === true);
 
     function loadScanner(selectedTimeframe = timeframe) {
         const version = ++requestVersion.current;
@@ -130,6 +163,7 @@ function Scanner() {
             selectedTimeframe,
             marketUniverse,
             suppliedSymbols,
+            location.pathname.startsWith("/stock-details/"),
         )
             .then((data) => {
                 if (version !== requestVersion.current) return;
@@ -170,26 +204,89 @@ function Scanner() {
     }
 
     function reloadScanner() {
+        // Dashboard Refresh is strictly a read of the currently published
+        // persisted snapshot.  It must never enter the legacy scanner route
+        // or start a Dhan incremental/canonical recalculation.
         if (market !== "NSE") {
             setIsLoading(false);
             return;
         }
         setIsLoading(true);
         setErrorMessage(null);
-
-        loadScanner();
+        setPersistedReloadNonce((value) => value + 1);
     }
 
-    function changeMarket(value: string) {
-        setMarket(value);
-        setIsLoading(value === "NSE");
+    function updateDhanData() {
         setErrorMessage(null);
+        void startDhanIncrementalUpdate().then(() => {
+            updateWasRunning.current = true;
+            return getDhanRuntimeStatus();
+        }).then((status) => {
+            setDhanRuntimeStatus(status);
+        }).catch(() => {
+            setErrorMessage("Unable to start the Dhan update. Existing AlphaEdge data remains available.");
+        });
+    }
+
+    function cancelDhanDataUpdate() {
+        const runId = dhanRuntimeStatus?.last_update.run_id;
+        if (!runId) return;
+        setErrorMessage(null);
+        void cancelDhanIncrementalUpdate(runId).then((status) => {
+            setDhanRuntimeStatus((current) => current ? {
+                ...current,
+                data_status: "CANCELLING",
+                last_update: { ...current.last_update, status: status.status, stage: status.message },
+            } : current);
+        }).catch(() => {
+            setErrorMessage("Unable to cancel the Dhan update. Existing AlphaEdge data remains available.");
+        });
     }
 
     function changeTimeframe(value: string) {
         setIsLoading(true);
         setErrorMessage(null);
+        setPersistedResults([]);
+        setPersistedTotal(0);
+        setPersistedState("LOADING");
+        setPersistedRefreshState(null);
         setTimeframe(value);
+        try {
+            const preferences = JSON.parse(localStorage.getItem("alphaedge.local.preferences") ?? "{}");
+            localStorage.setItem(
+                "alphaedge.local.preferences",
+                JSON.stringify({ ...preferences, defaultTimeframe: value }),
+            );
+        } catch {
+            // A storage failure must not block timeframe selection.
+        }
+    }
+
+    function changeUniverse(value: MarketUniverse) {
+        setMarketUniverse(value);
+        setIsLoading(true);
+        setErrorMessage(null);
+        setPersistedResults([]);
+        setPersistedTotal(0);
+        setPersistedState("LOADING");
+    }
+
+    function toggleActionableZones() {
+        setActionableActive((active) => {
+            if (!active) {
+                // Existing server-side filters preserve global ordering and
+                // pagination; this only applies a convenience filter set.
+                setMinimumScore(70); // Canonical Zone Quality: GOOD and above.
+                setStatusFilter("APPROACHING");
+                setProximityFilter(5);
+            }
+            return !active;
+        });
+    }
+
+    function changeManualFilter(change: () => void) {
+        setActionableActive(false);
+        change();
     }
 
     function applyQuickPreset(preset: ScannerQuickPreset) {
@@ -212,6 +309,7 @@ function Scanner() {
             setStatusFilter("APPROACHING");
             setProximityFilter(3);
         } else {
+            setActionableActive(false);
             setSearchQuery("");
             setMinimumScore(scannerPreference("minimumQuality", 40));
             setApprovalFilter("approved");
@@ -224,16 +322,30 @@ function Scanner() {
     }
 
     useEffect(() => {
+        void getScannerCapabilities(marketUniverse).then((capabilities) => {
+            const supported = capabilities.universes.filter((item) => item.instrument_count > 0);
+            setUniverseOptions(supported.map((item) => ({
+                value: item.id,
+                label: `${marketUniverseOptions.find((option) => option.value === item.id)?.label.replace(/ \([\d,]+\)$/, "") ?? item.id} (${item.instrument_count.toLocaleString("en-IN")})`,
+            })));
+        }).catch(() => undefined);
+    }, [marketUniverse]);
+
+    useEffect(() => {
         if (market !== "NSE") {
             return;
         }
-        loadScanner(timeframe);
+        if (location.pathname.startsWith("/stock-details/") && !instrumentOnly) {
+            loadScanner(timeframe);
+        } else {
+            queueMicrotask(() => setIsLoading(false));
+        }
         return () => {
             requestVersion.current += 1;
         };
         // The selected timeframe is the request boundary.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [customSymbols, market, marketUniverse, timeframe]);
+    }, [customSymbols, instrumentOnly, market, marketUniverse, timeframe]);
 
     useEffect(() => {
         const handleSearch = (event: Event) => setSearchQuery(String((event as CustomEvent).detail ?? ""));
@@ -248,6 +360,99 @@ function Scanner() {
         return () => window.clearTimeout(timeout);
     }, [approvalFilter, market, minimumScore, patternFilter, proximityFilter, searchQuery, statusFilter]);
 
+    useEffect(() => {
+        if (location.pathname.startsWith("/stock-details/") || market !== "NSE") return;
+        const watchlist = marketUniverse === "watchlist"
+            ? JSON.parse(localStorage.getItem("alphaedge.local.watchlist") ?? "[]")
+            : [];
+        const suppliedSymbols = marketUniverse === "custom" ? customSymbols : watchlist;
+        let active = true;
+        queueMicrotask(() => {
+            if (!active) return;
+            setPersistedResults([]);
+            setPersistedTotal(0);
+            setPersistedState("LOADING");
+            setPersistedRefreshState(null);
+            setPersistedProgress({ processed: 0, total: 0 });
+        });
+        void getPersistedZonePage({
+            timeframe,
+            universe: marketUniverse,
+            symbols: suppliedSymbols,
+            zoneType: effectiveFilters.approvalFilter === "approved" ? "DEMAND"
+                : effectiveFilters.approvalFilter === "rejected" ? "SUPPLY" : undefined,
+            pattern: effectiveFilters.patternFilter === "all" ? undefined : effectiveFilters.patternFilter,
+            minimumQuality: effectiveFilters.minimumScore,
+            status: effectiveFilters.statusFilter === "all" ? undefined : effectiveFilters.statusFilter,
+            maxDistance: effectiveFilters.proximityFilter < 100 ? effectiveFilters.proximityFilter : undefined,
+            symbol: effectiveFilters.searchQuery || undefined,
+            sort: resultSort,
+            descending: resultSortDirection === "desc",
+            page: resultPage,
+            pageSize: 14,
+        }).then((response) => {
+            if (!active) return;
+            setPersistedState(response.state);
+            setPersistedRefreshState(response.refresh_state ?? null);
+            setPersistedProgress({
+                processed: response.processed_symbols ?? 0,
+                total: response.total_symbols ?? 0,
+            });
+            setPersistedSelection({
+                timeframe: response.selected_timeframe ?? timeframe,
+                universe: response.selected_universe ?? marketUniverse,
+            });
+            setPersistedResults(rowsForSelectedTimeframe(response, timeframe));
+            setPersistedTotal(response.total);
+            setIsLoading(false);
+            if (shouldRequestScannerBuild(response.state, timeframe)) {
+                loadScanner(timeframe);
+            }
+        }).catch(() => {
+            if (!active) return;
+            setPersistedResults([]);
+            setPersistedTotal(0);
+            setPersistedState("FAILED");
+            setPersistedRefreshState(null);
+            setPersistedProgress({ processed: 0, total: 0 });
+            setIsLoading(false);
+        });
+        return () => { active = false; };
+        // loadScanner is intentionally invoked only for a missing/building
+        // materialization; READY switches remain database reads.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [customSymbols, effectiveFilters, location.pathname, market, marketUniverse, persistedReloadNonce, resultPage, resultSort, resultSortDirection, scanner?.last_completed_at, timeframe]);
+
+    useEffect(() => {
+        queueMicrotask(() => setResultPage(1));
+    }, [effectiveFilters, marketUniverse, timeframe]);
+
+    useEffect(() => {
+        let active = true;
+        const refreshStatus = () => void getDhanRuntimeStatus()
+            .then((status) => {
+                if (!active) return;
+                setDhanRuntimeStatus(status);
+                if (status.data_status === "UPDATING") {
+                    updateWasRunning.current = true;
+                } else if (updateWasRunning.current && status.data_status === "READY") {
+                    updateWasRunning.current = false;
+                    setResultPage(1);
+                    reloadScanner();
+                }
+            })
+            .catch(() => { if (active) setDhanRuntimeStatus(null); });
+        refreshStatus();
+        const timer = window.setInterval(
+            refreshStatus,
+            dhanRuntimeStatus?.data_status === "UPDATING" ? 3_000 : 60_000,
+        );
+        return () => { active = false; window.clearInterval(timer); };
+        // reloadScanner only reloads the current persisted page after a
+        // completed server-side update; it never starts a historical scan.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dhanRuntimeStatus?.data_status]);
+
     const filtersSettling = effectiveFilters.searchQuery !== searchQuery
         || effectiveFilters.minimumScore !== minimumScore
         || effectiveFilters.approvalFilter !== approvalFilter
@@ -256,10 +461,25 @@ function Scanner() {
         || effectiveFilters.proximityFilter !== proximityFilter
         || effectiveFilters.market !== market;
     const isInitialLoad = isLoading && scanner === null;
+    const selectedTimeframeLabel = [...timeframes, ...intradayTimeframes]
+        .find((item) => item.value === timeframe)?.label ?? timeframe;
+    const persistedStatusMessage = timeframeStatusMessage(
+        persistedState,
+        selectedTimeframeLabel,
+        persistedTotal,
+        persistedRefreshState,
+        persistedProgress.processed,
+        persistedProgress.total,
+        universeOptions.find((option) => option.value === marketUniverse)?.label
+            .replace(/ \([\d,]+\)$/, "") ?? "NSE Main Equity",
+    );
 
-    const visibleResults = (
-        effectiveFilters.market === "NSE" ? scanner?.results ?? [] : []
-    ).filter((result) => {
+    const fullResults = effectiveFilters.market === "NSE" ? scanner?.results ?? [] : [];
+    const persistedSelectionMatches = scannerSelectionMatches(
+        persistedSelection,
+        { timeframe, universe: marketUniverse },
+    );
+    const visibleResults = location.pathname.startsWith("/stock-details/") ? fullResults.filter((result) => {
         const matchesSymbol = result.symbol
             .toLowerCase()
             .includes(effectiveFilters.searchQuery.toLowerCase());
@@ -279,7 +499,7 @@ function Scanner() {
             && matchesPattern
             && matchesStatus
             && matchesProximity;
-    });
+    }) : persistedSelectionMatches ? persistedResults : [];
 
     function exportResults() {
         const header = [
@@ -317,32 +537,63 @@ function Scanner() {
         URL.revokeObjectURL(url);
     }
 
+    if (instrumentOnly && routeSymbol) {
+        return (
+            <Stack spacing={1.5} sx={{ bgcolor: "#ffffff", p: 2 }}>
+                <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
+                    <Box>
+                        <Typography sx={{ fontSize: "1rem", fontWeight: 750 }}>
+                            {routeSymbol.toUpperCase()} · NSE
+                        </Typography>
+                        <Typography color="text.secondary" sx={{ fontSize: "0.72rem" }}>
+                            {initialFilters?.instrumentName ?? "Instrument market research"} · no qualifying zone selected
+                        </Typography>
+                    </Box>
+                    <Button variant="outlined" onClick={() => navigate("/dashboard")}>Back to Dashboard</Button>
+                </Stack>
+                <Alert severity="info">
+                    This is an instrument chart. Zone-specific analysis is unavailable because no qualifying canonical zone is selected.
+                </Alert>
+                <TradingChart symbol={routeSymbol.toUpperCase()} displayName={initialFilters?.instrumentName} />
+            </Stack>
+        );
+    }
+
     return (
         <Stack spacing={0} sx={{ bgcolor: "#ffffff" }}>
             <ScannerToolbar
                 isLoading={isInitialLoad}
                 searchQuery={searchQuery}
                 onRefresh={reloadScanner}
-                onRunScan={reloadScanner}
+                onUpdateData={updateDhanData}
+                onCancelUpdate={cancelDhanDataUpdate}
+                isUpdatingData={dhanRuntimeStatus?.data_status === "UPDATING" || dhanRuntimeStatus?.data_status === "CANCELLING"}
+                isCancellingUpdate={dhanRuntimeStatus?.data_status === "CANCELLING"}
+                updateStage={dhanRuntimeStatus?.last_update.stage}
                 onSearchChange={setSearchQuery}
                 minimumScore={minimumScore}
                 approvalFilter={approvalFilter}
-                onMinimumScoreChange={setMinimumScore}
-                onApprovalFilterChange={setApprovalFilter}
+                onMinimumScoreChange={(value) => changeManualFilter(() => setMinimumScore(value))}
+                onApprovalFilterChange={(value) => changeManualFilter(() => setApprovalFilter(value))}
                 onExport={exportResults}
                 canExport={visibleResults.length > 0}
-                market={market}
+                universe={marketUniverse}
+                universeOptions={universeOptions}
                 timeframe={timeframe}
-                onMarketChange={changeMarket}
+                onUniverseChange={changeUniverse}
                 onTimeframeChange={changeTimeframe}
                 patternFilter={patternFilter}
                 statusFilter={statusFilter}
                 proximityFilter={proximityFilter}
-                onPatternFilterChange={setPatternFilter}
-                onStatusFilterChange={setStatusFilter}
-                onProximityFilterChange={setProximityFilter}
+                onPatternFilterChange={(value) => changeManualFilter(() => setPatternFilter(value))}
+                onStatusFilterChange={(value) => changeManualFilter(() => setStatusFilter(value))}
+                onProximityFilterChange={(value) => changeManualFilter(() => setProximityFilter(value))}
                 onQuickPreset={applyQuickPreset}
+                actionableActive={actionableActive}
+                actionableCount={persistedState === "READY" ? persistedTotal : null}
+                onToggleActionable={toggleActionableZones}
             />
+            <DhanDataStatus status={dhanRuntimeStatus} currentResult={visibleResults[0]} />
             <Box sx={{ height: 2 }}>
                 {(filtersSettling || isInitialLoad) && <LinearProgress sx={{ height: 2, borderRadius: 1 }} />}
             </Box>
@@ -454,11 +705,17 @@ function Scanner() {
                 </Alert>
             )}
 
-            {!isLoading && !errorMessage && scanner
-                && (scanner.status === "refreshing" || scanner.status === "queued")
-                && scanner.results.length === 0 && (
-                <Alert severity="info">
-                    Scanning this market for the first time: {scanner.processed_symbols} / {scanner.total_symbols} stocks checked. Results will appear automatically.
+            {!errorMessage && dhanRuntimeStatus?.data_status === "FAILED" && (
+                <Alert severity="warning">
+                    {dhanRuntimeStatus.last_update.error?.startsWith("DHAN_HTTP_401")
+                        ? "Dhan authentication required. Existing AlphaEdge data remains available. Update your Dhan access token to download new market data."
+                        : "Dhan data update failed. Existing AlphaEdge data remains available and the next scheduled update can retry safely."}
+                </Alert>
+            )}
+
+            {!errorMessage && persistedStatusMessage && (
+                <Alert severity={persistedState === "FAILED" ? "error" : "info"}>
+                    {persistedStatusMessage}
                 </Alert>
             )}
 
@@ -481,7 +738,27 @@ function Scanner() {
                     results={location.pathname.startsWith("/stock-details/")
                     ? scanner?.results ?? []
                     : visibleResults}
+                    serverTotal={location.pathname.startsWith("/stock-details/") ? undefined : persistedTotal}
+                    serverPage={location.pathname.startsWith("/stock-details/") ? undefined : resultPage}
+                    onServerPageChange={location.pathname.startsWith("/stock-details/") ? undefined : setResultPage}
+                    serverSort={location.pathname.startsWith("/stock-details/") || resultSort === "contextual_rank"
+                        ? undefined
+                        : resultSort === "zone_quality" ? "zone_score"
+                            : resultSort === "distance" ? "distance_percent" : resultSort}
+                    serverSortDirection={location.pathname.startsWith("/stock-details/") || resultSort === "contextual_rank" ? undefined : resultSortDirection}
+                    onServerSortChange={location.pathname.startsWith("/stock-details/") ? undefined : (sort, direction) => {
+                        setResultSort(sort === "zone_score" ? "zone_quality" : sort === "distance_percent" ? "distance" : sort);
+                        setResultSortDirection(direction);
+                        setResultPage(1);
+                    }}
+                    emptyStateTitle={persistedState === "READY" && persistedTotal === 0
+                        ? "No zones currently qualify for this timeframe."
+                        : undefined}
+                    emptyStateDescription={persistedState === "READY" && persistedTotal === 0
+                        ? "This timeframe is ready; no rows meet the current frozen qualification rules."
+                        : undefined}
                     methodologyVersion={scanner?.methodology_version}
+                    candleRefreshKey={scanner?.last_completed_at}
                     initialSelection={initialFilters?.symbol && initialFilters.selectedZone
                     ? {
                         symbol: initialFilters.symbol,

@@ -5,6 +5,7 @@ Tests for the Scanner API response mapping.
 from concurrent.futures import Future
 from time import monotonic
 
+import pytest
 from pandas import DataFrame, date_range
 
 from backend.api import scanner as scanner_api
@@ -25,6 +26,17 @@ from backend.models.screener.screener_result import (
     ScreenerResult,
 )
 from backend.models.zone import Zone, ZoneType
+
+
+@pytest.fixture(autouse=True)
+def isolate_runtime_persistent_snapshots(monkeypatch) -> None:
+    """Legacy endpoint tests must not depend on a developer's runtime database."""
+
+    monkeypatch.setattr(
+        scanner_api._persistent_scanner_store,
+        "latest_complete",
+        lambda **kwargs: None,
+    )
 
 
 def _completed_zone_response(
@@ -84,6 +96,46 @@ def test_zone_scan_cache_key_contains_canonical_methodology_version() -> None:
 
     assert SCANNER_METHODOLOGY_CACHE_VERSION in key
     assert "formation-1.1" in key
+
+
+def test_capabilities_report_states_for_the_selected_universe(monkeypatch) -> None:
+    observed: list[str] = []
+    monkeypatch.setattr(
+        scanner_api._persistent_scanner_store,
+        "instrument_counts",
+        lambda: {"nifty50": 50, "nse500": 500},
+    )
+    monkeypatch.setattr(
+        scanner_api._persistent_scanner_store,
+        "materialization_states",
+        lambda universe: observed.append(universe) or {"WEEKLY": "READY"},
+    )
+
+    response = scanner_api.get_scanner_capabilities("nifty50")
+    states = {item["id"]: item["state"] for item in response["timeframes"]}
+
+    assert observed == ["nifty50"]
+    assert states["WEEKLY"] == "READY"
+    assert states["DAILY"] == "UNAVAILABLE"
+
+
+def test_missing_weekly_snapshot_never_falls_back_to_daily(monkeypatch) -> None:
+    monkeypatch.setattr(
+        scanner_api._persistent_scanner_store,
+        "materialization_states",
+        lambda universe: {"DAILY": "READY", "WEEKLY": "BUILDING"},
+    )
+
+    response = scanner_api.get_persisted_zone_page(
+        timeframe="WEEKLY",
+        universe="nse500",
+    )
+
+    assert response["state"] == "BUILDING"
+    assert response["selected_timeframe"] == "WEEKLY"
+    assert response["selected_universe"] == "nse500"
+    assert response["results"] == []
+    assert response["total"] == 0
 
 
 def test_cached_refresh_response_uses_active_progress(monkeypatch) -> None:

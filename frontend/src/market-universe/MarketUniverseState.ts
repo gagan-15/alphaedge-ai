@@ -1,20 +1,28 @@
 import { createContext, useContext } from "react";
 
 export const marketUniverseOptions = [
-    { value: "nifty50", label: "Nifty 50" },
-    { value: "nifty100", label: "Nifty 100" },
-    { value: "nifty200", label: "Nifty 200" },
+    { value: "nifty50", label: "Nifty 50 (50)" },
+    { value: "nifty100", label: "Nifty 100 (100)" },
+    { value: "nifty200", label: "Nifty 200 (200)" },
     { value: "nse500", label: "NSE 500" },
     { value: "fno", label: "FnO" },
-    { value: "allnse", label: "All NSE Stocks" },
+    { value: "nse_main", label: "NSE Main Equity" },
+    { value: "nse_sme", label: "NSE SME" },
+    { value: "allnse", label: "All NSE Equity" },
+    { value: "bse_main", label: "BSE Main Equity" },
+    { value: "bse_sme", label: "BSE SME" },
+    { value: "allbse", label: "All BSE Equity" },
+    { value: "allindia", label: "All Supported Indian Equity" },
     { value: "watchlist", label: "My Watchlist" },
     { value: "custom", label: "Custom Universe" },
 ] as const;
 
 export type MarketUniverse = typeof marketUniverseOptions[number]["value"];
 
-export const DEFAULT_MARKET_UNIVERSE: MarketUniverse = "nse500";
+export const DEFAULT_MARKET_UNIVERSE: MarketUniverse = "allindia";
 export const MARKET_UNIVERSE_STORAGE_KEY = "alphaedge.market.universe";
+export const MARKET_UNIVERSE_DEFAULT_VERSION_KEY = "alphaedge.market.universe.default-version";
+export const MARKET_UNIVERSE_DEFAULT_VERSION = "allindia-v2";
 
 const legacyUniverseMap: Record<string, MarketUniverse> = {
     nifty500: "nse500",

@@ -22,7 +22,19 @@ class CandleClassifier:
     EXPLOSIVE_CLOSE_FRACTION = 0.20
     RANGE_LOOKBACK = 20
 
+    def __init__(self) -> None:
+        # Per-detection memoization only.  Values are exact immutable
+        # CandleClassification objects produced by the frozen formulas.
+        self._cache: dict[tuple[int, int], CandleClassification] = {}
+
+    def clear_cache(self) -> None:
+        self._cache.clear()
+
     def classify(self, market_data: DataFrame, index: int) -> CandleClassification:
+        key = (id(market_data), index)
+        cached = self._cache.get(key)
+        if cached is not None:
+            return cached
         candle = market_data.iloc[index]
         open_price = Decimal(str(candle["Open"]))
         high_price = Decimal(str(candle["High"]))
@@ -66,7 +78,7 @@ class CandleClassifier:
                     and close_location <= self.EXPLOSIVE_CLOSE_FRACTION
                 )
 
-        return CandleClassification(
+        result = CandleClassification(
             index=index,
             direction=direction,
             structure=structure,
@@ -77,16 +89,17 @@ class CandleClassifier:
             range_to_median=range_to_median,
             close_location=close_location,
         )
+        self._cache[key] = result
+        return result
 
     def classify_all(self, market_data: DataFrame) -> list[CandleClassification]:
         return [self.classify(market_data, index) for index in range(len(market_data))]
 
     def _prior_ranges(self, market_data: DataFrame, index: int) -> list[float]:
         start = max(0, index - self.RANGE_LOOKBACK)
-        ranges: list[float] = []
-        for prior_index in range(start, index):
-            candle = market_data.iloc[prior_index]
-            candle_range = float(candle["High"]) - float(candle["Low"])
-            if candle_range > 0:
-                ranges.append(candle_range)
-        return ranges
+        # Vectorized access is numerically identical to the former row loop;
+        # it only avoids constructing up to twenty pandas Series objects for
+        # every classification during an incremental run.
+        highs = market_data["High"].iloc[start:index].to_numpy(dtype=float)
+        lows = market_data["Low"].iloc[start:index].to_numpy(dtype=float)
+        return [float(value) for value in (highs - lows) if value > 0]

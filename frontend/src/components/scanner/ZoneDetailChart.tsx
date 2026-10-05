@@ -111,8 +111,25 @@ function readIndicatorPreference(): string[] {
     }
 }
 
+function chartTimestamp(value: string, intraday: boolean): UTCTimestamp {
+    if (!intraday) {
+        // Dhan EOD timestamps represent an exchange trading date at midnight
+        // Asia/Kolkata. Converting that instant to UTC shifts it to 18:30 on
+        // the previous calendar day. Lightweight Charts needs a date-stable
+        // UTC anchor so 28-Aug OHLC is labelled and positioned on 28-Aug.
+        const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+        if (match) {
+            return Math.floor(Date.UTC(
+                Number(match[1]), Number(match[2]) - 1, Number(match[3]),
+            ) / 1000) as UTCTimestamp;
+        }
+    }
+    return Math.floor(new Date(value).getTime() / 1000) as UTCTimestamp;
+}
+
 interface ZoneDetailChartProps {
     result: ZoneResearchResult;
+    candleRefreshKey?: string | null;
     zones?: ZoneResearchResult[];
     selectedZoneId?: string;
     confluenceOverlays?: ConfluenceChartOverlay[];
@@ -131,6 +148,7 @@ interface ZoneDetailChartProps {
 
 function ZoneDetailChart({
     result,
+    candleRefreshKey,
     zones = [result],
     selectedZoneId,
     confluenceOverlays = [],
@@ -384,11 +402,19 @@ function ZoneDetailChart({
         const intraday = ["5m", "15m", "75m", "125m", "1H", "2H", "4H", "6H"].includes(result.timeframe);
         const chartPeriod = intraday ? "1mo" : result.timeframe === "1D" ? "1y" : "10y";
         const chartInterval = intraday ? (result.timeframe.includes("H") ? "1h" : result.timeframe === "5m" || result.timeframe === "125m" ? "5m" : "15m") : "1d";
-        void getMarketCandles(result.symbol, chartPeriod, chartInterval, result.timeframe)
+        void getMarketCandles(
+            result.symbol,
+            chartPeriod,
+            chartInterval,
+            result.timeframe,
+            undefined,
+            result.instrument_id,
+            result.base_date,
+        )
             .then((response) => {
                 if (cancelled) return;
                 const data = response.candles.map((candle) => ({
-                    time: Math.floor(new Date(candle.time).getTime() / 1000) as UTCTimestamp,
+                    time: chartTimestamp(candle.time, intraday),
                     open: candle.open,
                     high: candle.high,
                     low: candle.low,
@@ -402,11 +428,26 @@ function ZoneDetailChart({
                     wickUpColor: "#089981",
                     wickDownColor: "#f23645",
                     borderVisible: false,
-                    priceLineColor: "#64748b",
-                    priceLineWidth: 1,
+                    // Candles remain the immutable delayed Dhan OHLCV series.
+                    // Do not let Lightweight Charts label its last persisted
+                    // close as the current market price: the Dashboard result
+                    // supplies the authoritative live-quote/fallback price.
+                    priceLineVisible: false,
+                    lastValueVisible: false,
                 });
                 candleSeriesRef.current = candles;
                 candles.setData(data);
+                const currentPrice = Number(result.current_price);
+                if (Number.isFinite(currentPrice) && currentPrice > 0) {
+                    candles.createPriceLine({
+                        price: currentPrice,
+                        color: result.price_source === "LIVE_QUOTE" ? "#0f766e" : "#64748b",
+                        lineWidth: 1,
+                        lineStyle: LineStyle.Dashed,
+                        axisLabelVisible: true,
+                        title: result.price_source === "LIVE_QUOTE" ? "LIVE PRICE" : "LATEST CLOSE",
+                    });
+                }
                 const recentSteps = data.slice(-12).reduce<number[]>((steps, candle, index, recent) => {
                     if (index > 0) steps.push(Number(candle.time) - Number(recent[index - 1].time));
                     return steps;
@@ -548,7 +589,7 @@ function ZoneDetailChart({
                         lastValueVisible: false,
                     });
                     const requestedBaseTime = displayZone.baseStartDate
-                        ? new Date(displayZone.baseStartDate).getTime() / 1000
+                        ? chartTimestamp(displayZone.baseStartDate, intraday)
                         : Number.NaN;
                     const datedBaseIndex = Number.isFinite(requestedBaseTime)
                         ? data.reduce((closest, candle, index) =>
@@ -657,7 +698,7 @@ function ZoneDetailChart({
         // Zone selection is handled separately so changing the active zone
         // never destroys the chart or resets user drawings and indicators.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [developerMode, developerZones, height, onInspectConfluenceOverlay, result.symbol, result.timeframe, updateMeasurementLabel, updateRectangleOverlays, updateZoneBorders]);
+    }, [candleRefreshKey, developerMode, developerZones, height, onInspectConfluenceOverlay, result.symbol, result.timeframe, updateMeasurementLabel, updateRectangleOverlays, updateZoneBorders]);
 
     useEffect(() => {
         rectangleContextRef.current = { symbol: result.symbol, timeframe: result.timeframe };
